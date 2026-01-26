@@ -1,0 +1,15 @@
+---
+alwaysApply: true
+description: A rule without crux frontmatter
+---
+
+# Regular Rule
+
+This is a regular rule file that does not have `crux: true` in its frontmatter.
+It should be ignored by the CRUX compression hook.
+
+## Guidelines
+
+1. Do something
+2. Do something else
+3. Finish up

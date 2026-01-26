@@ -1,0 +1,102 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq bc
+
+      - name: Setup BATS
+        uses: bats-core/bats-action@2.0.0
+
+      - name: Run BATS tests
+        run: |
+          bats tests/*.bats --formatter tap
+
+      - name: Validate zip creation
+        run: |
+          chmod +x create-crux-zip.sh
+          ./create-crux-zip.sh /tmp
+          
+          # Verify zip was created
+          ZIP_FILE=$(ls /tmp/CRUX-Compress-v*.zip 2>/dev/null || echo "")
+          if [[ -z "$ZIP_FILE" ]]; then
+            echo "ERROR: Zip file was not created"
+            exit 1
+          fi
+          
+          echo "Created: $ZIP_FILE"
+          
+          # Verify required files are in the zip
+          REQUIRED_FILES=(
+            "CRUX.md"
+            "AGENTS.crux.md"
+            "version.txt"
+            ".cursor/hooks.json"
+            ".cursor/agents/crux-cursor-rule-manager.md"
+            ".cursor/commands/crux-compress.md"
+            ".cursor/hooks/detect-crux-changes.sh"
+            ".cursor/rules/_CRUX-RULE.mdc"
+            ".cursor/skills/CRUX-Utils/SKILL.md"
+            ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+          )
+          
+          for file in "${REQUIRED_FILES[@]}"; do
+            if ! unzip -l "$ZIP_FILE" | grep -q "$file"; then
+              echo "ERROR: Missing required file in zip: $file"
+              exit 1
+            fi
+            echo "OK: $file"
+          done
+          
+          echo "All required files present in zip"
+
+      - name: Validate install script syntax
+        run: |
+          # Check for syntax errors
+          bash -n install.sh
+          echo "Install script syntax OK"
+
+      - name: Test install script help
+        run: |
+          chmod +x install.sh
+          ./install.sh --help
+
+      - name: Summary
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All tests passed:" >> $GITHUB_STEP_SUMMARY
+          echo "- BATS test suite" >> $GITHUB_STEP_SUMMARY
+          echo "- Zip creation validation" >> $GITHUB_STEP_SUMMARY
+          echo "- Install script syntax check" >> $GITHUB_STEP_SUMMARY
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          ignore_paths: tests/bats
+          severity: warning

@@ -1,0 +1,104 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'version.txt'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    # Skip if the commit was made by this workflow (prevents infinite loop)
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'chore: bump version')"
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get current version
+        id: current_version
+        run: |
+          if [[ -f version.txt ]]; then
+            VERSION=$(cat version.txt | tr -d '[:space:]')
+          else
+            VERSION="0.0.0"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Analyze commits for version bump
+        id: analyze
+        run: |
+          CURRENT="${{ steps.current_version.outputs.version }}"
+          
+          # Parse current version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          
+          # Get commit message
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          # Determine bump type based on conventional commits
+          BUMP_TYPE="patch"  # default
+          
+          # Check for breaking change (major bump)
+          if echo "$COMMIT_MSG" | grep -qiE "BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:"; then
+            BUMP_TYPE="major"
+          # Check for feat (minor bump)
+          elif echo "$COMMIT_MSG" | grep -qE "^feat(\([^)]+\))?:"; then
+            BUMP_TYPE="minor"
+          # Check for fix (patch bump)
+          elif echo "$COMMIT_MSG" | grep -qE "^fix(\([^)]+\))?:"; then
+            BUMP_TYPE="patch"
+          fi
+          
+          echo "Detected bump type: $BUMP_TYPE"
+          
+          # Calculate new version
+          case $BUMP_TYPE in
+            major)
+              NEW_VERSION="$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              NEW_VERSION="${MAJOR}.$((MINOR + 1)).0"
+              ;;
+            patch)
+              NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+              ;;
+          esac
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: Update version.txt
+        run: |
+          echo "${{ steps.analyze.outputs.new_version }}" > version.txt
+          echo "Updated version.txt to ${{ steps.analyze.outputs.new_version }}"
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add version.txt
+          git commit -m "chore: bump version to ${{ steps.analyze.outputs.new_version }} [skip ci]"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## Version Bump Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Previous Version | ${{ steps.current_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| New Version | ${{ steps.analyze.outputs.new_version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bump Type | ${{ steps.analyze.outputs.bump_type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trigger Commit | ${{ github.event.head_commit.message }} |" >> $GITHUB_STEP_SUMMARY

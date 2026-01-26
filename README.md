@@ -42,6 +42,55 @@ The "X" is intentionally flexible:
 
 The name also serves as a backronym for "crux" — the decisive or most important point — which is exactly what the compression preserves while stripping everything else.
 
+## Quick Install
+
+Install CRUX Compress into your project with a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash
+```
+
+### Install Options
+
+```bash
+# With backup of existing files
+curl -fsSL .../install.sh | bash -s -- --backup
+
+# Verbose output
+curl -fsSL .../install.sh | bash -s -- --verbose
+
+# Show help
+curl -fsSL .../install.sh | bash -s -- --help
+```
+
+### What Gets Installed
+
+The installer creates/updates these files in your project:
+
+| File | Purpose |
+|------|---------|
+| `CRUX.md` | Specification (READONLY) |
+| `AGENTS.md` | Agent awareness notice |
+| `version.txt` | Installed CRUX version |
+| `.cursor/hooks.json` | Hook configuration |
+| `.cursor/hooks/detect-crux-changes.sh` | File change detection |
+| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
+| `.cursor/commands/crux-compress.md` | Compression command |
+| `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
+| `.cursor/skills/CRUX-Utils/` | Utility skill |
+
+### Upgrading
+
+The install script is re-runnable. It detects existing installations and shows version comparison before upgrading:
+
+```
+Current version: v1.0.0
+Latest version:  v1.1.0
+Upgrading from v1.0.0 to v1.1.0...
+```
+
+Use `--backup` to preserve your existing files before overwriting.
+
 ## System Architecture
 
 The CRUX system consists of 6 interconnected components:
@@ -377,9 +426,15 @@ flowchart TD
 | Agent Notice | `AGENTS.md` (CRUX block) | High-visibility awareness |
 | Always-Applied Rule | `.cursor/rules/_CRUX-RULE.mdc` | Runtime instructions |
 | Subagent | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor |
-| Command | `.cursor/commands/crux-compress.md` | User interface |
+| Compress Command | `.cursor/commands/crux-compress.md` | Compression interface |
+| Test Command | `.cursor/commands/crux-test.md` | LLM feature testing |
 | Hook | `.cursor/hooks/detect-crux-changes.sh` | Auto-detect file changes |
 | Hook Config | `.cursor/hooks.json` | Hook configuration |
+| Utility Skill | `.cursor/skills/CRUX-Utils/` | Token estimation, checksums |
+| Install Script | `install.sh` | Curl-pipe-bash installer |
+| Zip Builder | `create-crux-zip.sh` | Build distribution zip |
+| Tests | `tests/*.bats` | BATS test suite |
+| CI Workflows | `.github/workflows/` | Automated testing and releases |
 
 ## Quick Reference
 
@@ -433,3 +488,100 @@ BLOCKS:     Ρ E Λ Π Κ R P Γ M Φ Ω
 ```
 
 See `CRUX.md` for complete specification.
+
+## Testing
+
+CRUX Compress includes comprehensive test coverage for all scripts.
+
+### Running Tests Locally
+
+Tests use [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System):
+
+```bash
+# Install BATS (if not already installed)
+# macOS
+brew install bats-core
+
+# Ubuntu/Debian
+sudo apt-get install bats
+
+# Run all tests
+bats tests/*.bats
+
+# Run specific test file
+bats tests/test_crux_utils.bats
+
+# Verbose output
+bats tests/*.bats --verbose-run
+```
+
+### Test Coverage
+
+| Script | Test File | Coverage |
+|--------|-----------|----------|
+| `crux-utils.sh` | `test_crux_utils.bats` | Token counting, checksums, ratios, error handling |
+| `create-crux-zip.sh` | `test_create_zip.bats` | Zip contents, version embedding, structure |
+| `detect-crux-changes.sh` | `test_detect_hook.bats` | Frontmatter detection, queue management |
+| `install.sh` | `test_install.bats` | Syntax validation, options, functions |
+
+### LLM Feature Testing
+
+Use the `/crux-test` command in Cursor to run comprehensive LLM-driven tests:
+
+```
+/crux-test              - Run all tests
+/crux-test compression  - Test compression only
+/crux-test validation   - Test semantic validation only
+```
+
+This generates a `CRUX-TEST-REPORT.md` with detailed results including:
+- Compression metrics
+- Token reduction analysis
+- Semantic validation scores
+- Any issues found
+
+## CI/CD
+
+CRUX Compress uses GitHub Actions for automated testing and releases.
+
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `test.yml` | PR, Push | Runs BATS tests, validates zip, checks scripts |
+| `version-bump.yml` | Push to main | Auto-bumps version based on conventional commits |
+| `release.yml` | version.txt change | Creates GitHub Release with zip artifact |
+
+### Conventional Commits
+
+Version bumping follows conventional commits:
+
+| Commit Type | Version Bump | Example |
+|-------------|--------------|---------|
+| `feat:` | Minor (1.X.0) | `feat: add new compression mode` |
+| `fix:` | Patch (1.0.X) | `fix: handle empty files` |
+| `BREAKING CHANGE:` | Major (X.0.0) | Body contains "BREAKING CHANGE:" |
+| Other | Patch (1.0.X) | `docs: update readme` |
+
+### Release Process
+
+1. Push commits to `main` with conventional commit messages
+2. `version-bump.yml` analyzes commits and updates `version.txt`
+3. `release.yml` detects version change and:
+   - Builds versioned zip via `create-crux-zip.sh`
+   - Creates GitHub Release with tag `vX.X.X`
+   - Attaches zip as release artifact
+   - Generates release notes from commits
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make changes and add tests
+4. Run tests: `bats tests/*.bats`
+5. Commit with conventional message: `git commit -m "feat: add my feature"`
+6. Push and create PR
+
+## License
+
+MIT License - see LICENSE file for details.

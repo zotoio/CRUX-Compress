@@ -1,0 +1,63 @@
+---
+generated: 2024-01-15 10:30
+sourceChecksum: "3847291056"
+beforeTokens: 850
+afterTokens: 180
+confidence: 94%
+alwaysApply: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Sample Coding Standards
+
+```crux
+«CRUX⟨sample-rule.md⟩»
+
+# Naming
+Φ.naming{
+  JS/TS:var+fn→camelCase
+  Py:var+fn→snake_case
+  ∀class→PascalCase
+  ∀const→SCREAMING_SNAKE
+}
+
+# Code Style
+R.fn{len≤20-30;single-purpose}
+R.nest{depth≤3;early-return≻deep-nest}
+R.code{self-documenting}
+
+# Documentation
+R.docs{
+  public→JSDoc|docstring
+  ∋[desc,params:type,return]
+}
+
+# Errors
+P.err{¬swallow;min→log+context}
+R.err-types{custom:[ValidationError{msg,field}]}
+
+# Testing
+Ω.test{coverage≥80%;meaningful}
+R.test-name="should [behavior] when [condition]"
+R.test-struct=AAA{Arrange→Act→Assert}
+P.mock{external-deps-only}
+
+# Git
+Φ.commit{
+  fmt:"type(scope): desc"
+  types:[feat,fix,docs,style,refactor,test,chore]
+}
+Φ.branch{
+  fmt:[feature|fix]/short-desc
+  +ticket→PROJ-123-desc
+}
+
+# Security
+P.secret{¬commit:[API-keys,passwords,creds]}
+R.input{validate;sanitize;param-queries}
+R.output{encode→¬XSS}
+
+«/CRUX»
+```
