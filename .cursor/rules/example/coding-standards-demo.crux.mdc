@@ -1,0 +1,110 @@
+---
+description: Team coding standards and best practices
+alwaysApply: true
+generated: 2026-01-26 14:32
+sourceChecksum: "3184230184"
+beforeTokens: 3232
+afterTokens: 950
+confidence: 93%
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Team Coding Standards
+
+```crux
+«CRUX⟨.cursor/rules/example/coding-standards-demo.md⟩»
+
+# Philosophy
+Κ{code:humans≻machines;readable≻clever;written-once→read-many}
+R.boyscout{touchΔ→improve;¬scope-creep;bigΔ→separate-ticket}
+
+# Naming
+Φ.naming{
+  JS/TS:var+fn→camelCase
+  Py:var+fn→snake_case
+  ∀class→PascalCase
+  ∀const→SCREAMING_SNAKE
+}
+R.var{descriptive+self-doc;¬single-letter(except:short-loop|math)}
+R.var.bad[x,data,temp,handleClick]
+R.var.good[userEmailAddress,orderLineItems,calculateMonthlyRevenue]
+R.bool{prefix:[is|has|can|should]+question}
+Φ.file{JS/TS→kebab-case;Py→snake_case;dir→lowercase-hyphens}
+P.file{single-responsibility;multi-concern→split}
+
+# Structure
+R.fn{len≤20-30;single-purpose;comment-sections→split}
+R.nest{depth≤3;early-return≻deep-nest}
+R.comments{why≻what;code=self-doc}
+R.docs{
+  public→JSDoc|docstring
+  ∋[desc,params:type,return,examples?,throws?]
+}
+
+# Errors
+P.err{¬swallow;min→log;better→handle|rethrow}
+R.err-types{custom:[ValidationError{msg,field},NotFoundError{resourceType,resourceId}]}
+R.err-msg∋[op-failed,expected-state,actual-state,context-ids]
+
+# Testing
+Ω.test{coverage≥80%;meaningful≻percentage}
+R.test-name="should [behavior] when [condition]"
+R.test-struct=AAA{Arrange→Act→Assert}
+P.mock{¬[unit-under-test,simple-utils,data-structs]}
+R.mock→[ext-APIs,DB,filesystem,time-ops]
+
+# Git
+Φ.commit{
+  fmt:"type(scope): desc\n\nbody(why)\n\nFixes #N"
+  types:[feat,fix,docs,style,refactor,test,chore]
+}
+Φ.branch{
+  fmt:[feature|fix|refactor|docs]/short-desc
+  +ticket→PROJ-123-desc
+}
+R.PR∋[clear-title,desc:what+why,issue-refs,small+complete,tests,CI-pass]
+
+# Security
+P.secret{¬commit:[API-keys,passwords,creds,private-keys,PII]}
+R.secret{cfg→env-vars;prod→secret-mgr}
+R.input{
+  val:[type,format,range]
+  sanitize→¬injection
+  DB→param-queries
+  output→encode(¬XSS)
+}
+R.auth{check-authz-first;¬roll-own-auth;rate-limit;secure-sessions}
+
+# Performance
+R.db{¬N+1→eager-load;index:freq-cols;paginate-large;profile-slow}
+R.cache{expensive|ext-API→cache;TTL∝volatility;invalidation-strategy;warm-critical}
+R.frontend{lazy-load;optimize-assets;min-bundle;code-split}
+
+# Dependencies
+R.deps-eval{active-maint?;bundle-impact?;vulns?;existing-alt?}
+R.deps-doc{major→README:why-chosen}
+Φ.versions{prod→pin-exact;lib→ranges;update+test-regular;auto-monitor-vulns}
+
+# Code Review
+R.author{self-review-first;small-focused-PRs;context-in-desc;feedback→constructive}
+R.reviewer{respectful;explain-reasoning;distinguish:required|suggestion;approve:good-enough≻perfect}
+
+# Logging
+R.log∋[startup,shutdown,auth-events,biz-critical,errors+context,perf-metrics:critical]
+P.log{¬[sensitive-data,high-freq-flood,redundant]}
+Φ.log-levels{
+  ERROR:failed+needs-attention
+  WARN:unexpected+recoverable
+  INFO:normal-biz-events
+  DEBUG:detail-for-debug
+  TRACE:very-detailed-trace
+}
+
+# Meta
+M{living-doc;update-as-team-evolves;suggest→meeting|PR}
+Ω{goal:better-code-together;judgment≻bureaucracy;?→ask-colleague}
+
+«/CRUX»
+```

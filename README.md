@@ -104,6 +104,7 @@ flowchart TB
 2. DO NOT LOAD SOURCE FILES when CRUX exists
 3. SURGICAL DIFF UPDATES on source changes
 4. ABORT IF NO SIGNIFICANT REDUCTION
+5. IGNORE EXAMPLE RULES - `.cursor/rules/example/*` are demos only
 </CRUX>
 ```
 
@@ -119,7 +120,7 @@ flowchart TB
 **Key Functions**:
 - **Decompression**: Tells agents to interpret and follow CRUX-compressed rules
 - **Compression**: Directs agents to delegate compression tasks to `crux-cursor-rule-manager`
-- **Foundational Rules**: Reinforces the 4 critical rules
+- **Foundational Rules**: Reinforces the 5 critical rules
 - **Specification Reference**: Points to `CRUX.md` for full details
 
 **Contents**:
@@ -135,6 +136,7 @@ When asked to compress a markdown rule file, delegate to crux-cursor-rule-manage
 2. DO NOT LOAD SOURCE FILES when CRUX exists
 3. SURGICAL DIFF UPDATES on source changes
 4. SOURCE CHECKSUM TRACKING - Skip updates if sourceChecksum matches
+5. IGNORE EXAMPLE RULES - `.cursor/rules/example/*` are demos only
 
 # CRUX Rule Compression Specification
 load from CRUX.md
@@ -153,9 +155,9 @@ load from CRUX.md
 
 **Workflow**:
 1. Load `CRUX.md` specification (required first step)
-2. Get source file's checksum via `cksum`
+2. Get source file's checksum via `CRUX-Utils` skill
 3. Check if existing CRUX `sourceChecksum` matches → skip if unchanged
-4. Estimate token reduction → abort if <50% reduction
+4. Estimate token reduction using `CRUX-Utils` skill → abort if <50% reduction
 5. Apply compression rules from specification
 6. Generate output with frontmatter (generated, sourceChecksum, beforeTokens, afterTokens)
 7. Verify quality gates (target ≤20% of original)
@@ -166,12 +168,15 @@ load from CRUX.md
 ```yaml
 ---
 generated: YYYY-MM-DD HH:MM
-sourceChecksum: "1234567890 2500"
+sourceChecksum: "1234567890"
 beforeTokens: 2500
 afterTokens: 400
 confidence: 92%
 alwaysApply: true
 ---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
 ```
 
 ### 5. `crux-compress.md` - The Command (`.cursor/commands/`)
@@ -189,7 +194,7 @@ alwaysApply: true
 - **Parallelism**: Spawns up to 4 `crux-cursor-rule-manager` subagents in parallel
 - **Batching**: Processes files in batches of 4 when >4 files
 - **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed
-- **Eligibility Criteria**: Files must have `crux: true` frontmatter
+- **Eligibility Criteria**: Files must have `crux: true` frontmatter (`.md` or `.mdc` files, not `.crux.mdc`)
 
 **File Convention**:
 | Type | Extension | Example |
@@ -227,6 +232,32 @@ alwaysApply: true
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
 
+### 7. `CRUX-Utils` - The Skill (`.cursor/skills/`)
+
+**Purpose**: Multi-purpose utility for CRUX compression workflows.
+
+**Modes**:
+| Mode | Purpose |
+|------|---------|
+| `--token-count <file>` | Estimate tokens for a file |
+| `--token-count --ratio <src> <crux>` | Compare source vs CRUX, calculate compression ratio |
+| `--cksum <file>` | Get checksum formatted for `sourceChecksum` frontmatter |
+
+**Token Estimation Method**:
+| Content Type | Chars/Token | Notes |
+|--------------|-------------|-------|
+| Prose | 4.0 | Markdown text, headers, lists |
+| Code blocks | 3.5 | More symbols, shorter identifiers |
+| Special chars | 1.0 | CRUX Unicode symbols (→, ⊳, «, etc.) |
+
+**Benefits**:
+- Deterministic (same input = same output)
+- Content-aware (different ratios for prose vs code)
+- CRUX-aware (counts special Unicode symbols)
+- Used by `crux-cursor-rule-manager` for frontmatter metrics
+
+See `.cursor/skills/CRUX-Utils/SKILL.md` for detailed usage.
+
 ## Installation in Another Project
 
 To use CRUX in your project, copy these files to your project root:
@@ -240,6 +271,7 @@ To use CRUX in your project, copy these files to your project root:
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
 | `.cursor/commands/crux-compress.md` | Compression command |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
+| `.cursor/skills/CRUX-Utils/` | Utility skill (token estimation, checksums) |
 
 Then:
 1. Ensure `.cursor/hooks.json` is recognized by Cursor
@@ -262,10 +294,10 @@ flowchart TD
     
     subgraph MANAGER["crux-cursor-rule-manager (Subagent)"]
         M1["1. Read CRUX.md specification"]
-        M2["2. cksum source"]
+        M2["2. Get checksum (CRUX-Utils skill)"]
         M3{"3. sourceChecksum matches?"}
         M4["4. Read source file"]
-        M5["5. Estimate reduction"]
+        M5["5. Estimate tokens (CRUX-Utils skill)"]
         M6{"6. Reduction ≥50%?"}
         M7["7. Apply compression rules"]
         M8["8. Write .crux.mdc with frontmatter"]
@@ -335,6 +367,7 @@ flowchart TD
 2. **DO NOT LOAD SOURCE FILES when CRUX exists** - Use `«CRUX⟨...⟩»` content directly
 3. **SURGICAL DIFF UPDATES** - Keep CRUX files synchronized with source changes
 4. **ABORT IF NO SIGNIFICANT REDUCTION** - Target ≤20% of original; skip if not achieved
+5. **IGNORE EXAMPLE RULES** - Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow or apply these rules to actual work.
 
 ## File Locations Summary
 
@@ -364,6 +397,10 @@ Add to frontmatter:
 crux: true
 ---
 ```
+
+**Note**: Both `.md` and `.mdc` files with `crux: true` are eligible. For `.mdc` files, the compression workflow will:
+1. Rename the file to `.md` (preserving the source)
+2. Compress to `.crux.mdc` (which becomes the active Cursor rule)
 
 ### To Check Compression Ratio and Confidence
 

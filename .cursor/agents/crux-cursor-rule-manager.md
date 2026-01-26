@@ -35,6 +35,7 @@ This file contains the complete encoding symbols, compression rules, standard bl
 ## Key Files You Should Reference
 
 - `CRUX.md` - Complete CRUX specification (REQUIRED - load first)
+- `CRUX-Utils` skill - Token estimation and checksum utilities (if available)
 
 ## When Invoked
 
@@ -48,20 +49,25 @@ This file contains the complete encoding symbols, compression rules, standard bl
    - **Semantic Validation** → Compare CRUX output to source for semantic equivalence and produce confidence score
 
 3. **For compression tasks**:
-   - **Get source file's checksum** using: `cksum <source_file_path>` (outputs: checksum bytes filename)
+   - **Get source file's checksum** using `CRUX-Utils` skill (`--cksum` mode)
    - **Check if CRUX file exists** - if so, read its `sourceChecksum` frontmatter
    - **Skip if unchanged**: If existing `sourceChecksum` matches current source checksum, report "Source unchanged (checksum: <checksum>)" and skip compression
    - Read the source file completely
+   - **Estimate source tokens**: 
+     - If `CRUX-Utils` skill is available, use `--token-count` mode
+     - Fallback: LLM estimation (prose: 4 chars/token, code: 3.5 chars/token, CRUX symbols: 1 token each)
    - **Estimate token reduction BEFORE writing output** - if reduction would be <50%, ABORT and inform the user the file is already compact
    - Apply compression rules from the specification
    - Use standard blocks appropriately and don't invent new block types
-   - **Add `sourceChecksum` to frontmatter** with the cksum output (format: "checksum bytes")
-   - Report the estimated source and compressed rule size in tokens and percentage reduction
+   - **Add `sourceChecksum` to frontmatter** with the checksum value
+   - **After writing CRUX file**, estimate its tokens using the same method
+   - **Compare tokens**: Use the skill's ratio mode if available, otherwise calculate from LLM estimates
+   - Report the token counts and percentage reduction
    - Verify quality gates are met (target ≤20% of original)
    - **If target ratio not achieved, DO NOT write the CRUX file** - inform user compression is not beneficial
 
 4. **For surgical diff updates** (when source file changed):
-   - **Get source file's checksum** using: `cksum <source_file_path>` (outputs: checksum bytes filename)
+   - **Get source file's checksum** using `CRUX-Utils` skill (`--cksum` mode)
    - Read the existing `.crux.mdc` file and check its `sourceChecksum` frontmatter
    - **Skip if unchanged**: If `sourceChecksum` matches current source checksum, report "Source unchanged" and skip
    - Read the modified source file to identify what changed
@@ -91,13 +97,13 @@ This file contains the complete encoding symbols, compression rules, standard bl
 ## Compression Checklist
 
 When compressing, verify:
-- [ ] **Source checksum obtained** via `cksum <file>` (outputs: checksum bytes filename)
+- [ ] **Source checksum obtained** via `CRUX-Utils` skill
 - [ ] **Skip check performed** - if existing CRUX `sourceChecksum` matches, skip update
 - [ ] **Significant reduction achieved** (≥50% reduction, target ≤20% of original) - ABORT if not met
 - [ ] `generated` timestamp in frontmatter (YYYY-MM-DD HH:MM format)
-- [ ] `sourceChecksum` in frontmatter (format: "checksum bytes")
-- [ ] `beforeTokens` populated with estimated source file token count
-- [ ] `afterTokens` populated with estimated CRUX file token count
+- [ ] `sourceChecksum` in frontmatter (checksum value only)
+- [ ] `beforeTokens` populated (skill if available, else LLM estimation)
+- [ ] `afterTokens` populated (skill if available, else LLM estimation)
 - [ ] `confidence` populated after validation (see below)
 - [ ] All file paths preserved verbatim
 - [ ] All commands reconstructable
@@ -147,13 +153,16 @@ For compression output files:
 
 ---
 generated: YYYY-MM-DD HH:MM
-sourceChecksum: [cksum output of source file, format: "checksum bytes"]
+sourceChecksum: [checksum from CRUX-Utils skill]
 beforeTokens: [estimated token count of source file]
 afterTokens: [estimated token count of this CRUX file]
 confidence: [XX% - added after semantic validation by separate agent]
 alwaysApply: [match source file frontmatter value, if not found default to false]
 [copy any other frontmatter from source file]
 ---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
 
 # [TITLE]
 
@@ -166,8 +175,8 @@ alwaysApply: [match source file frontmatter value, if not found default to false
 
 **IMPORTANT**: 
 - The `generated` field is REQUIRED and must be updated every time the CRUX file is created or modified. Use the current date and time in `YYYY-MM-DD HH:MM` format (24-hour time).
-- The `sourceChecksum` field is REQUIRED. Obtain via `cksum <source_file_path>` (outputs: checksum bytes filename). Store as "checksum bytes" format. This enables skip-if-unchanged optimization.
-- The `beforeTokens` and `afterTokens` fields are REQUIRED and must be populated with estimated token counts. Use approximate token estimation (roughly 4 characters per token for English text, accounting for code structure).
+- The `sourceChecksum` field is REQUIRED. Use the `CRUX-Utils` skill (`--cksum` mode). Store the checksum value only. This enables skip-if-unchanged optimization.
+- The `beforeTokens` and `afterTokens` fields are REQUIRED. Use the `CRUX-Utils` skill (`--token-count` mode) if available. Fallback: LLM estimation using prose=4 chars/token, code=3.5 chars/token, CRUX symbols=1 token each.
 - The `confidence` field is REQUIRED and must be populated after a separate validation agent evaluates the CRUX against the source.
 
 ## Critical Knowledge

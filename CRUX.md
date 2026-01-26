@@ -229,6 +229,31 @@ archetype∋[rules,plugins,deps,structure]
 
 ---
 
+## Token Estimation
+
+Token counts are required in CRUX output frontmatter (`beforeTokens`, `afterTokens`).
+
+### Primary Method: CRUX-Utils Skill
+
+If the `CRUX-Utils` skill is available, use `--token-count` mode for deterministic token counting. The skill also provides `--cksum` mode for sourceChecksum generation.
+
+### Fallback Method: LLM-Based Estimation
+
+If the skill is not available, use these heuristics:
+
+| Content Type | Chars/Token | Notes |
+|--------------|-------------|-------|
+| Prose (markdown) | 4.0 | English text, headers, lists |
+| Code blocks | 3.5 | More symbols, shorter identifiers |
+| Special chars | 1.0 | CRUX Unicode symbols (→, ⊳, «, etc.) |
+
+**Estimation formula**:
+```
+total_tokens = (prose_chars / 4.0) + (code_chars / 3.5) + special_char_count
+```
+
+---
+
 ## Standard Abbreviations
 
 | Abbreviation | Full Word |
@@ -322,9 +347,9 @@ alwaysApply: true
 
 ---
 generated: yyyy-mm-dd hh:mm
-sourceChecksum: [cksum output of source file, format: "checksum bytes"]
-beforeTokens: ~325
-afterTokens: ~85
+sourceChecksum: [checksum from CRUX-Utils skill]
+beforeTokens: ~400
+afterTokens: ~140
 confidence: [XX% - semantic validation score from separate agent]
 alwaysApply: true
 ---

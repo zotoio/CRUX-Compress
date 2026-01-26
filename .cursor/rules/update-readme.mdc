@@ -14,6 +14,7 @@ When you modify any CRUX tool-related files, update `README.md` to reflect those
 - `.cursor/commands/crux-compress.md` - command changes
 - `.cursor/hooks/detect-crux-changes.sh` - hook script changes
 - `.cursor/hooks.json` - hook configuration changes
+- `CRUX-Utils` skill - utility skill changes (token estimation, checksums)
 
 ## Excluded Files (do NOT trigger README update)
 - `.gitignore`, `.editorconfig`, and other generic config files

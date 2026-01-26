@@ -28,12 +28,12 @@ This prevents resource exhaustion and ensures reliable processing.
 
 **CRUX files track the source file's checksum to avoid unnecessary updates.**
 
-Each `.crux.mdc` file includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file (generated using the `cksum` utility). Before processing:
+Each `.crux.mdc` file includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file. Before processing:
 
-1. Agent runs `cksum <source_file_path>` to get current checksum (outputs: checksum bytes filename)
+1. Agent gets current checksum using `CRUX-Utils` skill (`--cksum` mode)
 2. If existing CRUX file's `sourceChecksum` matches, the source is unchanged - **skip update**
 3. If no match (or no existing CRUX file), proceed with compression
-4. After compression, store the new `sourceChecksum` in the output frontmatter (format: "checksum bytes")
+4. After compression, store the new `sourceChecksum` in the output frontmatter
 
 This optimization prevents redundant recompression of unchanged files.
 
@@ -52,7 +52,7 @@ This optimization prevents redundant recompression of unchanged files.
      - Output: <file path with .crux.mdc extension>
      - Follow CRUX.md specification
      - Check source checksum vs existing CRUX sourceChecksum - skip if unchanged
-     - Report before/after token counts (or "skipped - source unchanged")
+     - Report before/after token counts using `CRUX-Utils` skill (or "skipped - source unchanged")
      - If source lacks `crux: true` frontmatter, add it first
      - Ensure source uses .md extension (rename from .mdc if needed)
      ```
@@ -85,8 +85,9 @@ This optimization prevents redundant recompression of unchanged files.
 ### When invoked with `ALL`
 
 1. **Find all eligible files**:
-   - Search `.cursor/rules/**/*.md` for files with frontmatter `crux: true`
+   - Search `.cursor/rules/**/*.md` and `.cursor/rules/**/*.mdc` for files with frontmatter `crux: true`
    - Exclude files that already have a `.crux.mdc` extension (they are outputs, not sources)
+   - For `.mdc` files found: apply pre-processing (rename to `.md`, add `crux: true` if missing) before compression
    
 2. **For each eligible file**, spawn a **separate `crux-cursor-rule-manager` subagent instance**:
    - Task the subagent to compress the source file
@@ -117,9 +118,11 @@ This optimization prevents redundant recompression of unchanged files.
 
 A file is eligible for CRUX compression if:
 - Located in `.cursor/rules/` directory
-- Has `.md` extension (not `.mdc` - those are already cursor rule files or compressed outputs)
+- Has `.md` or `.mdc` extension
 - Has `crux: true` in YAML frontmatter
 - Is not already a `.crux.mdc` file (outputs are not recompressed)
+
+**Note**: `.mdc` files with `crux: true` will be pre-processed (renamed to `.md`) before compression. The resulting `.crux.mdc` file will then become the active Cursor rule.
 
 ## Adding New Files for Compression
 
@@ -237,3 +240,4 @@ Using a **separate agent instance** for validation ensures:
 - `crux-cursor-rule-manager` subagent - The specialist that performs compression
 - `CRUX.md` - The CRUX notation specification
 - `.cursor/rules/_CRUX-RULE.mdc` - Rules for working with CRUX files
+- `CRUX-Utils` skill - Token estimation and checksum utilities
