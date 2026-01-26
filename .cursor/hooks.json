@@ -1,0 +1,13 @@
+{
+  "$schema": "https://cursor.sh/hooks-schema.json",
+  "version": 1,
+  "description": "CRUX compression hooks - detects source file changes and queues for compression",
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "bash .cursor/hooks/detect-crux-changes.sh",
+        "description": "Queue modified source files (with crux: true) for CRUX compression"
+      }
+    ]
+  }
+}
