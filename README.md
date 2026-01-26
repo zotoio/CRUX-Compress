@@ -1,6 +1,35 @@
-# CRUX System Architecture
+# CRUX Compress
 
-This document explains how the CRUX (Context Reduction Using X-encoding) system works in this repository. CRUX achieves 5-10x token reduction for Cursor rules while preserving all actionable information.
+**Repository**: [github.com/zotoio/CRUX-Compress](https://github.com/zotoio/CRUX-Compress)
+
+## The Problem
+
+AI coding assistants like Cursor rely on context windows to understand your project. When you add natural language markdown rules to guide agent behavior, those rules consume valuable context tokens—often thousands of tokens per rule file. As your rule library grows, context window usage balloons, leaving less room for actual code and conversation.
+
+Users want to manage their rules in readable, natural language markdown. But LLMs don't need the verbose prose—they just need the actionable information.
+
+## The Approach
+
+CRUX extracts the essential meaning from natural language markdown rules and compresses it into a logic-based Domain Specific Language (DSL) that all LLMs understand without additional instructions.
+
+**How it works:**
+1. **You write rules in natural language markdown** — readable, maintainable, version-controllable
+2. **CRUX compresses them** — extracting the "crux" (the decisive, most important points) into a compact symbolic notation
+3. **Compressed rules load into context** — achieving 5-10x token reduction (target ≤20% of original)
+4. **LLMs interpret the notation natively** — no decompression needed, semantic meaning preserved, although the spec is added for completeness and reinforcement
+
+The result: your context window stays lean while your rules remain powerful.
+
+## Demonstration
+Here is an experiment for you. 
+
+1. Start a new chat with any model in Claude, ChatGPT, Gemini, Deepseek etc.
+2. Paste this into the chat and submit it. 
+```markdown
+Explain this:
+
+R=req→if gap→assume+mark; C=obs→cite path:lines; Δ=R≠C→tag{code|tests|req}+why
+```
 
 ## Etymology
 
@@ -13,9 +42,7 @@ The "X" is intentionally flexible:
 
 The name also serves as a backronym for "crux" — the decisive or most important point — which is exactly what the compression preserves while stripping everything else.
 
-**Repository**: [github.com/zotoio/CRUX-Compress](https://github.com/zotoio/CRUX-Compress)
-
-## Overview
+## System Architecture
 
 The CRUX system consists of 6 interconnected components:
 

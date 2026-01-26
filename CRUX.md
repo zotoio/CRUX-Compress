@@ -323,8 +323,8 @@ alwaysApply: true
 ---
 generated: yyyy-mm-dd hh:mm
 sourceChecksum: [cksum output of source file, format: "checksum bytes"]
-beforeTokens: [estimated token count of source file]
-afterTokens: [estimated token count of this CRUX file]
+beforeTokens: ~325
+afterTokens: ~85
 confidence: [XX% - semantic validation score from separate agent]
 alwaysApply: true
 ---
@@ -333,47 +333,39 @@ alwaysApply: true
 
 ```crux
 «CRUX⟨{source_file}⟩»
-R=req→if gap→assume+mark; C=obs→cite path:lines; Δ=R≠C→tag{code|tests|req}+why
+R=req→truth;gap→assume+mark;?arch→ask first
+C=obs→cite path:lines;repo≻chat
+Δ=R≠C→tag{code|tests|req}+why
+PLAN=min files+targeted Δ;justify+file|broad
+PATCH=surgical diff;¬rewrite w/o proof
+CHECK=run/+tests|static val
+STATE={R,C,Δ}→upd on progress
+Ω{¬halluc;verified only}
 «/CRUX»
 ```
 
 ### LLM/agent interpretation (internal CoT trace)
 
-R=req→if gap→assume+mark
+`R=req→truth;gap→assume+mark;?arch→ask first`
+Requirements: user requirements are source of truth (req→truth); when gaps exist, assume and mark them (gap→assume+mark); when architecture is uncertain (?arch), ask first
 
-R = Requirements
-If requirements are unclear, make explicit assumptions and mark them
+`C=obs→cite path:lines;repo≻chat`
+Code analysis: observations should cite specific file paths and line numbers (obs→cite path:lines); trust repo over conversation history (repo≻chat)
 
-C=obs→cite path:lines
+`Δ=R≠C→tag{code|tests|req}+why`
+Changes: when requirements ≠ current code (R≠C), tag what's affected (code, tests, or requirements docs) and explain why (+why)
 
-C = Code observations
-When referencing code, always cite file/path:line-numbers
+`PLAN=min files+targeted Δ;justify+file|broad`
+Planning: touch minimum files with targeted changes (min files+targeted Δ); justify when adding files or making broad modifications (justify+file|broad)
 
-Δ=R≠C→tag{code|tests|req}+why
+`PATCH=surgical diff;¬rewrite w/o proof`
+Implementation: make surgical, precise edits using diffs; don't rewrite entire files without proof it's necessary (¬rewrite w/o proof)
 
-Δ = Delta/discrepancy
-When requirements ≠ actual code, tag what needs to change (code, tests, or requirements) and explain why
+`CHECK=run/+tests|static val`
+Verification: run existing tests, add new tests, or use static validation (run/+tests|static val)
 
-PLAN=min files+change
+`STATE={R,C,Δ}→upd on progress`
+Tracking: maintain mental model of requirements (R), code state (C), and changes (Δ); update as conversation progresses (→upd on progress)
 
-Plan changes to touch minimum files with minimum modifications
-
-PATCH=surgical diff
-
-Make precise, targeted edits (not wholesale rewrites)
-
-CHECK=run/add tests|static verify
-
-Verify changes by running tests, adding tests, or static analysis
-
-STATE=upd R/C/Δ
-
-Maintain updated tracking of Requirements, Code state, and Deltas
-
-mem=repo>chat
-
-Trust repository content over conversation history
-
-no halluc; no full rewrite w/o proof
-
-Don't fabricate information; don't rewrite entire files without clear justification
+`Ω{¬halluc;verified only}`
+Quality: never hallucinate (¬halluc); base all suggestions on verified information only
