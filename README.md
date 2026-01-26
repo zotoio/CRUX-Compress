@@ -200,34 +200,24 @@ alwaysApply: true
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
 
-## Distribution Package
+## Installation in Another Project
 
-The CRUX system can be packaged as a standalone zip for use in other projects.
-
-### Creating the Package
-
-```bash
-bash .cursor/scripts/create-crux-zip.sh [output-dir]
-```
-
-### Package Contents
+To use CRUX in your project, copy these files to your project root:
 
 | File | Purpose |
 |------|---------|
 | `CRUX.md` | Specification (READONLY) |
-| `.cursor/crux-readme.md` | This documentation |
+| `AGENTS.md` | Agent awareness notice (or add the `<CRUX>` block to your existing AGENTS.md) |
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/hooks/detect-crux-changes.sh` | File change detection hook |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
 | `.cursor/commands/crux-compress.md` | Compression command |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
 
-### Installation in Another Project
-
-1. Extract the zip to your project root
-2. Ensure `.cursor/hooks.json` is recognized by Cursor
-3. Add `crux: true` to any rule files you want to compress
-4. Use `/crux-compress ALL` to compress eligible files
+Then:
+1. Ensure `.cursor/hooks.json` is recognized by Cursor
+2. Add `crux: true` to any rule files you want to compress
+3. Use `/crux-compress ALL` to compress eligible files
 
 ## How They Work Together
 
@@ -330,7 +320,6 @@ flowchart TD
 | Command | `.cursor/commands/crux-compress.md` | User interface |
 | Hook | `.cursor/hooks/detect-crux-changes.sh` | Auto-detect file changes |
 | Hook Config | `.cursor/hooks.json` | Hook configuration |
-| Zip Script | `.cursor/scripts/create-crux-zip.sh` | Create distribution package |
 
 ## Quick Reference
 
