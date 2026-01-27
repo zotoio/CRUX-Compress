@@ -43,8 +43,8 @@ jobs:
       - name: Build distribution zip
         if: steps.tag_check.outputs.exists == 'false'
         run: |
-          chmod +x create-crux-zip.sh
-          ./create-crux-zip.sh .
+          chmod +x scripts/create-crux-zip.sh
+          ./scripts/create-crux-zip.sh .
           ls -la CRUX-Compress-*.zip
 
       - name: Generate release notes

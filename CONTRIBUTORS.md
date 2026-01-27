@@ -62,7 +62,7 @@ tests/
 │   ├── sample-rule.md
 │   └── special-chars.md
 ├── helpers.bash        # Shared test utilities and assertions
-├── test_create_zip.bats    # Tests for create-crux-zip.sh
+├── test_create_zip.bats    # Tests for scripts/create-crux-zip.sh
 ├── test_crux_utils.bats    # Tests for CRUX-Utils skill
 ├── test_detect_hook.bats   # Tests for the detect-crux-changes.sh hook
 └── test_install.bats       # Tests for install.sh
@@ -75,7 +75,7 @@ tests/
 | `test_install.bats` | `install.sh` | Installation script validation, CLI options, dependencies |
 | `test_crux_utils.bats` | `.cursor/skills/CRUX-Utils/scripts/crux-utils.sh` | Token counting, checksums, compression ratio |
 | `test_detect_hook.bats` | `.cursor/hooks/detect-crux-changes.sh` | Hook triggering, file filtering, queue management |
-| `test_create_zip.bats` | `create-crux-zip.sh` | Zip creation, version matching, required files |
+| `test_create_zip.bats` | `scripts/create-crux-zip.sh` | Zip creation, version matching, required files |
 
 ### Running Tests
 

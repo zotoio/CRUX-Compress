@@ -130,9 +130,7 @@ get_latest_version() {
 # Get currently installed version
 get_installed_version() {
     if [[ -f "VERSION" ]]; then
-        cat "VERSION" | tr -d '[:space:]'
-    elif [[ -f ".cursor/VERSION" ]]; then
-        cat ".cursor/VERSION" | tr -d '[:space:]'
+        tr -d '[:space:]' < "VERSION"
     else
         echo ""
     fi
@@ -145,7 +143,10 @@ compare_versions() {
     fi
     
     local IFS=.
-    local i ver1=($1) ver2=($2)
+    local i
+    local -a ver1 ver2
+    read -ra ver1 <<< "$1"
+    read -ra ver2 <<< "$2"
     
     for ((i=0; i<${#ver1[@]} || i<${#ver2[@]}; i++)); do
         local v1=${ver1[i]:-0}
@@ -165,7 +166,8 @@ compare_versions() {
 backup_file() {
     local file="$1"
     if [[ -f "$file" && "$BACKUP" == "true" ]]; then
-        local backup="${file}.backup.$(date +%Y%m%d%H%M%S)"
+        local backup
+        backup="${file}.backup.$(date +%Y%m%d%H%M%S)"
         cp "$file" "$backup"
         log_verbose "Backed up: $file -> $backup"
     fi
@@ -238,7 +240,7 @@ download_and_extract() {
     local temp_dir
     
     temp_dir=$(mktemp -d)
-    trap "rm -rf $temp_dir" EXIT
+    trap 'rm -rf "$temp_dir"' EXIT
     
     log "Downloading CRUX Compress v${version}..."
     log_verbose "URL: $download_url"

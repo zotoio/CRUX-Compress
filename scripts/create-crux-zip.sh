@@ -1,6 +1,6 @@
 #!/bin/bash
 # Create CRUX distribution zip file
-# Usage: ./create-crux-zip.sh [output-dir]
+# Usage: ./scripts/create-crux-zip.sh [output-dir]
 #
 # This script packages all CRUX-related files for distribution.
 # Output: CRUX-Compress-v{version}.zip (version read from VERSION)
@@ -9,11 +9,11 @@ set -e
 
 # Get the directory where this script is located (works regardless of where it's called from)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 OUTPUT_DIR="${1:-$PROJECT_ROOT}"
 
 # Read version from VERSION file
-VERSION=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
+VERSION=$(tr -d '[:space:]' < "$PROJECT_ROOT/VERSION")
 ZIP_NAME="CRUX-Compress-v${VERSION}.zip"
 
 cd "$PROJECT_ROOT"
@@ -23,7 +23,7 @@ echo "Output: $OUTPUT_DIR/$ZIP_NAME"
 
 # Create temp directory for staging
 STAGING_DIR=$(mktemp -d)
-trap "rm -rf $STAGING_DIR" EXIT
+trap 'rm -rf "$STAGING_DIR"' EXIT
 
 # Create directory structure
 mkdir -p "$STAGING_DIR/.cursor/agents"

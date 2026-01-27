@@ -432,7 +432,8 @@ flowchart TD
 | Hook Config | `.cursor/hooks.json` | Hook configuration |
 | Utility Skill | `.cursor/skills/CRUX-Utils/` | Token estimation, checksums |
 | Install Script | `install.sh` | Curl-pipe-bash installer |
-| Zip Builder | `create-crux-zip.sh` | Build distribution zip |
+| Zip Builder | `scripts/create-crux-zip.sh` | Build distribution zip |
+| Shellcheck | `scripts/shellcheck.sh` | Lint all shell scripts |
 | Tests | `tests/*.bats` | BATS test suite |
 | CI Workflows | `.github/workflows/` | Automated testing and releases |
 
@@ -515,12 +516,33 @@ bats tests/test_crux_utils.bats
 bats tests/*.bats --verbose-run
 ```
 
+### Running Shellcheck Locally
+
+All shell scripts are validated with [shellcheck](https://www.shellcheck.net/). Run locally before committing:
+
+```bash
+# Install shellcheck (if not already installed)
+# macOS
+brew install shellcheck
+
+# Ubuntu/Debian
+sudo apt install shellcheck
+
+# Run shellcheck on all scripts
+./scripts/shellcheck.sh
+
+# Show diff suggestions for fixes
+./scripts/shellcheck.sh --fix
+```
+
+The script checks all shell files including `install.sh`, `scripts/create-crux-zip.sh`, hook scripts, utility scripts, and test helpers.
+
 ### Test Coverage
 
 | Script | Test File | Coverage |
 |--------|-----------|----------|
 | `crux-utils.sh` | `test_crux_utils.bats` | Token counting, checksums, ratios, error handling |
-| `create-crux-zip.sh` | `test_create_zip.bats` | Zip contents, version embedding, structure |
+| `scripts/create-crux-zip.sh` | `test_create_zip.bats` | Zip contents, version embedding, structure |
 | `detect-crux-changes.sh` | `test_detect_hook.bats` | Frontmatter detection, queue management |
 | `install.sh` | `test_install.bats` | Syntax validation, options, functions |
 
@@ -568,7 +590,7 @@ Version bumping follows conventional commits:
 1. Push commits to `main` with conventional commit messages
 2. `version-bump.yml` analyzes commits and updates `VERSION`
 3. `release.yml` detects version change and:
-   - Builds versioned zip via `create-crux-zip.sh`
+   - Builds versioned zip via `scripts/create-crux-zip.sh`
    - Creates GitHub Release with tag `vX.X.X`
    - Attaches zip as release artifact
    - Generates release notes from commits

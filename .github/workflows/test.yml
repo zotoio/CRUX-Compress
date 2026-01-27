@@ -31,8 +31,8 @@ jobs:
 
       - name: Validate zip creation
         run: |
-          chmod +x create-crux-zip.sh
-          ./create-crux-zip.sh /tmp
+          chmod +x scripts/create-crux-zip.sh
+          ./scripts/create-crux-zip.sh /tmp
           
           # Verify zip was created
           ZIP_FILE=$(ls /tmp/CRUX-Compress-v*.zip 2>/dev/null || echo "")

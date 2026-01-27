@@ -4,14 +4,14 @@
 # Get the project root directory
 PROJECT_ROOT="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
 
-# Path to scripts under test
-CRUX_UTILS="${PROJECT_ROOT}/.cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
-CREATE_ZIP="${PROJECT_ROOT}/create-crux-zip.sh"
-DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/detect-crux-changes.sh"
-INSTALL_SCRIPT="${PROJECT_ROOT}/install.sh"
+# Path to scripts under test (exported for use by test files that source this helper)
+export CRUX_UTILS="${PROJECT_ROOT}/.cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+export CREATE_ZIP="${PROJECT_ROOT}/scripts/create-crux-zip.sh"
+export DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/detect-crux-changes.sh"
+export INSTALL_SCRIPT="${PROJECT_ROOT}/install.sh"
 
 # Path to test fixtures
-FIXTURES="${PROJECT_ROOT}/tests/fixtures"
+export FIXTURES="${PROJECT_ROOT}/tests/fixtures"
 
 # Create a temporary directory for test artifacts
 setup_temp_dir() {
@@ -121,8 +121,10 @@ assert_dir_exists() {
 }
 
 # Assert that output contains a string
+# Note: $output is a BATS framework variable set by run command
 assert_output_contains() {
     local expected="$1"
+    # shellcheck disable=SC2154  # output is set by BATS framework
     if [[ "$output" != *"$expected"* ]]; then
         echo "Expected output to contain: $expected"
         echo "Actual output: $output"
@@ -141,8 +143,10 @@ assert_output_not_contains() {
 }
 
 # Assert exit code
+# Note: $status is a BATS framework variable set by run command
 assert_exit_code() {
     local expected="$1"
+    # shellcheck disable=SC2154  # status is set by BATS framework
     if [[ "$status" -ne "$expected" ]]; then
         echo "Expected exit code: $expected"
         echo "Actual exit code: $status"
