@@ -112,8 +112,11 @@ teardown() {
     assert_exit_code 0
 }
 
-# Integration test - only run if network is available
+# Integration test - only run locally (not in CI)
 @test "install.sh get_latest_version function works (requires network)" {
+    # Skip in CI environments to avoid rate limiting and network dependencies
+    [[ -n "${CI:-}" ]] && skip "Skipping network test in CI"
+    
     # Skip if no network connectivity to GitHub
     curl -s --connect-timeout 3 https://api.github.com > /dev/null 2>&1 || skip "No network"
     

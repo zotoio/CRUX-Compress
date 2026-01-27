@@ -84,11 +84,23 @@ jobs:
           echo "${{ steps.analyze.outputs.new_version }}" > VERSION
           echo "Updated VERSION to ${{ steps.analyze.outputs.new_version }}"
 
+      - name: Update CRUX.md version
+        run: |
+          NEW_VERSION="${{ steps.analyze.outputs.new_version }}"
+          
+          # Update frontmatter version (line: version: X.Y.Z)
+          sed -i "s/^version: .*/version: $NEW_VERSION/" CRUX.md
+          
+          # Update heading version (line: # CRUX Rule Compression Specification vX.Y.Z)
+          sed -i "s/# CRUX Rule Compression Specification v.*/# CRUX Rule Compression Specification v$NEW_VERSION/" CRUX.md
+          
+          echo "Updated CRUX.md to version $NEW_VERSION"
+
       - name: Commit version bump
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add VERSION
+          git add VERSION CRUX.md
           git commit -m "chore: bump version to ${{ steps.analyze.outputs.new_version }} [skip ci]"
           git push
 
