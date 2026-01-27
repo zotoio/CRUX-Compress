@@ -55,13 +55,16 @@ CRUX Compress uses [BATS](https://github.com/bats-core/bats-core) (Bash Automate
 
 ```
 tests/
-├── fixtures/           # Test fixtures and sample files
-│   ├── empty-file.md
-│   ├── no-crux-frontmatter.md
+├── fixtures/               # Test fixtures and sample files
+│   ├── compress-test.crux.mdc
+│   ├── compress-test.md
+│   ├── no-change.crux.mdc
+│   ├── no-change.md
+│   ├── no-crux-frontmatter.mdc
 │   ├── sample-rule.crux.mdc
 │   ├── sample-rule.md
 │   └── special-chars.md
-├── helpers.bash        # Shared test utilities and assertions
+├── helpers.bash            # Shared test utilities and assertions
 ├── test_create_zip.bats    # Tests for scripts/create-crux-zip.sh
 ├── test_crux_utils.bats    # Tests for CRUX-Utils skill
 ├── test_detect_hook.bats   # Tests for the detect-crux-changes.sh hook

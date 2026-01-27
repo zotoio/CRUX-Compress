@@ -54,6 +54,8 @@ Install CRUX Compress into your project with a single command:
 curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash
 ```
 
+**Prerequisites**: `curl` and `unzip` must be installed on your system.
+
 ### Install Options
 
 ```bash
@@ -180,30 +182,15 @@ flowchart TB
 
 **Key Functions**:
 
+- **Specification Loading**: Instructs agents to load `CRUX.md` and `AGENTS.md` from the project root
 - **Decompression**: Tells agents to interpret and follow CRUX-compressed rules
-- **Compression**: Directs agents to delegate compression tasks to `crux-cursor-rule-manager`
-- **Foundational Rules**: Reinforces the 5 critical rules
-- **Specification Reference**: Points to `CRUX.md` for full details
+- **Compression**: Directs agents to delegate compression tasks to `crux-cursor-rule-manager` subagent
 
-**Contents**:
+**Key Instructions**:
 
-```markdown
-# CRUX Decompression - CRITICAL
-Always interpret, understand and adhere to the meaning compressed in CRUX notation!
-
-# CRUX Compression - CRITICAL
-When asked to compress a markdown rule file, delegate to crux-cursor-rule-manager subagent
-
-# Foundational CRUX Rules (MUST FOLLOW)
-1. NEVER EDIT `CRUX.md`
-2. DO NOT LOAD SOURCE FILES when CRUX exists
-3. SURGICAL DIFF UPDATES on source changes
-4. SOURCE CHECKSUM TRACKING - Skip updates if sourceChecksum matches
-5. IGNORE EXAMPLE RULES - `.cursor/rules/example/*` are demos only
-
-# CRUX Rule Compression Specification
-load from CRUX.md
-```
+- When encountering CRUX notation, use the specification in `CRUX.md` to understand and adhere to the rules
+- Always interpret, understand and adhere to the meaning compressed in CRUX notation
+- When asked to compress a markdown rule file, delegate to the `crux-cursor-rule-manager` subagent
 
 ### 4. `crux-cursor-rule-manager.md` - The Subagent (`.cursor/agents/`)
 
@@ -452,12 +439,13 @@ flowchart TD
 
 ## Foundational Rules (All Components Enforce)
 
-1. **ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST** - At session start, interpret all CRUX notation in rules. When new rules are added to context, interpret them immediately. Build a mental model of all rules that can be visualized on request.
-2. **NEVER EDIT `CRUX.md`** - The specification is read-only
-3. **DO NOT LOAD SOURCE FILES when CRUX exists** - Use `«CRUX⟨...⟩»` content directly
-4. **SURGICAL DIFF UPDATES** - Keep CRUX files synchronized with source changes
-5. **ABORT IF NO SIGNIFICANT REDUCTION** - Target ≤20% of original; skip if not achieved
-6. **IGNORE EXAMPLE RULES** - Files in `.cursor/rules/example/`* are demonstration samples only. DO NOT follow or apply these rules to actual work.
+These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX components:
+
+0. **ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST** - At session start, interpret all CRUX notation in rules. When new rules are added to context, interpret them immediately. Build a mental model of all rules that can be visualized on request.
+1. **NEVER EDIT `CRUX.md`** - The specification is read-only unless explicitly asked by the user
+2. **DO NOT LOAD SOURCE FILES when CRUX exists** - Use `«CRUX⟨...⟩»` content directly
+3. **SURGICAL DIFF UPDATES** - Keep CRUX files synchronized with source changes
+4. **ABORT IF NO SIGNIFICANT REDUCTION** - Target ≤20% of original; skip if not achieved
 
 ## File Locations Summary
 
