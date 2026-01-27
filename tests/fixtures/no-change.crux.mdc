@@ -1,0 +1,47 @@
+---
+generated: 2026-01-27 15:32
+sourceChecksum: 2942027156
+beforeTokens: 1120
+afterTokens: 299
+confidence: 96%
+crux: true
+alwaysApply: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Testing Standards
+
+```crux
+«CRUX⟨no-change.md⟩»
+# Coverage Thresholds
+COV={line:≥80→90%,branch:≥75→85%,func:≥85→95%}
+CRIT=100%∀[payment,auth,validation,errors]
+
+# Test Naming & Structure
+NAME="should [X] when [Y]"
+AAA=Arrange→Act→Assert
+
+# Test Categories
+CAT={unit⊲commit,integration⊲PR,e2e⊲nightly,perf⊲weekly,security⊲PR}
+
+# Test Independence
+INDEP=isolated&cleanup&¬order_depend&fresh_fixtures
+
+# Mocking
+MOCK.do=[external_svc,time,RNG,network]
+MOCK.dont=[code_under_test,utils,value_obj,pure_func]
+
+# Test Data
+DATA={fixtures@tests/fixtures/,factories⊤,¬prod_data}
+DB={txn_rollback,min_seed,¬shared_state}
+
+# Assertions
+ASSERT={specific⊤,one_behavior,verify_err_type+msg}
+
+# CI Requirements
+CI.pass=[unit:100%,integration:100%,cov_thresholds,¬flaky]
+FLAKY=fix≤48h|quarantine+issue;¬skip_w/o_docs
+«/CRUX»
+```
