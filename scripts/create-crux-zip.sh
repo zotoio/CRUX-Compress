@@ -10,7 +10,8 @@ set -e
 # Get the directory where this script is located (works regardless of where it's called from)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-OUTPUT_DIR="${1:-$PROJECT_ROOT}"
+# Convert output dir to absolute path (important: script cd's later, relative paths would break)
+OUTPUT_DIR="$(cd "${1:-.}" && pwd)"
 
 # Read version from VERSION file
 VERSION=$(tr -d '[:space:]' < "$PROJECT_ROOT/VERSION")
