@@ -97,7 +97,7 @@ This optimization prevents redundant recompression of unchanged files.
      - Create/update the `[filename].crux.mdc` version
      - Report token reduction metrics
    - **Process in batches of up to 4 parallel agents**
-   - Wait for each batch to complete before starting the next batch
+   - Wait for each batch to complete before starting the next batch.
 
 3. **After each compression completes**, spawn a **fresh validation agent**:
    - For each successfully compressed file, spawn a separate `crux-cursor-rule-manager` instance
