@@ -1,5 +1,6 @@
 ---
 alwaysApply: true
+crux: true
 ---
 # Automatic Version Bumping Rule
 

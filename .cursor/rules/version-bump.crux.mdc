@@ -1,0 +1,50 @@
+---
+generated: 2026-01-28 10:15
+sourceChecksum: 1061964867
+beforeTokens: 422
+afterTokens: 262
+confidence: 94%
+alwaysApply: true
+crux: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Automatic Version Bumping Rule
+
+```crux
+«CRUX⟨version-bump.md⟩»
+⊲commit→analyze msg+Δ VERSION
+
+Λ.semver{
+  fix:|docs:|style:|refactor:|perf:|test:|chore:→PATCH(0.0.X)
+  feat:→MINOR(0.X.0)
+  BREAKING CHANGE|!→MAJOR(X.0.0)
+}
+
+Γ.apply{
+  1.pre-commit→analyze type→Δ VERSION
+  2.stage VERSION w/ Δ
+}
+
+Κ.ver=MAJOR.MINOR.PATCH{
+  MAJOR=breaking(API incompat)
+  MINOR=feat(compat)
+  PATCH=fix+minor(compat)
+}
+
+E.examples{
+  fix:typo→patch 1.2.3→1.2.4
+  feat:custom dir→minor 1.2.3→1.3.0
+  feat!:Δ format→major 1.2.3→2.0.0
+  refactor:simplify→patch 1.2.3→1.2.4
+}
+
+P{
+  1x bump/commit→use highest impact
+  Δ major|minor→reset lower(1.2.3→2.0.0¬2.2.3)
+  ¬conventional→ask user
+}
+«/CRUX»
+```

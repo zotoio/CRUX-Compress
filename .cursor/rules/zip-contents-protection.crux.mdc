@@ -1,0 +1,26 @@
+---
+generated: 2026-01-28 12:00
+sourceChecksum: 2683285129
+beforeTokens: 513
+afterTokens: 215
+confidence: 94%
+crux: true
+alwaysApply: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Zip Contents Protection Rule
+
+```crux
+«CRUX⟨.cursor/rules/zip-contents-protection.md⟩»
+⊛P{scripts/create-crux-zip.sh;¬Δ w/o user!}
+→[install,ver_bump@version-bump.yml:RELEASE_PATHS,size]
+¬ADD⊲[rules/*.mdc,skills/*,scripts/*.sh,∀files]
+Δ⊲user["add zip"|"incl release"|"mod zip"]
+Δ→[+create-crux-zip.sh,+version-bump.yml,+CONTRIBUTORS.md,warn:ver_bump]
+ZIP∋[CRUX.md,VERSION,AGENTS.crux.md,hooks.json,crux-cursor-rule-manager.md,crux-compress.md,detect-crux-changes.sh,_CRUX-RULE.mdc,SKILL.md,crux-utils.sh]
+Ω{min;¬bloat;¬conflict;¬churn}
+«/CRUX»
+```

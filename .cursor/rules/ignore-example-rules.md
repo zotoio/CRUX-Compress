@@ -1,5 +1,6 @@
 ---
 alwaysApply: false
+crux: true
 ---
 
 # Ignore Example Rules

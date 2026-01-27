@@ -1,5 +1,6 @@
 ---
 alwaysApply: true
+crux: true
 ---
 
 # Documentation Synchronization Rule

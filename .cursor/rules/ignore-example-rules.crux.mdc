@@ -1,0 +1,22 @@
+---
+generated: 2026-01-28 10:30
+sourceChecksum: "3154349694"
+beforeTokens: 229
+afterTokens: 103
+confidence: 92%
+alwaysApply: false
+crux: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Ignore Example Rules
+
+```crux
+«CRUX⟨ignore-example-rules.md⟩»
+P{.cursor/rules/example/*=demo;¬follow|apply}
+IGNORE@[coding-standards-demo.md,.crux.mdc]
+#teaching materials only
+«/CRUX»
+```

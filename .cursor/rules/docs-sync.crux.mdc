@@ -1,0 +1,21 @@
+---
+generated: 2026-01-28 14:32
+sourceChecksum: 1813785632
+beforeTokens: 388
+afterTokens: 135
+confidence: 90%
+alwaysApply: true
+crux: true
+---
+
+# Docs Sync
+
+```crux
+«CRUX⟨.cursor/rules/docs-sync.md⟩»
+Γ{Δfile→Δdocs}
+README⊲[install.sh,CRUX.md,.cursor/commands/*,.cursor/skills/*/SKILL.md]
+CONTRIB⊲[.github/workflows/*.yml,tests/*.bats,scripts/*.sh,tests/helpers.bash]
+R{surgical;fmt=exist;upd ver+paths;+flow→+list}
+P{¬.cursor/rules/example/*;¬temp;¬spec}
+«/CRUX»
+```
