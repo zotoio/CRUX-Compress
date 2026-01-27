@@ -1,0 +1,27 @@
+---
+generated: 2026-01-28 10:45
+sourceChecksum: 2179275645
+beforeTokens: 480
+afterTokens: 224
+confidence: 89%
+alwaysApply: true
+description: A test rule for compress command testing
+crux: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Test Coding Standards Rule
+
+```crux
+«CRUX⟨tests/fixtures/compress-test.md⟩»
+R.naming{unit=test_*.bats,fixtures=*.md|*.mdc,helpers=helpers.bash}
+R.setup{setup()→init env;teardown()→cleanup;tmp→$BATS_TMPDIR;¬artifacts}
+R.assert{ok→assert_success,fail→assert_failure,substr→--partial,line→assert_line}
+Λ.good=run cmd→assert*;Λ.bad=¬run∧¬assert
+Γ.apply⊲new_tests|review_PR|debug_fail
+P{⊛¬skip run;⊛cleanup in teardown;!descriptive names;¬hardcoded paths→vars}
+R.debug{check $output,$status,$lines;?set -x}
+«/CRUX»
+```

@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-27 12:00
+generated: 2026-01-27 12:30
 sourceChecksum: 2253728265
 beforeTokens: 6278
-afterTokens: 1172
-confidence: 95%
+afterTokens: 1679
+confidence: 96%
 crux: true
 alwaysApply: true
 ---
@@ -14,93 +14,95 @@ alwaysApply: true
 # Comprehensive Team Coding Standards
 
 ```crux
-«CRUX⟨sample-rule.md⟩»
+«CRUX⟨tests/fixtures/sample-rule.md⟩»
 
 # NAMING
-JS/TS:camelCase:var/fn|PascalCase:class/iface|SCREAMING:const|enum:Pascal+SCREAM
-Py:snake:var/fn|Pascal:class|SCREAM:const|_:private
-Go:Pascal:exported|camel:unexported|acronyms:consistent case
+JS/TS:{var,fn}=camelCase;{class,iface}=PascalCase;CONST=SCREAMING_SNAKE;enum=Pascal+SNAKE_vals;typeParam=[T,K,TReq]
+Python:{var,fn}=snake_case;class=PascalCase;CONST=SCREAMING_SNAKE;_private=underscore prefix
+Go:exported=PascalCase;unexported=camelCase;acronyms=consistent(HTTPClient,userID)
 
-# STYLE
-fn≤30ln;early ret;nest≤3;1 concept/fn;compose≻inherit;SRP=⊤
-lines:JS100/2sp,Py88/4sp,Go120/tab,Rust100/4sp,SQL80/2sp
-limits:cyclo≤10,cognitive≤15,params≤5,nest≤3
+# CODE STYLE
+Π.principles{fn≤20-30 lines;early return;nest≤3;self-doc names;1 concept/fn;composition≻inheritance;SRP}
+Φ.line_length{JS/TS=100/2sp,Python=88/4sp,Go=120/tab,Rust=100/4sp,SQL=80/2sp}
+Φ.complexity{cyclomatic≤10!,cognitive≤15!,params≤5!,lines≤30,nest≤3!}
 
 # DOCS
-∀public→{desc,@param,@returns,@throws,@example};Py:Google docstr;Go://comment
+∀public API→JSDoc/docstring{desc,@params,@returns,@throws,@example}
+Python=Google-style docstrings;Go=comment above fn
 
 # ERRORS
-hierarchy:Base→Val{Req,Format,Range}|Biz{Funds,Dup,State}|Integ{Net,Timeout,Unavail}|Sys{DB,Cache,Cfg}
-¬swallow;log+ctx;custom types;fail fast;actionable msg
-resp:{code,msg,details{field,val,constraint},reqId,ts}
+P.err{¬swallow;log+ctx;custom types;fail fast;actionable msg}
+E.err_hierarchy{Base→[Val{Req,Format,Range},Biz{Funds,Dup,State},Integration{Net,Timeout,Unavail},Sys{DB,Cache,Cfg}]}
+Φ.err_response{code,message,details{field,value,constraint},requestId,timestamp}
 
-# TEST
-cov:line≥80→90%,branch≥75→85%,fn≥85→95%
-name:"should [X] when [Y]";AAA:Arrange→Act→Assert
-cat:unit/commit,integ/PR,e2e/nightly,perf/weekly,sec/PR
-mock:ext only;¬test code;real data;DI;reset each
+# TESTING
+Φ.coverage{line≥80%→90%,branch≥75%→85%,fn≥85%→95%}
+P.test_name="should [behavior] when [condition]"
+P.test_struct=AAA{Arrange,Act,Assert}
+Φ.test_cat{unit→commit,integration→PR,e2e→nightly,perf→weekly,security→PR}
+P.mock{ext deps only;¬mock code under test;realistic data;DI;reset between}
 
-# ARCH
-layers:Pres→App→Domain→Infra;deps→inward;Domain:¬ext deps
-src/{domain/{ent,vo,svc,iface},app/{uc,svc,dto},infra/{persist,ext,cfg},pres/{ctrl,mw,val}}
+# ARCHITECTURE
+Π.layers{Presentation→Application→Domain→Infrastructure}
+P.deps{inward→domain;domain=no ext deps;infra implements domain ifaces}
+Π.structure{src/{domain/{entities,value-objects,services,interfaces},app/{use-cases,services,dtos},infra/{persistence,external-services,config},presentation/{controllers,middleware,validators}}}
 
-# API
-REST:GET=read,POST=create,PUT=replace,PATCH=partial,DELETE=remove
-url:nouns,plural,kebab,nest rels,?filter
-codes:200OK,201Created,204NoContent,400Bad,401Unauth,403Forbid,404NotFound,409Conflict,422Semantic,429Rate,500ISE,503Unavail
-page:{data,page,size,total,hasNext/Prev,links};ver:/api/v{n}/*
+# API DESIGN
+Λ.http{GET=retrieve,POST=create,PUT=replace,PATCH=partial,DELETE=remove}
+P.url{nouns¬verbs;plural;kebab-case;nest relations;query for filter}
+Φ.status{200=OK,201=Created,204=NoContent,400=BadReq,401=Unauth,403=Forbidden,404=NotFound,409=Conflict,422=Unprocessable,429=RateLimit,500=ServerErr,503=Unavailable}
+R.pagination{data,pagination{page,pageSize,totalPages,totalItems,hasNext,hasPrev},links{self,next,last}}
+P.versioning=/api/v{n}/resource
 
 # GIT
-commit:"type(scope):desc" [feat:minor,fix:patch,docs|style|refactor|test|chore|ci:none,perf:patch]
-branch:feature/PROJ-{id}-{desc}|fix/|hotfix/|release/v{ver}|experiment/
-protect:main=PR+2+CI+¬force;develop=PR+1+CI;release/*=PR+2+CI+CODEOWNERS
-PR:<400ln;desc+ctx;issues;screenshots;docs;tests;owners
+P.commit="type(scope): desc\n\nBody\n\nFixes #N\nBREAKING CHANGE: desc"
+Φ.commit_type{feat→Minor,fix→Patch,docs|style|refactor|test|chore|ci|build→None,perf→Patch}
+P.branch{feature/PROJ-{id}-{desc},fix/PROJ-{id}-{desc},hotfix/PROJ-{id}-{desc},release/v{M.m.p},experiment/{desc}}
+P.branch_protect{main=PR+2approvals+CI+¬force,develop=PR+1approval+CI,release/*=PR+2approvals+CI+CODEOWNERS}
+R.PR{small<400lines;desc+ctx;link issues;screenshots for UI;update docs;add tests;request CODEOWNERS}
 
 # SECURITY
-auth:OAuth2/OIDC;session;httpOnly+secure;rate limit;log all
-input:email=RFC5322,phone=E.164,url=https,num=type+range,str=len+whitelist,file=type+size
-data:AES256 rest;TLS1.3 transit;bcrypt≥12 pwd;encrypt PII;param queries;sanitize
-secrets:env|Vault|AWSSecrets;rotate;audit ¬[git,log,chat,shared]
-headers:CSP:self,XCT:nosniff,XFrame:DENY,XSS:1;block,HSTS:31536000,Referrer:strict
+P.auth{OAuth2.0|OIDC;session mgmt;secure storage(httpOnly);rate limit auth;log auth events}
+Φ.input_val{email=RFC5322+domain,phone=E.164,url=https+domain whitelist,num=type+range+precision,str=len+charset,file=type+size+content}
+P.data{encrypt@rest(AES-256);TLS1.3@transit;bcrypt≥12 for pwd;field encrypt PII;parameterized queries;sanitize output→¬XSS}
+P.secrets{env vars|secrets mgr(Vault,AWS);rotate;audit;¬commit;¬log;¬chat share;¬same across env}
+R.headers{CSP:default-src 'self';X-Content-Type-Options:nosniff;X-Frame-Options:DENY;X-XSS-Protection:1;HSTS:31536000;Referrer-Policy:strict-origin-when-cross-origin}
 
-# DB
-query:idx filter/sort;¬SELECT *;EXPLAIN;paginate;conn pool
-migrate:reversible;¬modify;desc name;test prod-like;backup
-naming:tables=snake_plural,cols=snake,pk=id,fk={t}_id,idx=idx_{t}_{c}
+# DATABASE
+P.query{indexes for filter/sort;¬SELECT *;EXPLAIN;paginate;conn pool}
+P.migration{reversible;¬modify existing;descriptive name(YYYYMMDD_desc);test on prod-like data;backup first}
+Φ.db_naming{tables=snake_plural,cols=snake,pk=id,fk={table}_id,idx=idx_{t}_{c},constraint={type}_{t}_{c}}
 
-# LOG/MONITOR
-levels:ERROR=exceptions!,WARN=handled,INFO=biz,DEBUG=diag,TRACE=dev
-format:{ts,level,svc,traceId,spanId,msg,ctx{userId,action,dur}}
-metrics:app=req/err/latency,biz=signups/conv/txn,infra=CPU/mem/disk/net
-alerts:err>1%warn|>5%crit;p99>500ms|>2s;CPU>70%|>90%;mem>75%|>90%;disk>80%|>95%
+# LOGGING
+Φ.log_level{ERROR=exceptions,WARN=handled unexpected,INFO=biz events,DEBUG=diagnostics,TRACE=dev only}
+R.log_format{timestamp,level,service,traceId,spanId,message,context{userId,action,duration}}
+Φ.metrics{app=[req rate,err rate,latency p50/95/99],biz=[signups,conversions,txn],infra=[cpu,mem,disk,net],deps=[api latency,failure rate]}
+Φ.alerts{err_rate>1%→warn>5%→crit,p99>500ms→warn>2000ms→crit,cpu>70%→warn>90%→crit,mem>75%→warn>90%→crit,disk>80%→warn>95%→crit}
 
-# PERF
-targets:read=50/150/300ms,write=100/300/500ms,bg=1/5/30s,batch=30/60/120s
-cache:browser=1yr,CDN=5m,app=15m,db=1hr
-opt:gzip;keepalive;cache;lazy;async;batch db;optimize assets;paginate
+# PERFORMANCE
+Φ.response_target{read:p50=50ms/p95=150ms/p99=300ms,write:p50=100ms/p95=300ms/p99=500ms,bg:p50=1s/p95=5s/p99=30s,batch:p50=30s/p95=60s/p99=120s}
+Φ.cache{browser:static=1yr,CDN:public=5min,app:session=15min,db:query=1hr}
+R.optimize[gzip|brotli,keep-alive,cache,lazy load,async I/O,batch db ops,optimize assets,paginate]
 
-# REVIEW
-check:correct?secure?perf?readable?maintain?tests?docs?
-feedback:specific;why;suggest;ask;ack ¬[vague,criticize only,assume bad,neg only]
-resp:P0=1h→4h,P1=4h→1d,P2=1d→3d,P3=3d→1wk
+# CODE REVIEW
+R.review_check[correctness,security,perf,readability,maintainability,tests,docs]
+P.feedback{specific+actionable;explain why;suggest alts;ask questions;ack good work}
+Φ.review_time{P0:1hr→4hr,P1:4hr→1d,P2:1d→3d,P3:3d→1wk}
 
-# FLAGS
-FeatureFlag:{name,enabled,rolloutPct,allowedUsers,allowedGroups,meta}
-check:¬flag→⊥;¬enabled→⊥;allowed∋user→⊤;rollout=100→⊤;hash%100<rollout→⊤
-lifecycle:Created→Testing→Rollout→Enabled→Cleanup
+# FEATURE FLAGS
+R.flag_impl{name,enabled,rolloutPct,allowedUsers[],allowedGroups[],metadata{}}
+Φ.flag_lifecycle{Created→Testing→Rollout→Enabled→Cleanup}
 
-# A11Y WCAG2.1AA
-perceive:alt img,captions,contrast≥4.5:1
-operate:keyboard,¬seizure,time sufficient
-understand:clear lang,consistent nav,input assist
-robust:valid HTML,ARIA,screen reader
-checks:contrast4.5|3lg,focus vis,alt,h1→h2→h3,labels,keyboard,ARIA
+# ACCESSIBILITY
+R.WCAG_2.1_AA{Perceivable[alt,captions,contrast≥4.5:1],Operable[keyboard,no seizure,time],Understandable[clear lang,consistent nav,input help],Robust[valid HTML,ARIA,screen reader]}
+Φ.a11y_check{contrast:4.5:1 text/3:1 large,focus visible,alt text,heading hierarchy,form labels,keyboard nav,ARIA roles}
 
 # RELEASE
-semver:MAJOR.MINOR.PATCH breaking:MAJOR,feat:MINOR,fix:PATCH
-checklist:tests,CHANGELOG,ver,docs,sec scan,perf,rollback,notify
-deploy:blue-green=0downtime|med,canary=high Δ|low risk,rolling=std|med,recreate=dev|high
+P.semver=MAJOR.MINOR.PATCH{break,feat,fix}
+R.release_check[tests pass,CHANGELOG,version bump,docs,security scan,perf benchmarks,rollback plan,notify stakeholders]
+Φ.deploy{blue-green=0 downtime,canary=low risk,rolling=standard,recreate=dev only}
 
-Ω{consistent;quality;secure;perf;maintain;a11y;reliable;∀team→follow;deviation→discuss+doc}
+Ω{consistency;quality;security;perf;maintainability;a11y;reliability}
+∀team→follow;deviation→discuss+doc exception
 «/CRUX»
 ```
