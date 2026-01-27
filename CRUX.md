@@ -1,10 +1,10 @@
 ---
 name: crux-rule-compression-specification
-version: 1.4.0
+version: 1.4.2
 description: Semantic compressor for Markdown rules. Converts rules to CRUX notation achieving 5-10x token reduction while preserving all actionable information in a form LLMs understand.
 readonly: true
 ---
-# CRUX Rule Compression Specification v1.4.0
+# CRUX Rule Compression Specification v1.4.2
 
 A semantic compression notation for reducing markdown rules to ≤20% of original rule file token count while preserving all actionable information.
 
