@@ -1,3 +1,6 @@
+---
+alwaysApply: true
+---
 # Automatic Version Bumping Rule
 
 When committing changes, analyze commit messages and update `VERSION` accordingly.

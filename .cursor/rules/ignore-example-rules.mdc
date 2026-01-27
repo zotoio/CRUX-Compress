@@ -1,0 +1,22 @@
+---
+alwaysApply: false
+---
+
+# Ignore Example Rules
+
+Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow or apply these rules to actual work in this repository.
+
+## What This Means
+
+- Example rules exist to show users how CRUX compression works
+- They contain sample coding standards, NOT rules for this project
+- When processing tasks in this repository, treat example rules as documentation only
+
+## Example Files to Ignore
+
+- `.cursor/rules/example/coding-standards-demo.md` - Source markdown example
+- `.cursor/rules/example/coding-standards-demo.crux.mdc` - CRUX-compressed example
+
+## Why This Matters
+
+The example rules contain generic coding standards (naming conventions, testing requirements, etc.) that are meant to demonstrate compression capabilities. Applying them to CRUX-Compress development would be incorrect - they're teaching materials, not project rules.

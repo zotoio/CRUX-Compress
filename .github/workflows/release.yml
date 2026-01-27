@@ -47,10 +47,13 @@ jobs:
           ./scripts/create-crux-zip.sh .
           ls -la CRUX-Compress-*.zip
 
-      - name: Generate release notes
+      - name: Generate release notes and changelog
         if: steps.tag_check.outputs.exists == 'false'
         id: release_notes
         run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          
           # Get the previous tag
           PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           
@@ -62,7 +65,7 @@ jobs:
             COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges -20 | grep -v "chore: bump version" || echo "")
           fi
           
-          # Create release notes
+          # Create release notes for GitHub Release
           {
             echo "## What's Changed"
             echo ""
@@ -82,6 +85,26 @@ jobs:
           } > release_notes.md
           
           cat release_notes.md
+          
+          # Create changelog entry for this version
+          {
+            echo "## [v${VERSION}](https://github.com/${{ github.repository }}/releases/tag/v${VERSION}) - ${DATE}"
+            echo ""
+            if [[ -n "$COMMITS" ]]; then
+              echo "$COMMITS"
+            else
+              echo "- Initial release"
+            fi
+            echo ""
+          } > changelog_entry.md
+          
+          echo "Changelog entry:"
+          cat changelog_entry.md
+          
+          # Save commits for output
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         if: steps.tag_check.outputs.exists == 'false'
@@ -96,6 +119,56 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update CHANGELOG.md
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Create or update CHANGELOG.md
+          if [[ -f CHANGELOG.md ]]; then
+            # Prepend new entry after the header
+            # Look for the first ## heading and insert before it
+            if grep -q "^## \[v" CHANGELOG.md; then
+              # Has existing entries - insert after header, before first entry
+              {
+                # Keep everything up to (but not including) the first version entry
+                sed -n '1,/^## \[v/{ /^## \[v/!p }' CHANGELOG.md
+                # Add the new entry
+                cat changelog_entry.md
+                # Add the rest starting from first version entry
+                sed -n '/^## \[v/,$p' CHANGELOG.md
+              } > CHANGELOG.md.new
+              mv CHANGELOG.md.new CHANGELOG.md
+            else
+              # Has header but no entries yet - append entry
+              cat changelog_entry.md >> CHANGELOG.md
+            fi
+          else
+            # Create new CHANGELOG.md
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes to CRUX Compress will be documented in this file."
+              echo ""
+              echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),"
+              echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
+              echo ""
+              cat changelog_entry.md
+            } > CHANGELOG.md
+          fi
+          
+          echo "Updated CHANGELOG.md:"
+          head -50 CHANGELOG.md
+
+      - name: Commit CHANGELOG.md
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add CHANGELOG.md
+          git commit -m "docs: update CHANGELOG.md for v${{ steps.version.outputs.version }} [skip ci]"
+          git push
+
       - name: Summary
         if: steps.tag_check.outputs.exists == 'false'
         run: |
@@ -105,6 +178,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Assets**:" >> $GITHUB_STEP_SUMMARY
           echo "- CRUX-Compress-v${{ steps.version.outputs.version }}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- CHANGELOG.md updated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install Command**:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY

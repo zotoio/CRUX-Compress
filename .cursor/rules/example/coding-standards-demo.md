@@ -1,6 +1,6 @@
 ---
 description: Team coding standards and best practices
-alwaysApply: true
+alwaysApply: false
 crux: true
 ---
 

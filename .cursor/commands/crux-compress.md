@@ -39,7 +39,7 @@ This optimization prevents redundant recompression of unchanged files.
 
 ## Instructions
 
-### When invoked with file reference(s) (`@path/to/file.md`)
+### When invoked with file reference(s) (`@path/to/file.md*`)
 
 1. **For each file reference provided**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
    - Each file gets its own dedicated agent instance

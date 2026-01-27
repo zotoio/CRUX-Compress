@@ -1,6 +1,6 @@
 ---
 description: Team coding standards and best practices
-alwaysApply: true
+alwaysApply: false
 generated: 2026-01-26 14:32
 sourceChecksum: "3184230184"
 beforeTokens: 3232

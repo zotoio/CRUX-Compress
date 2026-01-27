@@ -3,7 +3,7 @@
 # Triggered by: afterFileEdit hook
 #
 # This hook queues modified source files (with crux: true) for compression.
-# The sessionStart hook will inject context to trigger /crux-compress.
+# The afterFileEdit hook will inject context to trigger /crux-compress.
 
 # Read input JSON from stdin (Cursor sends edit details)
 read -r input

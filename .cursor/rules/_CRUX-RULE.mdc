@@ -5,22 +5,15 @@ version: 1.1
 repository: https://github.com/zotoio/CRUX-Compress
 ---
 
-# CRUX Decompression - CRITICAL
+# Foundational CRUX Rules (MUST FOLLOW)
+If not already loaded in context, load `CRUX.md` and `AGENTS.md` from the project root.
+
+## When you encounter CRUX notation, use the 'CRUX Rule Compression Specification' in `CRUX.md` to help you understand and adhere to the rules or intents it contains. 
+
+## CRUX Decompression - CRITICAL
 Always interpret, understand and adhere to the meaning compressed in CRUX notation! NEVER forget this.
 
-## When you encounter CRUX notation, use the 'CRUX Rule Compression Specification' below to help you understand and adhere to the rules or intents it contains. 
+## CRUX Compression - CRITICAL
+When asked to compress a markdown rule file, delegate this to the `crux-cursor-rule-manager` subagent that adheres to this spec. 
 
-# CRUX Compression - CRITICAL
-When asked to compress a markdown rule file, delegate this to the crux-cursor-rule-manager subagent that adheres to this spec. 
 
-# Foundational CRUX Rules (MUST FOLLOW)
-
-0. **ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST** - At the beginning of each agent session, interpret and understand all crux notation detected in rules, and when a new rule(s) is added to context do the same for the new rule(s) immediately. Build a mental model of all rules in context that the user can ask for at any point in time that will include a visualisation.
-1. **NEVER EDIT `CRUX.md`** - The specification is read-only unless the user specifically asks you by name to edit it, at which point ask the user to confirm before proceeding
-2. **DO NOT LOAD SOURCE FILES when CRUX exists** - When you encounter `«CRUX⟨source_file⟩»`, use the compressed CRUX content. DO NOT load the original source file referenced in the header. The CRUX notation is semantically equivalent.
-3. **SURGICAL DIFF UPDATES on source changes** - When you modify a source file that has a corresponding `.crux.mdc` file, you MUST apply surgical diff updates to the CRUX file to keep them synchronized. Invoke the crux-cursor-rule-manager agent to make the update.
-4. **SOURCE CHECKSUM TRACKING** - CRUX files include `sourceChecksum` in frontmatter (use `CRUX-Utils` skill). Skip updates if source checksum matches - the file hasn't changed.
-5. **IGNORE EXAMPLE RULES** - Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow or apply these rules to actual work in this repository.
-
-# CRUX Rule Compression Specification
-load from CRUX.md

@@ -100,20 +100,35 @@ Execute the following tests in order:
 
 ### Test 6: Semantic Validation Test
 
-**Purpose**: Verify semantic validation scoring works.
+**Purpose**: Verify semantic validation scoring works using a fresh subagent instance.
 
-1. Read both `tests/fixtures/sample-rule.md` and `tests/fixtures/sample-rule.crux.mdc`
-2. Evaluate semantic equivalence on these dimensions:
-   - **Completeness** (0-100%): Are all actionable items present?
-   - **Accuracy** (0-100%): Does CRUX correctly represent meaning?
-   - **Reconstructability** (0-100%): Could you reconstruct the original intent?
-   - **No Hallucination** (0-100%): Is everything in CRUX actually in source?
-3. Calculate weighted confidence score:
-   - Completeness 30%
-   - Accuracy 30%
-   - Reconstructability 25%
-   - No Hallucination 15%
+1. Spawn a **fresh `crux-cursor-rule-manager` subagent instance** for validation:
+   - Task the validation agent:
+     ```
+     Perform semantic validation on this CRUX file:
+     - Source: tests/fixtures/sample-rule.md
+     - CRUX: tests/fixtures/sample-rule.crux.mdc
+     - DO NOT use the CRUX specification - evaluate purely on semantic understanding
+     - Compare meaning and completeness between source and CRUX
+     - Evaluate on these dimensions:
+       - Completeness (0-100%): Are all actionable items present?
+       - Accuracy (0-100%): Does CRUX correctly represent meaning?
+       - Reconstructability (0-100%): Could you reconstruct the original intent?
+       - No Hallucination (0-100%): Is everything in CRUX actually in source?
+     - Calculate weighted confidence score:
+       - Completeness 30%, Accuracy 30%, Reconstructability 25%, No Hallucination 15%
+     - Return: individual dimension scores and overall confidence percentage
+     - Flag any issues if confidence < 80%
+     ```
+2. The validation agent returns the confidence score and dimension breakdown
+3. Update the `.crux.mdc` frontmatter with `confidence: XX%` (replacing "pending")
 4. Record: PASS/FAIL (pass if ≥80%), individual scores, overall confidence
+
+**Why Fresh Agent?** Using a separate agent instance ensures:
+- No bias from the compression process or test orchestration
+- Independent semantic evaluation
+- The validator doesn't rely on CRUX specification knowledge loaded earlier
+- True test of whether an LLM can understand the compressed notation
 
 ---
 
@@ -125,6 +140,30 @@ Execute the following tests in order:
 2. Verify "Special tokens" count is > 0
 3. Count should reflect the Unicode symbols in the file
 4. Record: PASS/FAIL, special token count
+
+---
+
+### Test 8: Crux-Compress Command Test
+
+**Purpose**: Verify the `/crux-compress` command works correctly end-to-end.
+
+1. **Setup**: Ensure `tests/fixtures/no-crux-frontmatter.md` exists (a file without `crux: true`)
+2. **Create a test file**: Copy `tests/fixtures/no-crux-frontmatter.md` to `tests/fixtures/compress-test.md`
+3. **Add crux frontmatter**: Add `crux: true` to the test file's frontmatter
+4. **Simulate the command**: Follow the `/crux-compress` workflow:
+   - Spawn a `crux-cursor-rule-manager` subagent to compress `tests/fixtures/compress-test.md`
+   - Verify output created at `tests/fixtures/compress-test.crux.mdc`
+   - Spawn a fresh validation subagent to get confidence score
+   - Update the `.crux.mdc` frontmatter with confidence
+5. **Verify the complete workflow**:
+   - Compression subagent created the CRUX file
+   - Validation subagent returned confidence ≥80%
+   - Frontmatter has all required fields: `generated`, `sourceChecksum`, `beforeTokens`, `afterTokens`, `confidence`
+6. **Verify skip-if-unchanged**: Run compression again on the same file
+   - Should report "source unchanged" and skip recompression
+   - Verify by checking that `generated` timestamp didn't change
+7. **Cleanup**: Delete `tests/fixtures/compress-test.md` and `tests/fixtures/compress-test.crux.mdc`
+8. Record: PASS/FAIL, workflow completion status, skip-if-unchanged working
 
 ---
 
@@ -148,10 +187,11 @@ After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
 | Token Estimation | PASS/FAIL | Tokens: X, Ratio: Y% |
 | Checksum | PASS/FAIL | Deterministic: Yes/No |
 | Install Script | PASS/FAIL | Syntax OK, help available |
-| Semantic Validation | PASS/FAIL | Confidence: X% |
+| Semantic Validation | PASS/FAIL | Confidence: X% (fresh subagent) |
 | Special Characters | PASS/FAIL | Special tokens: X |
+| Crux-Compress Command | PASS/FAIL | Full workflow, skip-if-unchanged |
 
-**Overall**: X/7 tests passed
+**Overall**: X/8 tests passed
 
 ## Detailed Results
 

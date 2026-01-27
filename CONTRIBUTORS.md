@@ -217,14 +217,75 @@ When reporting issues, please include:
 
 ## Release Process
 
-Releases are automated based on the VERSION file:
+Releases are fully automated via GitHub Actions. The CI/CD pipeline ensures that version bumps only occur when tests pass and release-relevant files change.
 
-1. Commits trigger version analysis (conventional commits)
-2. VERSION file is updated automatically
-3. On VERSION change, a GitHub Release is created with:
-   - Tagged version (e.g., `v1.2.3`)
-   - Distribution zip file
-   - Auto-generated release notes
+### CI/CD Flow
+
+```
+Push to main
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Test Workflow (.github/workflows/test.yml)                     │
+│  ├─ Run BATS test suite                                         │
+│  ├─ Validate zip creation                                       │
+│  ├─ Check install script syntax                                 │
+│  └─ Run ShellCheck linting                                      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ success
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Version Bump Workflow (.github/workflows/version-bump.yml)     │
+│  ├─ Check if release-relevant files changed                     │
+│  │   (skips if only docs, tests, or non-release files changed) │
+│  ├─ Analyze commit message for bump type (feat→minor, fix→patch)│
+│  └─ Update VERSION and CRUX.md, commit with [skip ci]           │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ VERSION changed
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Release Workflow (.github/workflows/release.yml)               │
+│  ├─ Build distribution zip (CRUX-Compress-vX.Y.Z.zip)           │
+│  ├─ Create GitHub Release with tag vX.Y.Z                       │
+│  ├─ Generate release notes from commits                         │
+│  └─ Update CHANGELOG.md and commit                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Release-Relevant Files
+
+Version bumps only occur when these files change (matches distribution zip contents):
+
+| File/Path | Description |
+|-----------|-------------|
+| `CRUX.md` | Core specification |
+| `AGENTS.md` | Agent awareness block |
+| `.cursor/hooks.json` | Hook configuration |
+| `.cursor/agents/crux-cursor-rule-manager.md` | Subagent definition |
+| `.cursor/commands/crux-compress.md` | Command definition |
+| `.cursor/hooks/detect-crux-changes.sh` | Hook script |
+| `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
+| `.cursor/skills/CRUX-Utils/**` | Utility skill |
+
+Changes to other files (README, tests, examples, scripts) do **not** trigger releases.
+
+### Manual Version Bump
+
+If you need to force a version bump:
+
+1. Go to **Actions** → **Version Bump** workflow
+2. Click **Run workflow**
+3. Select bump type: `patch`, `minor`, or `major`
+4. Click **Run workflow**
+
+### Version Bump Rules
+
+| Commit Prefix | Version Bump | Example |
+|---------------|-------------|---------|
+| `fix:` | Patch (0.0.x) | `fix: correct token counting` |
+| `feat:` | Minor (0.x.0) | `feat: add new operator` |
+| `feat!:` or `BREAKING CHANGE` | Major (x.0.0) | `feat!: change syntax` |
+| Other (`docs:`, `chore:`, etc.) | Patch (0.0.x) | `docs: update README` |
 
 ## Questions?
 

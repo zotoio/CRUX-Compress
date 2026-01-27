@@ -98,9 +98,10 @@ estimate_tokens() {
     prose_chars=$(count_chars_without_special "$prose_content")
     
     local prose_tokens code_tokens total_tokens
-    prose_tokens=$(echo "scale=0; $prose_chars / $PROSE_RATIO" | bc)
-    code_tokens=$(echo "scale=0; $code_chars / $CODE_RATIO" | bc)
-    total_tokens=$(echo "$prose_tokens + $code_tokens + $special_count" | bc)
+    # Use ceiling (round up) to ensure consistent counts with LLM estimation
+    prose_tokens=$(echo "scale=2; $prose_chars / $PROSE_RATIO" | bc | awk '{print int($1) + ($1 > int($1) ? 1 : 0)}')
+    code_tokens=$(echo "scale=2; $code_chars / $CODE_RATIO" | bc | awk '{print int($1) + ($1 > int($1) ? 1 : 0)}')
+    total_tokens=$((prose_tokens + code_tokens + special_count))
     
     local filename
     filename=$(basename "$file")

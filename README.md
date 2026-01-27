@@ -13,6 +13,7 @@ Users want to manage their rules in readable, natural language markdown. But LLM
 CRUX extracts the essential meaning from natural language markdown rules and compresses it into a logic-based Domain Specific Language (DSL) that all LLMs understand without additional instructions.
 
 **How it works:**
+
 1. **You write rules in natural language markdown** — readable, maintainable, version-controllable
 2. **CRUX compresses them** — extracting the "crux" (the decisive, most important points) into a compact symbolic notation
 3. **Compressed rules load into context** — achieving 5-10x token reduction (target ≤20% of original)
@@ -21,10 +22,12 @@ CRUX extracts the essential meaning from natural language markdown rules and com
 The result: your context window stays lean while your rules remain powerful.
 
 ## Demonstration
+
 Here is an experiment for you. 
 
 1. Start a new chat with any model in Claude, ChatGPT, Gemini, Deepseek etc.
-2. Paste this into the chat and submit it. 
+2. Paste this into the chat and submit it.
+
 ```markdown
 Explain this:
 
@@ -36,6 +39,7 @@ R=req→if gap→assume+mark; C=obs→cite path:lines; Δ=R≠C→tag{code|tests
 **CRUX** = **C**ontext **R**eduction **U**sing **X**-encoding
 
 The "X" is intentionally flexible:
+
 - e**X**pressive symbols (→ ⊳ ⊲ ∋ ∀)
 - e**X**tensible notation (custom blocks)
 - e**X**change format (compress ↔ expand)
@@ -67,17 +71,19 @@ curl -fsSL .../install.sh | bash -s -- --help
 
 The installer creates/updates these files in your project:
 
-| File | Purpose |
-|------|---------|
-| `CRUX.md` | Specification (READONLY) |
-| `AGENTS.md` | Agent awareness notice |
-| `VERSION` | Installed CRUX version |
-| `.cursor/hooks.json` | Hook configuration |
-| `.cursor/hooks/detect-crux-changes.sh` | File change detection |
-| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
-| `.cursor/commands/crux-compress.md` | Compression command |
-| `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
-| `.cursor/skills/CRUX-Utils/` | Utility skill |
+
+| File                                         | Purpose                  |
+| -------------------------------------------- | ------------------------ |
+| `CRUX.md`                                    | Specification (READONLY) |
+| `AGENTS.md`                                  | Agent awareness notice   |
+| `VERSION`                                    | Installed CRUX version   |
+| `.cursor/hooks.json`                         | Hook configuration       |
+| `.cursor/hooks/detect-crux-changes.sh`       | File change detection    |
+| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
+| `.cursor/commands/crux-compress.md`          | Compression command      |
+| `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule      |
+| `.cursor/skills/CRUX-Utils/`                 | Utility skill            |
+
 
 ### Upgrading
 
@@ -99,7 +105,7 @@ The CRUX system consists of 6 interconnected components:
 flowchart TB
     subgraph "CRUX System Architecture"
         CRUX["CRUX.md<br/>(Specification)<br/>READONLY"]
-        AGENTS["AGENTS.md<br/>&lt;CRUX&gt; block<br/>(High-visibility notice)"]
+        AGENTS["AGENTS.md<br/><CRUX> block<br/>(High-visibility notice)"]
         RULE["_CRUX-RULE.mdc<br/>(Always-Applied Rule)<br/>.cursor/rules/"]
         MANAGER["crux-cursor-rule-manager.md<br/>(Subagent - ΣCRUX)<br/>.cursor/agents/"]
         COMMAND["crux-compress.md<br/>(Cursor Command)<br/>.cursor/commands/"]
@@ -120,6 +126,8 @@ flowchart TB
     end
 ```
 
+
+
 ## Component Details
 
 ### 1. `CRUX.md` - The Specification (Project Root)
@@ -127,6 +135,7 @@ flowchart TB
 **Purpose**: The authoritative specification defining CRUX notation syntax, encoding symbols, and compression rules.
 
 **Key Contents**:
+
 - Encoding symbols (structure, relations, logic, change, qualifiers)
 - Standard blocks (`Ρ`, `E`, `Λ`, `Π`, `Κ`, `R`, `P`, `Γ`, `M`, `Φ`, `Ω`)
 - Compression rules (eliminate prose, deduplicate, collapse, merge)
@@ -134,6 +143,7 @@ flowchart TB
 - Example transformations
 
 **Critical Rules**:
+
 - **READONLY** - Agents must NEVER edit this file unless explicitly asked by the user
 - All other CRUX components reference this as their source of truth
 
@@ -144,6 +154,7 @@ flowchart TB
 **Location**: Near the top of `AGENTS.md`, the first file agents read.
 
 **Key Contents**:
+
 ```xml
 <CRUX agents="always">
 ## CRITICAL: CRUX Notation
@@ -158,6 +169,7 @@ flowchart TB
 ```
 
 **Why It Matters**: This ensures agents know to:
+
 - Load `CRUX.md` to understand compression symbols
 - Use CRUX content instead of loading original source files
 - Keep CRUX files synchronized when sources change
@@ -167,12 +179,14 @@ flowchart TB
 **Purpose**: A Cursor rule that is always loaded into context, providing agents with instructions for handling CRUX notation.
 
 **Key Functions**:
+
 - **Decompression**: Tells agents to interpret and follow CRUX-compressed rules
 - **Compression**: Directs agents to delegate compression tasks to `crux-cursor-rule-manager`
 - **Foundational Rules**: Reinforces the 5 critical rules
 - **Specification Reference**: Points to `CRUX.md` for full details
 
 **Contents**:
+
 ```markdown
 # CRUX Decompression - CRITICAL
 Always interpret, understand and adhere to the meaning compressed in CRUX notation!
@@ -196,6 +210,7 @@ load from CRUX.md
 **Purpose**: A specialized AI subagent (ΣCRUX) that performs compression and decompression tasks.
 
 **Capabilities**:
+
 - **Compression**: Convert verbose markdown → compact CRUX notation
 - **Decompression**: Explain CRUX notation in natural language
 - **Validation**: Verify CRUX output follows specification
@@ -203,6 +218,7 @@ load from CRUX.md
 - **Surgical Diff Updates**: Update CRUX files when sources change
 
 **Workflow**:
+
 1. Load `CRUX.md` specification (required first step)
 2. Get source file's checksum via `CRUX-Utils` skill
 3. Check if existing CRUX `sourceChecksum` matches → skip if unchanged
@@ -214,6 +230,7 @@ load from CRUX.md
 9. Update frontmatter with `confidence: XX%`
 
 **Output Format**:
+
 ```yaml
 ---
 generated: YYYY-MM-DD HH:MM
@@ -233,6 +250,7 @@ alwaysApply: true
 **Purpose**: A Cursor command that orchestrates CRUX compression tasks.
 
 **Usage**:
+
 ```
 /crux-compress ALL                    - Compress all eligible rules
 /crux-compress @path/to/file.md       - Compress a specific file
@@ -240,28 +258,34 @@ alwaysApply: true
 ```
 
 **Key Features**:
+
 - **Parallelism**: Spawns up to 4 `crux-cursor-rule-manager` subagents in parallel
 - **Batching**: Processes files in batches of 4 when >4 files
 - **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed
 - **Eligibility Criteria**: Files must have `crux: true` frontmatter (`.md` or `.mdc` files, not `.crux.mdc`)
 
 **File Convention**:
-| Type | Extension | Example |
-|------|-----------|---------|
-| Source (human-readable) | `.md` | `core-tenets.md` |
+
+
+| Type                         | Extension   | Example                |
+| ---------------------------- | ----------- | ---------------------- |
+| Source (human-readable)      | `.md`       | `core-tenets.md`       |
 | Compressed (token-efficient) | `.crux.mdc` | `core-tenets.crux.mdc` |
+
 
 ### 6. `detect-crux-changes.sh` - The Hook (`.cursor/hooks/`)
 
 **Purpose**: A Cursor hook that automatically detects when source files with `crux: true` are modified and queues them for compression.
 
 **How It Works**:
+
 1. Triggered by the `afterFileEdit` Cursor hook
 2. Checks if the edited file is in `.cursor/rules/` with `.md` extension (not `.crux.mdc`)
 3. Verifies the file has `crux: true` in its frontmatter
 4. Queues the file in `.cursor/hooks/pending-crux-compress.json` for later compression
 
 **Hook Configuration** (`.cursor/hooks.json`):
+
 ```json
 {
   "version": 1,
@@ -277,6 +301,7 @@ alwaysApply: true
 ```
 
 **Benefits**:
+
 - Automatically tracks which source files need recompression
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
@@ -286,20 +311,27 @@ alwaysApply: true
 **Purpose**: Multi-purpose utility for CRUX compression workflows.
 
 **Modes**:
-| Mode | Purpose |
-|------|---------|
-| `--token-count <file>` | Estimate tokens for a file |
-| `--token-count --ratio <src> <crux>` | Compare source vs CRUX, calculate compression ratio |
-| `--cksum <file>` | Get checksum formatted for `sourceChecksum` frontmatter |
+
+
+| Mode                                 | Purpose                                                 |
+| ------------------------------------ | ------------------------------------------------------- |
+| `--token-count <file>`               | Estimate tokens for a file                              |
+| `--token-count --ratio <src> <crux>` | Compare source vs CRUX, calculate compression ratio     |
+| `--cksum <file>`                     | Get checksum formatted for `sourceChecksum` frontmatter |
+
 
 **Token Estimation Method**:
-| Content Type | Chars/Token | Notes |
-|--------------|-------------|-------|
-| Prose | 4.0 | Markdown text, headers, lists |
-| Code blocks | 3.5 | More symbols, shorter identifiers |
-| Special chars | 1.0 | CRUX Unicode symbols (→, ⊳, «, etc.) |
+
+
+| Content Type  | Chars/Token | Notes                                |
+| ------------- | ----------- | ------------------------------------ |
+| Prose         | 4.0         | Markdown text, headers, lists        |
+| Code blocks   | 3.5         | More symbols, shorter identifiers    |
+| Special chars | 1.0         | CRUX Unicode symbols (→, ⊳, «, etc.) |
+
 
 **Benefits**:
+
 - Deterministic (same input = same output)
 - Content-aware (different ratios for prose vs code)
 - CRUX-aware (counts special Unicode symbols)
@@ -311,18 +343,21 @@ See `.cursor/skills/CRUX-Utils/SKILL.md` for detailed usage.
 
 To use CRUX in your project, copy these files to your project root:
 
-| File | Purpose |
-|------|---------|
-| `CRUX.md` | Specification (READONLY) |
-| `AGENTS.md` | Agent awareness notice (or add the `<CRUX>` block to your existing AGENTS.md) |
-| `.cursor/hooks.json` | Hook configuration |
-| `.cursor/hooks/detect-crux-changes.sh` | File change detection hook |
-| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
-| `.cursor/commands/crux-compress.md` | Compression command |
-| `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
-| `.cursor/skills/CRUX-Utils/` | Utility skill (token estimation, checksums) |
+
+| File                                         | Purpose                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------- |
+| `CRUX.md`                                    | Specification (READONLY)                                                      |
+| `AGENTS.md`                                  | Agent awareness notice (or add the `<CRUX>` block to your existing AGENTS.md) |
+| `.cursor/hooks.json`                         | Hook configuration                                                            |
+| `.cursor/hooks/detect-crux-changes.sh`       | File change detection hook                                                    |
+| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
+| `.cursor/commands/crux-compress.md`          | Compression command                                                           |
+| `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
+| `.cursor/skills/CRUX-Utils/`                 | Utility skill (token estimation, checksums)                                   |
+
 
 Then:
+
 1. Ensure `.cursor/hooks.json` is recognized by Cursor
 2. Add `crux: true` to any rule files you want to compress
 3. Use `/crux-compress ALL` to compress eligible files
@@ -362,6 +397,8 @@ flowchart TD
     COMMAND --> MANAGER
 ```
 
+
+
 ### Decompression Flow (Runtime)
 
 ```mermaid
@@ -382,6 +419,8 @@ flowchart TD
     START --> RULE
     RULE --> INTERPRET
 ```
+
+
 
 ### Synchronization Flow
 
@@ -409,33 +448,38 @@ flowchart TD
     RULE --> MANAGER
 ```
 
+
+
 ## Foundational Rules (All Components Enforce)
 
-0. **ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST** - At session start, interpret all CRUX notation in rules. When new rules are added to context, interpret them immediately. Build a mental model of all rules that can be visualized on request.
-1. **NEVER EDIT `CRUX.md`** - The specification is read-only
-2. **DO NOT LOAD SOURCE FILES when CRUX exists** - Use `«CRUX⟨...⟩»` content directly
-3. **SURGICAL DIFF UPDATES** - Keep CRUX files synchronized with source changes
-4. **ABORT IF NO SIGNIFICANT REDUCTION** - Target ≤20% of original; skip if not achieved
-5. **IGNORE EXAMPLE RULES** - Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow or apply these rules to actual work.
+1. **ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST** - At session start, interpret all CRUX notation in rules. When new rules are added to context, interpret them immediately. Build a mental model of all rules that can be visualized on request.
+2. **NEVER EDIT `CRUX.md`** - The specification is read-only
+3. **DO NOT LOAD SOURCE FILES when CRUX exists** - Use `«CRUX⟨...⟩»` content directly
+4. **SURGICAL DIFF UPDATES** - Keep CRUX files synchronized with source changes
+5. **ABORT IF NO SIGNIFICANT REDUCTION** - Target ≤20% of original; skip if not achieved
+6. **IGNORE EXAMPLE RULES** - Files in `.cursor/rules/example/`* are demonstration samples only. DO NOT follow or apply these rules to actual work.
 
 ## File Locations Summary
 
-| Component | Path | Purpose |
-|-----------|------|---------|
-| Specification | `CRUX.md` | Defines notation syntax |
-| Agent Notice | `AGENTS.md` (CRUX block) | High-visibility awareness |
-| Always-Applied Rule | `.cursor/rules/_CRUX-RULE.mdc` | Runtime instructions |
-| Subagent | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor |
-| Compress Command | `.cursor/commands/crux-compress.md` | Compression interface |
-| Test Command | `.cursor/commands/crux-test.md` | LLM feature testing |
-| Hook | `.cursor/hooks/detect-crux-changes.sh` | Auto-detect file changes |
-| Hook Config | `.cursor/hooks.json` | Hook configuration |
-| Utility Skill | `.cursor/skills/CRUX-Utils/` | Token estimation, checksums |
-| Install Script | `install.sh` | Curl-pipe-bash installer |
-| Zip Builder | `scripts/create-crux-zip.sh` | Build distribution zip |
-| Shellcheck | `scripts/shellcheck.sh` | Lint all shell scripts |
-| Tests | `tests/*.bats` | BATS test suite |
-| CI Workflows | `.github/workflows/` | Automated testing and releases |
+
+| Component           | Path                                         | Purpose                        |
+| ------------------- | -------------------------------------------- | ------------------------------ |
+| Specification       | `CRUX.md`                                    | Defines notation syntax        |
+| Agent Notice        | `AGENTS.md` (CRUX block)                     | High-visibility awareness      |
+| Always-Applied Rule | `.cursor/rules/_CRUX-RULE.mdc`               | Runtime instructions           |
+| Subagent            | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor           |
+| Compress Command    | `.cursor/commands/crux-compress.md`          | Compression interface          |
+| Test Command        | `.cursor/commands/crux-test.md`              | LLM feature testing            |
+| Hook                | `.cursor/hooks/detect-crux-changes.sh`       | Auto-detect file changes       |
+| Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
+| Utility Skill       | `.cursor/skills/CRUX-Utils/`                 | Token estimation, checksums    |
+| Install Script      | `install.sh`                                 | Curl-pipe-bash installer       |
+| Zip Builder         | `scripts/create-crux-zip.sh`                 | Build distribution zip         |
+| Shellcheck          | `scripts/shellcheck.sh`                      | Lint all shell scripts         |
+| Tests               | `tests/*.bats`                               | BATS test suite                |
+| CI Workflows        | `.github/workflows/`                         | Automated testing and releases |
+| Dev Rules           | `.cursor/rules/*.mdc`                        | Development workflow rules     |
+
 
 ## Quick Reference
 
@@ -448,6 +492,7 @@ flowchart TD
 ### To Make a File Eligible for Compression
 
 Add to frontmatter:
+
 ```yaml
 ---
 crux: true
@@ -455,12 +500,14 @@ crux: true
 ```
 
 **Note**: Both `.md` and `.mdc` files with `crux: true` are eligible. For `.mdc` files, the compression workflow will:
+
 1. Rename the file to `.md` (preserving the source)
 2. Compress to `.crux.mdc` (which becomes the active Cursor rule)
 
 ### To Check Compression Ratio and Confidence
 
 Compressed files include metrics in frontmatter:
+
 ```yaml
 beforeTokens: 2500  # Original
 afterTokens: 400    # Compressed (16% of original)
@@ -468,6 +515,7 @@ confidence: 92%     # Semantic validation score
 ```
 
 **Confidence Score** indicates how well CRUX preserves semantic meaning:
+
 - ≥90%: Excellent (accept as-is)
 - 80-89%: Good (accept)
 - 70-79%: Marginal (review)
@@ -539,12 +587,14 @@ The script checks all shell files including `install.sh`, `scripts/create-crux-z
 
 ### Test Coverage
 
-| Script | Test File | Coverage |
-|--------|-----------|----------|
-| `crux-utils.sh` | `test_crux_utils.bats` | Token counting, checksums, ratios, error handling |
-| `scripts/create-crux-zip.sh` | `test_create_zip.bats` | Zip contents, version embedding, structure |
-| `detect-crux-changes.sh` | `test_detect_hook.bats` | Frontmatter detection, queue management |
-| `install.sh` | `test_install.bats` | Syntax validation, options, functions |
+
+| Script                       | Test File               | Coverage                                          |
+| ---------------------------- | ----------------------- | ------------------------------------------------- |
+| `crux-utils.sh`              | `test_crux_utils.bats`  | Token counting, checksums, ratios, error handling |
+| `scripts/create-crux-zip.sh` | `test_create_zip.bats`  | Zip contents, version embedding, structure        |
+| `detect-crux-changes.sh`     | `test_detect_hook.bats` | Frontmatter detection, queue management           |
+| `install.sh`                 | `test_install.bats`     | Syntax validation, options, functions             |
+
 
 ### LLM Feature Testing
 
@@ -557,6 +607,7 @@ Use the `/crux-test` command in Cursor to run comprehensive LLM-driven tests:
 ```
 
 This generates a `CRUX-TEST-REPORT.md` with detailed results including:
+
 - Compression metrics
 - Token reduction analysis
 - Semantic validation scores
@@ -568,32 +619,36 @@ CRUX Compress uses GitHub Actions for automated testing and releases.
 
 ### Workflows
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `test.yml` | PR, Push | Runs BATS tests, validates zip, checks scripts |
-| `version-bump.yml` | Push to main | Auto-bumps version based on conventional commits |
-| `release.yml` | VERSION change | Creates GitHub Release with zip artifact |
+
+| Workflow           | Trigger        | Purpose                                          |
+| ------------------ | -------------- | ------------------------------------------------ |
+| `test.yml`         | PR, Push       | Runs BATS tests, validates zip, checks scripts   |
+| `version-bump.yml` | Push to main   | Auto-bumps version based on conventional commits |
+| `release.yml`      | VERSION change | Creates GitHub Release with zip artifact         |
+
 
 ### Conventional Commits
 
 Version bumping follows conventional commits:
 
-| Commit Type | Version Bump | Example |
-|-------------|--------------|---------|
-| `feat:` | Minor (1.X.0) | `feat: add new compression mode` |
-| `fix:` | Patch (1.0.X) | `fix: handle empty files` |
+
+| Commit Type        | Version Bump  | Example                          |
+| ------------------ | ------------- | -------------------------------- |
+| `feat:`            | Minor (1.X.0) | `feat: add new compression mode` |
+| `fix:`             | Patch (1.0.X) | `fix: handle empty files`        |
 | `BREAKING CHANGE:` | Major (X.0.0) | Body contains "BREAKING CHANGE:" |
-| Other | Patch (1.0.X) | `docs: update readme` |
+| Other              | Patch (1.0.X) | `docs: update readme`            |
+
 
 ### Release Process
 
 1. Push commits to `main` with conventional commit messages
 2. `version-bump.yml` analyzes commits and updates `VERSION`
 3. `release.yml` detects version change and:
-   - Builds versioned zip via `scripts/create-crux-zip.sh`
-   - Creates GitHub Release with tag `vX.X.X`
-   - Attaches zip as release artifact
-   - Generates release notes from commits
+  - Builds versioned zip via `scripts/create-crux-zip.sh`
+  - Creates GitHub Release with tag `vX.X.X`
+  - Attaches zip as release artifact
+  - Generates release notes from commits
 
 ## Contributing
 

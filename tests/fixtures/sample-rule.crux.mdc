@@ -1,63 +1,106 @@
 ---
-generated: 2024-01-15 10:30
-sourceChecksum: "3847291056"
-beforeTokens: 850
-afterTokens: 180
-confidence: 94%
+generated: 2026-01-27 12:00
+sourceChecksum: 2253728265
+beforeTokens: 6278
+afterTokens: 1172
+confidence: 95%
+crux: true
 alwaysApply: true
 ---
 
 > [!IMPORTANT]
 > Generated file - do not edit!
 
-# Sample Coding Standards
+# Comprehensive Team Coding Standards
 
 ```crux
 «CRUX⟨sample-rule.md⟩»
 
-# Naming
-Φ.naming{
-  JS/TS:var+fn→camelCase
-  Py:var+fn→snake_case
-  ∀class→PascalCase
-  ∀const→SCREAMING_SNAKE
-}
+# NAMING
+JS/TS:camelCase:var/fn|PascalCase:class/iface|SCREAMING:const|enum:Pascal+SCREAM
+Py:snake:var/fn|Pascal:class|SCREAM:const|_:private
+Go:Pascal:exported|camel:unexported|acronyms:consistent case
 
-# Code Style
-R.fn{len≤20-30;single-purpose}
-R.nest{depth≤3;early-return≻deep-nest}
-R.code{self-documenting}
+# STYLE
+fn≤30ln;early ret;nest≤3;1 concept/fn;compose≻inherit;SRP=⊤
+lines:JS100/2sp,Py88/4sp,Go120/tab,Rust100/4sp,SQL80/2sp
+limits:cyclo≤10,cognitive≤15,params≤5,nest≤3
 
-# Documentation
-R.docs{
-  public→JSDoc|docstring
-  ∋[desc,params:type,return]
-}
+# DOCS
+∀public→{desc,@param,@returns,@throws,@example};Py:Google docstr;Go://comment
 
-# Errors
-P.err{¬swallow;min→log+context}
-R.err-types{custom:[ValidationError{msg,field}]}
+# ERRORS
+hierarchy:Base→Val{Req,Format,Range}|Biz{Funds,Dup,State}|Integ{Net,Timeout,Unavail}|Sys{DB,Cache,Cfg}
+¬swallow;log+ctx;custom types;fail fast;actionable msg
+resp:{code,msg,details{field,val,constraint},reqId,ts}
 
-# Testing
-Ω.test{coverage≥80%;meaningful}
-R.test-name="should [behavior] when [condition]"
-R.test-struct=AAA{Arrange→Act→Assert}
-P.mock{external-deps-only}
+# TEST
+cov:line≥80→90%,branch≥75→85%,fn≥85→95%
+name:"should [X] when [Y]";AAA:Arrange→Act→Assert
+cat:unit/commit,integ/PR,e2e/nightly,perf/weekly,sec/PR
+mock:ext only;¬test code;real data;DI;reset each
 
-# Git
-Φ.commit{
-  fmt:"type(scope): desc"
-  types:[feat,fix,docs,style,refactor,test,chore]
-}
-Φ.branch{
-  fmt:[feature|fix]/short-desc
-  +ticket→PROJ-123-desc
-}
+# ARCH
+layers:Pres→App→Domain→Infra;deps→inward;Domain:¬ext deps
+src/{domain/{ent,vo,svc,iface},app/{uc,svc,dto},infra/{persist,ext,cfg},pres/{ctrl,mw,val}}
 
-# Security
-P.secret{¬commit:[API-keys,passwords,creds]}
-R.input{validate;sanitize;param-queries}
-R.output{encode→¬XSS}
+# API
+REST:GET=read,POST=create,PUT=replace,PATCH=partial,DELETE=remove
+url:nouns,plural,kebab,nest rels,?filter
+codes:200OK,201Created,204NoContent,400Bad,401Unauth,403Forbid,404NotFound,409Conflict,422Semantic,429Rate,500ISE,503Unavail
+page:{data,page,size,total,hasNext/Prev,links};ver:/api/v{n}/*
 
+# GIT
+commit:"type(scope):desc" [feat:minor,fix:patch,docs|style|refactor|test|chore|ci:none,perf:patch]
+branch:feature/PROJ-{id}-{desc}|fix/|hotfix/|release/v{ver}|experiment/
+protect:main=PR+2+CI+¬force;develop=PR+1+CI;release/*=PR+2+CI+CODEOWNERS
+PR:<400ln;desc+ctx;issues;screenshots;docs;tests;owners
+
+# SECURITY
+auth:OAuth2/OIDC;session;httpOnly+secure;rate limit;log all
+input:email=RFC5322,phone=E.164,url=https,num=type+range,str=len+whitelist,file=type+size
+data:AES256 rest;TLS1.3 transit;bcrypt≥12 pwd;encrypt PII;param queries;sanitize
+secrets:env|Vault|AWSSecrets;rotate;audit ¬[git,log,chat,shared]
+headers:CSP:self,XCT:nosniff,XFrame:DENY,XSS:1;block,HSTS:31536000,Referrer:strict
+
+# DB
+query:idx filter/sort;¬SELECT *;EXPLAIN;paginate;conn pool
+migrate:reversible;¬modify;desc name;test prod-like;backup
+naming:tables=snake_plural,cols=snake,pk=id,fk={t}_id,idx=idx_{t}_{c}
+
+# LOG/MONITOR
+levels:ERROR=exceptions!,WARN=handled,INFO=biz,DEBUG=diag,TRACE=dev
+format:{ts,level,svc,traceId,spanId,msg,ctx{userId,action,dur}}
+metrics:app=req/err/latency,biz=signups/conv/txn,infra=CPU/mem/disk/net
+alerts:err>1%warn|>5%crit;p99>500ms|>2s;CPU>70%|>90%;mem>75%|>90%;disk>80%|>95%
+
+# PERF
+targets:read=50/150/300ms,write=100/300/500ms,bg=1/5/30s,batch=30/60/120s
+cache:browser=1yr,CDN=5m,app=15m,db=1hr
+opt:gzip;keepalive;cache;lazy;async;batch db;optimize assets;paginate
+
+# REVIEW
+check:correct?secure?perf?readable?maintain?tests?docs?
+feedback:specific;why;suggest;ask;ack ¬[vague,criticize only,assume bad,neg only]
+resp:P0=1h→4h,P1=4h→1d,P2=1d→3d,P3=3d→1wk
+
+# FLAGS
+FeatureFlag:{name,enabled,rolloutPct,allowedUsers,allowedGroups,meta}
+check:¬flag→⊥;¬enabled→⊥;allowed∋user→⊤;rollout=100→⊤;hash%100<rollout→⊤
+lifecycle:Created→Testing→Rollout→Enabled→Cleanup
+
+# A11Y WCAG2.1AA
+perceive:alt img,captions,contrast≥4.5:1
+operate:keyboard,¬seizure,time sufficient
+understand:clear lang,consistent nav,input assist
+robust:valid HTML,ARIA,screen reader
+checks:contrast4.5|3lg,focus vis,alt,h1→h2→h3,labels,keyboard,ARIA
+
+# RELEASE
+semver:MAJOR.MINOR.PATCH breaking:MAJOR,feat:MINOR,fix:PATCH
+checklist:tests,CHANGELOG,ver,docs,sec scan,perf,rollback,notify
+deploy:blue-green=0downtime|med,canary=high Δ|low risk,rolling=std|med,recreate=dev|high
+
+Ω{consistent;quality;secure;perf;maintain;a11y;reliable;∀team→follow;deviation→discuss+doc}
 «/CRUX»
 ```
