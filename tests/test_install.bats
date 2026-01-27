@@ -102,7 +102,8 @@ teardown() {
 }
 
 @test "install.sh creates required directories" {
-    run grep -E "mkdir -p .cursor/agents" "$INSTALL_SCRIPT"
+    # The script relies on unzip to create directories during extraction
+    run grep -E "unzip -o" "$INSTALL_SCRIPT"
     assert_exit_code 0
 }
 
@@ -113,9 +114,12 @@ teardown() {
 
 # Integration test - only run if network is available
 @test "install.sh get_latest_version function works (requires network)" {
-    skip "Skipping network-dependent test"
+    # Skip if no network connectivity to GitHub
+    curl -s --connect-timeout 3 https://api.github.com > /dev/null 2>&1 || skip "No network"
     
-    # This would test actual GitHub API call
-    # run bash -c "source '$INSTALL_SCRIPT'; get_latest_version"
-    # assert_exit_code 0
+    # Show the URL being requested
+    run bash -c "source '$INSTALL_SCRIPT'; echo \"API URL: \$GITHUB_API\"; get_latest_version"
+    echo "Exit code: $status"
+    echo "Output: $output"
+    assert_exit_code 0
 }
