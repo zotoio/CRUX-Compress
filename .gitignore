@@ -49,3 +49,6 @@ temp/
 dist/
 build/
 out/
+
+# X-Fidelity analysis results
+.xfiResults/
