@@ -71,7 +71,7 @@ The installer creates/updates these files in your project:
 |------|---------|
 | `CRUX.md` | Specification (READONLY) |
 | `AGENTS.md` | Agent awareness notice |
-| `version.txt` | Installed CRUX version |
+| `VERSION` | Installed CRUX version |
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/hooks/detect-crux-changes.sh` | File change detection |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent |
@@ -550,7 +550,7 @@ CRUX Compress uses GitHub Actions for automated testing and releases.
 |----------|---------|---------|
 | `test.yml` | PR, Push | Runs BATS tests, validates zip, checks scripts |
 | `version-bump.yml` | Push to main | Auto-bumps version based on conventional commits |
-| `release.yml` | version.txt change | Creates GitHub Release with zip artifact |
+| `release.yml` | VERSION change | Creates GitHub Release with zip artifact |
 
 ### Conventional Commits
 
@@ -566,7 +566,7 @@ Version bumping follows conventional commits:
 ### Release Process
 
 1. Push commits to `main` with conventional commit messages
-2. `version-bump.yml` analyzes commits and updates `version.txt`
+2. `version-bump.yml` analyzes commits and updates `VERSION`
 3. `release.yml` detects version change and:
    - Builds versioned zip via `create-crux-zip.sh`
    - Creates GitHub Release with tag `vX.X.X`

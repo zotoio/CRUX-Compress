@@ -1,6 +1,6 @@
 # Automatic Version Bumping Rule
 
-When committing changes, analyze commit messages and update `version.txt` accordingly.
+When committing changes, analyze commit messages and update `VERSION` accordingly.
 
 ## Conventional Commit Version Rules
 
@@ -15,8 +15,8 @@ Apply semantic versioning based on conventional commit prefixes:
 
 ## When to Apply
 
-1. **Before creating a commit** - If the user asks you to commit changes, analyze the commit message type and bump `version.txt` before staging
-2. **Include version.txt in the commit** - Stage the updated `version.txt` along with the other changes
+1. **Before creating a commit** - If the user asks you to commit changes, analyze the commit message type and bump `VERSION` before staging
+2. **Include VERSION in the commit** - Stage the updated `VERSION` along with the other changes
 
 ## Version Bump Logic
 

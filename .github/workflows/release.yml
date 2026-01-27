@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'version.txt'
+      - 'VERSION'
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          VERSION=$(cat version.txt | tr -d '[:space:]')
+          VERSION=$(cat VERSION | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 

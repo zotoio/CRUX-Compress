@@ -47,7 +47,7 @@ jobs:
           REQUIRED_FILES=(
             "CRUX.md"
             "AGENTS.crux.md"
-            "version.txt"
+            "VERSION"
             ".cursor/hooks.json"
             ".cursor/agents/crux-cursor-rule-manager.md"
             ".cursor/commands/crux-compress.md"

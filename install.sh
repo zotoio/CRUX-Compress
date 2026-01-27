@@ -129,10 +129,10 @@ get_latest_version() {
 
 # Get currently installed version
 get_installed_version() {
-    if [[ -f "version.txt" ]]; then
-        cat "version.txt" | tr -d '[:space:]'
-    elif [[ -f ".cursor/version.txt" ]]; then
-        cat ".cursor/version.txt" | tr -d '[:space:]'
+    if [[ -f "VERSION" ]]; then
+        cat "VERSION" | tr -d '[:space:]'
+    elif [[ -f ".cursor/VERSION" ]]; then
+        cat ".cursor/VERSION" | tr -d '[:space:]'
     else
         echo ""
     fi
@@ -253,7 +253,7 @@ download_and_extract() {
         log "Creating backups of existing files..."
         backup_file "CRUX.md"
         backup_file "AGENTS.md"
-        backup_file "version.txt"
+        backup_file "VERSION"
         backup_file ".cursor/hooks.json"
         backup_file ".cursor/agents/crux-cursor-rule-manager.md"
         backup_file ".cursor/commands/crux-compress.md"

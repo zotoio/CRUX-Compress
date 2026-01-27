@@ -3,7 +3,7 @@
 # Usage: ./create-crux-zip.sh [output-dir]
 #
 # This script packages all CRUX-related files for distribution.
-# Output: CRUX-Compress-v{version}.zip (version read from version.txt)
+# Output: CRUX-Compress-v{version}.zip (version read from VERSION)
 
 set -e
 
@@ -12,8 +12,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 OUTPUT_DIR="${1:-$PROJECT_ROOT}"
 
-# Read version from version.txt
-VERSION=$(cat "$PROJECT_ROOT/version.txt" | tr -d '[:space:]')
+# Read version from VERSION file
+VERSION=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
 ZIP_NAME="CRUX-Compress-v${VERSION}.zip"
 
 cd "$PROJECT_ROOT"
@@ -35,7 +35,7 @@ mkdir -p "$STAGING_DIR/.cursor/skills/CRUX-Utils/scripts"
 # Copy core files
 echo "Copying core files..."
 cp CRUX.md "$STAGING_DIR/"
-cp version.txt "$STAGING_DIR/"
+cp VERSION "$STAGING_DIR/"
 
 # Extract CRUX block from AGENTS.md into AGENTS.crux.md
 # This contains only the <CRUX...> to </CRUX> block for merging during install

@@ -63,7 +63,7 @@ teardown() {
     assert_output_contains "</CRUX>"
 }
 
-@test "create-crux-zip.sh zip contains version.txt" {
+@test "create-crux-zip.sh zip contains VERSION" {
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
     
@@ -71,7 +71,7 @@ teardown() {
     zip_file=$(ls "$TEST_TEMP_DIR"/CRUX-Compress-v*.zip)
     
     run unzip -l "$zip_file"
-    assert_output_contains "version.txt"
+    assert_output_contains "VERSION"
 }
 
 @test "create-crux-zip.sh zip contains .cursor/hooks.json" {
@@ -141,9 +141,9 @@ teardown() {
     assert_output_contains ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
 }
 
-@test "create-crux-zip.sh version in filename matches version.txt" {
+@test "create-crux-zip.sh version in filename matches VERSION" {
     local expected_version
-    expected_version=$(cat "$PROJECT_ROOT/version.txt" | tr -d '[:space:]')
+    expected_version=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
     
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
@@ -151,9 +151,9 @@ teardown() {
     assert_file_exists "$TEST_TEMP_DIR/CRUX-Compress-v${expected_version}.zip"
 }
 
-@test "create-crux-zip.sh extracted version.txt matches source" {
+@test "create-crux-zip.sh extracted VERSION matches source" {
     local expected_version
-    expected_version=$(cat "$PROJECT_ROOT/version.txt" | tr -d '[:space:]')
+    expected_version=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
     
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
@@ -165,7 +165,7 @@ teardown() {
     unzip -q "$zip_file" -d "$TEST_TEMP_DIR/extracted"
     
     local extracted_version
-    extracted_version=$(cat "$TEST_TEMP_DIR/extracted/version.txt" | tr -d '[:space:]')
+    extracted_version=$(cat "$TEST_TEMP_DIR/extracted/VERSION" | tr -d '[:space:]')
     
     [[ "$extracted_version" == "$expected_version" ]]
 }

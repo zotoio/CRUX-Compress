@@ -136,7 +136,7 @@ After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
 # CRUX Test Report
 
 **Generated**: [timestamp]
-**Version**: [from version.txt]
+**Version**: [from VERSION]
 **Environment**: [OS, bash version if relevant]
 
 ## Summary
