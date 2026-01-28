@@ -5,6 +5,12 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.1.0) - 2026-01-28
+
+- test: update test report and fixtures with improved compression (395fb22)
+- feat: add --force and --minified flags to crux-compress command (ef8914b)
+- docs: update CHANGELOG.md for v2.0.1 [skip ci] (94617ab)
+
 ## [v2.0.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.0.1) - 2026-01-28
 
 - docs: add interactive demonstration section to README (f3c4ac1)
