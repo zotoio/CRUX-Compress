@@ -229,3 +229,79 @@ jobs:
           echo "| Bump Type | ${{ steps.analyze.outputs.bump_type }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Trigger | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | ${{ needs.check-release-files.outputs.commit_message }} |" >> $GITHUB_STEP_SUMMARY
+
+  # Always sync CRUX.md with VERSION file (runs when version-bump is skipped)
+  sync-version:
+    needs: [check-release-files, version-bump]
+    # Run if version-bump was skipped (not needed) but check-release-files ran
+    if: |
+      always() && 
+      needs.check-release-files.result == 'success' && 
+      needs.version-bump.result == 'skipped'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check and sync CRUX.md version
+        id: sync
+        run: |
+          # Get current VERSION
+          if [[ -f VERSION ]]; then
+            VERSION=$(cat VERSION | tr -d '[:space:]')
+          else
+            echo "No VERSION file found"
+            echo "needs_sync=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "VERSION file: $VERSION"
+          
+          # Get version from CRUX.md frontmatter
+          CRUX_VERSION=$(grep -E "^version: " CRUX.md | head -1 | sed 's/version: //' | tr -d '[:space:]')
+          echo "CRUX.md version: $CRUX_VERSION"
+          
+          # Check if they match
+          if [[ "$VERSION" == "$CRUX_VERSION" ]]; then
+            echo "Versions match - no sync needed"
+            echo "needs_sync=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version mismatch - sync needed"
+            echo "needs_sync=true" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update CRUX.md version
+        if: steps.sync.outputs.needs_sync == 'true'
+        run: |
+          VERSION="${{ steps.sync.outputs.version }}"
+          
+          # Update frontmatter version
+          sed -i "s/^version: .*/version: $VERSION/" CRUX.md
+          
+          # Update heading version
+          sed -i "s/# CRUX Rule Compression Specification v.*/# CRUX Rule Compression Specification v$VERSION/" CRUX.md
+          
+          echo "Synced CRUX.md to version $VERSION"
+
+      - name: Commit sync
+        if: steps.sync.outputs.needs_sync == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add CRUX.md
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: sync CRUX.md version to ${{ steps.sync.outputs.version }} [skip ci]"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## Version Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.sync.outputs.needs_sync }}" == "true" ]]; then
+            echo "Synced CRUX.md to version ${{ steps.sync.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No sync needed - versions already match" >> $GITHUB_STEP_SUMMARY
+          fi
