@@ -95,11 +95,11 @@ teardown() {
     # Create a file with CRUX special characters
     cat > "$TEST_TEMP_DIR/special.crux.mdc" << 'EOF'
 # Test
-«CRUX⟨test.md⟩»
+⟦CRUX:test.md
 Κ{code→clean}
 R.style{indent→consistent}
 ∀fn→small
-«/CRUX»
+⟧
 EOF
     
     run "$CRUX_UTILS" --token-count "$TEST_TEMP_DIR/special.crux.mdc"

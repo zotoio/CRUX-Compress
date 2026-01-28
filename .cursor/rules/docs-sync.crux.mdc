@@ -11,11 +11,11 @@ crux: true
 # Docs Sync
 
 ```crux
-«CRUX⟨.cursor/rules/docs-sync.md⟩»
+⟦CRUX:.cursor/rules/docs-sync.md
 Γ{Δfile→Δdocs}
 README⊲[install.sh,CRUX.md,.cursor/commands/*,.cursor/skills/*/SKILL.md]
 CONTRIB⊲[.github/workflows/*.yml,tests/*.bats,scripts/*.sh,tests/helpers.bash]
 R{surgical;fmt=exist;upd ver+paths;+flow→+list}
 P{¬.cursor/rules/example/*;¬temp;¬spec}
-«/CRUX»
+⟧
 ```

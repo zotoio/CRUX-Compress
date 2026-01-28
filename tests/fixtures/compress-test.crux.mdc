@@ -1,12 +1,12 @@
 ---
-generated: 2026-01-28 10:45
+generated: 2026-01-28 12:00
 sourceChecksum: 2179275645
 beforeTokens: 480
-afterTokens: 224
-confidence: 89%
+afterTokens: 259
+confidence: 94%
+crux: true
 alwaysApply: true
 description: A test rule for compress command testing
-crux: true
 ---
 
 > [!IMPORTANT]
@@ -15,13 +15,30 @@ crux: true
 # Test Coding Standards Rule
 
 ```crux
-«CRUX⟨tests/fixtures/compress-test.md⟩»
-R.naming{unit=test_*.bats,fixtures=*.md|*.mdc,helpers=helpers.bash}
-R.setup{setup()→init env;teardown()→cleanup;tmp→$BATS_TMPDIR;¬artifacts}
-R.assert{ok→assert_success,fail→assert_failure,substr→--partial,line→assert_line}
-Λ.good=run cmd→assert*;Λ.bad=¬run∧¬assert
-Γ.apply⊲new_tests|review_PR|debug_fail
-P{⊛¬skip run;⊛cleanup in teardown;!descriptive names;¬hardcoded paths→vars}
-R.debug{check $output,$status,$lines;?set -x}
-«/CRUX»
+⟦CRUX:tests/fixtures/compress-test.md
+Φ.naming{test:test_*.bats;fixture:*.md|*.mdc;helper:helpers.bash}
+
+R.setup{
+ setup()→init env;teardown()→cleanup tmp
+ ¬artifacts@workdir;use $BATS_TMPDIR
+}
+
+R.assert{
+ assert_success←ok;assert_failure←fail
+ assert_output --partial←substr;assert_line←ln check
+}
+
+E.good{@test "desc"→run fn→assert_failure+assert_output --partial}
+E.bad{@test→¬run,¬assert} #avoid
+
+Γ.apply⊲[+BATS tests|review PR|debug fail]
+
+P.critical{
+ ⊛¬skip run→assert
+ ⊛cleanup@teardown
+ !desc test names;¬hardcode paths→vars
+}
+
+Γ.error{fail→check $output+$status+$lines;debug→set -x temp}
+⟧
 ```

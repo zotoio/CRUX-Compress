@@ -52,7 +52,7 @@ This ensures the compression tests generate fresh output that reflects the curre
    - `sourceChecksum` (checksum value)
    - `beforeTokens` (number)
    - `afterTokens` (number)
-5. Verify the CRUX block contains `«CRUX⟨sample-rule.md⟩»` header
+5. Verify the CRUX block contains `⟦CRUX:sample-rule.md` header
 6. Record: PASS/FAIL, token reduction percentage
 
 ---

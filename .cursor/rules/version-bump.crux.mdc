@@ -14,7 +14,7 @@ crux: true
 # Automatic Version Bumping Rule
 
 ```crux
-«CRUX⟨version-bump.md⟩»
+⟦CRUX:version-bump.md
 ⊲commit→analyze msg+Δ VERSION
 
 Λ.semver{
@@ -46,5 +46,5 @@ P{
   Δ major|minor→reset lower(1.2.3→2.0.0¬2.2.3)
   ¬conventional→ask user
 }
-«/CRUX»
+⟧
 ```

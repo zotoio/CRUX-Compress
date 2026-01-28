@@ -1,10 +1,10 @@
 ---
 name: crux-rule-compression-specification
-version: 1.4.2
+version: 2.0.0
 description: Semantic compressor for Markdown rules. Converts rules to CRUX notation achieving 5-10x token reduction while preserving all actionable information in a form LLMs understand.
 readonly: true
 ---
-# CRUX Rule Compression Specification v1.4.2
+# CRUX Rule Compression Specification v2.0.0
 
 A semantic compression notation for reducing markdown rules to ≤20% of original rule file token count while preserving all actionable information.
 
@@ -13,7 +13,7 @@ A semantic compression notation for reducing markdown rules to ≤20% of origina
 **CRUX** = **C**ontext **R**eduction **U**sing **X**-encoding
 
 The "X" is intentionally flexible:
-- e**X**pressive symbols (→ ⊳ ⊲ ∋ ∀)
+- e**X**pressive symbols (→ ⊳ ⊲ ∋ ∀ » ⊕)
 - e**X**tensible notation (custom blocks)
 - e**X**change format (compress ↔ expand)
 
@@ -25,7 +25,7 @@ The name also serves as a backronym for "crux" — the decisive or most importan
 > CRITICAL FOUNDATIONAL CRUX RULES
 > 0. ALWAYS INTERPRET AND UNDERSTAND ALL CRUX RULES FIRST - At session start, interpret all CRUX notation in rules. When new rules are added to context, interpret them immediately. Build a mental model of all rules that can be visualized on request.
 > 1. AGENTS MUST NEVER EDIT THIS FILE UNLESS SPECIFICALLY ASKED TO BY NAME BY THE USER, AT WHICH POINT ASK THE USER TO CONFIRM
-> 2. AGENTS MUST NOT LOAD THE SOURCE FILE in «CRUX⟨source⟩»
+> 2. AGENTS MUST NOT LOAD THE SOURCE FILE in ⟦CRUX:source ... ⟧
 > 3. UPDATES TO THE SOURCE FILE MUST TRIGGER SURGICAL DIFF UPDATES TO RELATED CRUX FILE
 > 4. IF CRUX GENERATION DOES NOT RESULT IN SIGNIFICANT REDUCTION IN TOKENS, DON'T DO IT.
 
@@ -35,11 +35,12 @@ The name also serves as a backronym for "crux" — the decisive or most importan
 
 | Symbol | Meaning |
 |--------|---------|
-| `«CRUX⟨source⟩»...«/CRUX»` | Block delimiters |
+| `⟦CRUX:source ... ⟧` | Block delimiters (source file reference after colon) |
 | `{k=v,k2=v2}` | Object/map |
 | `[a,b,c]` | List/array |
 | `(grouping)` | Logical grouping |
 | `.sub` | Namespace (e.g., `Π.core`, `Λ.build`) |
+| `;` | Statement separator (multiple clauses on one line) |
 
 ### Comparison (Numeric)
 
@@ -49,6 +50,8 @@ The name also serves as a backronym for "crux" — the decisive or most importan
 | `<` | less than |
 | `≥` | greater or equal |
 | `≤` | less or equal |
+| `≠` | not equal |
+| `..` | range / to (e.g., `20..30` = 20 to 30) |
 
 ### Priority / Preference
 
@@ -63,10 +66,18 @@ Example: `CONFIRMED ≻ DRAFT` means CONFIRMED takes precedence over DRAFT
 
 | Symbol | Meaning |
 |--------|---------|
-| `→` | flows to / maps to / outputs |
+| `→` | flows to / maps to / outputs / conditional then |
 | `←` | flows from / derives from / inputs |
 
-Example: `trigger→action`, `source←upstream`
+Example: `trigger→action`, `source←upstream`, `∀changes→run_tests`
+
+### Sequence
+
+| Symbol | Meaning |
+|--------|---------|
+| `»` | then / next step / sequential (ordered operations) |
+
+Example: `analyze»transform»output` (do analyze, then transform, then output)
 
 ### Relations
 
@@ -75,9 +86,11 @@ Example: `trigger→action`, `source←upstream`
 | `⊳` | has domain/expertise (left=entity, right=capability) |
 | `⊲` | triggered by / activated on (left=entity, right=trigger) |
 | `@` | located at path |
-| `:` | has type / is-a |
+| `:` | has type / is-a / key-value separator (context-dependent) |
 | `=` | equals / defined as |
 | `∋` | contains / includes |
+
+Note: `:` meaning depends on context — `agent:coordinator` (type), `{line:≥80%}` (key-value), `fix:typo` (prefix)
 
 ### Logic
 
@@ -96,8 +109,10 @@ Example: `trigger→action`, `source←upstream`
 | Symbol | Meaning |
 |--------|---------|
 | `Δ` | change / update / delta |
-| `+` | add / include |
+| `+` | add / include / with (context-dependent) |
 | `-` | remove / exclude |
+
+Note: `+` meaning depends on context — `+file` (add), `log+ctx` (with/and), `gap→assume+mark` (combination)
 
 ### Qualifiers
 
@@ -107,6 +122,7 @@ Example: `trigger→action`, `source←upstream`
 | `?` | optional |
 | `!` | required / important |
 | `#` | comment / note |
+| `⊕` | optimal / target (e.g., `≥80%⊕90%` = min 80%, target 90%) |
 
 ### Importance
 
@@ -184,18 +200,18 @@ archetype∋[rules,plugins,deps,structure]
 ### Template
 
 ```
-«CRUX⟨{filename of source markdown rules}⟩»
+⟦CRUX:{filename of source markdown rules}
 {blocks in logical order, one concept per line, max ~80 chars/line}
-«/CRUX»
+⟧
 ```
 
 ### Do
 
-- Start immediately with `«CRUX⟨...⟩»`
+- Start immediately with `⟦CRUX:{source_file}`
 - Use single line per logical unit
 - Group related items with namespaces
 - Preserve all actionable information
-- End with `«/CRUX»`
+- End with `⟧`
 
 ### Don't
 
@@ -245,7 +261,7 @@ If the skill is not available, use these heuristics:
 |--------------|-------------|-------|
 | Prose (markdown) | 4.0 | English text, headers, lists |
 | Code blocks | 3.5 | More symbols, shorter identifiers |
-| Special chars | 1.0 | CRUX Unicode symbols (→, ⊳, «, etc.) |
+| Special chars | 1.0 | CRUX Unicode symbols (→, ⊳, ⟦, », etc.) |
 
 **Estimation formula**:
 ```
@@ -273,20 +289,36 @@ total_tokens = (prose_chars / 4.0) + (code_chars / 3.5) + special_char_count
 | `auth` | authentication |
 | `val` | validation |
 | `repo` | repository |
+| `w/` | with |
+| `w/o` | without |
+| `ln` | lines |
+| `cls` | class |
+| `iface` | interface |
+| `svc` | service |
+| `txn` | transaction |
+| `idx` | index |
+| `fn` | function |
+| `var` | variable |
+| `param` | parameter |
+| `ctx` | context |
+| `msg` | message |
+| `req` | request |
+| `res` | response |
 
 ---
 
 ## Quick Reference
 
 ```
-STRUCTURE:  «»⟨⟩{}[]().sub
-COMPARE:    > < ≥ ≤
+STRUCTURE:  ⟦⟧{}[]().sub;
+COMPARE:    > < ≥ ≤ ≠ ..
 PRIORITY:   ≻ ≺
 DATA FLOW:  → ←
+SEQUENCE:   »
 RELATIONS:  ⊳ ⊲ @ : = ∋
 LOGIC:      | & ⊤ ⊥ ∀ ∃ ¬
 CHANGE:     Δ + -
-QUALIFY:    * ? ! #
+QUALIFY:    * ? ! # ⊕
 IMPORTANCE: ⊛ ◊
 BLOCKS:     Ρ E Λ Π Κ R P Γ M Φ Ω
 ```
@@ -357,7 +389,7 @@ alwaysApply: true
 # Code Modification Protocol
 
 ```crux
-«CRUX⟨{source_file}⟩»
+⟦CRUX:{source_file}
 R=req→truth;gap→assume+mark;?arch→ask first
 C=obs→cite path:lines;repo≻chat
 Δ=R≠C→tag{code|tests|req}+why
@@ -366,7 +398,7 @@ PATCH=surgical diff;¬rewrite w/o proof
 CHECK=run/+tests|static val
 STATE={R,C,Δ}→upd on progress
 Ω{¬halluc;verified only}
-«/CRUX»
+⟧
 ```
 
 ### LLM/agent interpretation (internal CoT trace)

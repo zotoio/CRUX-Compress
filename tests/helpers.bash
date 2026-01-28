@@ -83,12 +83,12 @@ alwaysApply: true
 # Sample Rule
 
 ```crux
-«CRUX⟨sample-rule.md⟩»
+⟦CRUX:sample-rule.md
 
 Κ{code:clean;naming:conventions;docs:proper}
 R.style{indent:consistent;fn:small;comments:meaningful}
 
-«/CRUX»
+⟧
 ```
 EOF
 }

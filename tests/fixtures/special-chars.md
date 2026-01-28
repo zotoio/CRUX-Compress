@@ -20,9 +20,9 @@ This file contains CRUX special characters for testing token counting.
 ## Sample CRUX Block
 
 ```crux
-«CRUX⟨special-chars.md⟩»
+⟦CRUX:special-chars.md
 Κ{key→value}
 R.rule{a∋b;c≻d}
 ∀x→process(x)
-«/CRUX»
+⟧
 ```

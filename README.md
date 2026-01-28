@@ -23,16 +23,157 @@ The result: your context window stays lean while your rules remain powerful.
 
 ## Demonstration
 
-Here is an experiment for you. 
+<div align="center">
 
-1. Start a new chat with any model in Claude, ChatGPT, Gemini, Deepseek etc.
-2. Paste this into the chat and submit it.
-
-```markdown
-Explain this:
-
-R=req→if gap→assume+mark; C=obs→cite path:lines; Δ=R≠C→tag{code|tests|req}+why
 ```
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│   ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  82% SAVED     │
+│                                                           │
+│       BEFORE: ~625 tokens  →  AFTER: ~112 tokens          │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+</div>
+
+<details>
+<summary><strong>BEFORE — Original Rule (625 tokens)</strong></summary>
+
+> # Team Development Standards
+> 
+> ## Key Definitions
+> 
+> | Abbreviation | Meaning |
+> |--------------|---------|
+> | fn | function |
+> | cls | class |
+> | cmp | component |
+> | pr | pull request |
+> 
+> ## Style Rules
+> 
+> ### Indentation & Formatting
+> 
+> - Use **2 spaces** for indentation
+> - **Never use tabs!** This is strictly enforced
+> - Lines must not exceed **100 characters**
+> 
+> ### Naming Conventions
+> 
+> | Element | Convention | Examples |
+> |---------|------------|----------|
+> | Functions | camelCase | `getUserData`, `processOrder` |
+> | Classes | PascalCase | `UserService`, `OrderProcessor` |
+> | Constants | UPPER_SNAKE_CASE | `MAX_RETRIES`, `API_BASE_URL` |
+> 
+> ## Quality Rules
+> 
+> ### Size Limits
+> 
+> - Functions must be **50 lines or fewer**
+> - Classes must be **300 lines or fewer**
+> 
+> ### Documentation & Testing
+> 
+> - All exported members must have test coverage of **at least 80%**
+> - All functions must include JSDoc comments documenting:
+>   - Parameters
+>   - Return value
+> 
+> ### Complexity
+> 
+> - Cyclomatic complexity must not exceed **10**
+> 
+> ## Code Review Process
+> 
+> - All pull requests require:
+>   - At least **1 approval** from a reviewer
+>   - **CI pipeline must pass**
+> - If a change is **500 lines or more**, you must split it into smaller PRs!
+> 
+> ## Patterns to Avoid
+> 
+> | Anti-Pattern | Guidance |
+> |--------------|----------|
+> | `any` type | **Strictly forbidden!** Always use proper types |
+> | `console.log` | Not allowed in production code |
+> | Magic numbers | Extract to named constants instead |
+> 
+> ## Examples
+> 
+> ### Good Practice
+> 
+> When handling errors, use try/catch with proper logging and handling:
+> 
+> ```typescript
+> try {
+>   await riskyOperation();
+> } catch (error) {
+>   logger.error('Operation failed', error);
+>   handleError(error);
+> }
+> ```
+> 
+> ### Bad Practice
+> 
+> Never silently swallow errors:
+> 
+> ```typescript
+> try {
+>   await riskyOperation();
+> } catch (e) {
+>   /* ignore */
+> }
+> ```
+> 
+> ## Core Principles
+> 
+> - **Quality takes priority over speed** — Don't sacrifice code quality to ship faster
+> - **Readable code takes priority over clever code** — Write code that others can understand
+
+</details>
+
+---
+
+<details open>
+<summary><strong>AFTER — CRUX Compressed (112 tokens)</strong></summary>
+
+**Try it yourself!** Copy and paste into Claude, ChatGPT, Gemini, or any LLM:
+
+```
+Explain this: ⟦CRUX:coding-standards.md; Ρ{team dev standards}; Κ{fn=function; cls=class; cmp=component; pr=pull request}; R.style{indent=2sp; ¬tabs!; line≤100ch; naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}}; R.quality{fn.len≤50; cls.len≤300; ∀export→test.cov≥80%; ∀fn→jsdoc[params+return]; cyclomatic≤10}; Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}; P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}; E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}; Ω{quality≻speed; readable≻clever}⟧
+```
+
+</details>
+
+<details>
+<summary><strong>Formatted CRUX (for readability)</strong></summary>
+
+```
+⟦CRUX:coding-standards.md
+Ρ{team dev standards}
+Κ{fn=function; cls=class; cmp=component; pr=pull request}
+R.style{
+  indent=2sp; ¬tabs!; line≤100ch
+  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
+}
+R.quality{
+  fn.len≤50; cls.len≤300; ∀export→test.cov≥80%
+  ∀fn→jsdoc[params+return]; cyclomatic≤10
+}
+Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}
+P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}
+E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}
+Ω{quality≻speed; readable≻clever}
+⟧
+```
+
+</details>
+
+---
+
+> **Note:** Larger source documents typically achieve higher compression percentages. A 500-word markdown file might compress to 15% of its original tokens, while a 100-word file might only reach 40%. CRUX works best when there's sufficient prose to distill.
 
 ## Etymology
 

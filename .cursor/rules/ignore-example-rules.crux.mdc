@@ -14,9 +14,9 @@ crux: true
 # Ignore Example Rules
 
 ```crux
-«CRUX⟨ignore-example-rules.md⟩»
+⟦CRUX:ignore-example-rules.md
 P{.cursor/rules/example/*=demo;¬follow|apply}
 IGNORE@[coding-standards-demo.md,.crux.mdc]
 #teaching materials only
-«/CRUX»
+⟧
 ```

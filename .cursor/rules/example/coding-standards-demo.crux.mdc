@@ -1,12 +1,11 @@
 ---
-generated: 2026-01-28 10:15
-sourceChecksum: "2130530612"
-beforeTokens: 3234
-afterTokens: 434
-confidence: 94%
+generated: 2026-01-28 14:30
+sourceChecksum: "3847291056"
+beforeTokens: 625
+afterTokens: 112
+confidence: 92%
 description: Team coding standards and best practices
 alwaysApply: false
-crux: true
 ---
 
 > [!IMPORTANT]
@@ -15,18 +14,20 @@ crux: true
 # Team Coding Standards
 
 ```crux
-«CRUX⟨.cursor/rules/example/coding-standards-demo.md⟩»
-Κ.core{humans≻computers;readable≻clever;Δtouch→cleanup¬scope-creep}
-Κ.naming{JS/TS:camelCase|PascalCase(cls)|SCREAMING(const);PY:snake_case;bool:is|has|can|should;files:kebab(JS)|snake(PY);¬generic[x,data,temp]}
-Κ.struct{func≤30ln;1func=1thing;nest≤3→early ret;comments→why¬what;docs:JSDoc|docstr∋[desc,params,ret,ex,throws]}
-Κ.err{¬swallow!→log|handle|throw;custom[ValErr,NotFoundErr];msg∋[op,expected,actual,ctx]}
-Κ.test{cov≥80%+meaningful;name="should X when Y";AAA;mock:ext¬internal}
-Κ.git{commit:"type(scope):desc";types:[feat,fix,docs,style,refactor,test,chore];branch:type/desc+ticket;PR∋[title,desc,refs,small,tests,CI✓]}
-Κ.sec{¬commit:[keys,secrets,PII]→env|secrets;input→val+sanitize+parameterize;auth:check authz,¬DIY,rate limit}
-Κ.perf{DB:¬N+1,idx,page,profile;cache:TTL+invalidate+warm;FE:lazy,optimize,split}
-Κ.deps{+dep→check[maintained,size,vulns,alt];prod:pin;lib:range;monitor vulns}
-Κ.review{author:self-review,small,ctx;reviewer:respectful,explain,good≻perfect}
-Κ.log{+:[start,auth,biz,err+ctx];-:[sensitive,flood];levels:ERR|WARN|INFO|DEBUG|TRACE}
-R{living doc;good judgment;ask if ?}
-«/CRUX»
+⟦CRUX:.cursor/rules/example/coding-standards-demo.md
+Ρ{team dev standards}
+Κ{fn=function; cls=class; cmp=component; pr=pull request}
+R.style{
+  indent=2sp; ¬tabs!; line≤100ch
+  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
+}
+R.quality{
+  fn.len≤50; cls.len≤300; ∀export→test.cov≥80%
+  ∀fn→jsdoc[params+return]; cyclomatic≤10
+}
+Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}
+P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}
+E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}
+Ω{quality≻speed; readable≻clever}
+⟧
 ```

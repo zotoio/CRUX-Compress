@@ -14,7 +14,7 @@ alwaysApply: true
 # Testing Standards
 
 ```crux
-«CRUX⟨no-change.md⟩»
+⟦CRUX:no-change.md
 # Coverage Thresholds
 COV={line:≥80→90%,branch:≥75→85%,func:≥85→95%}
 CRIT=100%∀[payment,auth,validation,errors]
@@ -43,5 +43,5 @@ ASSERT={specific⊤,one_behavior,verify_err_type+msg}
 # CI Requirements
 CI.pass=[unit:100%,integration:100%,cov_thresholds,¬flaky]
 FLAKY=fix≤48h|quarantine+issue;¬skip_w/o_docs
-«/CRUX»
+⟧
 ```

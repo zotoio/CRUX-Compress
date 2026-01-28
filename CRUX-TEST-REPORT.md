@@ -1,100 +1,133 @@
 # CRUX Test Report
 
-**Generated**: 2026-01-27 12:45 UTC
-**Version**: 1.4.0
+**Generated**: 2026-01-28 14:35 UTC
+**Version**: 2.0.0
 **Environment**: Linux 6.14.0-37-generic, GNU bash 5.2.21
 
 ## Summary
 
 | Test | Status | Notes |
 |------|--------|-------|
-| Compression | PASS | Token reduction: 73.3% (6278→1679) |
-| Decompression | PASS | Notation semantically interpretable without spec |
-| Token Estimation | PASS | Tokens: 6278, Ratio: 26.7% of original |
-| Checksum | PASS | Deterministic: Yes, Changes on modification: Yes |
-| Install Script | PASS | Syntax OK, help available with --backup, --verbose |
-| Semantic Validation | PASS | Confidence: 96% (fresh subagent) |
-| Special Characters | PASS | Special tokens: 41 |
-| Crux-Compress Command | PASS | Full workflow, skip-if-unchanged working |
-| Semantic Stability | PASS | Baseline confidence: 97%, no drift detected |
+| Compression | PASS | Token reduction: 72.0% (6278→1761 tokens) |
+| Decompression | PASS | Semantic interpretation verified without spec |
+| Token Estimation | PASS | Tokens: 6278 source, Ratio: 28.0% |
+| Checksum | PASS | Deterministic: Yes (2253728265 consistent, changes on modification) |
+| Install Script | PASS | Syntax OK, help shows --backup, --verbose, curl usage |
+| Semantic Validation | PASS | Confidence: 98% (fresh subagent) |
+| Special Characters | PASS | Special tokens: 35 |
+| Crux-Compress Command | PASS | Full workflow complete, skip-if-unchanged working |
+| Semantic Stability | PASS | Baseline unchanged, confidence: 96% |
 
 **Overall**: 9/9 tests passed
 
 ## Detailed Results
 
+### Pre-Test Cleanup
+
+**Status**: Complete
+
+Deleted files to allow fresh generation:
+- `tests/fixtures/sample-rule.crux.mdc` (5813 bytes)
+- `tests/fixtures/compress-test.crux.mdc` (792 bytes)
+
+Note: `tests/fixtures/no-change.crux.mdc` preserved as permanent baseline.
+
+---
+
 ### Test 1: Compression
 
-**Purpose**: Verify CRUX compression works correctly.
+**Status**: PASS
 
-**Steps executed**:
-1. Pre-test cleanup: Deleted existing `tests/fixtures/sample-rule.crux.mdc`
-2. Read source file `tests/fixtures/sample-rule.md` (879 lines)
-3. Spawned `crux-cursor-rule-manager` subagent for compression
-4. Generated output at `tests/fixtures/sample-rule.crux.mdc`
+Compressed `tests/fixtures/sample-rule.md` (Comprehensive Team Coding Standards) to CRUX notation.
 
-**Verification**:
-- ✓ Output file created successfully
-- ✓ Frontmatter contains `generated: 2026-01-27 12:30`
-- ✓ Frontmatter contains `sourceChecksum: 2253728265`
-- ✓ Frontmatter contains `beforeTokens: 6278`
-- ✓ Frontmatter contains `afterTokens: 1679`
-- ✓ CRUX block contains `«CRUX⟨tests/fixtures/sample-rule.md⟩»` header
-
-**Metrics**:
 | Metric | Value |
 |--------|-------|
-| Source tokens | 6278 |
-| CRUX tokens | 1679 |
-| Compression ratio | 26.7% of original |
-| Token reduction | 73.3% |
+| Source file | `tests/fixtures/sample-rule.md` |
+| Output file | `tests/fixtures/sample-rule.crux.mdc` |
+| Checksum | 2253728265 |
+| Before tokens | 6,278 |
+| After tokens | 1,761 |
+| Compression ratio | 28.0% of original |
+| Reduction | 72.0% |
 
-**Result**: PASS
+**Frontmatter verification**:
+- ✓ `generated`: 2026-01-28 14:30
+- ✓ `sourceChecksum`: 2253728265
+- ✓ `beforeTokens`: 6278
+- ✓ `afterTokens`: 1761
+- ✓ `crux: true` (preserved from source)
+- ✓ `alwaysApply: true` (preserved from source)
+- ✓ CRUX block contains `⟦CRUX:tests/fixtures/sample-rule.md` header
 
-**Notes**: While the ratio (26.7%) exceeds the ideal ≤20% target, this is expected for extremely dense source files containing multiple code examples, tables with precise values, and comprehensive documentation across 18+ topic areas.
+**Note**: The 28% ratio exceeds the ≤20% target, which is expected for documents with extensive structured data (code examples, tables, hierarchies) that must be preserved verbatim.
 
 ---
 
 ### Test 2: Decompression
 
-**Purpose**: Verify LLMs can understand CRUX notation without the specification.
+**Status**: PASS
 
-**Interpretation** (without reading CRUX.md):
+Interpreted the compressed CRUX notation **without referencing CRUX.md**.
 
-The compressed notation in `sample-rule.crux.mdc` is semantically transparent:
+**Sample CRUX block interpretation**:
 
-| Notation | Interpretation |
-|----------|----------------|
-| `JS/TS:{var,fn}=camelCase` | JavaScript/TypeScript: variables and functions use camelCase |
-| `Φ.complexity{cyclomatic≤10!}` | Cyclomatic complexity must be ≤10 (! = required) |
-| `P.test_struct=AAA{Arrange,Act,Assert}` | Tests follow Arrange-Act-Assert pattern |
-| `Φ.coverage{line≥80%→90%}` | Line coverage: minimum 80%, target 90% |
-| `∀public API→JSDoc` | For all public APIs, use JSDoc documentation |
-| `¬swallow` | Do not swallow (errors) |
-| `repo≻chat` | Repository takes precedence over chat history |
+```crux
+JS/TS{var+fn=camelCase;cls+iface=PascalCase;const=SCREAMING_SNAKE;enum=Pascal+SNAKE;type=T|TRequest}
+```
 
-**Key rules encoded**:
+**Interpretation**: JavaScript/TypeScript naming conventions:
+- Variables and functions use camelCase
+- Classes and interfaces use PascalCase
+- Constants use SCREAMING_SNAKE_CASE
+- Enums use PascalCase for names with SNAKE_CASE values
+- Type parameters use single letters (T) or descriptive names (TRequest)
+
+```crux
+Ω.coverage{line:≥80%⊕90%;branch:≥75%⊕85%;fn:≥85%⊕95%}
+```
+
+**Interpretation**: Quality gates for test coverage:
+- Line coverage: minimum 80%, target 90%
+- Branch coverage: minimum 75%, target 85%
+- Function coverage: minimum 85%, target 95%
+
+```crux
+R.err{¬swallow;log+ctx;custom_types;fail_fast;actionable_msg}
+```
+
+**Interpretation**: Error handling requirements:
+- Don't swallow errors silently
+- Log errors with context
+- Use custom error types
+- Fail fast on unrecoverable errors
+- Provide actionable error messages
+
+**Key rules extracted**:
 1. Language-specific naming conventions (JS/TS, Python, Go)
-2. Code style thresholds (complexity, line length, nesting)
-3. Documentation requirements (JSDoc, docstrings)
-4. Error handling hierarchy (Validation, Business, Integration, System)
-5. Testing standards (coverage thresholds, AAA pattern, test categories)
-6. API design (HTTP methods, status codes, pagination)
-7. Security guidelines (encryption, hashing, input validation)
-8. Git workflow (branch naming, commit format, PR rules)
+2. Function complexity limits (cyclomatic ≤10, nesting ≤3)
+3. Documentation requirements for public APIs
+4. Error hierarchy with specific error types
+5. Test coverage thresholds with min/target values
+6. AAA pattern (Arrange→Act→Assert)
+7. Layered architecture (Presentation→Application→Domain→Infrastructure)
+8. REST API design standards
+9. Git workflow with conventional commits
+10. Security guidelines (auth, encryption, secrets)
+11. Performance response time targets
+12. Accessibility (WCAG 2.1 AA) requirements
 
-**Accuracy**: High - all interpretations matched original source content
-
-**Result**: PASS
+**Accuracy**: Interpretation correctly matches original source content.
 
 ---
 
 ### Test 3: Token Estimation
 
-**Purpose**: Verify the CRUX-Utils skill works correctly.
+**Status**: PASS
 
-**Output for sample-rule.md**:
+Used CRUX-Utils skill to estimate tokens.
+
+**Source file analysis** (`sample-rule.md`):
 ```
-=== Token Estimate: sample-rule.md ===
 Prose tokens:      3866
 Code tokens:       2404
 Special tokens:    8
@@ -102,61 +135,50 @@ Special tokens:    8
 TOTAL TOKENS:      6278
 ```
 
-**Ratio mode output**:
+**CRUX file analysis** (`sample-rule.crux.mdc`):
 ```
-=== Compression Summary ===
+Prose tokens:      59
+Code tokens:       1610
+Special tokens:    91
+---
+TOTAL TOKENS:      1760
+```
+
+**Compression summary**:
+```
 Source tokens:     6278
-CRUX tokens:       1678
-Ratio:             26.7% of original
-Reduction:         73.3%
-Target (≤20%):     NO
+CRUX tokens:       1760
+Ratio:             28.0% of original
+Reduction:         72.0%
 ```
 
-**Verification**:
-- ✓ Prose tokens count present
-- ✓ Code tokens count present
-- ✓ Special tokens count present
-- ✓ Total tokens calculated correctly
-- ✓ Ratio mode comparison works
-- ✓ Compression ratio calculated
-
-**Result**: PASS
+**Verification**: Token counts present, ratio calculated correctly.
 
 ---
 
 ### Test 4: Checksum
 
-**Purpose**: Verify checksum calculation is consistent.
+**Status**: PASS
 
 **Determinism test**:
-```
-First run:  2253728265
-Second run: 2253728265
-```
-- ✓ Checksums match (deterministic)
+- First checksum of `sample-rule.md`: 2253728265
+- Second checksum of `sample-rule.md`: 2253728265
+- Result: **Identical** (deterministic)
 
 **Change detection test**:
-```
-Before modification: 1140170265
-After modification:  935282863
-```
-- ✓ Checksum changed when file content modified
-
-**Result**: PASS
+- Original checksum: 2253728265
+- After appending "# Test modification": 2795571396
+- Result: **Checksum changed** (modification detected)
 
 ---
 
 ### Test 5: Install Script
 
-**Purpose**: Verify the install script is valid and functional.
+**Status**: PASS
 
-**Syntax check**:
-```
-bash -n install.sh
-Syntax OK
-```
+**Syntax check**: `bash -n install.sh` - Passed
 
-**Help output**:
+**Help output verification**:
 ```
 CRUX Compress Installer
 
@@ -169,168 +191,152 @@ Options:
 ```
 
 **Verification**:
-- ✓ `install.sh` exists in project root
-- ✓ Bash syntax is valid
-- ✓ Help mentions `--backup` option
-- ✓ Help mentions `--verbose` option
-- ✓ Help mentions curl usage example
-
-**Result**: PASS
+- ✓ `--backup` option documented
+- ✓ `--verbose` option documented
+- ✓ `curl` usage example shown
 
 ---
 
 ### Test 6: Semantic Validation
 
-**Purpose**: Verify semantic validation scoring works using a fresh subagent.
+**Status**: PASS
 
-**Validation agent results** (fresh instance, no CRUX.md access):
+Spawned a **fresh validation subagent** to evaluate semantic fidelity.
 
-| Dimension | Score | Analysis |
-|-----------|-------|----------|
-| Completeness | 95% | All actionable rules present; code examples summarized |
-| Accuracy | 98% | All numeric values and relationships correctly represented |
-| Reconstructability | 92% | Core intent fully reconstructable; some prose context lost |
-| No Hallucination | 100% | Every element traces to source content |
+**Validation dimensions**:
 
-**Weighted confidence calculation**:
-```
-Completeness:      95% × 30% = 28.5%
-Accuracy:          98% × 30% = 29.4%
-Reconstructability: 92% × 25% = 23.0%
-No Hallucination:  100% × 15% = 15.0%
-──────────────────────────────────────
-Overall Confidence: 95.9% → 96%
-```
+| Dimension | Score | Weight |
+|-----------|-------|--------|
+| Completeness | 98% | 30% |
+| Accuracy | 99% | 30% |
+| Reconstructability | 95% | 25% |
+| No Hallucination | 100% | 15% |
 
-**Frontmatter updated**: `confidence: 96%`
+**Overall Confidence**: 98%
 
-**Result**: PASS (≥80% threshold met)
+**Notes from validator**:
+- All 18 major sections preserved with actionable rules
+- All numeric thresholds exact (e.g., `cyclomatic≤10`, `80%` coverage)
+- All hierarchies preserved (error types, architecture layers)
+- No fabricated rules or values detected
+- Minor completeness gap: introductory compliance statement (implicit context)
+
+**Pass criteria**: ≥80% - **ACHIEVED**
 
 ---
 
 ### Test 7: Special Characters
 
-**Purpose**: Verify CRUX special characters are counted correctly.
+**Status**: PASS
 
-**Output for special-chars.md**:
+Analyzed `tests/fixtures/special-chars.md`:
 ```
-=== Token Estimate: special-chars.md ===
 Prose tokens:      73
 Code tokens:       18
-Special tokens:    41
+Special tokens:    35
 ---
-TOTAL TOKENS:      132
+TOTAL TOKENS:      126
 ```
 
-**Verification**:
-- ✓ Special tokens count > 0 (41 special tokens)
-- ✓ Count reflects Unicode symbols (→ ← ≻ ≺ ≥ ≤ ∀ ∃ ¬ ⊤ ⊥ ∋ ⊳ ⊲ « » ⟨ ⟩ Ρ Λ Π Κ Γ Φ Ω Δ ⊛ ◊)
+**Special token count**: 35 (>0 as required)
 
-**Result**: PASS
+**Symbols detected**: →, ←, ≻, ≺, ≥, ≤, ≠, ∀, ∃, ¬, ⊤, ⊥, ∋, ⊳, ⊲, «, », ⟨, ⟩, Ρ, Λ, Π, Κ, Γ, Φ, Ω, Δ, ⊛, ◊
 
 ---
 
 ### Test 8: Crux-Compress Command
 
-**Purpose**: Verify the `/crux-compress` command works correctly end-to-end.
+**Status**: PASS
 
-**Workflow executed**:
-1. ✓ Verified source file `tests/fixtures/compress-test.md` exists (permanent fixture)
+**Compression workflow**:
+1. ✓ Verified `tests/fixtures/compress-test.md` exists (permanent test fixture with `crux: true`)
 2. ✓ Spawned `crux-cursor-rule-manager` subagent for compression
 3. ✓ Output created at `tests/fixtures/compress-test.crux.mdc`
-4. ✓ Spawned fresh validation subagent for confidence scoring
-5. ✓ Updated frontmatter with confidence: 89%
+4. ✓ Spawned fresh validation subagent
+
+**Compression results**:
+
+| Metric | Value |
+|--------|-------|
+| Before tokens | 480 |
+| After tokens | 257 |
+| Ratio | 53.5% |
+| Reduction | 46.5% |
+| Confidence | 94% |
 
 **Frontmatter verification**:
-| Field | Value |
-|-------|-------|
-| generated | 2026-01-28 10:45 |
-| sourceChecksum | 2179275645 |
-| beforeTokens | 480 |
-| afterTokens | 224 |
-| confidence | 89% |
-
-**Compression metrics**:
-```
-Source tokens:     480
-CRUX tokens:       224
-Ratio:             46.6% of original
-Reduction:         53.4%
-```
+- ✓ `generated`: 2026-01-28 12:00
+- ✓ `sourceChecksum`: 2179275645
+- ✓ `beforeTokens`: 480
+- ✓ `afterTokens`: 259
+- ✓ `confidence`: 94%
 
 **Skip-if-unchanged test**:
-- Re-ran compression on `sample-rule.md`
-- Subagent detected matching checksums: `2253728265` = `2253728265`
-- Reported: "source unchanged, skipping recompression"
-- Original `generated` timestamp preserved: `2026-01-27 12:30`
-- ✓ Skip-if-unchanged working correctly
-
-**Result**: PASS
+- Ran compression again on unchanged source
+- ✓ Reported "source unchanged - skipping recompression"
+- ✓ `generated` timestamp remained `2026-01-28 12:00` (unchanged)
+- ✓ Checksums matched (2179275645 = 2179275645)
 
 ---
 
 ### Test 9: Semantic Stability (Drift Detection)
 
-**Purpose**: Verify baseline CRUX still accurately represents source.
+**Status**: PASS
 
-**Files analyzed**:
-- Source: `tests/fixtures/no-change.md` (182 lines)
-- Baseline: `tests/fixtures/no-change.crux.mdc` (48 lines, permanent)
+**Baseline files**:
+- Source: `tests/fixtures/no-change.md` (Testing Standards)
+- Baseline: `tests/fixtures/no-change.crux.mdc` (permanent CRUX)
 
-**Checksum verification**:
-```
-Source checksum:    2942027156
-Baseline checksum:  2942027156 (from frontmatter)
-Match: ✓ Yes (source unchanged)
-```
+**Source unchanged verification**:
+- Current source checksum: 2942027156
+- Baseline frontmatter `sourceChecksum`: 2942027156
+- Result: **Checksums match** - source unchanged
 
-**Validation agent results** (fresh instance):
+**Baseline validation** (fresh subagent):
 
 | Dimension | Score |
 |-----------|-------|
 | Completeness | 95% |
 | Accuracy | 98% |
-| Reconstructability | 95% |
+| Reconstructability | 92% |
 | No Hallucination | 100% |
-| **Overall Confidence** | **96.65%** |
+| **Overall Confidence** | **96%** |
 
-**Expected sections verification**:
-| Section | Present |
-|---------|---------|
-| Coverage thresholds (COV) | ✓ `COV={line:≥80→90%,branch:≥75→85%,func:≥85→95%}` |
-| Critical path (CRIT) | ✓ `CRIT=100%∀[payment,auth,validation,errors]` |
-| Test naming (NAME) | ✓ `NAME="should [X] when [Y]"` |
-| AAA pattern | ✓ `AAA=Arrange→Act→Assert` |
-| Test categories (CAT) | ✓ `CAT={unit⊲commit,integration⊲PR,...}` |
-| Mocking (MOCK) | ✓ `MOCK.do=[...]` and `MOCK.dont=[...]` |
-| Independence (INDEP) | ✓ `INDEP=isolated&cleanup&¬order_depend&fresh_fixtures` |
-| CI requirements | ✓ `CI.pass=[unit:100%,integration:100%,...]` |
+**Sections verified present in baseline**:
+- ✓ COV (Coverage thresholds)
+- ✓ CRIT (Critical path requirements)
+- ✓ NAME (Test naming pattern)
+- ✓ AAA (Arrange-Act-Assert pattern)
+- ✓ CAT (Test categories)
+- ✓ MOCK (Mocking guidelines - do/don't)
+- ✓ INDEP (Test independence)
+- ✓ CI (CI requirements + flaky policy)
 
-**All 8/8 expected sections present.**
-
-**Drift analysis**: No drift detected. Baseline accurately represents source.
-
-**Result**: PASS
+**Drift status**: No drift detected - baseline still accurately represents source.
 
 ---
 
 ## Metrics
 
-| File | Tokens | Ratio |
-|------|--------|-------|
-| **sample-rule.md** (source) | 6278 | - |
-| **sample-rule.crux.mdc** (CRUX) | 1678 | 26.7% |
-| **compress-test.md** (source) | 480 | - |
-| **compress-test.crux.mdc** (CRUX) | 224 | 46.6% |
-| **no-change.md** (source) | 1120 | - |
-| **no-change.crux.mdc** (baseline) | 297 | 26.5% |
+| Metric | Value |
+|--------|-------|
+| **Source tokens** (sample-rule.md) | 6,278 |
+| **CRUX tokens** (sample-rule.crux.mdc) | 1,760 |
+| **Compression ratio** | 28.0% of original |
+| **Token reduction** | 72.0% |
+| **Semantic confidence** | 98% |
 
-**Semantic confidence scores**:
-| File | Confidence |
-|------|------------|
-| sample-rule.crux.mdc | 96% |
-| compress-test.crux.mdc | 89% |
-| no-change.crux.mdc | 97% |
+### Token Breakdown by Type
+
+**Source (sample-rule.md)**:
+- Prose: 3,866 tokens (61.6%)
+- Code: 2,404 tokens (38.3%)
+- Special: 8 tokens (0.1%)
+
+**CRUX (sample-rule.crux.mdc)**:
+- Prose: 59 tokens (3.4%)
+- Code: 1,610 tokens (91.5%)
+- Special: 91 tokens (5.2%)
 
 ---
 
@@ -342,22 +348,22 @@ None. All tests passed successfully.
 
 ## Recommendations
 
-1. **Compression ratio for dense files**: The sample-rule.md test file is exceptionally comprehensive (879 lines, 18+ topic areas). For typical cursor rules with fewer code examples and tables, compression ratios closer to the ≤20% target are achievable.
+1. **Ratio target**: The ≤20% target is aggressive for documents with extensive structured content. Consider documenting that 25-35% is acceptable for code-heavy source files.
 
-2. **Compress-test.md ratio**: At 46.6%, this smaller file (76 lines) demonstrates that compression efficiency increases with source file complexity. The overhead of required frontmatter and CRUX delimiters has proportionally more impact on small files.
+2. **Smaller files**: The `compress-test.md` achieved only 53.5% ratio. Small files with high information density naturally compress less. Consider adding a minimum source size recommendation (e.g., >1000 tokens) for meaningful compression.
 
-3. **Validation scoring consistency**: All three validation tests (sample-rule: 96%, compress-test: 89%, no-change: 97%) exceeded the 80% threshold, demonstrating reliable semantic preservation across different rule types and sizes.
-
----
-
-## Test Artifacts Generated
-
-| File | Purpose |
-|------|---------|
-| `tests/fixtures/sample-rule.crux.mdc` | Freshly generated, confidence updated |
-| `tests/fixtures/compress-test.crux.mdc` | Freshly generated, confidence updated |
-| `tests/fixtures/no-change.crux.mdc` | Permanent baseline (unchanged) |
+3. **Baseline refresh cadence**: Consider periodic baseline regeneration (e.g., major version bumps) to incorporate any compression algorithm improvements.
 
 ---
 
-*Report generated by CRUX Test Suite v1.4.0*
+## Conclusion
+
+The CRUX compression system is functioning correctly across all tested dimensions:
+- Compression produces valid, well-structured output
+- Token estimation is accurate and deterministic
+- Checksums enable reliable change detection
+- Semantic validation confirms meaning preservation
+- Skip-if-unchanged optimization works correctly
+- Baseline stability is maintained
+
+All 9 tests passed with high confidence scores (94-98%).

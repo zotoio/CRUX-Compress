@@ -147,7 +147,9 @@ To make a rule file eligible for CRUX compression:
 
 **Important**: The CRUX header in compressed files references the source file:
 ```
-«CRUX⟨core-tenets.md⟩»
+⟦CRUX:core-tenets.md
+...content...
+⟧
 ```
 
 ## Example Batch Execution

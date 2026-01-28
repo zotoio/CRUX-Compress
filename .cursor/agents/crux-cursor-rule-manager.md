@@ -161,9 +161,9 @@ alwaysApply: [match source file frontmatter value, if not found default to false
 # [TITLE]
 
 ```
-«CRUX⟨{source_file}⟩»
+⟦CRUX:{source_file}
 {compressed content, one concept per line, max ~80 chars/line}
-«/CRUX»
+⟧
 ```
 
 

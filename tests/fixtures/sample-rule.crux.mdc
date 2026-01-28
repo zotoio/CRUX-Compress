@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-27 12:30
+generated: 2026-01-28 14:30
 sourceChecksum: 2253728265
 beforeTokens: 6278
-afterTokens: 1679
-confidence: 96%
+afterTokens: 1761
+confidence: 98%
 crux: true
 alwaysApply: true
 ---
@@ -14,95 +14,100 @@ alwaysApply: true
 # Comprehensive Team Coding Standards
 
 ```crux
-«CRUX⟨tests/fixtures/sample-rule.md⟩»
+⟦CRUX:tests/fixtures/sample-rule.md
+# Naming Conventions
+JS/TS{var+fn=camelCase;cls+iface=PascalCase;const=SCREAMING_SNAKE;enum=Pascal+SNAKE;type=T|TRequest}
+Python{var+fn=snake_case;cls=PascalCase;const=SCREAMING_SNAKE;_private=single_underscore}
+Go{export=PascalCase;unexport=camelCase;acronym=consistent(HTTPClient|userID)}
 
-# NAMING
-JS/TS:{var,fn}=camelCase;{class,iface}=PascalCase;CONST=SCREAMING_SNAKE;enum=Pascal+SNAKE_vals;typeParam=[T,K,TReq]
-Python:{var,fn}=snake_case;class=PascalCase;CONST=SCREAMING_SNAKE;_private=underscore prefix
-Go:exported=PascalCase;unexported=camelCase;acronyms=consistent(HTTPClient,userID)
+# Code Style
+R.fn{ln≤20..30;early_return;nest≤3;1concept/fn;composition≻inheritance;SRP}
+Φ.fmt{JS/TS:100ch+2sp;Py:88ch+4sp;Go:120ch+tabs;Rust:100ch+4sp;SQL:80ch+2sp}
+Ω.complexity{cyclomatic≤10!;cognitive≤15!;params≤5!;ln/fn≤30;nest≤3!}
 
-# CODE STYLE
-Π.principles{fn≤20-30 lines;early return;nest≤3;self-doc names;1 concept/fn;composition≻inheritance;SRP}
-Φ.line_length{JS/TS=100/2sp,Python=88/4sp,Go=120/tab,Rust=100/4sp,SQL=80/2sp}
-Φ.complexity{cyclomatic≤10!,cognitive≤15!,params≤5!,lines≤30,nest≤3!}
+# Documentation
+R.docs{public_API→full_docs;@param+@returns+@throws+@example}
+Python→Google_docstrings{Args+Returns+Raises+Examples}
+Go→comment_style{fn_desc+params+returns}
 
-# DOCS
-∀public API→JSDoc/docstring{desc,@params,@returns,@throws,@example}
-Python=Google-style docstrings;Go=comment above fn
+# Error Handling
+R.err{¬swallow;log+ctx;custom_types;fail_fast;actionable_msg}
+E.err_hierarchy{
+  BaseError∋[ValidationError,BusinessError,IntegrationError,SystemError]
+  ValidationError∋[RequiredFieldError,InvalidFormatError,OutOfRangeError]
+  BusinessError∋[InsufficientFundsError,DuplicateEntityError,StateTransitionError]
+  IntegrationError∋[NetworkError,TimeoutError,ServiceUnavailableError]
+  SystemError∋[DatabaseError,CacheError,ConfigurationError]
+}
+Φ.err_response{code+msg+details+requestId+timestamp}
 
-# ERRORS
-P.err{¬swallow;log+ctx;custom types;fail fast;actionable msg}
-E.err_hierarchy{Base→[Val{Req,Format,Range},Biz{Funds,Dup,State},Integration{Net,Timeout,Unavail},Sys{DB,Cache,Cfg}]}
-Φ.err_response{code,message,details{field,value,constraint},requestId,timestamp}
+# Testing
+Ω.coverage{line:≥80%⊕90%;branch:≥75%⊕85%;fn:≥85%⊕95%}
+R.test_name="should [behavior] when [condition]"
+R.AAA{Arrange»Act»Assert}
+Λ.test_cat{unit:∀commit;integration:∀PR;E2E:nightly;perf:weekly;security:∀PR}
+P.mock{ext_deps_only;¬mock_code_under_test;realistic_data;DI;reset_between}
 
-# TESTING
-Φ.coverage{line≥80%→90%,branch≥75%→85%,fn≥85%→95%}
-P.test_name="should [behavior] when [condition]"
-P.test_struct=AAA{Arrange,Act,Assert}
-Φ.test_cat{unit→commit,integration→PR,e2e→nightly,perf→weekly,security→PR}
-P.mock{ext deps only;¬mock code under test;realistic data;DI;reset between}
+# Architecture
+Π.layers{Presentation»Application»Domain»Infrastructure}
+R.deps{→inward;Domain:¬ext_deps;Infra→impl_domain_iface;App→orchestrate}
+Π.structure{domain/[entities,value-objects,services,interfaces];app/[use-cases,services,dtos];infra/[persistence,external-services,config];presentation/[controllers,middleware,validators]}
 
-# ARCHITECTURE
-Π.layers{Presentation→Application→Domain→Infrastructure}
-P.deps{inward→domain;domain=no ext deps;infra implements domain ifaces}
-Π.structure{src/{domain/{entities,value-objects,services,interfaces},app/{use-cases,services,dtos},infra/{persistence,external-services,config},presentation/{controllers,middleware,validators}}}
+# API Design
+Κ.REST{GET=retrieve;POST=create;PUT=replace;PATCH=partial;DELETE=remove}
+R.url{nouns¬verbs;plural;kebab-case;nest_for_relations;query_for_filter}
+Κ.http_codes{200=OK;201=Created;204=NoContent;400=BadRequest;401=Unauth;403=Forbidden;404=NotFound;409=Conflict;422=Unprocessable;429=RateLimit;500=ServerErr;503=Unavailable}
+R.pagination∋[page,pageSize,totalPages,totalItems,hasNext,hasPrevious,links]
+Φ.versioning=URL_path(/api/v1/);v1:deprecated@2024-06-01;v2:current;v3:beta
 
-# API DESIGN
-Λ.http{GET=retrieve,POST=create,PUT=replace,PATCH=partial,DELETE=remove}
-P.url{nouns¬verbs;plural;kebab-case;nest relations;query for filter}
-Φ.status{200=OK,201=Created,204=NoContent,400=BadReq,401=Unauth,403=Forbidden,404=NotFound,409=Conflict,422=Unprocessable,429=RateLimit,500=ServerErr,503=Unavailable}
-R.pagination{data,pagination{page,pageSize,totalPages,totalItems,hasNext,hasPrev},links{self,next,last}}
-P.versioning=/api/v{n}/resource
+# Git Workflow
+R.commit="type(scope): desc\n\nBody\n\nFixes #123\nBREAKING CHANGE:"
+Κ.commit_types{feat→minor;fix→patch;docs|style|refactor|test|chore|ci|build→none;perf→patch}
+R.branch{feature/PROJ-{id}-{desc};fix/PROJ-{id}-{desc};hotfix/PROJ-{id}-{desc};release/v{M}.{m}.{p};experiment/{desc}}
+P.branch_protect{main:PR+2approvals+CI+¬force;develop:PR+1approval+CI;release/*:PR+2approvals+CI+CODEOWNERS}
+R.PR{<400ln;desc+ctx;link_issues;screenshots_UI;update_docs;add_tests;request_CODEOWNERS}
 
-# GIT
-P.commit="type(scope): desc\n\nBody\n\nFixes #N\nBREAKING CHANGE: desc"
-Φ.commit_type{feat→Minor,fix→Patch,docs|style|refactor|test|chore|ci|build→None,perf→Patch}
-P.branch{feature/PROJ-{id}-{desc},fix/PROJ-{id}-{desc},hotfix/PROJ-{id}-{desc},release/v{M.m.p},experiment/{desc}}
-P.branch_protect{main=PR+2approvals+CI+¬force,develop=PR+1approval+CI,release/*=PR+2approvals+CI+CODEOWNERS}
-R.PR{small<400lines;desc+ctx;link issues;screenshots for UI;update docs;add tests;request CODEOWNERS}
+# Security
+R.auth{OAuth2.0|OIDC;session_mgmt;httpOnly_cookies;rate_limit_auth;log_auth_events}
+Κ.input_val{email:RFC5322;phone:E.164;URL:https+domain_val;numbers:type+range+precision;strings:len+whitelist;files:type+size+content}
+R.data_protect{rest:AES-256;transit:TLS1.3;password:bcrypt(cost≥12);PII:field_level_encrypt;SQL:parameterized;output:sanitize_XSS}
+P.secrets{env_vars;secrets_mgr(Vault|AWS);rotate;audit;¬git;¬log;¬chat;¬share_across_env}
+R.headers{CSP:default-src 'self';X-Content-Type-Options:nosniff;X-Frame-Options:DENY;X-XSS-Protection:1;HSTS:max-age=31536000;Referrer-Policy:strict-origin-when-cross-origin}
 
-# SECURITY
-P.auth{OAuth2.0|OIDC;session mgmt;secure storage(httpOnly);rate limit auth;log auth events}
-Φ.input_val{email=RFC5322+domain,phone=E.164,url=https+domain whitelist,num=type+range+precision,str=len+charset,file=type+size+content}
-P.data{encrypt@rest(AES-256);TLS1.3@transit;bcrypt≥12 for pwd;field encrypt PII;parameterized queries;sanitize output→¬XSS}
-P.secrets{env vars|secrets mgr(Vault,AWS);rotate;audit;¬commit;¬log;¬chat share;¬same across env}
-R.headers{CSP:default-src 'self';X-Content-Type-Options:nosniff;X-Frame-Options:DENY;X-XSS-Protection:1;HSTS:31536000;Referrer-Policy:strict-origin-when-cross-origin}
+# Database
+R.query{indexes;¬SELECT*;EXPLAIN;paginate;connection_pool}
+R.migration{reversible(up/down);¬modify_existing;name:YYYYMMDD_desc;test_on_prod_data;backup_first}
+Κ.db_naming{tables:snake_case+plural;cols:snake_case;PK:id;FK:{table}_id;idx:idx_{table}_{cols};constraint:{type}_{table}_{cols}}
 
-# DATABASE
-P.query{indexes for filter/sort;¬SELECT *;EXPLAIN;paginate;conn pool}
-P.migration{reversible;¬modify existing;descriptive name(YYYYMMDD_desc);test on prod-like data;backup first}
-Φ.db_naming{tables=snake_plural,cols=snake,pk=id,fk={table}_id,idx=idx_{t}_{c},constraint={type}_{t}_{c}}
+# Logging & Monitoring
+Κ.log_levels{ERROR=exceptions;WARN=unexpected_handled;INFO=business_events;DEBUG=diagnostics;TRACE=dev_only}
+Φ.log_format{timestamp+level+service+traceId+spanId+message+context}
+Κ.metrics{app:[req_rate,err_rate,latency(p50,p95,p99)];biz:[signups,conversions,txns];infra:[CPU,mem,disk,net];deps:[latency,failure_rate]}
+Ω.alerts{err_rate:>1%warn/>5%crit;p99:>500ms_warn/>2000ms_crit;CPU:>70%warn/>90%crit;mem:>75%warn/>90%crit;disk:>80%warn/>95%crit}
 
-# LOGGING
-Φ.log_level{ERROR=exceptions,WARN=handled unexpected,INFO=biz events,DEBUG=diagnostics,TRACE=dev only}
-R.log_format{timestamp,level,service,traceId,spanId,message,context{userId,action,duration}}
-Φ.metrics{app=[req rate,err rate,latency p50/95/99],biz=[signups,conversions,txn],infra=[cpu,mem,disk,net],deps=[api latency,failure rate]}
-Φ.alerts{err_rate>1%→warn>5%→crit,p99>500ms→warn>2000ms→crit,cpu>70%→warn>90%→crit,mem>75%→warn>90%→crit,disk>80%→warn>95%→crit}
+# Performance
+Ω.response{API_read:50ms/150ms/300ms(p50/p95/p99);API_write:100ms/300ms/500ms;bg_jobs:1s/5s/30s;batch:30s/60s/120s}
+Φ.cache{browser:static→1yr;CDN:public→5min;app:session→15min;DB:query→1hr}
+R.optimize{gzip|brotli;keep-alive;cache;lazy_load;async_IO;batch_DB;optimize_assets;paginate}
 
-# PERFORMANCE
-Φ.response_target{read:p50=50ms/p95=150ms/p99=300ms,write:p50=100ms/p95=300ms/p99=500ms,bg:p50=1s/p95=5s/p99=30s,batch:p50=30s/p95=60s/p99=120s}
-Φ.cache{browser:static=1yr,CDN:public=5min,app:session=15min,db:query=1hr}
-R.optimize[gzip|brotli,keep-alive,cache,lazy load,async I/O,batch db ops,optimize assets,paginate]
+# Code Review
+Ω.review{correctness;security;performance;readability;maintainability;tests;docs}
+R.feedback{specific+actionable;explain_why;suggest_alt;ask_to_understand;acknowledge_good}
+Φ.review_time{P0:1hr→4hr;P1:4hr→1d;P2:1d→3d;P3:3d→1wk}
 
-# CODE REVIEW
-R.review_check[correctness,security,perf,readability,maintainability,tests,docs]
-P.feedback{specific+actionable;explain why;suggest alts;ask questions;ack good work}
-Φ.review_time{P0:1hr→4hr,P1:4hr→1d,P2:1d→3d,P3:3d→1wk}
+# Feature Flags
+Κ.flag{name+enabled+rolloutPercentage+allowedUsers+allowedGroups+metadata}
+Γ.flag_lifecycle{Created→Testing→Rollout→Enabled→Cleanup}
 
-# FEATURE FLAGS
-R.flag_impl{name,enabled,rolloutPct,allowedUsers[],allowedGroups[],metadata{}}
-Φ.flag_lifecycle{Created→Testing→Rollout→Enabled→Cleanup}
+# Accessibility (WCAG 2.1 AA)
+R.a11y{perceivable:alt_text+captions+contrast(4.5:1);operable:keyboard+no_seizure+time;understandable:clear_lang+consistent_nav+input_assist;robust:valid_HTML+ARIA+screen_reader}
+Ω.a11y{contrast:4.5:1_text/3:1_large;focus:visible;alt:∀meaningful_img;headings:h1→h2→h3;forms:labels+errors;keyboard:∀fn;ARIA:proper_roles}
 
-# ACCESSIBILITY
-R.WCAG_2.1_AA{Perceivable[alt,captions,contrast≥4.5:1],Operable[keyboard,no seizure,time],Understandable[clear lang,consistent nav,input help],Robust[valid HTML,ARIA,screen reader]}
-Φ.a11y_check{contrast:4.5:1 text/3:1 large,focus visible,alt text,heading hierarchy,form labels,keyboard nav,ARIA roles}
+# Release Management
+Κ.semver{MAJOR:breaking;MINOR:feat_compat;PATCH:fix_compat}
+Λ.release_check{tests_pass;CHANGELOG;version_bump;docs;security_scan;perf_bench;rollback_plan;notify_stakeholders}
+Κ.deploy{blue-green:zero_downtime+med_risk;canary:high_risk_changes+low_risk;rolling:standard+med_risk;recreate:dev_only+high_risk}
 
-# RELEASE
-P.semver=MAJOR.MINOR.PATCH{break,feat,fix}
-R.release_check[tests pass,CHANGELOG,version bump,docs,security scan,perf benchmarks,rollback plan,notify stakeholders]
-Φ.deploy{blue-green=0 downtime,canary=low risk,rolling=standard,recreate=dev only}
-
-Ω{consistency;quality;security;perf;maintainability;a11y;reliability}
-∀team→follow;deviation→discuss+doc exception
-«/CRUX»
+Ω{consistency;quality;security;performance;maintainability;accessibility;reliability}
+⟧
 ```
