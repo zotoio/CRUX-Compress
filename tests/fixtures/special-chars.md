@@ -21,8 +21,9 @@ This file contains CRUX special characters for testing token counting.
 
 ```crux
 ⟦CRUX:special-chars.md
+Ρ{special characters test}
 Κ{key→value}
 R.rule{a∋b;c≻d}
-∀x→process(x)
+Λ{∀x→process(x)}
 ⟧
 ```

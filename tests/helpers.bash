@@ -84,10 +84,12 @@ alwaysApply: true
 
 ```crux
 ⟦CRUX:sample-rule.md
-
-Κ{code:clean;naming:conventions;docs:proper}
-R.style{indent:consistent;fn:small;comments:meaningful}
-
+Ρ{code quality standards}
+Κ{code=clean;naming=conventions;docs=proper}
+R.style{
+  indent=consistent;fn=small;comments=meaningful
+}
+Ω{quality;maintainability}
 ⟧
 ```
 EOF

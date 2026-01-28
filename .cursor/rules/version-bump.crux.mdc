@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-28 10:15
-sourceChecksum: 1061964867
+generated: 2026-01-28 12:00
+sourceChecksum: 2923143429
 beforeTokens: 422
-afterTokens: 262
-confidence: 94%
+afterTokens: 245
+confidence: 98%
 alwaysApply: true
 crux: true
 ---
@@ -15,36 +15,27 @@ crux: true
 
 ```crux
 ⟦CRUX:version-bump.md
-⊲commit→analyze msg+Δ VERSION
-
-Λ.semver{
-  fix:|docs:|style:|refactor:|perf:|test:|chore:→PATCH(0.0.X)
-  feat:→MINOR(0.X.0)
-  BREAKING CHANGE|!→MAJOR(X.0.0)
+Ρ{auto version bump on commit}
+Κ{ver=MAJOR.MINOR.PATCH; M=major(X.0.0); m=minor(0.X.0); p=patch(0.0.X)}
+R.commit_type{
+  fix:|docs:|style:|refactor:|perf:|test:|chore:→p
+  feat:→m
+  BREAKING CHANGE:|!→M
 }
-
-Γ.apply{
-  1.pre-commit→analyze type→Δ VERSION
-  2.stage VERSION w/ Δ
+Λ.apply{
+  ⊲commit→analyze msg type»bump VERSION before stage
+  VERSION+other Δ→single commit
 }
-
-Κ.ver=MAJOR.MINOR.PATCH{
-  MAJOR=breaking(API incompat)
-  MINOR=feat(compat)
-  PATCH=fix+minor(compat)
-}
-
-E.examples{
-  fix:typo→patch 1.2.3→1.2.4
-  feat:custom dir→minor 1.2.3→1.3.0
-  feat!:Δ format→major 1.2.3→2.0.0
-  refactor:simplify→patch 1.2.3→1.2.4
-}
-
 P{
-  1x bump/commit→use highest impact
-  Δ major|minor→reset lower(1.2.3→2.0.0¬2.2.3)
-  ¬conventional→ask user
+  1bump/commit→use highest impact type
+  m|M bump→reset lower nums (1.2.3→2.0.0¬2.2.3)
+  ¬conventional format→ask user clarify
+}
+E.examples{
+  fix:typo→p(1.2.3→1.2.4)
+  feat:add support→m(1.2.3→1.3.0)
+  feat!:change default→M(1.2.3→2.0.0)
+  refactor:simplify→p(1.2.3→1.2.4)
 }
 ⟧
 ```

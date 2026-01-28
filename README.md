@@ -139,10 +139,10 @@ The result: your context window stays lean while your rules remain powerful.
 <details open>
 <summary><strong>AFTER — CRUX Compressed (112 tokens)</strong></summary>
 
-**Try it yourself!** Copy and paste into Claude, ChatGPT, Gemini, or any LLM:
+**Try this** Copy and paste into Claude, ChatGPT, Gemini, or any LLM:
 
 ```
-Explain this: ⟦CRUX:coding-standards.md; Ρ{team dev standards}; Κ{fn=function; cls=class; cmp=component; pr=pull request}; R.style{indent=2sp; ¬tabs!; line≤100ch; naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}}; R.quality{fn.len≤50; cls.len≤300; ∀export→test.cov≥80%; ∀fn→jsdoc[params+return]; cyclomatic≤10}; Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}; P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}; E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}; Ω{quality≻speed; readable≻clever}⟧
+Explain this: ⟦CRUX:coding-standards.md;Ρ{team dev standards};Κ{fn=function;cls=class;cmp=component;pr=pull request};R.style{indent=2sp;¬tabs!;line≤100ch;naming{fn=camelCase;cls=PascalCase;const=UPPER_SNAKE}};R.quality{fn.len≤50;cls.len≤300;∀export→test.cov≥80%;∀fn→jsdoc[params+return];cyclomatic≤10};Λ.review{pr→≥1approval+CI.pass;Δ≥500lines→split!};P.avoid{¬any!;¬console.log[prod];¬magic.num→use.const};E{⊤:err→try/catch→log+handle;⊥:catch(e){/*ignore*/}};Ω{quality≻speed;readable≻clever}⟧
 ```
 
 </details>
@@ -151,6 +151,8 @@ Explain this: ⟦CRUX:coding-standards.md; Ρ{team dev standards}; Κ{fn=functio
 <summary><strong>Formatted CRUX (for readability)</strong></summary>
 
 ```
+Explain this: 
+
 ⟦CRUX:coding-standards.md
 Ρ{team dev standards}
 Κ{fn=function; cls=class; cmp=component; pr=pull request}
@@ -383,13 +385,22 @@ alwaysApply: true
 /crux-compress ALL                    - Compress all eligible rules
 /crux-compress @path/to/file.md       - Compress a specific file
 /crux-compress @file1.md @file2.md    - Compress multiple files
+/crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
+/crux-compress @file.md --minified    - Compress with single-line output (note that LLMs take more effort to parse and understand this format)
 ```
+
+**Flags**:
+
+| Flag | Description |
+|------|-------------|
+| `--minified` | Single-line output, no spaces, max compression |
+| `--force` | Delete existing `.crux.mdc` files before compression (bypasses checksum skip) |
 
 **Key Features**:
 
 - **Parallelism**: Spawns up to 4 `crux-cursor-rule-manager` subagents in parallel
 - **Batching**: Processes files in batches of 4 when >4 files
-- **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed
+- **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed (use `--force` to bypass)
 - **Eligibility Criteria**: Files must have `crux: true` frontmatter (`.md` or `.mdc` files, not `.crux.mdc`)
 
 **File Convention**:

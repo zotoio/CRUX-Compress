@@ -43,4 +43,4 @@ MAJOR.MINOR.PATCH
 
 - Only bump version once per commit, using the highest-impact change type
 - Reset lower version numbers when bumping higher ones (1.2.3 → 2.0.0, not 2.2.3)
-- Do not bump version for commits that don't follow conventional commit format (ask user to clarify)
+- Do not bump version for commits that don't follow conventional commit format (ask user to clarify) 

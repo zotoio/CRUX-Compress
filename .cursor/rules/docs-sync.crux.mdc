@@ -1,21 +1,49 @@
 ---
-generated: 2026-01-28 14:32
-sourceChecksum: 1813785632
-beforeTokens: 388
-afterTokens: 135
-confidence: 90%
+generated: 2026-01-28 15:42
+sourceChecksum: 3062732295
+beforeTokens: 389
+afterTokens: 265
+confidence: 96% 
 alwaysApply: true
 crux: true
 ---
 
-# Docs Sync
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Documentation Synchronization Rule
 
 ```crux
-⟦CRUX:.cursor/rules/docs-sync.md
-Γ{Δfile→Δdocs}
-README⊲[install.sh,CRUX.md,.cursor/commands/*,.cursor/skills/*/SKILL.md]
-CONTRIB⊲[.github/workflows/*.yml,tests/*.bats,scripts/*.sh,tests/helpers.bash]
-R{surgical;fmt=exist;upd ver+paths;+flow→+list}
-P{¬.cursor/rules/example/*;¬temp;¬spec}
+⟦CRUX:docs-sync.md
+Ρ{doc sync rule}
+Κ{doc=documentation}
+E.docs{
+  README.md←install|usage|feature Δ
+  CONTRIBUTORS.md←CI/CD|testing|contrib Δ
+}
+Γ.README{
+  install.sh→upd install
+  CRUX.md→upd spec+examples
+  .cursor/commands/*→upd cmd usage
+  .cursor/skills/*/SKILL.md→upd skill desc
+}
+Γ.CONTRIBUTORS{
+  .github/workflows/*.yml→upd CI/CD flow+desc
+  tests/*.bats→upd test struct|run
+  scripts/*.sh→upd dev setup
+  tests/helpers.bash→upd test helper doc
+}
+R.upd{
+  surgical; ¬rewrite
+  format=consistent
+  upd ver+paths+examples
+  +workflow|test→+tables/lists
+  CI/CD flow diagram=accurate
+}
+P.skip{
+  .cursor/rules/example/*
+  temp|gen files
+  ¬spec features→doc existing only
+}
 ⟧
 ```

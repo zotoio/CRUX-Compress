@@ -40,4 +40,4 @@ When you modify files that affect project functionality or workflows, update the
 
 - Don't update docs for changes to example files in `.cursor/rules/example/`
 - Don't update docs for temporary or generated files
-- Don't add speculative features - only document what exists
+- Don't add speculative features - only document what exists 

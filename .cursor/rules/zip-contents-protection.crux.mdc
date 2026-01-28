@@ -1,9 +1,9 @@
 ---
 generated: 2026-01-28 12:00
-sourceChecksum: 2683285129
+sourceChecksum: 722705910
 beforeTokens: 513
-afterTokens: 215
-confidence: 94%
+afterTokens: 314
+confidence: 97
 crux: true
 alwaysApply: true
 ---
@@ -14,13 +14,30 @@ alwaysApply: true
 # Zip Contents Protection Rule
 
 ```crux
-⟦CRUX:.cursor/rules/zip-contents-protection.md
-⊛P{scripts/create-crux-zip.sh;¬Δ w/o user!}
-→[install,ver_bump@version-bump.yml:RELEASE_PATHS,size]
-¬ADD⊲[rules/*.mdc,skills/*,scripts/*.sh,∀files]
-Δ⊲user["add zip"|"incl release"|"mod zip"]
-Δ→[+create-crux-zip.sh,+version-bump.yml,+CONTRIBUTORS.md,warn:ver_bump]
-ZIP∋[CRUX.md,VERSION,AGENTS.crux.md,hooks.json,crux-cursor-rule-manager.md,crux-compress.md,detect-crux-changes.sh,_CRUX-RULE.mdc,SKILL.md,crux-utils.sh]
-Ω{min;¬bloat;¬conflict;¬churn}
+⟦CRUX:zip-contents-protection.md
+P.⊛{¬auto-add to scripts/create-crux-zip.sh w/o explicit user request!}
+
+Κ{script=scripts/create-crux-zip.sh→dist pkg;
+  affects=[installs,ver bumps,dist size]}
+
+P.never{auto-add when creating:
+  .cursor/rules/*.mdc|.cursor/skills/*/|scripts/*.sh|any files}
+
+P.only{Δ zip when user says:
+  "add X to dist zip"|"include X in release"|"modify zip contents"}
+
+Λ.add{w/ permission→
+  1.Δ scripts/create-crux-zip.sh +path;
+  2.Δ .github/workflows/version-bump.yml RELEASE_PATHS;
+  3.Δ CONTRIBUTORS.md table;
+  4.warn: +file→ver bump}
+
+M.zip{
+  CRUX.md;VERSION;AGENTS.crux.md←AGENTS.md;
+  .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
+    commands/crux-compress.md,hooks/detect-crux-changes.sh,
+    rules/_CRUX-RULE.mdc,skills/CRUX-Utils/[SKILL.md,scripts/crux-utils.sh]]}
+
+Ω{dist=minimal;+files→[↑size,?conflicts,↑updates,↑maint]}
 ⟧
 ```

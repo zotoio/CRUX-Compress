@@ -2,7 +2,7 @@
 generated: 2026-01-28 12:00
 sourceChecksum: 2179275645
 beforeTokens: 480
-afterTokens: 259
+afterTokens: 180
 confidence: 94%
 crux: true
 alwaysApply: true
@@ -16,29 +16,25 @@ description: A test rule for compress command testing
 
 ```crux
 ⟦CRUX:tests/fixtures/compress-test.md
-Φ.naming{test:test_*.bats;fixture:*.md|*.mdc;helper:helpers.bash}
-
+Ρ{BATS test coding standards}
+Φ.naming{test=test_*.bats;fixture=*.md|*.mdc;helper=helpers.bash}
 R.setup{
- setup()→init env;teardown()→cleanup tmp
- ¬artifacts@workdir;use $BATS_TMPDIR
+  setup()→init env;teardown()→cleanup tmp
+  ¬artifacts@workdir;use $BATS_TMPDIR
 }
-
 R.assert{
- assert_success←ok;assert_failure←fail
- assert_output --partial←substr;assert_line←ln check
+  assert_success←ok;assert_failure←fail
+  assert_output --partial←substr;assert_line←ln check
 }
-
-E.good{@test "desc"→run fn→assert_failure+assert_output --partial}
-E.bad{@test→¬run,¬assert} #avoid
-
+E{
+  ⊤:@test "desc"→run fn→assert_failure+assert_output --partial
+  ⊥:@test→¬run,¬assert
+}
 Γ.apply⊲[+BATS tests|review PR|debug fail]
-
 P.critical{
- ⊛¬skip run→assert
- ⊛cleanup@teardown
- !desc test names;¬hardcode paths→vars
+  ⊛¬skip run→assert;⊛cleanup@teardown
+  !desc test names;¬hardcode paths→vars
 }
-
 Γ.error{fail→check $output+$status+$lines;debug→set -x temp}
 ⟧
 ```

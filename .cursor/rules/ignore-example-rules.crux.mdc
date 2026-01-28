@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-28 10:30
-sourceChecksum: "3154349694"
+generated: 2026-01-28 17:45
+sourceChecksum: 3284305428
 beforeTokens: 229
-afterTokens: 103
-confidence: 92%
+afterTokens: 150
+confidence: 95%
 alwaysApply: false
 crux: true
 ---
@@ -15,8 +15,15 @@ crux: true
 
 ```crux
 ⟦CRUX:ignore-example-rules.md
-P{.cursor/rules/example/*=demo;¬follow|apply}
-IGNORE@[coding-standards-demo.md,.crux.mdc]
-#teaching materials only
+P{
+  .cursor/rules/example/*=demo;¬apply!
+  purpose=show CRUX compression;¬project rules
+}
+Κ{demo=teaching materials;sample=docs only}
+E.ignore{
+  @.cursor/rules/example/coding-standards-demo.md
+  @.cursor/rules/example/coding-standards-demo.crux.mdc
+}
+Ω{example.rules→treat.as.docs;¬follow}
 ⟧
 ```

@@ -162,8 +162,51 @@ alwaysApply: [match source file frontmatter value, if not found default to false
 
 ```
 ⟦CRUX:{source_file}
-{compressed content, one concept per line, max ~80 chars/line}
+{formatted content - see below}
 ⟧
+```
+
+### Formatting Rules (Default: Formatted)
+
+**By default, output formatted CRUX** with the following structure:
+
+1. **One block per line** - Each major block (`Ρ{}`, `Κ{}`, `R{}`, `Λ{}`, `P{}`, `E{}`, `Ω{}`) starts on its own line
+2. **Sub-blocks on separate lines** - Dot-notation blocks like `R.style{}`, `R.quality{}` each get their own line
+3. **Indent nested content** - Use 2 spaces for content inside multi-statement blocks
+4. **Max ~80 chars per line** - Wrap longer content to next line with indent
+5. **Semicolons separate statements** - Within a block, use `; ` (semicolon + space) between statements
+
+**Formatted Example:**
+```
+⟦CRUX:coding-standards.md
+Ρ{team dev standards}
+Κ{fn=function; cls=class; cmp=component; pr=pull request}
+R.style{
+  indent=2sp; ¬tabs!; line≤100ch
+  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
+}
+R.quality{
+  fn.len≤50; cls.len≤300; ∀export→test.cov≥80%
+  ∀fn→jsdoc[params+return]; cyclomatic≤10
+}
+Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}
+P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}
+E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}
+Ω{quality≻speed; readable≻clever}
+⟧
+```
+
+### Minified Format (When `--minified` flag is passed)
+
+When the `--minified` flag is specified, output single-line CRUX:
+
+1. **All content on one line** - No line breaks within the CRUX block
+2. **No spaces after semicolons** - Maximum compression
+3. **No indentation** - Everything flows sequentially
+
+**Minified Example:**
+```
+⟦CRUX:coding-standards.md;Ρ{team dev standards};Κ{fn=function;cls=class;cmp=component;pr=pull request};R.style{indent=2sp;¬tabs!;line≤100ch;naming{fn=camelCase;cls=PascalCase;const=UPPER_SNAKE}};R.quality{fn.len≤50;cls.len≤300;∀export→test.cov≥80%;∀fn→jsdoc[params+return];cyclomatic≤10};Λ.review{pr→≥1approval+CI.pass;Δ≥500lines→split!};P.avoid{¬any!;¬console.log[prod];¬magic.num→use.const};E{⊤:err→try/catch→log+handle;⊥:catch(e){/*ignore*/}};Ω{quality≻speed;readable≻clever}⟧
 ```
 
 

@@ -57,4 +57,4 @@ The distribution zip should remain minimal and focused. Additional files:
 - Increase download size for users
 - May conflict with user's existing configurations
 - Require users to update more frequently
-- Increase maintenance burden
+- Increase maintenance burden 

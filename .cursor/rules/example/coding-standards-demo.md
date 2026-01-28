@@ -430,4 +430,4 @@ Document why each major dependency was chosen in the project README.
 
 These standards are living documentation. As our team grows and technology evolves, these guidelines should be updated to reflect our current best practices. If you have suggestions for improvements, bring them up in the team meeting or submit a PR to this document.
 
-Remember: the goal of these standards is to help us write better code together, not to create bureaucracy. Use good judgment, and when in doubt, ask a colleague.
+Remember: the goal of these standards is to help us write better code together, not to create bureaucracy. Use good judgment, and when in doubt, ask a colleague. 

@@ -1,33 +1,114 @@
 ---
-generated: 2026-01-28 14:30
-sourceChecksum: "3847291056"
-beforeTokens: 625
-afterTokens: 112
-confidence: 92%
-description: Team coding standards and best practices
+generated: 2026-01-28 10:45
+sourceChecksum: 264908382
+beforeTokens: 3234
+afterTokens: 875
+confidence: 95%
 alwaysApply: false
+crux: true
+description: Team coding standards and best practices
 ---
 
 > [!IMPORTANT]
 > Generated file - do not edit!
 
-# Team Coding Standards
+# Team Coding Standards and Best Practices
 
 ```crux
-⟦CRUX:.cursor/rules/example/coding-standards-demo.md
-Ρ{team dev standards}
-Κ{fn=function; cls=class; cmp=component; pr=pull request}
-R.style{
-  indent=2sp; ¬tabs!; line≤100ch
-  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
+⟦CRUX:coding-standards-demo.md
+Ρ{team coding standards+best practices}
+Κ{
+  fn=function; cls=class; var=variable;
+  JS=JavaScript; TS=TypeScript; Py=Python
 }
-R.quality{
-  fn.len≤50; cls.len≤300; ∀export→test.cov≥80%
-  ∀fn→jsdoc[params+return]; cyclomatic≤10
+
+R.philosophy{
+  readable≻clever; code→humans first;
+  ∀code→read many×>write 1×
 }
-Λ.review{pr→≥1approval+CI.pass; Δ≥500lines→split!}
-P.avoid{¬any!; ¬console.log[prod]; ¬magic.num→use.const}
-E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}
-Ω{quality≻speed; readable≻clever}
+
+R.boyscout{
+  leave code≥found; touch file→cleanup minor;
+  ¬scope-creep; big refactor→separate ticket
+}
+
+R.naming{
+  vars+fns=descriptive+self-doc; ¬single-letter[except short loops];
+  JS/TS{var+fn=camelCase; cls=PascalCase; const=SCREAMING_SNAKE};
+  Py{var+fn=snake_case; cls=PascalCase};
+  bool→prefix[is|has|can|should];
+  files{JS/TS=kebab-case; Py=snake_case};
+  dir=lowercase+hyphens; 1file→1responsibility
+}
+
+R.structure{
+  fn.len≤20..30ln; 1fn→1thing;
+  nesting≤3levels→use early return|extract fn;
+  comments→"why"¬"what"
+}
+
+R.docs{
+  ∀public[API|cls|fn]→doc comments;
+  include=[desc,params+types,return,examples?,exceptions?]
+}
+
+R.errors{
+  ¬swallow!→log|handle|rethrow;
+  custom err types→precise handling+debug;
+  err.msg∋[op failed,expected,actual,IDs,ctx]
+}
+
+R.test{
+  ∀new code→tests; cov≥80%⊕meaningful;
+  name="should [behavior] when [condition]";
+  pattern=AAA[Arrange→Act→Assert];
+  mock=[external APIs,DB,filesystem,time]; ¬mock=[unit tested,utils,data structs]
+}
+
+R.git{
+  commit=conventional{type(scope):desc};
+  types=[feat,fix,docs,style,refactor,test,chore];
+  branch=[feature/,fix/,refactor/,docs/]+desc; +ticket#?;
+  PR{title clear,desc what+why,ref issues,small+complete,tests,CI pass}
+}
+
+R.security{
+  ¬commit[API keys,secrets,passwords,creds,private keys,PII]!;
+  use env vars+secret mgmt;
+  ∀input→validate[type,format,range]+sanitize;
+  DB→parameterized queries; output→encode[XSS];
+  auth→check before op; use established libs; rate limit; secure sessions
+}
+
+R.perf{
+  DB{¬N+1→eager load; +indexes; paginate; profile slow};
+  cache{expensive ops+external API; TTL→volatility; invalidation; warming};
+  frontend{lazy load; optimize images; min bundle; code split}
+}
+
+R.deps{
+  before add→check[maintained?,bundle size?,vulns?,existing alt?];
+  doc major deps in README;
+  prod→pin exact ver; libs→ver ranges;
+  update regularly; monitor vulns
+}
+
+R.review{
+  author{self-review first; PR small+focused; ctx in desc; feedback→constructive};
+  reviewer{respectful; explain reasoning; required≠suggestions; approve when good enough}
+}
+
+R.logging{
+  log=[startup,shutdown,auth events,biz-critical ops,errors+ctx,perf metrics];
+  ¬log=[sensitive data,high-freq spam,redundant];
+  levels{ERROR=failed+attention; WARN=unexpected+recoverable;
+    INFO=normal biz; DEBUG=detailed; TRACE=very detailed}
+}
+
+Ω{
+  standards=living doc→update as team grows;
+  goal=better code together¬bureaucracy;
+  ?doubt→ask colleague
+}
 ⟧
 ```

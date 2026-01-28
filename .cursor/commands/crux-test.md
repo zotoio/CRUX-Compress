@@ -36,6 +36,8 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 **Note**: Do NOT delete `tests/fixtures/no-change.crux.mdc` - it is a permanent baseline for drift detection.
 
+**Alternative**: The `--force` flag in `/crux-compress` can be used to achieve the same effect by deleting CRUX files before recompression. However, for test isolation, we delete files explicitly in this pre-test phase.
+
 
 
 ---
@@ -218,6 +220,41 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 ---
 
+### Test 10: Force Recompression Test (`--force`)
+
+**Purpose**: Verify the `--force` flag correctly bypasses checksum-based skip and forces fresh recompression.
+
+1. **Setup**: Ensure `tests/fixtures/compress-test.crux.mdc` exists from Test 8
+2. **Record baseline state**:
+   - Note the current `generated` timestamp in the CRUX frontmatter
+   - Note the current `sourceChecksum` value
+3. **Simulate `--force` behavior**:
+   - Delete `tests/fixtures/compress-test.crux.mdc` (as `--force` would)
+   - Log: "Deleted: tests/fixtures/compress-test.crux.mdc (--force)"
+4. **Recompress without source changes**:
+   - Spawn a `crux-cursor-rule-manager` subagent to compress `tests/fixtures/compress-test.md`
+   - Since the CRUX file was deleted, compression should proceed (not skip)
+5. **Verify force behavior worked**:
+   - Confirm new `tests/fixtures/compress-test.crux.mdc` was created
+   - Verify `generated` timestamp is newer than baseline
+   - Verify `sourceChecksum` matches (source unchanged, but compression happened)
+6. **Compare to normal skip behavior**:
+   - Run compression again WITHOUT deleting the CRUX file
+   - Should report "source unchanged" and skip (normal behavior)
+   - Verify `generated` timestamp didn't change this time
+7. Record: PASS/FAIL, force triggered recompression, normal skip still works
+
+**Pass Criteria**:
+- `--force` (delete + recompress) creates new CRUX file with updated timestamp
+- Subsequent compression without `--force` correctly skips (unchanged source)
+
+**Rationale**: This test ensures the `--force` flag implementation correctly:
+- Bypasses the checksum optimization when needed
+- Allows users to force fresh recompression for debugging or validation
+- Doesn't break normal skip-if-unchanged behavior
+
+---
+
 ## Output Format
 
 After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
@@ -242,8 +279,9 @@ After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
 | Special Characters | PASS/FAIL | Special tokens: X |
 | Crux-Compress Command | PASS/FAIL | Full workflow, skip-if-unchanged |
 | Semantic Stability | PASS/FAIL | Drift detection, baseline confidence |
+| Force Recompression | PASS/FAIL | --force bypasses skip, normal skip works |
 
-**Overall**: X/9 tests passed
+**Overall**: X/10 tests passed
 
 ## Detailed Results
 

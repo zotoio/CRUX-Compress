@@ -1,11 +1,11 @@
 ---
-generated: 2026-01-27 15:32
-sourceChecksum: 2942027156
+generated: 2026-01-28 12:45
+sourceChecksum: "2942027156"
 beforeTokens: 1120
-afterTokens: 299
-confidence: 96%
-crux: true
+afterTokens: 331
+confidence: 94%
 alwaysApply: true
+crux: true
 ---
 
 > [!IMPORTANT]
@@ -14,34 +14,44 @@ alwaysApply: true
 # Testing Standards
 
 ```crux
-⟦CRUX:no-change.md
-# Coverage Thresholds
-COV={line:≥80→90%,branch:≥75→85%,func:≥85→95%}
-CRIT=100%∀[payment,auth,validation,errors]
+⟦CRUX:tests/fixtures/no-change.md
+Ρ{testing standards for eng team}
 
-# Test Naming & Structure
-NAME="should [X] when [Y]"
-AAA=Arrange→Act→Assert
+R.coverage{
+  line≥80%⊕90%; branch≥75%⊕85%; fn≥85%⊕95%
+  critical=100%∋[payment,auth,validation,err handling]
+}
 
-# Test Categories
-CAT={unit⊲commit,integration⊲PR,e2e⊲nightly,perf⊲weekly,security⊲PR}
+R.naming{pattern="should [behavior] when [condition]"}
 
-# Test Independence
-INDEP=isolated&cleanup&¬order_depend&fresh_fixtures
+R.structure{
+  AAA=Arrange»Act»Assert
+  independence{isolate;cleanup;¬order dep;fresh fixtures}
+}
 
-# Mocking
-MOCK.do=[external_svc,time,RNG,network]
-MOCK.dont=[code_under_test,utils,value_obj,pure_func]
+Κ.categories{
+  unit@commit→test fn isolation
+  integration@PR→test cmp interactions
+  E2E@nightly→test user flows
+  perf@weekly→verify response times
+  security@PR→SAST/DAST
+}
 
-# Test Data
-DATA={fixtures@tests/fixtures/,factories⊤,¬prod_data}
-DB={txn_rollback,min_seed,¬shared_state}
+R.mock{
+  ⊤[external svc,time ops,random,network]
+  ⊥[code under test,simple utils,value obj,pure fn]
+}
 
-# Assertions
-ASSERT={specific⊤,one_behavior,verify_err_type+msg}
+R.data{
+  fixtures@tests/fixtures/;use factories;¬prod data;anonymize
+  db{txn→rollback;minimal seed;¬shared state}
+}
 
-# CI Requirements
-CI.pass=[unit:100%,integration:100%,cov_thresholds,¬flaky]
-FLAKY=fix≤48h|quarantine+issue;¬skip_w/o_docs
+R.assert{specific;1 behavior/test;verify err type+msg}
+
+R.CI{
+  PR→[unit 100%,integration 100%,cov met,¬flaky]
+  flaky→fix≤48h|quarantine+issue;¬skip w/o docs
+}
 ⟧
 ```
