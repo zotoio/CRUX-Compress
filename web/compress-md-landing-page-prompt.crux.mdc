@@ -1,0 +1,283 @@
+---
+generated: 2026-01-29 10:45
+sourceChecksum: "1136001614"
+beforeTokens: 10278
+afterTokens: 2967
+confidence: 93%
+crux: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# COMPRESS.MD — Landing Page Build Specification
+
+```crux
+⟦CRUX:compress-md-landing-page-prompt.md
+Ρ{compress.md landing page}
+  target=single static page for CRUX-Compress
+  repo=github.com/zotoio/CRUX-Compress
+  domain=compress.md; status=EXPERIMENTAL!
+  msg="Reclaim ≤80% ctx window. CRUX→semantic core extraction"
+  journey{land→3D compression»scroll»camera pan»expand spec»install}
+
+Κ{WebGPU=browser GPU API; WGSL=WebGPU shading lang;
+  SDF=signed distance field; ctx=context; cmp=compression;
+  verbose=uncompressed; sp=space; ch=char}
+
+Λ.tech{
+  stack=static HTML/CSS/JS(¬build step)
+  gpu=WebGPU!(fallback msg for unsupported)
+  hosting=GitHub Pages compatible
+  deps=minimal+CDN-loaded
+  perf≤3s first meaningful paint@4G
+  a11y=WCAG 2.1 AA(WebGPU canvas exempt)
+}
+
+Λ.design{
+  palette{¬purple!; ¬std AI gradients!
+    USE=[deep teals,warm ambers,charcoal blacks]
+    ACCENT{verbose=cool; compressed=warm}}
+  typo{mono=[code,CRUX notation]; sans=Inter|system-ui}
+  layout{¬generic cards!; ¬cookie-cutter hero!
+    YES=[asymmetric,intentional whitespace,editorial]}
+  anim=purposeful only→every motion communicates cmp
+}
+
+Λ.content{
+  tone=technical+precise+forward-looking
+  audience=engineers who've hit ctx limits
+  claims=["≤80% token reduction","experimental tool","LLMs interpret natively"]
+}
+
+Π.sections{
+  S0{name="WebGPU Hero—Compression Chamber"; type=3D viz
+    concept="tokens as particles→gravitating center→merge→CRUX symbols"
+    camera{start=wide(chaos)»dolly in(compression)}
+    canvas=full viewport height
+    overlay{title="CRUX";subtitle="Context Reduction Using X-encoding"
+      progress bar="80% RECOVERED";stats="2,500→500 tokens"}}
+
+  S1{name="The Problem"; layout=split
+    left=verbose markdown; right=ctx window viz
+    copy="AI assistants rely on ctx windows. Rules consume tokens.
+      As rule library grows→ctx balloons. You want readable rules;
+      LLMs just need actionable info."
+    pain="70% consumed by rules"}
+
+  S2{name="The Approach—Live Compression Demo"
+    layout=side-by-side panels
+    left{title="BEFORE: 625 tokens"; content=verbose markdown}
+    right{title="AFTER: 112 tokens"; content=CRUX notation}
+    anim=scroll-triggered line-by-line cmp
+    msg="LLMs interpret CRUX natively. ¬decompression. ¬training."}
+
+  S3{name="The Notation—Interactive Spec Explorer"
+    layout=expandable/collapsible sections
+    default=collapsed+preview; click→expand
+    groups=[STRUCTURE,COMPARISON,PRIORITY,DATA_FLOW,SEQUENCE,
+      RELATIONS,LOGIC,CHANGE,QUALIFIERS,IMPORTANCE,STANDARD_BLOCKS]
+    link="View Full Spec on GitHub→"}
+
+  S4{name="Quickstart"
+    warning="⚠ EXPERIMENTAL—expect breaking Δ. Provide feedback."
+    install=`curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash`
+    prereqs=[curl,unzip,Cursor IDE]
+    installed{
+      CRUX.md="Specification (readonly)"
+      AGENTS.md="Agent awareness notice"
+      .cursor/rules/_CRUX-RULE.mdc="Always-applied rule"
+      .cursor/agents/crux-cursor-rule-manager.md
+      .cursor/commands/crux-compress.md
+      .cursor/hooks/detect-crux-changes.sh
+      VERSION}
+    usage{1.+`crux:true` to frontmatter; 2.run `/crux-compress ALL`; 3."Watch ctx breathe"}
+    links=["View on GitHub→","Read Full Docs→","Report Issue→"]}
+
+  S5{name="Footer"
+    title="CRUX—Context Reduction Using X-encoding"
+    desc="experimental tool for AI ctx optimization"
+    license=MIT; ver=v2.1.0
+    links=[GitHub,Specification,Changelog,Issues]}
+}
+
+Γ.WebGPU{
+  pipeline{ParticleBuf→ComputeShader→RenderPipeline}
+  particle.buf∋[positions,velocities,colors,states]
+  compute{attraction+damping+merging+mouse repulsion}
+  render{instanced quads+alpha blend}
+
+  scroll.ctrl{
+    scrollY→normalizedProgress(0.0..1.0)
+    →camera.position.z interp
+    →particle.compressionState interp
+    →color.temperature interp}
+
+  particle.struct{
+    position:vec3<f32>; velocity:vec3<f32>
+    baseColor:vec3<f32>; targetColor:vec3<f32>
+    size:f32; compressionState:f32(0=scattered,1=compressed)
+    mergeTarget:u32; isSymbol:u32; symbolIndex:u32}
+
+  const{
+    PARTICLE_COUNT=3000; ATTRACTION_STRENGTH=2.5
+    DAMPING=0.95; MERGE_DISTANCE=0.1
+    SYMBOL_EMERGENCE_THRESHOLD=0.7}
+
+  colors{
+    VERBOSE=vec3(0.4,0.6,0.8)#cool blue
+    COMPRESSED=vec3(0.9,0.6,0.2)#warm amber
+    SYMBOL=vec3(1.0,0.85,0.4)#bright gold}
+
+  mouse{
+    track{normalized:[-1,1]; velocity; isOverCanvas}
+    repulsion{radius=0.3; strength=0.5; creates "wake" effect}
+    camera.parallax{strength=2.0; more@compressed state}
+    intensity∝compressionState(0.3+scroll*0.7)}
+
+  touch{same as mouse; +touchend→fadeOut influence
+    mobile w/o hover→autonomous "breathing" motion}
+
+  camera.keyframes[
+    {scroll:0.0,pos:[0,0,50],fov:60}
+    {scroll:0.25,pos:[10,5,35],fov:55}
+    {scroll:0.5,pos:[5,2,20],fov:50}
+    {scroll:0.75,pos:[2,1,12],fov:45}
+    {scroll:1.0,pos:[0,0,8],fov:40}]
+  camera.interp=cubic bezier
+
+  compute.wgsl{
+    SimParams{scrollProgress:f32;deltaTime:f32;mouseX:f32;mouseY:f32;mouseActive:f32}
+    MOUSE_REPULSION_RADIUS=8.0; MOUSE_REPULSION_STRENGTH=15.0
+    logic{toCenter attraction»mouse repulsion»damping»position update
+      compressionState=smoothstep(0,1,scrollProgress)}}
+
+  symbol.render{
+    at~70% scroll→particles merge→CRUX symbols
+    symbols=['⟦','⟧','Ρ','Κ','R','Λ','Ω','→','←','∀','¬','≻','⊤','⊥']
+    method=SDF|pre-rendered textures; effect=glow+pulse}
+
+  fallback{
+    detect=navigator.gpu
+    ¬WebGPU→show static SVG|CSS-only anim
+    msg="WebGPU requires Chrome 113+/Edge 113+/Firefox Nightly w/ flag"
+    link="Skip to installation→"}
+}
+
+Φ.design{
+  colors{
+    bg{primary:#0a0f0f#near-black+teal undertone
+      secondary:#141c1c#dark teal-gray
+      tertiary:#1e2a2a#code block bg}
+    text{primary:#e8eeee#warm white
+      secondary:#8fa3a3#muted teal-gray
+      tertiary:#5a7070#subtle}
+    accent{verbose:#5b8a9a#cool teal
+      compressed:#d4915a#warm amber
+      symbol:#f0c674#bright gold}
+    interactive{link:#7ab3c2; hover:#9fd4e3}
+    border{default:#2a3838; focus:#4a6868}
+    experimental:#c27a5a#warm orange}
+
+  typo{
+    fonts{mono:'JetBrains Mono','Fira Code','SF Mono'
+      sans:'Inter',system-ui,-apple-system}
+    scale(1.25 ratio){xs:0.64rem;sm:0.8rem;base:1rem;lg:1.25rem
+      xl:1.563rem;2xl:1.953rem;3xl:2.441rem;4xl:3.052rem}
+    leading{tight:1.2;normal:1.5;relaxed:1.75}}
+
+  spacing{
+    1:0.25rem;2:0.5rem;3:0.75rem;4:1rem;6:1.5rem
+    8:2rem;12:3rem;16:4rem;24:6rem;32:8rem}
+
+  components{
+    code-block{bg:tertiary;border:1px+left 3px compressed
+      border-radius:0 4px 4px 0;font:mono;size:sm}
+    code-block--crux{left-border:symbol;bg:gradient→symbol 5%}
+    spec-section{border:1px;radius:4px;expandable
+      header{bg:secondary;hover:tertiary;cursor:pointer}
+      symbols{font:mono;color:symbol;margin-left:auto}}
+    compression-bar{height:8px;radius:4px
+      fill:gradient verbose→compressed
+      label{font:mono;size:xs;color:text-primary}}}
+}
+
+E.demo{
+  before{
+    "# Team Development Standards\n## Style Rules\n
+    ### Indentation & Formatting\n* Use **2 spaces**...\n
+    * **Never use tabs!**...\n* Lines must not exceed **100 chars**\n
+    ### Naming Conventions\n| Element | Convention |..."}
+  after{
+    "⟦CRUX:coding-standards.md\nΡ{team dev standards}\n
+    R.style{\n  indent=2sp; ¬tabs!; line≤100ch\n
+      naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}\n}\n⟧"}
+  try-it{
+    api-rules="⟦CRUX:api-rules\nΡ{REST API design standards}\n
+      R{∀endpoint→versioned(/v{n}/);auth=JWT|API_KEY;rate.limit=100/min}\n
+      P.response{success→{data,meta};error→{code,message,details?}}\n
+      Λ{5xx→retry»backoff[max=3];429→wait(retry-after)}\n
+      Γ{req»validate»auth»process»respond}\n
+      Ω{consistency≻flexibility;explicit≻implicit;¬halluc}\n⟧"
+    code-mod="⟦CRUX:code-mod-protocol\nR=req→truth;gap→assume+mark;?arch→ask first\n
+      C=obs→cite path:lines;repo≻chat\nΔ=R≠C→tag{code|tests|req}+why\n
+      PLAN=min files+targeted Δ;justify+file|broad\n
+      PATCH=surgical diff;¬rewrite w/o proof\nCHECK=run»+tests|static val\n
+      STATE={R,C,Δ}→upd on progress\nΩ{¬halluc;verified only}\n⟧"}
+}
+
+P.principles{
+  non-negotiable[
+    1."WebGPU is hero—3D viz IS differentiator. ¬ship w/o working impressively"
+    2."Experimental status is honest—every section acknowledges. Build trust via transparency"
+    3."Show, don't claim—live demo≻marketing copy. Make unmissable"
+    4."Technical audience respect—¬dumb down. Speak to ctx limit pain precisely"
+    5."Performance non-negotiable—if WebGPU tanks page→fix|simplify. Smooth 60fps simple≻janky complex"]
+  design-philosophy[
+    "asymmetry≻grids"; "editorial whitespace"; 
+    "purposeful anim→every motion=compression"; "warm technical—precise¬cold"]
+  positioning[
+    "early but promising"; "part of emerging ctx engineering discipline";
+    "evolves w/ community input"; "experiment w/¬depend on(yet)"]
+}
+
+M{
+  project:compress.md; version:1.0.0-alpha
+  repo:https://github.com/zotoio/CRUX-Compress
+  license:MIT
+  browsers{WebGPU:[Chrome 113+,Edge 113+,Firefox Nightly,Safari 18+(limited)]
+    fallback:any modern(CSS anim)}
+  deps{none required(vanilla JS); optional:Three.js}
+  hosting:GitHub Pages; analytics:none(privacy-first)
+}
+
+Κ.deliverables{
+  /compress.md/
+  ├─index.html#single page all content
+  ├─styles/main.css#all styles+CSS custom properties
+  ├─scripts/
+  │ ├─webgpu-init.js#setup+fallback detect
+  │ ├─particle-system.js#particle sim
+  │ ├─camera-controller.js#scroll-linked camera
+  │ ├─compression-demo.js#before/after anim
+  │ └─spec-expander.js#expandable notation sections
+  ├─shaders/
+  │ ├─particle.wgsl#compute+render
+  │ └─symbol.wgsl#CRUX symbol rendering
+  ├─assets/
+  │ ├─og-image.png#social sharing
+  │ └─favicon.svg#CRUX-themed
+  └─README.md#deployment instructions
+}
+
+Ω{
+  WebGPU hero working impressively!
+  experimental status acknowledged∀sections
+  show≻claim via live demo
+  60fps performance
+  ¬purple; ¬std AI gradients
+  asymmetric editorial layout
+  ≤3s first paint@4G
+}
+⟧
+```

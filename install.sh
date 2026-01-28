@@ -345,6 +345,7 @@ main() {
 }
 
 # Only run main if executed directly (not sourced)
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+# Handle both direct execution and piped via curl (where BASH_SOURCE is empty)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]] || [[ -z "${BASH_SOURCE[0]}" ]]; then
     main
 fi

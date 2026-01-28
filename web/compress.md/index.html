@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUX — Context Reduction Using X-encoding</title>
+  <meta name="description" content="Reclaim up to 80% of your context window. CRUX extracts semantic cores from verbose markdown rules for AI assistants.">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="CRUX — Semantic Compression for AI Context">
+  <meta property="og:description" content="Reclaim up to 80% of your context window with semantic core extraction.">
+  <meta property="og:image" content="assets/og-image.png">
+  <meta property="og:type" content="website">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <!-- S0: WebGPU Hero — Compression Chamber -->
+  <section id="hero" class="hero">
+    <canvas id="webgpu-canvas"></canvas>
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="hero-title">CRUX</h1>
+        <p class="hero-subtitle">Context Reduction Using X-encoding</p>
+        <div class="hero-stats">
+          <div class="compression-bar">
+            <div class="compression-bar-fill" id="compression-fill"></div>
+            <span class="compression-bar-label">
+              <span id="token-before">2,500</span> → <span id="token-after">500</span> tokens
+            </span>
+          </div>
+          <p class="compression-percentage"><span id="percentage">80</span>% RECOVERED</p>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <span>Scroll to compress</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- CSS Fallback Background (shown when WebGPU unavailable) -->
+    <div id="webgpu-fallback" class="hero-fallback" hidden>
+      <div class="fallback-particles"></div>
+    </div>
+  </section>
+
+  <!-- S1: The Problem -->
+  <section id="problem" class="section section--problem">
+    <div class="section-content">
+      <div class="split-layout">
+        <div class="split-left">
+          <div class="code-block code-block--verbose">
+            <div class="code-block-header">
+              <span class="code-block-label">Verbose Markdown Rules</span>
+              <span class="code-block-tokens">~2,500 tokens</span>
+            </div>
+            <pre><code class="language-markdown"># Team Development Standards
+
+## Code Style Requirements
+
+### Indentation and Formatting
+- Always use **2 spaces** for indentation
+- **Never use tabs** under any circumstances
+- Lines must not exceed **100 characters**
+- Add trailing newline to all files
+
+### Naming Conventions
+| Element | Convention | Example |
+|---------|------------|---------|
+| Functions | camelCase | getUserData |
+| Classes | PascalCase | UserService |
+| Constants | UPPER_SNAKE | MAX_RETRIES |
+
+### Error Handling
+All errors must be:
+1. Logged with full context
+2. Wrapped in custom error classes
+3. Include stack traces in development
+
+... and so on for hundreds more lines</code></pre>
+          </div>
+        </div>
+        <div class="split-right">
+          <div class="context-window-viz">
+            <div class="context-window">
+              <div class="context-window-header">Context Window</div>
+              <div class="context-window-bar">
+                <div class="context-segment context-segment--rules" style="width: 70%">
+                  <span>Rules: 70%</span>
+                </div>
+                <div class="context-segment context-segment--code" style="width: 20%">
+                  <span>Code</span>
+                </div>
+                <div class="context-segment context-segment--prompt" style="width: 10%">
+                  <span>?</span>
+                </div>
+              </div>
+              <p class="context-warning">Your actual work is squeezed out</p>
+            </div>
+          </div>
+          <div class="problem-text">
+            <h2>The Problem</h2>
+            <p>AI assistants rely on context windows. Your rules consume tokens. As your rule library grows, context balloons.</p>
+            <p class="problem-pain">You want readable, maintainable rules.<br>LLMs just need <strong>actionable information</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2: The Approach — Live Compression Demo -->
+  <section id="approach" class="section section--approach">
+    <div class="section-content">
+      <h2 class="section-title">The Approach</h2>
+      <p class="section-intro">CRUX extracts semantic cores. LLMs interpret it natively—no decompression, no special training.</p>
+      
+      <div class="compression-demo" id="compression-demo">
+        <div class="demo-panel demo-panel--before">
+          <div class="demo-panel-header">
+            <span class="demo-panel-title">BEFORE</span>
+            <span class="demo-panel-tokens" id="demo-before-tokens">625 tokens</span>
+          </div>
+          <div class="demo-panel-content">
+            <pre><code id="demo-before-code"># Team Development Standards
+
+## Style Rules
+
+### Indentation & Formatting
+* Use **2 spaces** for all indentation throughout the codebase
+* **Never use tabs!** This is enforced by our linting rules
+* Lines must not exceed **100 characters** in length
+
+### Naming Conventions
+| Element | Convention | Example |
+|---------|------------|---------|
+| Functions | camelCase | fetchUserData |
+| Classes | PascalCase | DataProcessor |
+| Constants | UPPER_SNAKE | MAX_CONNECTIONS |
+
+### Documentation
+- All public functions require JSDoc comments
+- Include @param and @returns annotations
+- Document exceptions with @throws</code></pre>
+          </div>
+        </div>
+        
+        <div class="demo-arrow">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        
+        <div class="demo-panel demo-panel--after">
+          <div class="demo-panel-header">
+            <span class="demo-panel-title">AFTER</span>
+            <span class="demo-panel-tokens" id="demo-after-tokens">112 tokens</span>
+          </div>
+          <div class="demo-panel-content">
+            <pre><code id="demo-after-code" class="language-crux">⟦CRUX:coding-standards.md
+Ρ{team dev standards}
+R.style{
+  indent=2sp; ¬tabs!; line≤100ch
+  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
+}
+R.docs{
+  ∀pub fn→JSDoc; +@param,@returns; exceptions→@throws
+}
+⟧</code></pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-reduction">
+        <div class="reduction-bar">
+          <div class="reduction-bar-fill" id="reduction-bar-fill"></div>
+        </div>
+        <p class="reduction-text"><strong>82% reduction</strong> — same semantic information</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3: The Notation — Interactive Spec Explorer -->
+  <section id="notation" class="section section--notation">
+    <div class="section-content">
+      <h2 class="section-title">The Notation</h2>
+      <p class="section-intro">A symbolic language LLMs interpret naturally. Click to explore.</p>
+      
+      <div class="spec-explorer" id="spec-explorer">
+        <div class="spec-section" data-group="structure">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Structure</span>
+            <span class="spec-section-symbols">⟦ ⟧ { } [ ] . ;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>⟦CRUX:source...⟧</code></td><td>Block delimiters with source reference</td><td><code>⟦CRUX:api.md ... ⟧</code></td></tr>
+              <tr><td><code>{k=v,k2=v2}</code></td><td>Object / map</td><td><code>{timeout=30,retries=3}</code></td></tr>
+              <tr><td><code>[a,b,c]</code></td><td>List / array</td><td><code>[js,ts,py]</code></td></tr>
+              <tr><td><code>.sub</code></td><td>Namespace (e.g., <code>Π.core</code>)</td><td><code>R.style{...}</code></td></tr>
+              <tr><td><code>;</code></td><td>Statement separator</td><td><code>a=1; b=2</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="comparison">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Comparison</span>
+            <span class="spec-section-symbols">&gt; &lt; ≥ ≤ ≠ ..</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&gt;</code></td><td>Greater than</td><td><code>size&gt;100</code></td></tr>
+              <tr><td><code>&lt;</code></td><td>Less than</td><td><code>len&lt;50</code></td></tr>
+              <tr><td><code>≥</code></td><td>Greater or equal</td><td><code>version≥2.0</code></td></tr>
+              <tr><td><code>≤</code></td><td>Less or equal</td><td><code>line≤100ch</code></td></tr>
+              <tr><td><code>≠</code></td><td>Not equal</td><td><code>status≠deleted</code></td></tr>
+              <tr><td><code>..</code></td><td>Range</td><td><code>port=8000..9000</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="priority">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Priority</span>
+            <span class="spec-section-symbols">≻ ≺</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>≻</code></td><td>Preferred over / takes precedence</td><td><code>CONFIRMED≻DRAFT</code></td></tr>
+              <tr><td><code>≺</code></td><td>Ranks below / lower priority</td><td><code>optional≺required</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="dataflow">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Data Flow</span>
+            <span class="spec-section-symbols">→ ←</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>→</code></td><td>Flows to / maps to / then</td><td><code>∀changes→run_tests</code></td></tr>
+              <tr><td><code>←</code></td><td>Flows from / derives from</td><td><code>config←env_vars</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="sequence">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Sequence</span>
+            <span class="spec-section-symbols">»</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>»</code></td><td>Then / next step / sequential</td><td><code>parse»validate»save</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="relations">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Relations</span>
+            <span class="spec-section-symbols">⊳ ⊲ @ : = ∋</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>⊳</code></td><td>Has domain/expertise</td><td><code>agent⊳security</code></td></tr>
+              <tr><td><code>⊲</code></td><td>Triggered by / activated on</td><td><code>hook⊲commit</code></td></tr>
+              <tr><td><code>@</code></td><td>Located at path</td><td><code>config@/etc/app</code></td></tr>
+              <tr><td><code>:</code></td><td>Has type / key-value</td><td><code>port:number</code></td></tr>
+              <tr><td><code>=</code></td><td>Equals / defined as</td><td><code>max=100</code></td></tr>
+              <tr><td><code>∋</code></td><td>Contains / includes</td><td><code>deps∋[react,vue]</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="logic">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Logic</span>
+            <span class="spec-section-symbols">| & ⊤ ⊥ ∀ ∃ ¬</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>|</code></td><td>OR / alternatives</td><td><code>format=json|yaml</code></td></tr>
+              <tr><td><code>&</code></td><td>AND / conjunction</td><td><code>valid&complete</code></td></tr>
+              <tr><td><code>⊤</code></td><td>True / enabled</td><td><code>debug=⊤</code></td></tr>
+              <tr><td><code>⊥</code></td><td>False / disabled</td><td><code>cache=⊥</code></td></tr>
+              <tr><td><code>∀</code></td><td>For all / universal</td><td><code>∀files→lint</code></td></tr>
+              <tr><td><code>∃</code></td><td>Exists / some</td><td><code>∃config→load</code></td></tr>
+              <tr><td><code>¬</code></td><td>Not / negation</td><td><code>¬tabs!</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="change">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Change</span>
+            <span class="spec-section-symbols">Δ + -</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>Δ</code></td><td>Change / update / delta</td><td><code>Δschema→migrate</code></td></tr>
+              <tr><td><code>+</code></td><td>Add / include / with</td><td><code>+tests,+docs</code></td></tr>
+              <tr><td><code>-</code></td><td>Remove / exclude</td><td><code>-node_modules</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="qualifiers">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Qualifiers</span>
+            <span class="spec-section-symbols">* ? ! # ⊕</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>*</code></td><td>Many / collection</td><td><code>files*→process</code></td></tr>
+              <tr><td><code>?</code></td><td>Optional</td><td><code>config?</code></td></tr>
+              <tr><td><code>!</code></td><td>Required / important</td><td><code>auth!</code></td></tr>
+              <tr><td><code>#</code></td><td>Comment / note</td><td><code>#deprecated</code></td></tr>
+              <tr><td><code>⊕</code></td><td>Optimal / target</td><td><code>⊕performance</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="importance">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Importance</span>
+            <span class="spec-section-symbols">⊛ ◊</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>⊛</code></td><td>Critical / highest importance</td><td><code>⊛security_check</code></td></tr>
+              <tr><td><code>◊</code></td><td>Lowest importance / trivial</td><td><code>◊formatting</code></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="spec-section" data-group="blocks">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Standard Blocks</span>
+            <span class="spec-section-symbols">Ρ E Λ Π Κ R P Γ M Φ Ω</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>Ρ{...}</code></td><td>Repository/project context</td><td><code>Ρ{api server}</code></td></tr>
+              <tr><td><code>E{...}</code></td><td>Entities (agents, components)</td><td><code>E{user,admin}</code></td></tr>
+              <tr><td><code>Λ{...}</code></td><td>Commands/actions</td><td><code>Λ{build,test,deploy}</code></td></tr>
+              <tr><td><code>Π{...}</code></td><td>Architecture (modules)</td><td><code>Π{src/,lib/}</code></td></tr>
+              <tr><td><code>Κ{...}</code></td><td>Concepts/definitions</td><td><code>Κ{token=JWT}</code></td></tr>
+              <tr><td><code>R{...}</code></td><td>Requirements/guidelines</td><td><code>R{∀fn→test}</code></td></tr>
+              <tr><td><code>P{...}</code></td><td>Policies/constraints</td><td><code>P{¬force push}</code></td></tr>
+              <tr><td><code>Γ{...}</code></td><td>Orchestration (workflows)</td><td><code>Γ{ci»cd»deploy}</code></td></tr>
+              <tr><td><code>M{...}</code></td><td>Memory/state</td><td><code>M{session,cache}</code></td></tr>
+              <tr><td><code>Φ{...}</code></td><td>Configuration</td><td><code>Φ{port=3000}</code></td></tr>
+              <tr><td><code>Ω{...}</code></td><td>Quality gates</td><td><code>Ω{cov≥80%}</code></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CRUX.md" class="spec-link" target="_blank" rel="noopener">
+        View Full Specification on GitHub →
+      </a>
+    </div>
+  </section>
+
+  <!-- S4: Quickstart -->
+  <section id="quickstart" class="section section--quickstart">
+    <div class="section-content">
+      <h2 class="section-title">Quickstart</h2>
+      
+      <div class="experimental-warning">
+        <span class="warning-icon">⚠</span>
+        <div class="warning-text">
+          <strong>EXPERIMENTAL</strong> — Expect breaking changes. Your feedback shapes the spec.
+        </div>
+      </div>
+      
+      <div class="install-section">
+        <h3>Installation</h3>
+        <p class="prereqs">Prerequisites: <code>curl</code>, <code>unzip</code>, <a href="https://cursor.sh" target="_blank" rel="noopener">Cursor IDE</a></p>
+        
+        <div class="code-block code-block--install">
+          <div class="code-block-header">
+            <span class="code-block-label">Terminal</span>
+            <button class="copy-button" data-copy="curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash</code></pre>
+        </div>
+      </div>
+      
+      <div class="installed-section">
+        <h3>What Gets Installed</h3>
+        <div class="file-tree">
+          <div class="file-tree-item"><code>CRUX.md</code><span>Specification (readonly)</span></div>
+          <div class="file-tree-item"><code>AGENTS.md</code><span>Agent awareness notice</span></div>
+          <div class="file-tree-item"><code>.cursor/rules/_CRUX-RULE.mdc</code><span>Always-applied rule</span></div>
+          <div class="file-tree-item"><code>.cursor/agents/crux-cursor-rule-manager.md</code><span>Compression agent</span></div>
+          <div class="file-tree-item"><code>.cursor/commands/crux-compress.md</code><span>Compression command</span></div>
+          <div class="file-tree-item"><code>.cursor/hooks/detect-crux-changes.sh</code><span>Change detection hook</span></div>
+          <div class="file-tree-item"><code>VERSION</code><span>Version tracker</span></div>
+        </div>
+      </div>
+      
+      <div class="usage-section">
+        <h3>Usage</h3>
+        <ol class="usage-steps">
+          <li>
+            <span class="step-number">1</span>
+            <div class="step-content">
+              Add <code>crux: true</code> to your rule file's frontmatter
+            </div>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <div class="step-content">
+              Run <code>/crux-compress ALL</code> in Cursor
+            </div>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <div class="step-content">
+              Watch your context breathe
+            </div>
+          </li>
+        </ol>
+      </div>
+      
+      <div class="quickstart-links">
+        <a href="https://github.com/zotoio/CRUX-Compress" class="btn btn--primary" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/README.md" class="btn btn--secondary" target="_blank" rel="noopener">
+          Read Full Docs →
+        </a>
+        <a href="https://github.com/zotoio/CRUX-Compress/issues" class="btn btn--secondary" target="_blank" rel="noopener">
+          Report Issue →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- S5: Footer -->
+  <footer id="footer" class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h2 class="footer-title">CRUX</h2>
+        <p class="footer-subtitle">Context Reduction Using X-encoding</p>
+        <p class="footer-description">An experimental tool for AI context optimization</p>
+      </div>
+      
+      <div class="footer-links">
+        <a href="https://github.com/zotoio/CRUX-Compress" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CRUX.md" target="_blank" rel="noopener">Specification</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/issues" target="_blank" rel="noopener">Issues</a>
+      </div>
+      
+      <div class="footer-meta">
+        <span class="footer-version">v2.1.0</span>
+        <span class="footer-license">MIT License</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="scripts/webgpu-init.js"></script>
+  <script src="scripts/particle-system.js"></script>
+  <script src="scripts/camera-controller.js"></script>
+  <script src="scripts/compression-demo.js"></script>
+  <script src="scripts/spec-expander.js"></script>
+</body>
+</html>

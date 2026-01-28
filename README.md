@@ -1,4 +1,4 @@
-# CRUX Compress
+# ΣCRUX Compress
 
 **Repository**: [github.com/zotoio/CRUX-Compress](https://github.com/zotoio/CRUX-Compress)
 
@@ -175,7 +175,7 @@ E{⊤:err→try/catch→log+handle; ⊥:catch(e){/*ignore*/}}
 
 ---
 
-> **Note:** Larger source documents typically achieve higher compression percentages. A 500-word markdown file might compress to 15% of its original tokens, while a 100-word file might only reach 40%. CRUX works best when there's sufficient prose to distill.
+> **Note:** Larger source documents typically achieve higher compression percentages. A 500-word markdown file might compress to 15% of its original tokens, while a 100-word file might only reach 40%. CRUX helps most dealing with verbose rules.
 
 ## Etymology
 
