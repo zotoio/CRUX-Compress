@@ -1,10 +1,9 @@
 ---
-generated: 2026-01-28 12:00
-sourceChecksum: 2179275645
+generated: 2026-01-28 15:42
+sourceChecksum: "2179275645"
 beforeTokens: 480
-afterTokens: 180
-confidence: 94%
-crux: true
+afterTokens: 345
+confidence: 96%
 alwaysApply: true
 description: A test rule for compress command testing
 ---
@@ -15,26 +14,50 @@ description: A test rule for compress command testing
 # Test Coding Standards Rule
 
 ```crux
-⟦CRUX:tests/fixtures/compress-test.md
-Ρ{BATS test coding standards}
-Φ.naming{test=test_*.bats;fixture=*.md|*.mdc;helper=helpers.bash}
-R.setup{
-  setup()→init env;teardown()→cleanup tmp
-  ¬artifacts@workdir;use $BATS_TMPDIR
+⟦CRUX:compress-test.md
+Ρ{test coding standards+best practices for test suite}
+Κ{test=BATS test; fx=fixture; tmp=$BATS_TMPDIR}
+
+R.naming{
+  unit=test_*.bats; fx=*.md|*.mdc; helper=helpers.bash
 }
-R.assert{
-  assert_success←ok;assert_failure←fail
-  assert_output --partial←substr;assert_line←ln check
+
+R.structure{
+  setup()→init env; teardown()→cleanup tmp
+  ¬leave artifacts!; use tmp for temp files
 }
-E{
-  ⊤:@test "desc"→run fn→assert_failure+assert_output --partial
-  ⊥:@test→¬run,¬assert
+
+R.assertions{
+  assert_success←cmd.ok; assert_failure←cmd.fail
+  assert_output --partial←substr; assert_line←specific lines
 }
-Γ.apply⊲[+BATS tests|review PR|debug fail]
+
+E.⊤{
+  @test "fn handles empty input" {
+    run my_function ""
+    assert_failure
+    assert_output --partial "Error: empty input"
+  }
+}
+
+E.⊥{
+  @test "test something" {
+    my_function ""  # No run, no assertions
+  }
+}
+
+Λ.apply{+new BATS tests; review test PRs; debug failures}
+
 P.critical{
-  ⊛¬skip run→assert;⊛cleanup@teardown
-  !desc test names;¬hardcode paths→vars
+  ¬skip run before assert!
+  ∀teardown→cleanup tmp!
+  test.name=descriptive!
+  ¬hardcoded paths→use vars!
 }
-Γ.error{fail→check $output+$status+$lines;debug→set -x temp}
+
+Γ.fail{
+  $output→err msgs; $status→exit code
+  $lines→line-by-line; set -x→debug
+}
 ⟧
 ```

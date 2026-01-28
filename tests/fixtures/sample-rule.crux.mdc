@@ -1,11 +1,11 @@
 ---
-generated: 2026-01-28 14:30
-sourceChecksum: 2253728265
+generated: 2026-01-28 15:42
+sourceChecksum: "2253728265"
 beforeTokens: 6278
-afterTokens: 1450
-confidence: 98%
-crux: true
+afterTokens: 890
+confidence: 96%
 alwaysApply: true
+crux: true
 ---
 
 > [!IMPORTANT]
@@ -14,115 +14,126 @@ alwaysApply: true
 # Comprehensive Team Coding Standards
 
 ```crux
-⟦CRUX:tests/fixtures/sample-rule.md
-Ρ{comprehensive team coding standards}
+⟦CRUX:sample-rule.md
+Ρ{team coding standards; consistent+maintainable+secure+quality code}
 
-Κ.naming{
-  JS/TS{var+fn=camelCase;cls+iface=PascalCase;const=SCREAMING_SNAKE;enum=Pascal+SNAKE;type=T|TRequest}
-  Python{var+fn=snake_case;cls=PascalCase;const=SCREAMING_SNAKE;_private=single_underscore}
-  Go{export=PascalCase;unexport=camelCase;acronym=consistent(HTTPClient|userID)}
+Κ{fn=function; cls=class; var=variable; const=constant; iface=interface;
+  cov=coverage; PR=pull request; API=REST endpoint; DB=database;
+  PII=personal info; a11y=accessibility}
+
+R.naming.js{
+  var+fn=camelCase; cls+iface=PascalCase; const=SCREAMING_SNAKE;
+  enum.name=PascalCase; enum.val=SCREAMING_SNAKE;
+  type.param=[T|K|V|TRequest|TResponse]
+}
+R.naming.py{var+fn=snake_case; cls=PascalCase; const=SCREAMING_SNAKE; _private}
+R.naming.go{exported=PascalCase; unexported=camelCase; acronym=consistent(HTTPClient|userID)}
+
+R.style{
+  fn.small+focused; early return; nest≤3; self-doc; 1concept/fn;
+  composition≻inheritance; SRP
+}
+R.style.format{
+  JS/TS:line≤100,indent=2sp;
+  Py:line≤88,indent=4sp;
+  Go:line≤120,indent=tab;
+  Rust:line≤100,indent=4sp;
+  SQL:line≤80,indent=2sp
+}
+R.complexity{
+  cyclomatic≤10!; cognitive≤15!; params≤5!→use obj;
+  ln/fn≤30; nest≤3!
 }
 
-R.code_style{
-  fn{ln≤20..30;early_return;nest≤3;1concept/fn;composition≻inheritance;SRP}
-  fmt{JS/TS:100ch+2sp;Py:88ch+4sp;Go:120ch+tabs;Rust:100ch+4sp;SQL:80ch+2sp}
-  complexity{cyclomatic≤10!;cognitive≤15!;params≤5!;ln/fn≤30;nest≤3!}
+R.docs{∀public API→JSDoc/docstring∋[desc,params+types,return,throws,examples]}
+
+R.err{
+  ¬swallow!; log w/ctx; custom err types; fail fast unrecoverable;
+  actionable msg;
+  hierarchy=BaseError→[ValidationError|BusinessError|IntegrationError|SystemError];
+  API.format={error:{code,message,details,requestId,timestamp}}
 }
 
-R.docs{
-  public_API→full_docs;@param+@returns+@throws+@example
-  Python→Google_docstrings{Args+Returns+Raises+Examples}
-  Go→comment_style{fn_desc+params+returns}
+R.test{
+  cov.line≥80%⊕90%; cov.branch≥75%⊕85%; cov.fn≥85%⊕95%;
+  name="should [behavior] when [condition]";
+  pattern=AAA(Arrange»Act»Assert)
+}
+R.test.category{
+  Unit→isolate→∀commit; Integration→interactions→∀PR;
+  E2E→user flows→nightly; Perf→response+throughput→weekly;
+  Security→SAST/DAST→∀PR
+}
+R.test.mock{
+  mock ext deps only; ¬mock code under test;
+  realistic data; prefer DI; reset between tests
 }
 
-R.errors{
-  ¬swallow;log+ctx;custom_types;fail_fast;actionable_msg
-  response{code+msg+details+requestId+timestamp}
-}
-E.err_hierarchy{
-  BaseError∋[ValidationError,BusinessError,IntegrationError,SystemError]
-  ValidationError∋[RequiredFieldError,InvalidFormatError,OutOfRangeError]
-  BusinessError∋[InsufficientFundsError,DuplicateEntityError,StateTransitionError]
-  IntegrationError∋[NetworkError,TimeoutError,ServiceUnavailableError]
-  SystemError∋[DatabaseError,CacheError,ConfigurationError]
-}
+Π.layers{Presentation→Application→Domain→Infrastructure}
+Π.deps{inward→domain; domain=¬ext deps; infra impl domain iface; app orchestrate}
 
-Λ.testing{
-  coverage{line:≥80%⊕90%;branch:≥75%⊕85%;fn:≥85%⊕95%}
-  name="should [behavior] when [condition]";AAA{Arrange»Act»Assert}
-  categories{unit:∀commit;integration:∀PR;E2E:nightly;perf:weekly;security:∀PR}
-  mock{ext_deps_only;¬mock_code_under_test;realistic_data;DI;reset_between}
+R.api.methods{
+  GET=retrieve,idempotent; POST=create,¬idempotent;
+  PUT=replace,idempotent; PATCH=partial,¬idempotent;
+  DELETE=remove,idempotent
 }
+R.api.url{nouns¬verbs; plural; kebab-case; nest relations:/users/{id}/orders}
+R.api.codes{200=OK;201=Created;204=NoContent;400=BadRequest;401=Unauth;403=Forbidden;404=NotFound;500=ServerError}
+R.api{∀list→pagination w/data+meta+links; versioning=/api/v1/*}
 
-Π.architecture{
-  layers{Presentation»Application»Domain»Infrastructure}
-  deps{→inward;Domain:¬ext_deps;Infra→impl_domain_iface;App→orchestrate}
+Γ.git.commit{
+  conventional=type(scope):desc;
+  types=[feat→Minor|fix→Patch|docs|style|refactor|perf|test|chore|ci|build]
 }
-
-Κ.api{
-  REST{GET=retrieve;POST=create;PUT=replace;PATCH=partial;DELETE=remove}
-  http_codes{200=OK;201=Created;204=NoContent;400=BadRequest;401=Unauth;403=Forbidden;404=NotFound;409=Conflict;422=Unprocessable;429=RateLimit;500=ServerErr;503=Unavailable}
-  url{nouns¬verbs;plural;kebab-case;nest_for_relations;query_for_filter}
-  pagination∋[page,pageSize,totalPages,totalItems,hasNext,hasPrevious,links]
-  versioning=URL_path(/api/v1/);v1:deprecated@2024-06-01;v2:current;v3:beta
+Γ.git.branch{
+  feature/PROJ-{id}-{desc}; fix/PROJ-{id}-{desc};
+  hotfix/PROJ-{id}-{desc}; release/v{M}.{m}.{p}
 }
+Γ.git.main{PR!; ≥2approvals; CI.pass; ¬force push}
+Γ.git.PR{lines<400; desc w/ctx; link issues; +tests for new fn}
 
-Κ.git{
-  commit="type(scope): desc";types{feat→minor;fix→patch;docs|style|refactor|test|chore|ci|build→none;perf→patch}
-  branch{feature/PROJ-{id}-{desc};fix/PROJ-{id}-{desc};hotfix/PROJ-{id}-{desc};release/v{M}.{m}.{p};experiment/{desc}}
-  protect{main:PR+2approvals+CI+¬force;develop:PR+1approval+CI;release/*:PR+2approvals+CI+CODEOWNERS}
-  PR{<400ln;desc+ctx;link_issues;screenshots_UI;update_docs;add_tests;request_CODEOWNERS}
+P.sec.auth{OAuth2.0+OIDC; session mgmt; secure token storage; rate limit auth; log auth events}
+P.sec.input{validate:email(RFC5322)|phone(E.164)|URL(https whitelist)|nums|strings|files}
+P.sec.data{
+  encrypt@rest=AES-256; transit=TLS1.3;
+  pwd=bcrypt(cost≥12); field-level encrypt PII;
+  parameterized queries; sanitize output→¬XSS
 }
-
-R.security{
-  auth{OAuth2.0|OIDC;session_mgmt;httpOnly_cookies;rate_limit_auth;log_auth_events}
-  input_val{email:RFC5322;phone:E.164;URL:https+domain_val;numbers:type+range+precision;strings:len+whitelist;files:type+size+content}
-  data_protect{rest:AES-256;transit:TLS1.3;password:bcrypt(cost≥12);PII:field_level_encrypt;SQL:parameterized;output:sanitize_XSS}
-  secrets{env_vars;secrets_mgr(Vault|AWS);rotate;audit;¬git;¬log;¬chat;¬share_across_env}
-  headers{CSP:default-src 'self';X-Content-Type-Options:nosniff;X-Frame-Options:DENY;X-XSS-Protection:1;HSTS:max-age=31536000;Referrer-Policy:strict-origin-when-cross-origin}
+P.sec.secrets{
+  DO:env vars+secrets mgr+rotate+audit;
+  DONT:¬commit+¬log sensitive+¬share via chat+¬reuse across env
 }
+P.sec.headers{CSP;X-Content-Type-Options;X-Frame-Options;X-XSS-Protection;HSTS;Referrer-Policy}
 
-Κ.database{
-  query{indexes;¬SELECT*;EXPLAIN;paginate;connection_pool}
-  migration{reversible(up/down);¬modify_existing;name:YYYYMMDD_desc;test_on_prod_data;backup_first}
-  naming{tables:snake_case+plural;cols:snake_case;PK:id;FK:{table}_id;idx:idx_{table}_{cols};constraint:{type}_{table}_{cols}}
+R.db.query{idx filtered/sorted cols; ¬SELECT *; EXPLAIN; pagination; connection pool}
+R.db.migration{reversible!; ¬modify existing; name=YYYYMMDD_desc; test on prod-like; backup first}
+R.db.naming{tables=snake_case+plural; cols=snake_case; PK=id; FK={table}_id; idx=idx_{table}_{cols}}
+
+R.log.levels{ERROR|WARN|INFO|DEBUG|TRACE}
+R.log.format{JSON∋[timestamp,level,service,traceId,spanId,message,context]}
+R.metrics{
+  app:req rate+err rate+latency[p50,p95,p99];
+  biz:signups+conversions+txns;
+  infra:CPU+mem+disk+net
 }
+R.alert{err>1%→warn,>5%→crit; p99>500ms→warn,>2s→crit; CPU>70%→warn,>90%→crit; mem>75%→warn,>90%→crit}
 
-Κ.observability{
-  log_levels{ERROR=exceptions;WARN=unexpected_handled;INFO=business_events;DEBUG=diagnostics;TRACE=dev_only}
-  log_format{timestamp+level+service+traceId+spanId+message+context}
-  metrics{app:[req_rate,err_rate,latency(p50,p95,p99)];biz:[signups,conversions,txns];infra:[CPU,mem,disk,net];deps:[latency,failure_rate]}
-  alerts{err_rate:>1%warn/>5%crit;p99:>500ms_warn/>2000ms_crit;CPU:>70%warn/>90%crit;mem:>75%warn/>90%crit;disk:>80%warn/>95%crit}
+R.perf.latency{
+  API.read:p50=50ms,p95=150ms,p99=300ms;
+  API.write:p50=100ms,p95=300ms,p99=500ms
 }
+R.perf.cache{browser=static,1yr; CDN=public,5min; app=session,15min; DB=queries,1hr}
+R.perf.checklist{compression;keep-alive;caching;lazy load;async I/O;batch DB;optimize assets;pagination}
 
-Ω.performance{
-  response{API_read:50ms/150ms/300ms(p50/p95/p99);API_write:100ms/300ms/500ms;bg_jobs:1s/5s/30s;batch:30s/60s/120s}
-  cache{browser:static→1yr;CDN:public→5min;app:session→15min;DB:query→1hr}
-  optimize{gzip|brotli;keep-alive;cache;lazy_load;async_IO;batch_DB;optimize_assets;paginate}
-}
+Λ.review.checklist{correctness;security;performance;readability;maintainability;tests;docs}
+Λ.review.SLA{P0:1hr init,4hr resolve; P1:4hr init,1d resolve; P2:1d init,3d resolve}
 
-Λ.code_review{
-  checklist{correctness;security;performance;readability;maintainability;tests;docs}
-  feedback{specific+actionable;explain_why;suggest_alt;ask_to_understand;acknowledge_good}
-  time{P0:1hr→4hr;P1:4hr→1d;P2:1d→3d;P3:3d→1wk}
-}
+R.feature.flags{lifecycle=Created→Testing→Rollout→Enabled→Cleanup}
 
-Κ.feature_flags{
-  schema{name+enabled+rolloutPercentage+allowedUsers+allowedGroups+metadata}
-  lifecycle{Created→Testing→Rollout→Enabled→Cleanup}
-}
+R.a11y{WCAG2.1 AA; perceivable+operable+understandable+robust; contrast:text≥4.5:1,large≥3:1; keyboard accessible; ARIA labels}
 
-R.a11y{
-  WCAG_2.1_AA{perceivable:alt_text+captions+contrast(4.5:1);operable:keyboard+no_seizure+time;understandable:clear_lang+consistent_nav+input_assist;robust:valid_HTML+ARIA+screen_reader}
-  checklist{contrast:4.5:1_text/3:1_large;focus:visible;alt:∀meaningful_img;headings:h1→h2→h3;forms:labels+errors;keyboard:∀fn;ARIA:proper_roles}
-}
+R.release{semver=MAJOR.MINOR.PATCH; deploy=[Blue-Green|Canary|Rolling|Recreate]}
 
-Κ.release{
-  semver{MAJOR:breaking;MINOR:feat_compat;PATCH:fix_compat}
-  checklist{tests_pass;CHANGELOG;version_bump;docs;security_scan;perf_bench;rollback_plan;notify_stakeholders}
-  deploy{blue-green:zero_downtime+med_risk;canary:high_risk_changes+low_risk;rolling:standard+med_risk;recreate:dev_only+high_risk}
-}
-
-Ω{consistency;quality;security;performance;maintainability;accessibility;reliability}
+Ω{quality≻speed; consistent; maintainable; secure; verified}
 ⟧
 ```

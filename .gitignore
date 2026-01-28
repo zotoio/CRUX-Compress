@@ -52,3 +52,4 @@ out/
 
 # X-Fidelity analysis results
 .xfiResults/
+*.zip
