@@ -5,6 +5,12 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.3.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.3.2) - 2026-01-29
+
+- chore: update release manifest for v2.3.2 [skip ci] (5512c29)
+- fix: handle null hook arrays in hooks.json merge (3089ca3)
+- docs: update CHANGELOG.md for v2.3.1 [skip ci] (05da0a2)
+
 ## [v2.3.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.3.1) - 2026-01-29
 
 - chore: update release manifest for v2.3.1 [skip ci] (b7f6a2f)
