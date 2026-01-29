@@ -518,17 +518,18 @@ merge_hooks_json() {
         # Merge each hook array, avoiding duplicates based on command
         jq -s '
             # Define a function to merge hook arrays by command (avoiding duplicates)
+            # Handle null arrays gracefully with // []
             def merge_hooks(existing; new):
-                (existing // []) + [new[] | select(. as $n | (existing // []) | all(.command != $n.command))];
+                (existing // []) + [(new // [])[] | select(. as $n | (existing // []) | all(.command != $n.command))];
             
             # $existing is .[0], $new is .[1]
             .[0] as $existing | .[1] as $new |
             
-            # Start with existing, update hooks
+            # Start with existing, update hooks (handle missing .hooks gracefully)
             $existing | .hooks = {
-                "sessionStart": merge_hooks($existing.hooks.sessionStart; $new.hooks.sessionStart),
-                "afterFileEdit": merge_hooks($existing.hooks.afterFileEdit; $new.hooks.afterFileEdit),
-                "stop": merge_hooks($existing.hooks.stop; $new.hooks.stop)
+                "sessionStart": merge_hooks(($existing.hooks // {}).sessionStart; ($new.hooks // {}).sessionStart),
+                "afterFileEdit": merge_hooks(($existing.hooks // {}).afterFileEdit; ($new.hooks // {}).afterFileEdit),
+                "stop": merge_hooks(($existing.hooks // {}).stop; ($new.hooks // {}).stop)
             }
         ' "$target_hooks" "$staging_hooks" > "$temp_file"
         
