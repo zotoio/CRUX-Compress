@@ -96,25 +96,25 @@ while [[ $# -gt 0 ]]; do
 done
 
 log() {
-    echo -e "${BLUE}[CRUX]${NC} $1"
+    echo -e "${BLUE}[CRUX]${NC} $1" >&2
 }
 
 log_verbose() {
     if [[ "$VERBOSE" == "true" ]]; then
-        echo -e "${BLUE}[CRUX]${NC} $1"
+        echo -e "${BLUE}[CRUX]${NC} $1" >&2
     fi
 }
 
 log_success() {
-    echo -e "${GREEN}[CRUX]${NC} $1"
+    echo -e "${GREEN}[CRUX]${NC} $1" >&2
 }
 
 log_warn() {
-    echo -e "${YELLOW}[CRUX]${NC} $1"
+    echo -e "${YELLOW}[CRUX]${NC} $1" >&2
 }
 
 log_error() {
-    echo -e "${RED}[CRUX]${NC} $1"
+    echo -e "${RED}[CRUX]${NC} $1" >&2
 }
 
 # Check if running within CRUX-Compress repository itself

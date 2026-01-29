@@ -47,10 +47,18 @@ cleanup_invalid_entries() {
         fi
     done < <(jq -r '.files[]?' "$pending_file" 2>/dev/null)
     
-    # Rebuild the pending file with only valid entries
-    local files_json
-    files_json=$(printf '%s\n' "${valid_files[@]}" | jq -R . | jq -s .)
-    echo "{\"files\": $files_json, \"updated\": \"$(date -Iseconds)\"}" > "$pending_file"
+    # Get current files array for comparison
+    local current_files_json
+    current_files_json=$(jq -c '.files // []' "$pending_file" 2>/dev/null)
+    
+    # Build new files array
+    local new_files_json
+    new_files_json=$(printf '%s\n' "${valid_files[@]}" | jq -R . | jq -sc .)
+    
+    # Only update file if entries actually changed
+    if [[ "$current_files_json" != "$new_files_json" ]]; then
+        echo "{\"files\": $new_files_json, \"updated\": \"$(date -Iseconds)\"}" > "$pending_file"
+    fi
 }
 
 # Read input JSON from stdin (Cursor sends edit details)
