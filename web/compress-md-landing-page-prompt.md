@@ -13,13 +13,13 @@ crux: true
 
 ## Ρ{PURPOSE}
 
-Build a technically sophisticated, visually distinctive landing page that demonstrates CRUX compression in real-time using WebGPU. The page must convince AI/ML engineers that CRUX is worth exploring by *showing* compression happening, not just claiming it works.
+Build a technically sophisticated, visually distinctive landing page that demonstrates CRUX compression in real-time. The page must convince AI/ML engineers that CRUX is worth exploring by *showing* compression happening, not just claiming it works.
 
 **Core Message**: Reclaim up to 80% of your context window. CRUX extracts the semantic core from verbose AI rules and compresses it into notation LLMs understand natively.
 
 **Visitor Journey**:
-1. Land → See compression happening in 3D (WebGPU hero)
-2. Scroll → Camera pans through compression stages
+1. Land → See compression visualization in hero section
+2. Scroll → Explore compression stages
 3. Understand → Expandable spec sections explain the notation
 4. Act → Install via quickstart
 
@@ -30,11 +30,10 @@ Build a technically sophisticated, visually distinctive landing page that demons
 ### Technical Requirements
 ```
 stack:        static HTML/CSS/JS (no build step required)
-gpu:          WebGPU required (provide fallback message for unsupported browsers)
 hosting:      GitHub Pages compatible
 dependencies: minimal, CDN-loaded where needed
 performance:  ≤3s first meaningful paint on 4G
-accessibility: WCAG 2.1 AA for text content (WebGPU canvas exempt)
+accessibility: WCAG 2.1 AA for text content
 ```
 
 ### Design Constraints
@@ -63,20 +62,19 @@ claims:       "up to 80% token reduction" (cite: AI rules benchmark)
 
 ## Π{PAGE_STRUCTURE}
 
-### Section 0: WebGPU Hero — "The Compression Chamber"
+### Section 0: Hero — "The Compression Chamber"
 
-**Concept**: A 3D visualization showing text tokens as particles that get pulled toward a central point, merge, and emerge as compressed CRUX symbols. Camera starts wide, showing the chaos of verbose text, then slowly dollies in as compression occurs.
+**Concept**: A visually striking hero section with CSS-animated background showing the essence of compression. Features animated gradients and floating particles that evoke the transformation from verbose to compressed.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │                                                         │   │
-│  │         [WebGPU Canvas — Full Viewport Height]          │   │
+│  │         [CSS Animated Background — Full Height]         │   │
 │  │                                                         │   │
-│  │    Particles representing tokens swirl inward...        │   │
-│  │    ...compress into dense CRUX symbols...               │   │
-│  │    ...camera follows the transformation                 │   │
+│  │    Gradient particles floating and pulsing...           │   │
+│  │    ...creating an atmosphere of transformation          │   │
 │  │                                                         │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
@@ -93,138 +91,25 @@ claims:       "up to 80% token reduction" (cite: AI rules benchmark)
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**WebGPU Implementation Notes**:
-```javascript
-// Particle system requirements:
-// - 2000-5000 particles representing "tokens"
-// - Each particle has: position, velocity, color, size, "compression state"
-// - Compression state: 0.0 (verbose/scattered) → 1.0 (compressed/clustered)
-// - Color shift: cool blues (verbose) → warm amber (compressed)
-// - Particle merging: multiple particles collapse into single CRUX symbol
-// - Camera: orbit controls disabled, scripted dolly/pan on scroll
-// - MOUSE REACTIVITY: particles and camera respond to cursor position
-
-// Mouse interaction requirements:
-// - Track normalized mouse position (-1 to 1 on both axes)
-// - Particles near cursor get subtle repulsion force (creates "wake" effect)
-// - Camera has slight parallax offset based on mouse position
-// - Effect intensity scales with compression state (more reactive when compressed)
-
-// Shader requirements:
-// - Vertex shader: particle instancing, size attenuation
-// - Fragment shader: soft circles with glow, color interpolation
-// - Compute shader (optional): physics simulation for attraction + mouse repulsion
-
-// Fallback for non-WebGPU:
-// - Detect via navigator.gpu
-// - Show static SVG animation or CSS-only version
-// - Clear message: "WebGPU visualization requires Chrome 113+ / Edge 113+"
-```
-
-**Mouse Reactivity Specification**:
-```javascript
-// Mouse state tracking
-const mouseState = {
-  normalized: { x: 0, y: 0 },      // -1 to 1, center is 0,0
-  velocity: { x: 0, y: 0 },         // for momentum effects
-  isOverCanvas: false,
-  lastUpdate: performance.now()
-};
-
-// Update on mousemove
-canvas.addEventListener('mousemove', (e) => {
-  const rect = canvas.getBoundingClientRect();
-  mouseState.normalized.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-  mouseState.normalized.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-  // Calculate velocity for momentum
-  const now = performance.now();
-  const dt = (now - mouseState.lastUpdate) / 1000;
-  mouseState.velocity.x = (mouseState.normalized.x - prevX) / dt;
-  mouseState.velocity.y = (mouseState.normalized.y - prevY) / dt;
-  mouseState.lastUpdate = now;
-});
-
-// Particle mouse repulsion (in compute shader or JS)
-const MOUSE_REPULSION_RADIUS = 0.3;    // normalized units
-const MOUSE_REPULSION_STRENGTH = 0.5;  // scales with proximity
-
-function applyMouseRepulsion(particle, mousePos3D) {
-  const toMouse = subtract(particle.position, mousePos3D);
-  const dist = length(toMouse);
-  if (dist < MOUSE_REPULSION_RADIUS && dist > 0.001) {
-    const force = normalize(toMouse);
-    const strength = (1 - dist / MOUSE_REPULSION_RADIUS) * MOUSE_REPULSION_STRENGTH;
-    particle.velocity = add(particle.velocity, scale(force, strength));
-  }
+**CSS Animation Notes**:
+```css
+/* Hero background with animated gradients */
+.hero-background {
+  background: var(--bg-primary);
 }
 
-// Camera parallax offset
-const PARALLAX_STRENGTH = 2.0;  // units of camera offset at edges
-
-function getCameraOffset(mouseNorm, compressionState) {
-  // More parallax when compressed (tighter view = more noticeable movement)
-  const intensity = 0.3 + compressionState * 0.7;
-  return {
-    x: mouseNorm.x * PARALLAX_STRENGTH * intensity,
-    y: mouseNorm.y * PARALLAX_STRENGTH * intensity * 0.5  // less vertical
-  };
+.hero-particles {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(91, 138, 154, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(212, 145, 90, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(240, 198, 116, 0.08) 0%, transparent 40%);
 }
 
-// Apply to camera each frame
-function updateCamera(basePosition, scrollProgress, mouseNorm) {
-  const keyframePos = interpolateKeyframes(scrollProgress);
-  const offset = getCameraOffset(mouseNorm, scrollProgress);
-  return {
-    x: keyframePos.x + offset.x,
-    y: keyframePos.y + offset.y,
-    z: keyframePos.z
-  };
+/* Optional floating particles via CSS animations */
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+  50% { transform: translate3d(20px, -30px, 0); opacity: 0.5; }
 }
-```
-
-**Mouse Effects Summary**:
-| Effect | Trigger | Behavior |
-|--------|---------|----------|
-| Particle repulsion | Cursor near particles | Particles gently pushed away, creating "wake" |
-| Camera parallax | Cursor position | Subtle camera offset, depth illusion |
-| Intensity scaling | Scroll progress | Effects stronger when view is compressed |
-| Momentum | Fast mouse movement | Particles continue moving briefly after cursor stops |
-| Glow intensify | Hover near CRUX symbols | Symbols brighten when cursor approaches |
-
-**Touch/Mobile Handling**:
-```javascript
-// Touch creates same effect as mouse, mapped to touch position
-canvas.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  mouseState.normalized.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-  mouseState.normalized.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
-  mouseState.isOverCanvas = true;
-}, { passive: false });
-
-canvas.addEventListener('touchend', () => {
-  // Gradually fade out mouse influence rather than instant stop
-  fadeOutMouseInfluence();
-});
-
-// On mobile without hover, add subtle autonomous "breathing" motion
-// to particles when no touch is active, suggesting interactivity
-function autonomousMotion(time) {
-  if (!mouseState.isOverCanvas && isMobile) {
-    const breathe = Math.sin(time * 0.001) * 0.1;
-    // Apply subtle oscillation to particle cluster
-  }
-}
-```
-
-**Scroll-Triggered Camera Animation**:
-```
-scroll 0%   → camera position: far, wide angle, particles scattered
-scroll 25%  → camera dollies in, particles begin gravitating to center
-scroll 50%  → camera at medium distance, particles merging, CRUX symbols forming
-scroll 75%  → camera close, dense cluster of CRUX notation visible
-scroll 100% → camera rests, compression complete, stats overlay visible
 ```
 
 ---
@@ -497,7 +382,7 @@ STANDARD_BLOCKS:
 │  │   ├── agents/crux-cursor-rule-manager.md                   │
 │  │   ├── commands/crux-compress.md                            │
 │  │   └── hooks/detect-crux-changes.sh                         │
-│  └── VERSION                                                   │
+│  └── .crux/crux.json                                           │
 │                                                                 │
 │  Then:                                                          │
 │  1. Add `crux: true` to any rule file's frontmatter            │
@@ -537,178 +422,6 @@ STANDARD_BLOCKS:
 ```
 
 ---
-
-## Γ{WEBGPU_IMPLEMENTATION}
-
-### Core Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     WebGPU Rendering Pipeline                   │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   Particle   │───▶│   Compute    │───▶│   Render     │      │
-│  │   Buffer     │    │   Shader     │    │   Pipeline   │      │
-│  │              │    │              │    │              │      │
-│  │  positions   │    │  attraction  │    │  instanced   │      │
-│  │  velocities  │    │  damping     │    │  quads       │      │
-│  │  colors      │    │  merging     │    │  alpha blend │      │
-│  │  states      │    │              │    │              │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                    Scroll Controller                      │  │
-│  │                                                           │  │
-│  │  scrollY → normalizedProgress (0.0 - 1.0)                │  │
-│  │         → camera.position.z interpolation                │  │
-│  │         → particle.compressionState interpolation        │  │
-│  │         → color.temperature interpolation                │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Particle System Specification
-
-```javascript
-// Particle structure (per-particle data)
-struct Particle {
-  position: vec3<f32>,      // world position
-  velocity: vec3<f32>,      // current velocity
-  baseColor: vec3<f32>,     // verbose state color (cool)
-  targetColor: vec3<f32>,   // compressed state color (warm)
-  size: f32,                // radius
-  compressionState: f32,    // 0.0 = scattered, 1.0 = compressed
-  mergeTarget: u32,         // index of particle to merge with (-1 if none)
-  isSymbol: u32,            // 0 = token particle, 1 = CRUX symbol
-  symbolIndex: u32,         // which CRUX symbol (if isSymbol)
-}
-
-// Constants
-const PARTICLE_COUNT = 3000;
-const ATTRACTION_STRENGTH = 2.5;
-const DAMPING = 0.95;
-const MERGE_DISTANCE = 0.1;
-const SYMBOL_EMERGENCE_THRESHOLD = 0.7;
-
-// Color palette
-const VERBOSE_COLOR = vec3(0.4, 0.6, 0.8);   // cool blue
-const COMPRESSED_COLOR = vec3(0.9, 0.6, 0.2); // warm amber
-const SYMBOL_COLOR = vec3(1.0, 0.85, 0.4);    // bright gold
-```
-
-### Compute Shader (WGSL) — with mouse reactivity
-
-```wgsl
-struct SimParams {
-  scrollProgress: f32,
-  deltaTime: f32,
-  mouseX: f32,           // normalized -1 to 1
-  mouseY: f32,           // normalized -1 to 1
-  mouseActive: f32,      // 1.0 if cursor over canvas, 0.0 otherwise
-}
-
-@group(0) @binding(0) var<storage, read_write> particles: array<Particle>;
-@group(0) @binding(1) var<uniform> params: SimParams;
-
-const ATTRACTION_STRENGTH: f32 = 2.5;
-const DAMPING: f32 = 0.95;
-const MOUSE_REPULSION_RADIUS: f32 = 8.0;      // world units
-const MOUSE_REPULSION_STRENGTH: f32 = 15.0;
-
-@compute @workgroup_size(256)
-fn main(@builtin(global_invocation_id) id: vec3<u32>) {
-    let idx = id.x;
-    if (idx >= arrayLength(&particles)) { return; }
-    
-    var p = particles[idx];
-    
-    // 1. Attraction toward center, strength based on scroll progress
-    let toCenter = -p.position;
-    let attractionForce = normalize(toCenter) * params.scrollProgress * ATTRACTION_STRENGTH;
-    
-    // 2. Mouse repulsion (project mouse to 3D plane at z=0)
-    let mousePos3D = vec3<f32>(params.mouseX * 20.0, params.mouseY * 12.0, 0.0);
-    let toMouse = p.position - mousePos3D;
-    let mouseDist = length(toMouse);
-    var mouseForce = vec3<f32>(0.0);
-    
-    if (params.mouseActive > 0.5 && mouseDist < MOUSE_REPULSION_RADIUS && mouseDist > 0.01) {
-        let repulsionDir = normalize(toMouse);
-        let falloff = 1.0 - (mouseDist / MOUSE_REPULSION_RADIUS);
-        // Stronger repulsion when more compressed (particles denser)
-        let intensityScale = 0.3 + params.scrollProgress * 0.7;
-        mouseForce = repulsionDir * falloff * falloff * MOUSE_REPULSION_STRENGTH * intensityScale;
-    }
-    
-    // 3. Apply forces with damping
-    p.velocity = (p.velocity + attractionForce + mouseForce) * DAMPING;
-    p.position = p.position + p.velocity * params.deltaTime;
-    
-    // 4. Update compression state for color interpolation
-    p.compressionState = smoothstep(0.0, 1.0, params.scrollProgress);
-    
-    particles[idx] = p;
-}
-```
-
-### Camera Animation Keyframes
-
-```javascript
-const cameraKeyframes = [
-  { scroll: 0.0,  position: [0, 0, 50],  fov: 60, lookAt: [0, 0, 0] },
-  { scroll: 0.25, position: [10, 5, 35], fov: 55, lookAt: [0, 0, 0] },
-  { scroll: 0.5,  position: [5, 2, 20],  fov: 50, lookAt: [0, 0, 0] },
-  { scroll: 0.75, position: [2, 1, 12],  fov: 45, lookAt: [0, 0, 0] },
-  { scroll: 1.0,  position: [0, 0, 8],   fov: 40, lookAt: [0, 0, 0] },
-];
-
-// Interpolation: use cubic bezier for smooth camera motion
-function interpolateCamera(scrollProgress) {
-  // Find surrounding keyframes
-  // Apply cubic interpolation
-  // Return { position, fov, lookAt }
-}
-```
-
-### CRUX Symbol Rendering
-
-When particles merge (at ~70% scroll), they transform into CRUX symbols:
-
-```javascript
-const CRUX_SYMBOLS = [
-  '⟦', '⟧', 'Ρ', 'Κ', 'R', 'Λ', 'Ω', 
-  '→', '←', '∀', '¬', '≻', '⊤', '⊥'
-];
-
-// Render symbols as SDF (Signed Distance Field) or pre-rendered textures
-// Symbols should glow and pulse slightly when formed
-```
-
-### Fallback for Non-WebGPU Browsers
-
-```html
-<div id="webgpu-fallback" style="display: none;">
-  <div class="fallback-animation">
-    <!-- CSS-only particle animation using @keyframes -->
-    <!-- Simpler, but still communicates compression -->
-  </div>
-  <p class="fallback-message">
-    Full 3D visualization requires WebGPU 
-    (Chrome 113+, Edge 113+, or Firefox Nightly with flag).
-    <br>
-    <a href="#quickstart">Skip to installation →</a>
-  </p>
-</div>
-
-<script>
-  if (!navigator.gpu) {
-    document.getElementById('webgpu-canvas').style.display = 'none';
-    document.getElementById('webgpu-fallback').style.display = 'flex';
-  }
-</script>
-```
 
 ---
 
@@ -962,7 +675,7 @@ STATE={R,C,Δ}→upd on progress
 
 ### Non-Negotiables
 
-1. **WebGPU is the hero** — The 3D compression visualization IS the differentiator. Don't ship without it working impressively.
+1. **Visual impact matters** — The hero section should immediately communicate the essence of compression through design.
 
 2. **Experimental status is honest** — Every major section should acknowledge this is new, evolving, potentially breaking. Build trust through transparency.
 
@@ -970,7 +683,7 @@ STATE={R,C,Δ}→upd on progress
 
 4. **Technical audience respect** — No dumbing down. These are engineers who've hit context limits. Speak to their pain precisely.
 
-5. **Performance is non-negotiable** — If WebGPU tanks the page, fix it or simplify. A smooth 60fps simple animation beats a janky complex one.
+5. **Performance is non-negotiable** — Keep animations smooth and lightweight. A smooth 60fps simple animation beats a janky complex one.
 
 ### Design Philosophy
 
@@ -997,15 +710,11 @@ version: 1.0.0-alpha
 repository: https://github.com/zotoio/CRUX-Compress
 license: MIT
 target_browsers:
-  - Chrome 113+ (WebGPU)
-  - Edge 113+ (WebGPU)
-  - Firefox Nightly (WebGPU flag)
-  - Safari 18+ (WebGPU, limited)
-  - Fallback: Any modern browser (CSS animation)
-estimated_build_time: 8-12 hours
+  - All modern browsers (Chrome, Edge, Firefox, Safari)
+  - Mobile browsers supported
+estimated_build_time: 4-6 hours
 dependencies:
   - None required (vanilla JS)
-  - Optional: Three.js for simplified WebGPU abstraction
 hosting: GitHub Pages
 analytics: None by default (privacy-first)
 ```
@@ -1020,14 +729,9 @@ analytics: None by default (privacy-first)
 ├── styles/
 │   └── main.css            # All styles, CSS custom properties
 ├── scripts/
-│   ├── webgpu-init.js      # WebGPU setup, fallback detection
-│   ├── particle-system.js  # Particle simulation
-│   ├── camera-controller.js # Scroll-linked camera
+│   ├── camera-controller.js # Scroll-linked animations
 │   ├── compression-demo.js  # Before/after animation
 │   └── spec-expander.js    # Expandable notation sections
-├── shaders/
-│   ├── particle.wgsl       # Compute + render shaders
-│   └── symbol.wgsl         # CRUX symbol rendering
 ├── assets/
 │   ├── og-image.png        # Social sharing image
 │   └── favicon.svg         # CRUX-themed favicon
@@ -1038,4 +742,4 @@ analytics: None by default (privacy-first)
 
 **END OF SPECIFICATION**
 
-*This prompt is designed to be executed by an AI coding agent (Claude, Cursor, etc.) to produce a complete, deployable static site. The agent should read this entire document, then implement section by section, testing WebGPU functionality in a real browser environment.*
+*This prompt is designed to be executed by an AI coding agent (Claude, Cursor, etc.) to produce a complete, deployable static site. The agent should read this entire document, then implement section by section.*

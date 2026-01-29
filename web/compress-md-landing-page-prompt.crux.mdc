@@ -19,19 +19,17 @@ crux: true
   repo=github.com/zotoio/CRUX-Compress
   domain=compress.md; status=EXPERIMENTAL!
   msg="Reclaim ≤80% ctx window. CRUX→semantic core extraction"
-  journey{land→3D compression»scroll»camera pan»expand spec»install}
+  journey{land→compression viz»scroll»explore»expand spec»install}
 
-Κ{WebGPU=browser GPU API; WGSL=WebGPU shading lang;
-  SDF=signed distance field; ctx=context; cmp=compression;
+Κ{ctx=context; cmp=compression;
   verbose=uncompressed; sp=space; ch=char}
 
 Λ.tech{
   stack=static HTML/CSS/JS(¬build step)
-  gpu=WebGPU!(fallback msg for unsupported)
   hosting=GitHub Pages compatible
   deps=minimal+CDN-loaded
   perf≤3s first meaningful paint@4G
-  a11y=WCAG 2.1 AA(WebGPU canvas exempt)
+  a11y=WCAG 2.1 AA
 }
 
 Λ.design{
@@ -51,10 +49,9 @@ crux: true
 }
 
 Π.sections{
-  S0{name="WebGPU Hero—Compression Chamber"; type=3D viz
-    concept="tokens as particles→gravitating center→merge→CRUX symbols"
-    camera{start=wide(chaos)»dolly in(compression)}
-    canvas=full viewport height
+  S0{name="Hero—Compression Chamber"; type=CSS viz
+    concept="animated gradients+floating particles→transformation atmosphere"
+    full viewport height
     overlay{title="CRUX";subtitle="Context Reduction Using X-encoding"
       progress bar="80% RECOVERED";stats="2,500→500 tokens"}}
 
@@ -90,7 +87,7 @@ crux: true
       .cursor/agents/crux-cursor-rule-manager.md
       .cursor/commands/crux-compress.md
       .cursor/hooks/detect-crux-changes.sh
-      VERSION}
+      .crux/crux.json}
     usage{1.+`crux:true` to frontmatter; 2.run `/crux-compress ALL`; 3."Watch ctx breathe"}
     links=["View on GitHub→","Read Full Docs→","Report Issue→"]}
 
@@ -101,67 +98,15 @@ crux: true
     links=[GitHub,Specification,Changelog,Issues]}
 }
 
-Γ.WebGPU{
-  pipeline{ParticleBuf→ComputeShader→RenderPipeline}
-  particle.buf∋[positions,velocities,colors,states]
-  compute{attraction+damping+merging+mouse repulsion}
-  render{instanced quads+alpha blend}
-
+Γ.hero{
+  CSS anim background{
+    radial gradients→[teal@20%30%,amber@80%70%,gold@center]
+    floating particles via @keyframes
+  }
   scroll.ctrl{
     scrollY→normalizedProgress(0.0..1.0)
-    →camera.position.z interp
-    →particle.compressionState interp
-    →color.temperature interp}
-
-  particle.struct{
-    position:vec3<f32>; velocity:vec3<f32>
-    baseColor:vec3<f32>; targetColor:vec3<f32>
-    size:f32; compressionState:f32(0=scattered,1=compressed)
-    mergeTarget:u32; isSymbol:u32; symbolIndex:u32}
-
-  const{
-    PARTICLE_COUNT=3000; ATTRACTION_STRENGTH=2.5
-    DAMPING=0.95; MERGE_DISTANCE=0.1
-    SYMBOL_EMERGENCE_THRESHOLD=0.7}
-
-  colors{
-    VERBOSE=vec3(0.4,0.6,0.8)#cool blue
-    COMPRESSED=vec3(0.9,0.6,0.2)#warm amber
-    SYMBOL=vec3(1.0,0.85,0.4)#bright gold}
-
-  mouse{
-    track{normalized:[-1,1]; velocity; isOverCanvas}
-    repulsion{radius=0.3; strength=0.5; creates "wake" effect}
-    camera.parallax{strength=2.0; more@compressed state}
-    intensity∝compressionState(0.3+scroll*0.7)}
-
-  touch{same as mouse; +touchend→fadeOut influence
-    mobile w/o hover→autonomous "breathing" motion}
-
-  camera.keyframes[
-    {scroll:0.0,pos:[0,0,50],fov:60}
-    {scroll:0.25,pos:[10,5,35],fov:55}
-    {scroll:0.5,pos:[5,2,20],fov:50}
-    {scroll:0.75,pos:[2,1,12],fov:45}
-    {scroll:1.0,pos:[0,0,8],fov:40}]
-  camera.interp=cubic bezier
-
-  compute.wgsl{
-    SimParams{scrollProgress:f32;deltaTime:f32;mouseX:f32;mouseY:f32;mouseActive:f32}
-    MOUSE_REPULSION_RADIUS=8.0; MOUSE_REPULSION_STRENGTH=15.0
-    logic{toCenter attraction»mouse repulsion»damping»position update
-      compressionState=smoothstep(0,1,scrollProgress)}}
-
-  symbol.render{
-    at~70% scroll→particles merge→CRUX symbols
-    symbols=['⟦','⟧','Ρ','Κ','R','Λ','Ω','→','←','∀','¬','≻','⊤','⊥']
-    method=SDF|pre-rendered textures; effect=glow+pulse}
-
-  fallback{
-    detect=navigator.gpu
-    ¬WebGPU→show static SVG|CSS-only anim
-    msg="WebGPU requires Chrome 113+/Edge 113+/Firefox Nightly w/ flag"
-    link="Skip to installation→"}
+    →compression bar fill
+    →percentage update}
 }
 
 Φ.design{
@@ -228,11 +173,11 @@ E.demo{
 
 P.principles{
   non-negotiable[
-    1."WebGPU is hero—3D viz IS differentiator. ¬ship w/o working impressively"
+    1."Visual impact matters—hero communicates compression via design"
     2."Experimental status is honest—every section acknowledges. Build trust via transparency"
     3."Show, don't claim—live demo≻marketing copy. Make unmissable"
     4."Technical audience respect—¬dumb down. Speak to ctx limit pain precisely"
-    5."Performance non-negotiable—if WebGPU tanks page→fix|simplify. Smooth 60fps simple≻janky complex"]
+    5."Performance non-negotiable—smooth 60fps simple≻janky complex"]
   design-philosophy[
     "asymmetry≻grids"; "editorial whitespace"; 
     "purposeful anim→every motion=compression"; "warm technical—precise¬cold"]
@@ -245,9 +190,8 @@ M{
   project:compress.md; version:1.0.0-alpha
   repo:https://github.com/zotoio/CRUX-Compress
   license:MIT
-  browsers{WebGPU:[Chrome 113+,Edge 113+,Firefox Nightly,Safari 18+(limited)]
-    fallback:any modern(CSS anim)}
-  deps{none required(vanilla JS); optional:Three.js}
+  browsers=all modern(Chrome,Edge,Firefox,Safari)+mobile
+  deps=none required(vanilla JS)
   hosting:GitHub Pages; analytics:none(privacy-first)
 }
 
@@ -256,14 +200,9 @@ M{
   ├─index.html#single page all content
   ├─styles/main.css#all styles+CSS custom properties
   ├─scripts/
-  │ ├─webgpu-init.js#setup+fallback detect
-  │ ├─particle-system.js#particle sim
-  │ ├─camera-controller.js#scroll-linked camera
+  │ ├─camera-controller.js#scroll-linked anim
   │ ├─compression-demo.js#before/after anim
   │ └─spec-expander.js#expandable notation sections
-  ├─shaders/
-  │ ├─particle.wgsl#compute+render
-  │ └─symbol.wgsl#CRUX symbol rendering
   ├─assets/
   │ ├─og-image.png#social sharing
   │ └─favicon.svg#CRUX-themed
@@ -271,7 +210,7 @@ M{
 }
 
 Ω{
-  WebGPU hero working impressively!
+  hero visual impact!
   experimental status acknowledged∀sections
   show≻claim via live demo
   60fps performance

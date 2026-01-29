@@ -6,8 +6,7 @@ A single-page static website showcasing CRUX-Compress — a semantic compression
 
 This landing page features:
 
-- **WebGPU 3D Visualization**: Interactive particle system showing tokens compressing into CRUX symbols
-- **Scroll-linked Camera**: Camera movement tied to scroll position for cinematic experience
+- **Animated Hero Section**: CSS-based particle visualization with compression theming
 - **Live Compression Demo**: Side-by-side before/after comparison of verbose markdown vs CRUX notation
 - **Interactive Spec Explorer**: Expandable sections documenting all CRUX symbols and blocks
 - **Quickstart Guide**: Installation and usage instructions
@@ -15,21 +14,15 @@ This landing page features:
 ## Tech Stack
 
 - Pure HTML/CSS/JavaScript (no build step required)
-- WebGPU for 3D particle rendering
-- WGSL shaders for compute and render pipelines
 - CSS custom properties for theming
+- CSS animations for visual effects
 - Intersection Observer for scroll animations
 
 ## Browser Support
 
-### WebGPU Required (for 3D visualization)
-- Chrome 113+
-- Edge 113+
-- Firefox Nightly (with WebGPU flag enabled)
-- Safari 18+ (limited support)
-
-### Fallback
-Browsers without WebGPU support will see a static CSS-animated fallback with floating particles.
+Works in all modern browsers:
+- Chrome, Edge, Firefox, Safari
+- Mobile browsers supported
 
 ## Local Development
 
@@ -46,7 +39,7 @@ npx serve .
 php -S localhost:8000
 ```
 
-2. Open http://localhost:8000 in a WebGPU-supported browser
+2. Open http://localhost:8000 in your browser
 
 ## Deployment
 
@@ -70,14 +63,9 @@ compress.md/
 ├── styles/
 │   └── main.css           # All styles with CSS custom properties
 ├── scripts/
-│   ├── webgpu-init.js     # WebGPU setup and fallback detection
-│   ├── particle-system.js # Particle simulation and rendering
-│   ├── camera-controller.js # Scroll-linked camera movement
+│   ├── camera-controller.js # Scroll-linked animations
 │   ├── compression-demo.js  # Before/after animation
 │   └── spec-expander.js   # Interactive specification explorer
-├── shaders/
-│   ├── particle.wgsl      # Compute and render shaders for particles
-│   └── symbol.wgsl        # CRUX symbol SDF rendering
 ├── assets/
 │   ├── favicon.svg        # CRUX-themed favicon
 │   └── og-image.png       # Social sharing image (to be added)

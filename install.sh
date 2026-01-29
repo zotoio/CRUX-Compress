@@ -1,9 +1,13 @@
 #!/bin/bash
 # CRUX Compress Installer
 # Usage: curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash
+#        curl -fsSL https://cdn.jsdelivr.net/gh/zotoio/CRUX-Compress@main/install.sh | bash
 #        curl -fsSL .../install.sh | bash -s -- --backup --verbose
+#        .crux/update.sh [-y] [--force] [--backup] [--verbose]
 #
 # Options:
+#   -y         Non-interactive mode, assume yes to all confirmations
+#   --force    Backup current installation and install regardless of version
 #   --backup   Create backups of existing files before overwriting
 #   --verbose  Show detailed progress
 #   --help     Show this help message
@@ -15,21 +19,50 @@ REPO_OWNER="zotoio"
 REPO_NAME="CRUX-Compress"
 GITHUB_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
 DOWNLOAD_BASE="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download"
+RAW_BASE="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main"
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Options
 BACKUP=false
 VERBOSE=false
+NON_INTERACTIVE=false
+FORCE=false
+
+# Detect script location for update.sh pattern
+SCRIPT_DIR=""
+PROJECT_ROOT=""
+
+# Detect if running as update.sh from .crux directory
+detect_script_location() {
+    if [[ -n "${BASH_SOURCE[0]}" && "${BASH_SOURCE[0]}" != "" ]]; then
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        # If script is in .crux directory, project root is parent
+        if [[ "$(basename "$SCRIPT_DIR")" == ".crux" ]]; then
+            PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+            cd "$PROJECT_ROOT"
+        fi
+    fi
+}
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -y)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            BACKUP=true  # Force always creates backup
+            shift
+            ;;
         --backup)
             BACKUP=true
             shift
@@ -42,8 +75,11 @@ while [[ $# -gt 0 ]]; do
             echo "CRUX Compress Installer"
             echo ""
             echo "Usage: curl -fsSL .../install.sh | bash -s -- [OPTIONS]"
+            echo "       .crux/update.sh [OPTIONS]"
             echo ""
             echo "Options:"
+            echo "  -y         Non-interactive mode, assume yes to all confirmations"
+            echo "  --force    Backup and install regardless of version"
             echo "  --backup   Create backups of existing files before overwriting"
             echo "  --verbose  Show detailed progress"
             echo "  --help     Show this help message"
@@ -81,6 +117,18 @@ log_error() {
     echo -e "${RED}[CRUX]${NC} $1"
 }
 
+# Check if running within CRUX-Compress repository itself
+check_not_in_crux_repo() {
+    if [[ -f "CRUX.md" ]] && \
+       grep -q "CRUX Rule Compression Specification" CRUX.md 2>/dev/null && \
+       [[ -d "scripts" ]] && \
+       [[ -f "scripts/create-crux-zip.sh" ]]; then
+        log_error "Cannot install CRUX-Compress within its own repository."
+        log_error "Run this script in a target project directory instead."
+        exit 1
+    fi
+}
+
 # Check for required tools
 check_dependencies() {
     local missing=()
@@ -93,6 +141,10 @@ check_dependencies() {
         missing+=("unzip")
     fi
     
+    if ! command -v zip &> /dev/null; then
+        missing+=("zip")
+    fi
+    
     if ! command -v jq &> /dev/null; then
         # jq is optional, we can parse JSON with grep/sed if needed
         log_verbose "jq not found, using fallback JSON parsing"
@@ -102,6 +154,47 @@ check_dependencies() {
         log_error "Missing required tools: ${missing[*]}"
         log_error "Please install them and try again."
         exit 1
+    fi
+}
+
+# Detect git repository root
+detect_git_root() {
+    local git_root
+    git_root=$(git rev-parse --show-toplevel 2>/dev/null) || true
+    echo "$git_root"
+}
+
+# Prompt for confirmation
+confirm() {
+    local prompt="$1"
+    local default="${2:-Y}"
+    
+    if [[ "$NON_INTERACTIVE" == "true" ]]; then
+        return 0
+    fi
+    
+    local yn_hint
+    if [[ "$default" == "Y" ]]; then
+        yn_hint="[Y/n]"
+    else
+        yn_hint="[y/N]"
+    fi
+    
+    read -p "$prompt $yn_hint " -n 1 -r
+    echo
+    
+    if [[ -z "$REPLY" ]]; then
+        if [[ "$default" == "Y" ]]; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+    
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        return 0
+    else
+        return 1
     fi
 }
 
@@ -129,8 +222,13 @@ get_latest_version() {
 
 # Get currently installed version
 get_installed_version() {
-    if [[ -f "VERSION" ]]; then
-        tr -d '[:space:]' < "VERSION"
+    if [[ -f ".crux/crux.json" ]]; then
+        if command -v jq &> /dev/null; then
+            jq -r '.version' ".crux/crux.json" 2>/dev/null
+        else
+            # Fallback: parse JSON with grep/sed
+            grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' ".crux/crux.json" | sed 's/.*"\([^"]*\)"$/\1/'
+        fi
     else
         echo ""
     fi
@@ -162,7 +260,115 @@ compare_versions() {
     return 1
 }
 
-# Backup a file if it exists
+# Get version change type (major, minor, patch)
+get_version_change_type() {
+    local old_ver="$1"
+    local new_ver="$2"
+    
+    local IFS=.
+    local -a old_parts new_parts
+    read -ra old_parts <<< "$old_ver"
+    read -ra new_parts <<< "$new_ver"
+    
+    local old_major=${old_parts[0]:-0}
+    local old_minor=${old_parts[1]:-0}
+    local new_major=${new_parts[0]:-0}
+    local new_minor=${new_parts[1]:-0}
+    
+    if [[ "$new_major" != "$old_major" ]]; then
+        echo "major"
+    elif [[ "$new_minor" != "$old_minor" ]]; then
+        echo "minor"
+    else
+        echo "patch"
+    fi
+}
+
+# Get files from release manifest
+get_manifest_files() {
+    local manifest=".crux/crux-release-files.json"
+    if [[ -f "$manifest" ]] && command -v jq &> /dev/null; then
+        jq -r '.allFiles | keys[]' "$manifest" 2>/dev/null || true
+    fi
+}
+
+# Create comprehensive backup zip
+create_backup_zip() {
+    local repo_name timestamp backup_zip
+    repo_name=$(basename "$(pwd)")
+    timestamp=$(date +%Y%m%d%H%M%S)
+    
+    mkdir -p "/tmp/crux/${repo_name}"
+    backup_zip="/tmp/crux/${repo_name}/crux-backup-${repo_name}-${timestamp}.zip"
+    
+    log "Creating backup..."
+    
+    # Collect files to backup
+    local files_to_backup=()
+    
+    # Add files from release manifest if available
+    while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+            files_to_backup+=("$file")
+        fi
+    done < <(get_manifest_files)
+    
+    # Add standard CRUX files that might exist
+    local standard_files=(
+        "CRUX.md"
+        "AGENTS.md"
+        ".crux/crux.json"
+        ".crux/crux-release-files.json"
+        ".cursor/hooks.json"
+        ".cursor/agents/crux-cursor-rule-manager.md"
+        ".cursor/commands/crux-compress.md"
+        ".cursor/hooks/detect-crux-changes.sh"
+        ".cursor/rules/_CRUX-RULE.mdc"
+        ".cursor/skills/CRUX-Utils/SKILL.md"
+        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+    )
+    
+    for file in "${standard_files[@]}"; do
+        if [[ -f "$file" ]]; then
+            # Add if not already in list
+            local found=false
+            for existing in "${files_to_backup[@]}"; do
+                if [[ "$existing" == "$file" ]]; then
+                    found=true
+                    break
+                fi
+            done
+            if [[ "$found" == "false" ]]; then
+                files_to_backup+=("$file")
+            fi
+        fi
+    done
+    
+    # Add all *.crux.* files
+    while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+            files_to_backup+=("$file")
+        fi
+    done < <(find . -name "*.crux.*" -type f 2>/dev/null | sed 's|^\./||')
+    
+    if [[ ${#files_to_backup[@]} -eq 0 ]]; then
+        log_verbose "No files to backup"
+        echo ""
+        return
+    fi
+    
+    # Create backup zip with relative paths
+    cd "$(pwd)"
+    if zip -q "$backup_zip" "${files_to_backup[@]}" 2>/dev/null; then
+        log_verbose "Backup created: $backup_zip"
+        echo "$backup_zip"
+    else
+        log_warn "Failed to create backup zip"
+        echo ""
+    fi
+}
+
+# Backup a file if it exists (legacy single-file backup)
 backup_file() {
     local file="$1"
     if [[ -f "$file" && "$BACKUP" == "true" ]]; then
@@ -171,6 +377,53 @@ backup_file() {
         cp "$file" "$backup"
         log_verbose "Backed up: $file -> $backup"
     fi
+}
+
+# Show colored diff between two files
+show_file_diff() {
+    local old_file="$1"
+    local new_file="$2"
+    
+    if [[ ! -f "$old_file" ]] || [[ ! -f "$new_file" ]]; then
+        return
+    fi
+    
+    if command -v diff &>/dev/null; then
+        # Check if terminal supports colors
+        if [[ -t 1 ]] && command -v tput &>/dev/null && [[ $(tput colors 2>/dev/null) -ge 8 ]]; then
+            diff --color=always -u "$old_file" "$new_file" 2>/dev/null | head -20 || true
+        else
+            diff -u "$old_file" "$new_file" 2>/dev/null | head -20 || true
+        fi
+    fi
+}
+
+# Preview files to be installed
+preview_installation() {
+    local staging_dir="$1"
+    local show_diff="${2:-false}"
+    
+    echo ""
+    echo "Files to be installed/updated:"
+    echo ""
+    
+    while IFS= read -r file; do
+        local rel_path="${file#"$staging_dir"/}"
+        
+        if [[ -f "$rel_path" ]]; then
+            # File exists - will be updated
+            echo -e "  ${YELLOW}[UPDATE]${NC} $rel_path"
+            if [[ "$show_diff" == "true" ]]; then
+                show_file_diff "$rel_path" "$file"
+                echo ""
+            fi
+        else
+            # New file
+            echo -e "  ${GREEN}[CREATE]${NC} $rel_path"
+        fi
+    done < <(find "$staging_dir" -type f | sort)
+    
+    echo ""
 }
 
 # Upsert CRUX block into AGENTS.md
@@ -232,46 +485,47 @@ upsert_agents_crux_block() {
     log_verbose "Removed AGENTS.crux.md"
 }
 
-# Download and extract the release
-download_and_extract() {
+# Download and stage the release (without installing)
+download_and_stage() {
     local version="$1"
     local zip_name="CRUX-Compress-v${version}.zip"
     local download_url="${DOWNLOAD_BASE}/v${version}/${zip_name}"
-    local temp_dir
+    local staging_dir
     
-    temp_dir=$(mktemp -d)
-    trap 'rm -rf "$temp_dir"' EXIT
+    staging_dir=$(mktemp -d)
     
     log "Downloading CRUX Compress v${version}..."
     log_verbose "URL: $download_url"
     
-    if ! curl -fsSL "$download_url" -o "$temp_dir/$zip_name"; then
+    if ! curl -fsSL "$download_url" -o "$staging_dir/$zip_name"; then
         log_error "Failed to download release"
+        rm -rf "$staging_dir"
         exit 1
     fi
     
-    # Backup existing files if requested (BEFORE extraction overwrites them)
-    if [[ "$BACKUP" == "true" ]]; then
-        log "Creating backups of existing files..."
-        backup_file "CRUX.md"
-        backup_file "AGENTS.md"
-        backup_file "VERSION"
-        backup_file ".cursor/hooks.json"
-        backup_file ".cursor/agents/crux-cursor-rule-manager.md"
-        backup_file ".cursor/commands/crux-compress.md"
-        backup_file ".cursor/hooks/detect-crux-changes.sh"
-        backup_file ".cursor/rules/_CRUX-RULE.mdc"
-        backup_file ".cursor/skills/CRUX-Utils/SKILL.md"
-        backup_file ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+    # Extract to staging directory
+    if ! unzip -o -q "$staging_dir/$zip_name" -d "$staging_dir/content"; then
+        log_error "Failed to extract archive"
+        rm -rf "$staging_dir"
+        exit 1
     fi
+    
+    rm "$staging_dir/$zip_name"
+    echo "$staging_dir/content"
+}
+
+# Install from staging directory
+install_from_staging() {
+    local staging_dir="$1"
     
     log "Installing CRUX files..."
-    log_verbose "Extracting archive..."
     
-    # Extract directly to current directory, overlaying existing files
-    if ! unzip -o -q "$temp_dir/$zip_name" -d .; then
-        log_error "Failed to extract archive"
-        exit 1
+    # Copy all files from staging to current directory
+    if command -v rsync &>/dev/null; then
+        rsync -a "$staging_dir/" .
+    else
+        cp -r "$staging_dir/"* . 2>/dev/null || true
+        cp -r "$staging_dir/".* . 2>/dev/null || true
     fi
     
     # Upsert CRUX block into AGENTS.md and remove AGENTS.crux.md
@@ -282,19 +536,97 @@ download_and_extract() {
     # Make scripts executable
     chmod +x .cursor/hooks/detect-crux-changes.sh 2>/dev/null || true
     chmod +x .cursor/skills/CRUX-Utils/scripts/crux-utils.sh 2>/dev/null || true
+}
+
+# Download update.sh for future updates
+download_update_script() {
+    mkdir -p .crux
+    log_verbose "Downloading update script..."
+    if curl -fsSL "${RAW_BASE}/install.sh" -o ".crux/update.sh" 2>/dev/null; then
+        chmod +x ".crux/update.sh"
+        log_verbose "Update script saved to .crux/update.sh"
+    fi
+}
+
+# Show completion report
+show_completion_report() {
+    local version="$1"
+    local backup_zip="$2"
     
+    echo ""
+    echo -e "${GREEN}╔═══════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║     Installation Complete!            ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════╝${NC}"
+    echo ""
     log_success "CRUX Compress v${version} installed successfully!"
+    echo ""
+    
+    if [[ -n "$backup_zip" && -f "$backup_zip" ]]; then
+        echo "Backup saved to:"
+        echo "  $backup_zip"
+        echo ""
+        echo "To revert this update:"
+        echo -e "  ${CYAN}# Remove installed CRUX files${NC}"
+        echo "  rm -rf .crux .cursor/agents/crux-cursor-rule-manager.md \\"
+        echo "         .cursor/commands/crux-compress.md \\"
+        echo "         .cursor/hooks/detect-crux-changes.sh \\"
+        echo "         .cursor/rules/_CRUX-RULE.mdc \\"
+        echo "         .cursor/skills/CRUX-Utils CRUX.md"
+        echo ""
+        echo -e "  ${CYAN}# Restore from backup${NC}"
+        echo "  unzip -o '$backup_zip'"
+        echo ""
+    fi
+    
+    echo "Next steps:"
+    echo "  1. Ensure .cursor/hooks.json is recognized by Cursor"
+    echo "  2. Add 'crux: true' to any rule files you want to compress"
+    echo "  3. Use /crux-compress ALL to compress eligible files"
+    echo ""
+    echo "For updates, run:"
+    echo "  .crux/update.sh"
+    echo ""
+    echo "Documentation: https://github.com/${REPO_OWNER}/${REPO_NAME}"
+    echo ""
 }
 
 # Main installation flow
 main() {
+    # Clear terminal
+    clear
+    
     echo ""
     echo -e "${BLUE}╔═══════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║     CRUX Compress Installer           ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════╝${NC}"
     echo ""
     
+    # Detect if running from .crux/update.sh
+    detect_script_location
+    
+    # Check if running within CRUX-Compress repo itself
+    check_not_in_crux_repo
+    
     check_dependencies
+    
+    # Detect git repository
+    local git_root
+    git_root=$(detect_git_root)
+    
+    if [[ -n "$git_root" ]]; then
+        log_verbose "Git repository detected: $git_root"
+        cd "$git_root"
+    else
+        log_warn "Not in a git repository."
+        echo ""
+        echo "It's recommended to run this script from an initialized git repository."
+        echo "You can initialize one with: git init"
+        echo ""
+        if ! confirm "Continue anyway and treat current directory as project root?"; then
+            log "Installation cancelled."
+            exit 0
+        fi
+    fi
     
     log "Checking for latest version..."
     local latest_version
@@ -303,45 +635,94 @@ main() {
     local installed_version
     installed_version=$(get_installed_version)
     
+    local backup_zip=""
+    local should_install=true
+    local change_type=""
+    
     if [[ -n "$installed_version" ]]; then
-        log "Current version: v${installed_version}"
-        log "Latest version:  v${latest_version}"
+        log "Detected CRUX version: ${installed_version}"
+        log "Latest version: v${latest_version}"
+        echo ""
         
         if compare_versions "$latest_version" "$installed_version"; then
-            log "Upgrading from v${installed_version} to v${latest_version}..."
+            # Newer version available
+            change_type=$(get_version_change_type "$installed_version" "$latest_version")
+            
+            case "$change_type" in
+                major)
+                    echo -e "${YELLOW}MAJOR version update (${installed_version} → ${latest_version})${NC}"
+                    echo ""
+                    log_warn "This is a major version update!"
+                    echo "After installation, regenerate all CRUX files using:"
+                    echo "  /crux-compress ALL --force"
+                    echo ""
+                    ;;
+                minor)
+                    echo -e "${CYAN}Minor version update (${installed_version} → ${latest_version})${NC}"
+                    echo ""
+                    ;;
+                patch)
+                    echo -e "${GREEN}Patch update (${installed_version} → ${latest_version})${NC}"
+                    echo ""
+                    ;;
+            esac
+            
         elif [[ "$latest_version" == "$installed_version" ]]; then
             log_warn "Already at latest version (v${installed_version})"
-            read -p "Reinstall anyway? [y/N] " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                log "Installation cancelled."
+            echo ""
+            if [[ "$FORCE" == "true" ]]; then
+                log "Force reinstall requested..."
+            else
+                echo "To reinstall anyway, run with --force"
                 exit 0
             fi
         else
             log_warn "Installed version (v${installed_version}) is newer than latest release (v${latest_version})"
-            read -p "Downgrade? [y/N] " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo ""
+            if [[ "$FORCE" == "true" ]]; then
+                log "Force downgrade requested..."
+            elif ! confirm "Downgrade?"; then
                 log "Installation cancelled."
                 exit 0
+            fi
+        fi
+        
+        # Create backup for upgrades
+        if [[ "$should_install" == "true" ]]; then
+            backup_zip=$(create_backup_zip)
+            if [[ -n "$backup_zip" ]]; then
+                log_success "Backup created: $backup_zip"
             fi
         fi
     else
         log "Fresh installation of v${latest_version}"
     fi
     
-    download_and_extract "$latest_version"
+    # Download and stage files
+    local staging_dir
+    staging_dir=$(download_and_stage "$latest_version")
     
-    echo ""
-    log_success "Installation complete!"
-    echo ""
-    echo "Next steps:"
-    echo "  1. Ensure .cursor/hooks.json is recognized by Cursor"
-    echo "  2. Add 'crux: true' to any rule files you want to compress"
-    echo "  3. Use /crux-compress ALL to compress eligible files"
-    echo ""
-    echo "Documentation: https://github.com/${REPO_OWNER}/${REPO_NAME}"
-    echo ""
+    # Preview installation
+    preview_installation "$staging_dir" "$VERBOSE"
+    
+    # Confirm installation
+    if ! confirm "Proceed with installation?"; then
+        rm -rf "$(dirname "$staging_dir")"
+        log "Installation cancelled."
+        exit 0
+    fi
+    
+    # Install files
+    install_from_staging "$staging_dir"
+    
+    # Cleanup staging
+    rm -rf "$(dirname "$staging_dir")"
+    
+    # Download update script for future updates
+    download_update_script
+    
+    # Show completion report
+    show_completion_report "$latest_version" "$backup_zip"
 }
 
 # Only run main if executed directly (not sourced)

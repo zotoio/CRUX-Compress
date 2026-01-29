@@ -24,9 +24,11 @@
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-  <!-- S0: WebGPU Hero — Compression Chamber -->
+  <!-- S0: Hero — Compression Chamber -->
   <section id="hero" class="hero">
-    <canvas id="webgpu-canvas"></canvas>
+    <div class="hero-background">
+      <div class="hero-particles"></div>
+    </div>
     <div class="hero-overlay">
       <div class="hero-content">
         <h1 class="hero-title">CRUX</h1>
@@ -42,16 +44,11 @@
         </div>
       </div>
       <div class="scroll-indicator">
-        <span>Scroll to compress</span>
+        <span>Scroll to explore</span>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12l7 7 7-7"/>
         </svg>
       </div>
-    </div>
-    
-    <!-- CSS Fallback Background (shown when WebGPU unavailable) -->
-    <div id="webgpu-fallback" class="hero-fallback" hidden>
-      <div class="fallback-particles"></div>
     </div>
   </section>
 
@@ -426,7 +423,7 @@ R.docs{
           <div class="file-tree-item"><code>.cursor/agents/crux-cursor-rule-manager.md</code><span>Compression agent</span></div>
           <div class="file-tree-item"><code>.cursor/commands/crux-compress.md</code><span>Compression command</span></div>
           <div class="file-tree-item"><code>.cursor/hooks/detect-crux-changes.sh</code><span>Change detection hook</span></div>
-          <div class="file-tree-item"><code>VERSION</code><span>Version tracker</span></div>
+          <div class="file-tree-item"><code>.crux/crux.json</code><span>Version tracker</span></div>
         </div>
       </div>
       
@@ -495,8 +492,6 @@ R.docs{
   </footer>
 
   <!-- Scripts -->
-  <script src="scripts/webgpu-init.js"></script>
-  <script src="scripts/particle-system.js"></script>
   <script src="scripts/camera-controller.js"></script>
   <script src="scripts/compression-demo.js"></script>
   <script src="scripts/spec-expander.js"></script>

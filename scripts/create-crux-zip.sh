@@ -3,7 +3,7 @@
 # Usage: ./scripts/create-crux-zip.sh [output-dir]
 #
 # This script packages all CRUX-related files for distribution.
-# Output: CRUX-Compress-v{version}.zip (version read from VERSION)
+# Output: CRUX-Compress-v{version}.zip (version read from .crux/crux.json)
 
 set -e
 
@@ -13,8 +13,13 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Convert output dir to absolute path (important: script cd's later, relative paths would break)
 OUTPUT_DIR="$(cd "${1:-.}" && pwd)"
 
-# Read version from VERSION file
-VERSION=$(tr -d '[:space:]' < "$PROJECT_ROOT/VERSION")
+# Read version from .crux/crux.json
+if ! command -v jq &> /dev/null; then
+    # Fallback if jq is not available
+    VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$PROJECT_ROOT/.crux/crux.json" | sed 's/.*"\([^"]*\)"$/\1/')
+else
+    VERSION=$(jq -r '.version' "$PROJECT_ROOT/.crux/crux.json")
+fi
 ZIP_NAME="CRUX-Compress-v${VERSION}.zip"
 
 cd "$PROJECT_ROOT"
@@ -27,6 +32,7 @@ STAGING_DIR=$(mktemp -d)
 trap 'rm -rf "$STAGING_DIR"' EXIT
 
 # Create directory structure
+mkdir -p "$STAGING_DIR/.crux"
 mkdir -p "$STAGING_DIR/.cursor/agents"
 mkdir -p "$STAGING_DIR/.cursor/commands"
 mkdir -p "$STAGING_DIR/.cursor/hooks"
@@ -36,7 +42,13 @@ mkdir -p "$STAGING_DIR/.cursor/skills/CRUX-Utils/scripts"
 # Copy core files
 echo "Copying core files..."
 cp CRUX.md "$STAGING_DIR/"
-cp VERSION "$STAGING_DIR/"
+cp .crux/crux.json "$STAGING_DIR/.crux/"
+
+# Copy release manifest (for backup/verification during install)
+if [[ -f "scripts/crux-release-files.json" ]]; then
+    cp scripts/crux-release-files.json "$STAGING_DIR/.crux/"
+    echo "Included release manifest"
+fi
 
 # Extract CRUX block from AGENTS.md into AGENTS.crux.md
 # This contains only the <CRUX...> to </CRUX> block for merging during install

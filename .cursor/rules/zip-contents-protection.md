@@ -40,7 +40,7 @@ These are the ONLY files that should be in the distribution:
 
 ```
 CRUX.md
-VERSION
+.crux/crux.json
 AGENTS.crux.md (extracted from AGENTS.md)
 .cursor/hooks.json
 .cursor/agents/crux-cursor-rule-manager.md

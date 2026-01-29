@@ -221,7 +221,53 @@ STATE={R,C,Δ}→upd on progress
 ⟧`
 };
 
+// Hero Stats Animation - animates compression bar and percentage based on scroll
+function animateHeroStats() {
+  const compressionFill = document.getElementById('compression-fill');
+  const percentage = document.getElementById('percentage');
+  const hero = document.getElementById('hero');
+  
+  if (!hero) return;
+  
+  let lastProgress = -1;
+  
+  function updateStats() {
+    const rect = hero.getBoundingClientRect();
+    const heroHeight = hero.offsetHeight;
+    
+    let progress = 0;
+    if (rect.top >= 0) {
+      progress = 0;
+    } else if (rect.bottom <= 0) {
+      progress = 1;
+    } else {
+      progress = Math.min(1, Math.max(0, -rect.top / heroHeight));
+    }
+    
+    // Only update DOM if progress changed significantly
+    if (Math.abs(progress - lastProgress) > 0.01) {
+      lastProgress = progress;
+      
+      // Animate compression bar
+      if (compressionFill) {
+        compressionFill.style.width = `${progress * 100}%`;
+      }
+      
+      // Calculate percentage recovered
+      const recovered = Math.round(progress * 80);
+      if (percentage) {
+        percentage.textContent = recovered;
+      }
+    }
+    
+    requestAnimationFrame(updateStats);
+  }
+  
+  updateStats();
+}
+
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   new CompressionDemo();
+  animateHeroStats();
 });

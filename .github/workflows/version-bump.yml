@@ -132,8 +132,8 @@ jobs:
       - name: Get current version
         id: current_version
         run: |
-          if [[ -f VERSION ]]; then
-            VERSION=$(cat VERSION | tr -d '[:space:]')
+          if [[ -f .crux/crux.json ]]; then
+            VERSION=$(jq -r '.version' .crux/crux.json)
           else
             VERSION="0.0.0"
           fi
@@ -193,10 +193,11 @@ jobs:
           echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
 
-      - name: Update VERSION
+      - name: Update .crux/crux.json
         run: |
-          echo "${{ steps.analyze.outputs.new_version }}" > VERSION
-          echo "Updated VERSION to ${{ steps.analyze.outputs.new_version }}"
+          mkdir -p .crux
+          jq --arg v "${{ steps.analyze.outputs.new_version }}" '.version = $v' .crux/crux.json > .crux/crux.json.tmp && mv .crux/crux.json.tmp .crux/crux.json
+          echo "Updated .crux/crux.json to ${{ steps.analyze.outputs.new_version }}"
 
       - name: Update CRUX.md version
         run: |
@@ -214,7 +215,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add VERSION CRUX.md
+          git add .crux/crux.json CRUX.md
           git commit -m "chore: bump version to ${{ steps.analyze.outputs.new_version }} [skip ci]"
           git push
 
@@ -230,7 +231,7 @@ jobs:
           echo "| Trigger | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | ${{ needs.check-release-files.outputs.commit_message }} |" >> $GITHUB_STEP_SUMMARY
 
-  # Always sync CRUX.md with VERSION file (runs when version-bump is skipped)
+  # Always sync CRUX.md with .crux/crux.json version (runs when version-bump is skipped)
   sync-version:
     needs: [check-release-files, version-bump]
     # Run if version-bump was skipped (not needed) but check-release-files ran
@@ -249,15 +250,15 @@ jobs:
       - name: Check and sync CRUX.md version
         id: sync
         run: |
-          # Get current VERSION
-          if [[ -f VERSION ]]; then
-            VERSION=$(cat VERSION | tr -d '[:space:]')
+          # Get current version from .crux/crux.json
+          if [[ -f .crux/crux.json ]]; then
+            VERSION=$(jq -r '.version' .crux/crux.json)
           else
-            echo "No VERSION file found"
+            echo "No .crux/crux.json file found"
             echo "needs_sync=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-          echo "VERSION file: $VERSION"
+          echo ".crux/crux.json version: $VERSION"
           
           # Get version from CRUX.md frontmatter
           CRUX_VERSION=$(grep -E "^version: " CRUX.md | head -1 | sed 's/version: //' | tr -d '[:space:]')

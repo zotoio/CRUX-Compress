@@ -29,7 +29,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          VERSION=$(cat VERSION | tr -d '[:space:]')
+          VERSION=$(jq -r '.version' .crux/crux.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
@@ -43,6 +43,89 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
             echo "Tag v${{ steps.version.outputs.version }} does not exist"
           fi
+
+      - name: Generate release manifest with checksums
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          MANIFEST="scripts/crux-release-files.json"
+          
+          # Files included in release (must match create-crux-zip.sh)
+          RELEASE_FILES=(
+            "CRUX.md"
+            ".crux/crux.json"
+            "AGENTS.md"
+            ".cursor/hooks.json"
+            ".cursor/agents/crux-cursor-rule-manager.md"
+            ".cursor/commands/crux-compress.md"
+            ".cursor/hooks/detect-crux-changes.sh"
+            ".cursor/rules/_CRUX-RULE.mdc"
+            ".cursor/skills/CRUX-Utils/SKILL.md"
+            ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+          )
+          
+          echo "Generating checksums for release v${VERSION}..."
+          
+          # Build the files JSON object
+          FILES_JSON="{"
+          FIRST=true
+          for file in "${RELEASE_FILES[@]}"; do
+            if [[ -f "$file" ]]; then
+              CHECKSUM=$(sha256sum "$file" | cut -d' ' -f1)
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null)
+              if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+              else
+                FILES_JSON+=","
+              fi
+              FILES_JSON+="\"$file\":{\"checksum\":\"$CHECKSUM\",\"size\":$SIZE}"
+              echo "  $file: $CHECKSUM ($SIZE bytes)"
+            fi
+          done
+          FILES_JSON+="}"
+          
+          # Update the manifest using jq
+          if [[ -f "$MANIFEST" ]]; then
+            # Add new release entry
+            jq --arg ver "$VERSION" \
+               --arg date "$DATE" \
+               --argjson files "$FILES_JSON" \
+               '.releases[$ver] = {"date": $date, "files": $files}' \
+               "$MANIFEST" > "${MANIFEST}.tmp"
+            mv "${MANIFEST}.tmp" "$MANIFEST"
+            
+            # Update allFiles index
+            for file in "${RELEASE_FILES[@]}"; do
+              if [[ -f "$file" ]]; then
+                jq --arg file "$file" --arg ver "$VERSION" \
+                   '.allFiles[$file] = ((.allFiles[$file] // []) + [$ver] | unique)' \
+                   "$MANIFEST" > "${MANIFEST}.tmp"
+                mv "${MANIFEST}.tmp" "$MANIFEST"
+              fi
+            done
+            
+            echo "Updated $MANIFEST with release v${VERSION}"
+          else
+            echo "ERROR: $MANIFEST not found"
+            exit 1
+          fi
+          
+          # Show the updated manifest
+          echo ""
+          echo "Release manifest:"
+          jq '.' "$MANIFEST"
+
+      - name: Commit release manifest
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add scripts/crux-release-files.json
+          git diff --cached --quiet && echo "No manifest changes to commit" || {
+            git commit -m "chore: update release manifest for v${{ steps.version.outputs.version }} [skip ci]"
+            git push
+          }
 
       - name: Build distribution zip
         if: steps.tag_check.outputs.exists == 'false'

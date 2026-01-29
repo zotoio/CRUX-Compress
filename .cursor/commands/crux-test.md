@@ -263,7 +263,7 @@ After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
 # CRUX Test Report
 
 **Generated**: [timestamp]
-**Version**: [from VERSION]
+**Version**: [from .crux/crux.json]
 **Environment**: [OS, bash version if relevant]
 
 ## Summary

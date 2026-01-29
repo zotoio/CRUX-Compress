@@ -4,7 +4,7 @@ crux: true
 ---
 # Automatic Version Bumping Rule
 
-When committing changes, analyze commit messages and update `VERSION` accordingly.
+When committing changes, analyze commit messages and update `.crux/crux.json` version accordingly.
 
 ## Conventional Commit Version Rules
 
@@ -19,8 +19,8 @@ Apply semantic versioning based on conventional commit prefixes:
 
 ## When to Apply
 
-1. **Before creating a commit** - If the user asks you to commit changes, analyze the commit message type and bump `VERSION` before staging
-2. **Include VERSION in the commit** - Stage the updated `VERSION` along with the other changes
+1. **Before creating a commit** - If the user asks you to commit changes, analyze the commit message type and bump `.crux/crux.json` version before staging
+2. **Include .crux/crux.json in the commit** - Stage the updated `.crux/crux.json` along with the other changes
 
 ## Version Bump Logic
 
