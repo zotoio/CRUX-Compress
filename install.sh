@@ -466,9 +466,6 @@ upsert_agents_crux_block() {
         return
     fi
     
-    local crux_content
-    crux_content=$(cat "$crux_block_file")
-    
     if [[ -f "AGENTS.md" ]]; then
         if grep -q '<CRUX' "AGENTS.md"; then
             # Replace existing CRUX block
@@ -479,7 +476,14 @@ upsert_agents_crux_block() {
             temp_file=$(mktemp)
             
             # Use awk to replace the block between <CRUX and </CRUX> (inclusive)
-            awk -v new_block="$crux_content" '
+            # Read new block from file to avoid newline issues with -v
+            awk '
+                BEGIN { 
+                    while ((getline line < "'"$crux_block_file"'") > 0) {
+                        new_block = new_block (new_block ? "\n" : "") line
+                    }
+                    close("'"$crux_block_file"'")
+                }
                 /<CRUX/ { in_block=1; print new_block; next }
                 /<\/CRUX>/ { in_block=0; next }
                 !in_block { print }
@@ -494,7 +498,7 @@ upsert_agents_crux_block() {
             local temp_file
             temp_file=$(mktemp)
             
-            echo "$crux_content" > "$temp_file"
+            cat "$crux_block_file" > "$temp_file"
             echo "" >> "$temp_file"
             cat "AGENTS.md" >> "$temp_file"
             
@@ -504,7 +508,7 @@ upsert_agents_crux_block() {
     else
         # Create new AGENTS.md with just the CRUX block
         log_verbose "Creating AGENTS.md with CRUX block..."
-        echo "$crux_content" > "AGENTS.md"
+        cat "$crux_block_file" > "AGENTS.md"
         log_success "Created AGENTS.md with CRUX block"
     fi
     
