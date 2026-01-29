@@ -4,6 +4,7 @@
 #
 # This hook queues modified source files (with crux: true) for compression.
 # The afterFileEdit hook will inject context to trigger /crux-compress.
+# See: https://github.com/zotoio/CRUX-Compress
 
 # Read input JSON from stdin (Cursor sends edit details)
 read -r input
