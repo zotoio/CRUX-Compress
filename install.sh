@@ -399,6 +399,23 @@ show_file_diff() {
     fi
 }
 
+# Get file checksum (portable across Linux/macOS)
+get_checksum() {
+    local file="$1"
+    if command -v sha256sum &>/dev/null; then
+        sha256sum "$file" 2>/dev/null | cut -d' ' -f1
+    elif command -v shasum &>/dev/null; then
+        shasum -a 256 "$file" 2>/dev/null | cut -d' ' -f1
+    elif command -v md5sum &>/dev/null; then
+        md5sum "$file" 2>/dev/null | cut -d' ' -f1
+    elif command -v md5 &>/dev/null; then
+        md5 -q "$file" 2>/dev/null
+    else
+        # Fallback: use file size + first/last bytes as pseudo-checksum
+        stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null
+    fi
+}
+
 # Preview files to be installed
 preview_installation() {
     local staging_dir="$1"
@@ -412,11 +429,21 @@ preview_installation() {
         local rel_path="${file#"$staging_dir"/}"
         
         if [[ -f "$rel_path" ]]; then
-            # File exists - will be updated
-            echo -e "  ${YELLOW}[UPDATE]${NC} $rel_path"
-            if [[ "$show_diff" == "true" ]]; then
-                show_file_diff "$rel_path" "$file"
-                echo ""
+            # File exists - compare checksums
+            local existing_checksum staged_checksum
+            existing_checksum=$(get_checksum "$rel_path")
+            staged_checksum=$(get_checksum "$file")
+            
+            if [[ "$existing_checksum" == "$staged_checksum" ]]; then
+                # Files are identical
+                echo -e "  ${BLUE}[NO CHANGE]${NC} $rel_path"
+            else
+                # File will be updated
+                echo -e "  ${YELLOW}[UPDATE]${NC} $rel_path"
+                if [[ "$show_diff" == "true" ]]; then
+                    show_file_diff "$rel_path" "$file"
+                    echo ""
+                fi
             fi
         else
             # New file
