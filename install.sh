@@ -525,12 +525,17 @@ merge_hooks_json() {
             # $existing is .[0], $new is .[1]
             .[0] as $existing | .[1] as $new |
             
-            # Start with existing, update hooks (handle missing .hooks gracefully)
-            $existing | .hooks = {
-                "sessionStart": merge_hooks(($existing.hooks // {}).sessionStart; ($new.hooks // {}).sessionStart),
-                "afterFileEdit": merge_hooks(($existing.hooks // {}).afterFileEdit; ($new.hooks // {}).afterFileEdit),
-                "stop": merge_hooks(($existing.hooks // {}).stop; ($new.hooks // {}).stop)
-            }
+            # Build merged hooks object, only including non-empty arrays
+            (
+                ["sessionStart", "afterFileEdit", "stop"] | 
+                map(. as $hook | 
+                    merge_hooks(($existing.hooks // {})[$hook]; ($new.hooks // {})[$hook]) |
+                    if length > 0 then {($hook): .} else {} end
+                ) | add // {}
+            ) as $merged_hooks |
+            
+            # Preserve existing structure, update/add hooks
+            $existing | .hooks = ((.hooks // {}) + $merged_hooks)
         ' "$target_hooks" "$staging_hooks" > "$temp_file"
         
         if [[ -s "$temp_file" ]]; then
