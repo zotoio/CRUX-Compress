@@ -67,7 +67,7 @@ tests/
 ├── helpers.bash            # Shared test utilities and assertions
 ├── test_create_zip.bats    # Tests for scripts/create-crux-zip.sh
 ├── test_crux_utils.bats    # Tests for CRUX-Utils skill
-├── test_detect_hook.bats   # Tests for the detect-crux-changes.sh hook
+├── test_detect_hook.bats   # Tests for the crux-detect-changes.sh hook
 └── test_install.bats       # Tests for install.sh
 ```
 
@@ -77,7 +77,7 @@ tests/
 |-----------|------------------|----------|
 | `test_install.bats` | `install.sh` | Installation script validation, CLI options, dependencies |
 | `test_crux_utils.bats` | `.cursor/skills/CRUX-Utils/scripts/crux-utils.sh` | Token counting, checksums, compression ratio |
-| `test_detect_hook.bats` | `.cursor/hooks/detect-crux-changes.sh` | Hook triggering, file filtering, queue management |
+| `test_detect_hook.bats` | `.cursor/hooks/crux-detect-changes.sh` | Hook triggering, file filtering, queue management |
 | `test_create_zip.bats` | `scripts/create-crux-zip.sh` | Zip creation, version matching, required files |
 
 ### Running Tests
@@ -249,7 +249,7 @@ Push to main
 ┌─────────────────────────────────────────────────────────────────┐
 │  Release Workflow (.github/workflows/release.yml)               │
 │  ├─ Generate checksums for release files                        │
-│  ├─ Update scripts/crux-release-files.json manifest             │
+│  ├─ Update .crux/crux-release-files.json manifest               │
 │  ├─ Build distribution zip (CRUX-Compress-vX.Y.Z.zip)           │
 │  ├─ Create GitHub Release with tag vX.Y.Z                       │
 │  ├─ Generate release notes from commits                         │
@@ -270,7 +270,8 @@ Version bumps only occur when these files change (matches distribution zip conte
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Subagent definition |
 | `.cursor/commands/crux-compress.md` | Command definition |
-| `.cursor/hooks/detect-crux-changes.sh` | Hook script |
+| `.cursor/hooks/crux-detect-changes.sh` | File change detection hook |
+| `.cursor/hooks/crux-session-start.sh` | Session start hook |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
 | `.cursor/skills/CRUX-Utils/**` | Utility skill |
 

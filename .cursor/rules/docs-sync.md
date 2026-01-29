@@ -13,8 +13,9 @@ When you modify files that affect project functionality or workflows, update the
 |----------|----------------|
 | `README.md` | Installation, usage, or feature changes |
 | `CONTRIBUTORS.md` | CI/CD workflow, testing, or contribution process changes |
+| `web/compress.md/` | Landing page content, examples, or feature highlights |
 
-## Trigger Files → Documentation Updates
+## Trigger Files → Documentation Updates.
 
 ### README.md Updates
 - `install.sh` - Update installation instructions
@@ -28,6 +29,11 @@ When you modify files that affect project functionality or workflows, update the
 - `scripts/*.sh` - Update development setup if scripts change
 - `tests/helpers.bash` - Update test helper documentation
 
+### web/compress.md/ Updates
+- `CRUX.md` - Update specification examples on landing page
+- Feature additions - Update feature highlights
+- `.cursor/agents/*` - Update agent/tooling descriptions
+
 ## Update Guidelines
 
 1. Make surgical updates - don't rewrite entire sections
@@ -40,4 +46,5 @@ When you modify files that affect project functionality or workflows, update the
 
 - Don't update docs for changes to example files in `.cursor/rules/example/`
 - Don't update docs for temporary or generated files
-- Don't add speculative features - only document what exists 
+- Don't add speculative features - only document what exists
+- Keep documentation concise and actionable

@@ -49,7 +49,7 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           DATE=$(date +%Y-%m-%d)
-          MANIFEST="scripts/crux-release-files.json"
+          MANIFEST=".crux/crux-release-files.json"
           
           # Files included in release (must match create-crux-zip.sh)
           RELEASE_FILES=(
@@ -59,7 +59,8 @@ jobs:
             ".cursor/hooks.json"
             ".cursor/agents/crux-cursor-rule-manager.md"
             ".cursor/commands/crux-compress.md"
-            ".cursor/hooks/detect-crux-changes.sh"
+            ".cursor/hooks/crux-detect-changes.sh"
+            ".cursor/hooks/crux-session-start.sh"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/CRUX-Utils/SKILL.md"
             ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
@@ -121,7 +122,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add scripts/crux-release-files.json
+          git add .crux/crux-release-files.json
           git diff --cached --quiet && echo "No manifest changes to commit" || {
             git commit -m "chore: update release manifest for v${{ steps.version.outputs.version }} [skip ci]"
             git push

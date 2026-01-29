@@ -1,11 +1,11 @@
 ---
-generated: 2026-01-28 15:42
-sourceChecksum: "2253728265"
+generated: 2026-01-30 10:42
+sourceChecksum: 2253728265
 beforeTokens: 6278
-afterTokens: 890
+afterTokens: 2232
 confidence: 96%
-alwaysApply: true
 crux: true
+alwaysApply: true
 ---
 
 > [!IMPORTANT]
@@ -15,125 +15,256 @@ crux: true
 
 ```crux
 ⟦CRUX:sample-rule.md
-Ρ{team coding standards; consistent+maintainable+secure+quality code}
+Ρ{team coding standards}
+Κ{fn=function;cls=class;iface=interface;var=variable;const=constant;
+  param=parameter;cfg=config;env=environment}
 
-Κ{fn=function; cls=class; var=variable; const=constant; iface=interface;
-  cov=coverage; PR=pull request; API=REST endpoint; DB=database;
-  PII=personal info; a11y=accessibility}
-
-R.naming.js{
-  var+fn=camelCase; cls+iface=PascalCase; const=SCREAMING_SNAKE;
-  enum.name=PascalCase; enum.val=SCREAMING_SNAKE;
-  type.param=[T|K|V|TRequest|TResponse]
+R.naming.js_ts{
+  var+fn=camelCase; cls+iface=PascalCase;
+  const=SCREAMING_SNAKE_CASE; enum.name=PascalCase,enum.val=SCREAMING_SNAKE;
+  type.param=T|K|V|TRequest|TResponse
 }
-R.naming.py{var+fn=snake_case; cls=PascalCase; const=SCREAMING_SNAKE; _private}
-R.naming.go{exported=PascalCase; unexported=camelCase; acronym=consistent(HTTPClient|userID)}
+R.naming.py{
+  var+fn=snake_case; cls=PascalCase; const=SCREAMING_SNAKE;
+  private=_prefix
+}
+R.naming.go{
+  exported=PascalCase; unexported=camelCase;
+  acronym=consistent(HTTPClient|userID)
+}
 
 R.style{
-  fn.small+focused; early return; nest≤3; self-doc; 1concept/fn;
-  composition≻inheritance; SRP
+  fn.lines≤20..30; early.return→avoid.nest; nest.depth≤3;
+  self.doc.code; 1concept/fn; composition≻inheritance; SRP!
 }
-R.style.format{
-  JS/TS:line≤100,indent=2sp;
-  Py:line≤88,indent=4sp;
-  Go:line≤120,indent=tab;
-  Rust:line≤100,indent=4sp;
-  SQL:line≤80,indent=2sp
+R.format{
+  js_ts{line≤100ch;indent=2sp}
+  py{line≤88ch;indent=4sp}
+  go{line≤120ch;indent=tabs}
+  rust{line≤100ch;indent=4sp}
+  sql{line≤80ch;indent=2sp}
 }
 R.complexity{
-  cyclomatic≤10!; cognitive≤15!; params≤5!→use obj;
-  ln/fn≤30; nest≤3!
+  cyclomatic≤10!; cognitive≤15!; params≤5!(else→obj);
+  fn.lines≤30; nest.depth≤3!
 }
 
-R.docs{∀public API→JSDoc/docstring∋[desc,params+types,return,throws,examples]}
+R.doc{
+  ∀public.API→comprehensive.doc;
+  ts→JSDoc[desc+@param+@returns+@throws+@example];
+  py→Google.docstring[Args+Returns+Raises+Examples];
+  go→comment[desc+params+returns]
+}
 
 R.err{
-  ¬swallow!; log w/ctx; custom err types; fail fast unrecoverable;
-  actionable msg;
-  hierarchy=BaseError→[ValidationError|BusinessError|IntegrationError|SystemError];
-  API.format={error:{code,message,details,requestId,timestamp}}
+  ¬swallow!; log+ctx!; custom.err.types; fail.fast.unrecoverable;
+  actionable.msg!
+}
+R.err.hierarchy{
+  BaseError∋[ValidationError∋[RequiredField,InvalidFormat,OutOfRange],
+  BusinessError∋[InsufficientFunds,DuplicateEntity,StateTransition],
+  IntegrationError∋[Network,Timeout,ServiceUnavailable],
+  SystemError∋[Database,Cache,Configuration]]
+}
+R.err.response{
+  format={error:{code,message,details,requestId,timestamp}}
 }
 
-R.test{
-  cov.line≥80%⊕90%; cov.branch≥75%⊕85%; cov.fn≥85%⊕95%;
-  name="should [behavior] when [condition]";
-  pattern=AAA(Arrange»Act»Assert)
+R.test.coverage{
+  line≥80%⊕90%; branch≥75%⊕85%; fn≥85%⊕95%
 }
-R.test.category{
-  Unit→isolate→∀commit; Integration→interactions→∀PR;
-  E2E→user flows→nightly; Perf→response+throughput→weekly;
-  Security→SAST/DAST→∀PR
+R.test.naming{
+  pattern="should [behavior] when [condition]"
 }
-R.test.mock{
-  mock ext deps only; ¬mock code under test;
-  realistic data; prefer DI; reset between tests
+R.test.structure{
+  AAA=Arrange»Act»Assert
+}
+R.test.categories{
+  unit→every.commit; integration→every.PR;
+  e2e→nightly; perf→weekly; security→every.PR
+}
+R.test.mocking{
+  mock.external.only!; ¬mock.code.under.test!;
+  realistic.data; DI; reset.between.tests
 }
 
-Π.layers{Presentation→Application→Domain→Infrastructure}
-Π.deps{inward→domain; domain=¬ext deps; infra impl domain iface; app orchestrate}
-
-R.api.methods{
-  GET=retrieve,idempotent; POST=create,¬idempotent;
-  PUT=replace,idempotent; PATCH=partial,¬idempotent;
-  DELETE=remove,idempotent
+Π.arch{
+  layers=[Presentation,Application,Domain,Infrastructure];
+  deps→inward(→domain); domain.no.ext.deps!;
+  infra.implements.domain.ifaces; app.orchestrates.domain
 }
-R.api.url{nouns¬verbs; plural; kebab-case; nest relations:/users/{id}/orders}
-R.api.codes{200=OK;201=Created;204=NoContent;400=BadRequest;401=Unauth;403=Forbidden;404=NotFound;500=ServerError}
-R.api{∀list→pagination w/data+meta+links; versioning=/api/v1/*}
-
-Γ.git.commit{
-  conventional=type(scope):desc;
-  types=[feat→Minor|fix→Patch|docs|style|refactor|perf|test|chore|ci|build]
+Π.structure{
+  src/[domain/[entities,value-objects,services,interfaces],
+  application/[use-cases,services,dtos],
+  infrastructure/[persistence,external-services,config],
+  presentation/[controllers,middleware,validators]]
 }
-Γ.git.branch{
+
+R.api.rest{
+  GET→retrieve(idempotent); POST→create(¬idempotent);
+  PUT→replace(idempotent); PATCH→partial(¬idempotent);
+  DELETE→remove(idempotent)
+}
+R.api.url{
+  nouns¬verbs; plural; kebab-case;
+  nest.for.relations(/users/{id}/orders);
+  query.for.filter(?role=admin&active=true)
+}
+R.api.status{
+  200=OK; 201=Created; 204=NoContent;
+  400=BadRequest; 401=Unauthorized; 403=Forbidden;
+  404=NotFound; 409=Conflict; 422=UnprocessableEntity;
+  429=TooManyRequests; 500=InternalError; 503=ServiceUnavailable
+}
+R.api.pagination{
+  ∀list→paginate!;
+  response∋{data,pagination:{page,pageSize,totalPages,totalItems,hasNext,hasPrevious},links}
+}
+R.api.version{
+  URL.path=/api/v{n}/resource
+}
+
+R.git.commit{
+  format="type(scope): description";
+  types={feat→minor,fix→patch,docs|style|refactor|test|chore|ci|build→none,
+  perf→patch,BREAKING→major}
+}
+R.git.branch{
   feature/PROJ-{id}-{desc}; fix/PROJ-{id}-{desc};
-  hotfix/PROJ-{id}-{desc}; release/v{M}.{m}.{p}
+  hotfix/PROJ-{id}-{desc}; release/v{M}.{m}.{p};
+  experiment/{desc}
 }
-Γ.git.main{PR!; ≥2approvals; CI.pass; ¬force push}
-Γ.git.PR{lines<400; desc w/ctx; link issues; +tests for new fn}
-
-P.sec.auth{OAuth2.0+OIDC; session mgmt; secure token storage; rate limit auth; log auth events}
-P.sec.input{validate:email(RFC5322)|phone(E.164)|URL(https whitelist)|nums|strings|files}
-P.sec.data{
-  encrypt@rest=AES-256; transit=TLS1.3;
-  pwd=bcrypt(cost≥12); field-level encrypt PII;
-  parameterized queries; sanitize output→¬XSS
+R.git.protection{
+  main{PR+2approvals+CI.pass+¬force.push};
+  develop{PR+1approval+CI.pass};
+  release/*{PR+2approvals+CI.pass+CODEOWNERS}
 }
-P.sec.secrets{
-  DO:env vars+secrets mgr+rotate+audit;
-  DONT:¬commit+¬log sensitive+¬share via chat+¬reuse across env
+R.git.pr{
+  lines<400; desc+context; link.issues; screenshots.for.UI;
+  upd.docs; +tests; request.codeowners
 }
-P.sec.headers{CSP;X-Content-Type-Options;X-Frame-Options;X-XSS-Protection;HSTS;Referrer-Policy}
 
-R.db.query{idx filtered/sorted cols; ¬SELECT *; EXPLAIN; pagination; connection pool}
-R.db.migration{reversible!; ¬modify existing; name=YYYYMMDD_desc; test on prod-like; backup first}
-R.db.naming{tables=snake_case+plural; cols=snake_case; PK=id; FK={table}_id; idx=idx_{table}_{cols}}
+R.sec.auth{
+  OAuth2.0+OIDC; session.mgmt; secure.token.storage(httpOnly);
+  rate.limit.auth; log.auth.events
+}
+R.sec.input{
+  email→RFC5322+domain.verify; phone→E.164;
+  url→https.whitelist+domain.val; numbers→type+range+precision;
+  strings→length+charset; files→type+size+content
+}
+R.sec.data{
+  encrypt.at.rest(AES-256); TLS1.3.in.transit;
+  bcrypt(cost≥12); field.level.encrypt.PII;
+  parameterized.queries!; sanitize.output.XSS!
+}
+R.sec.secrets{
+  ⊤{env.vars;secrets.mgr(Vault|AWS);rotate;audit}
+  ⊥{commit;log;share.via.chat;same.across.envs}
+}
+R.sec.headers{
+  CSP:default-src'self'; X-Content-Type-Options:nosniff;
+  X-Frame-Options:DENY; X-XSS-Protection:1;mode=block;
+  HSTS:max-age=31536000;includeSubDomains;
+  Referrer-Policy:strict-origin-when-cross-origin
+}
 
-R.log.levels{ERROR|WARN|INFO|DEBUG|TRACE}
-R.log.format{JSON∋[timestamp,level,service,traceId,spanId,message,context]}
+R.db.query{
+  index.filtered+sorted.cols!; ¬SELECT*!;
+  EXPLAIN.analyze; paginate; connection.pool
+}
+R.db.migration{
+  reversible(up/down)!; ¬modify.existing!;
+  name=YYYYMMDD_description; test.on.prod.like.data; backup.before
+}
+R.db.naming{
+  tables=snake_case+plural; cols=snake_case;
+  pk=id; fk={table}_id; idx=idx_{table}_{cols};
+  constraint={type}_{table}_{cols}
+}
+
+R.log.levels{
+  ERROR=exceptions+failures; WARN=unexpected.handled;
+  INFO=business.events; DEBUG=diagnostic; TRACE=dev.only
+}
+R.log.format{
+  structured.json∋{timestamp,level,service,traceId,spanId,message,context}
+}
 R.metrics{
-  app:req rate+err rate+latency[p50,p95,p99];
-  biz:signups+conversions+txns;
-  infra:CPU+mem+disk+net
+  app=[req.rate,err.rate,latency(p50,p95,p99)];
+  business=[signups,conversions,txns];
+  infra=[CPU,memory,disk,network];
+  deps=[ext.API.latency,failure.rate]
 }
-R.alert{err>1%→warn,>5%→crit; p99>500ms→warn,>2s→crit; CPU>70%→warn,>90%→crit; mem>75%→warn,>90%→crit}
-
-R.perf.latency{
-  API.read:p50=50ms,p95=150ms,p99=300ms;
-  API.write:p50=100ms,p95=300ms,p99=500ms
+R.alerting{
+  err.rate{warn>1%,crit>5%}; p99.latency{warn>500ms,crit>2000ms};
+  CPU{warn>70%,crit>90%}; memory{warn>75%,crit>90%};
+  disk{warn>80%,crit>95%}
 }
-R.perf.cache{browser=static,1yr; CDN=public,5min; app=session,15min; DB=queries,1hr}
-R.perf.checklist{compression;keep-alive;caching;lazy load;async I/O;batch DB;optimize assets;pagination}
 
-Λ.review.checklist{correctness;security;performance;readability;maintainability;tests;docs}
-Λ.review.SLA{P0:1hr init,4hr resolve; P1:4hr init,1d resolve; P2:1d init,3d resolve}
+R.perf.response{
+  API.reads{p50≤50ms,p95≤150ms,p99≤300ms};
+  API.writes{p50≤100ms,p95≤300ms,p99≤500ms};
+  background{p50≤1s,p95≤5s,p99≤30s};
+  batch{p50≤30s,p95≤60s,p99≤120s}
+}
+R.perf.cache{
+  browser→static(TTL=1yr); CDN→public.API(TTL=5min);
+  app→session+computed(TTL=15min); db→query.results(TTL=1hr)
+}
+R.perf.optimize{
+  compression(gzip|brotli); keep-alive; caching;
+  lazy.load; async.IO; batch.db.ops; optimize.assets; paginate
+}
 
-R.feature.flags{lifecycle=Created→Testing→Rollout→Enabled→Cleanup}
+R.review.checklist{
+  correctness; security; performance; readability;
+  maintainability; tests; documentation
+}
+R.review.feedback{
+  ⊤{specific+actionable;explain.why;suggest.alternatives;ask.questions;acknowledge.good}
+  ⊥{vague;just.criticize;assume.bad.intent;only.negatives}
+}
+R.review.response{
+  P0{initial≤1hr,resolve≤4hr}; P1{initial≤4hr,resolve≤1day};
+  P2{initial≤1day,resolve≤3days}; P3{initial≤3days,resolve≤1week}
+}
 
-R.a11y{WCAG2.1 AA; perceivable+operable+understandable+robust; contrast:text≥4.5:1,large≥3:1; keyboard accessible; ARIA labels}
+R.feature.flags{
+  iface={name,enabled,rolloutPercentage,allowedUsers,allowedGroups,metadata};
+  check=flag.enabled∧(user.allowed∨rollout.hit)
+}
+R.feature.lifecycle{
+  Created→Testing→Rollout→Enabled→Cleanup
+}
 
-R.release{semver=MAJOR.MINOR.PATCH; deploy=[Blue-Green|Canary|Rolling|Recreate]}
+R.a11y.wcag{
+  perceivable[alt.text,captions,contrast≥4.5:1];
+  operable[keyboard.accessible,no.seizure,sufficient.time];
+  understandable[clear.lang,consistent.nav,input.assist];
+  robust[valid.HTML,ARIA,screen.reader.compat]
+}
+R.a11y.checklist{
+  contrast{normal≥4.5:1,large≥3:1}; focus.indicators!;
+  alt.text.meaningful.images!; heading.hierarchy(h1→h2→h3);
+  form.labels+error.msgs; keyboard.accessible!; ARIA.roles+labels
+}
 
-Ω{quality≻speed; consistent; maintainable; secure; verified}
+R.release.semver{
+  MAJOR=breaking; MINOR=feature(compat); PATCH=fix(compat)
+}
+R.release.checklist{
+  tests.pass; CHANGELOG.upd; version.bump; docs.upd;
+  security.scan.pass; perf.benchmarks.met; rollback.plan; notify.stakeholders
+}
+R.release.deploy{
+  blue-green→zero.downtime(medium.risk);
+  canary→high.risk.changes(low.risk);
+  rolling→standard(medium.risk);
+  recreate→dev.only(high.risk)
+}
+
+Ω{consistent.style; quality+tested+documented; secure; performant;
+  maintainable; accessible; reliable; ∀team→follow!; deviation→discuss+document}
 ⟧
 ```

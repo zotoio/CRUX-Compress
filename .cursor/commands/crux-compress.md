@@ -123,6 +123,13 @@ This ensures compression agents always perform full recompression rather than sk
    - Any issues encountered
    - If `--force` was used, note files that were deleted before recompression
 
+6. **Clear processed files from pending-compression.json**:
+   - Read `.crux/pending-compression.json` if it exists
+   - Remove any files from the `files` array that were just processed (successfully compressed or skipped)
+   - Do NOT remove files that were not part of this compression run (preserve newly added pending files)
+   - Write the updated JSON back to the file
+   - If the `files` array is now empty, write `{"files": [], "updated": "<timestamp>"}`
+
 ### When invoked with `ALL`
 
 1. **If `--force` flag is passed**, delete all existing `.crux.mdc` files first:
@@ -160,6 +167,13 @@ This ensures compression agents always perform full recompression rather than sk
    - If `--force` was used, list files that were deleted before recompression
    - Total token savings
    - **Confidence scores** for each file (with average)
+
+6. **Clear processed files from pending-compression.json**:
+   - Read `.crux/pending-compression.json` if it exists
+   - Remove any files from the `files` array that were just processed (successfully compressed or skipped)
+   - Do NOT remove files that were not part of this compression run (preserve newly added pending files)
+   - Write the updated JSON back to the file
+   - If the `files` array is now empty, write `{"files": [], "updated": "<timestamp>"}`
 
 ## Eligibility Criteria
 

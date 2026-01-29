@@ -381,7 +381,7 @@ STANDARD_BLOCKS:
 │  │   ├── rules/_CRUX-RULE.mdc    Always-applied rule          │
 │  │   ├── agents/crux-cursor-rule-manager.md                   │
 │  │   ├── commands/crux-compress.md                            │
-│  │   └── hooks/detect-crux-changes.sh                         │
+│  │   └── hooks/crux-detect-changes.sh                         │
 │  └── .crux/crux.json                                           │
 │                                                                 │
 │  Then:                                                          │

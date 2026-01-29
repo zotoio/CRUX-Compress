@@ -107,7 +107,7 @@ teardown() {
     assert_output_contains ".cursor/commands/crux-compress.md"
 }
 
-@test "create-crux-zip.sh zip contains detect-crux-changes.sh" {
+@test "create-crux-zip.sh zip contains crux-detect-changes.sh" {
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
     
@@ -115,7 +115,7 @@ teardown() {
     zip_file=$(ls "$TEST_TEMP_DIR"/CRUX-Compress-v*.zip)
     
     run unzip -l "$zip_file"
-    assert_output_contains ".cursor/hooks/detect-crux-changes.sh"
+    assert_output_contains ".cursor/hooks/crux-detect-changes.sh"
 }
 
 @test "create-crux-zip.sh zip contains _CRUX-RULE.mdc" {
@@ -183,8 +183,8 @@ teardown() {
 }
 
 @test "create-crux-zip.sh zip contains release manifest if it exists" {
-    # Create the manifest file if it doesn't exist
-    if [[ -f "$PROJECT_ROOT/scripts/crux-release-files.json" ]]; then
+    # Check if manifest file exists at new location
+    if [[ -f "$PROJECT_ROOT/.crux/crux-release-files.json" ]]; then
         run "$CREATE_ZIP" "$TEST_TEMP_DIR"
         assert_exit_code 0
         

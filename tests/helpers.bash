@@ -7,7 +7,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
 # Path to scripts under test (exported for use by test files that source this helper)
 export CRUX_UTILS="${PROJECT_ROOT}/.cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
 export CREATE_ZIP="${PROJECT_ROOT}/scripts/create-crux-zip.sh"
-export DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/detect-crux-changes.sh"
+export DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/crux-detect-changes.sh"
 export INSTALL_SCRIPT="${PROJECT_ROOT}/install.sh"
 
 # Path to test fixtures

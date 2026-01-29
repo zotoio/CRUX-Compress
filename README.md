@@ -224,7 +224,8 @@ The installer creates/updates these files in your project:
 | `.crux/crux.json`                            | Installed CRUX version   |
 | `.crux/crux-release-files.json`              | Release manifest         |
 | `.cursor/hooks.json`                         | Hook configuration       |
-| `.cursor/hooks/detect-crux-changes.sh`       | File change detection    |
+| `.cursor/hooks/crux-detect-changes.sh`       | File change detection    |
+| `.cursor/hooks/crux-session-start.sh`        | Session start hook       |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
 | `.cursor/commands/crux-compress.md`          | Compression command      |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule      |
@@ -255,7 +256,7 @@ flowchart TB
         RULE["_CRUX-RULE.mdc<br/>(Always-Applied Rule)<br/>.cursor/rules/"]
         MANAGER["crux-cursor-rule-manager.md<br/>(Subagent - ΣCRUX)<br/>.cursor/agents/"]
         COMMAND["crux-compress.md<br/>(Cursor Command)<br/>.cursor/commands/"]
-        HOOK["detect-crux-changes.sh<br/>(File Edit Hook)<br/>.cursor/hooks/"]
+        HOOK["crux-detect-changes.sh<br/>(File Edit Hook)<br/>.cursor/hooks/"]
         
         AGENTS -->|"References"| CRUX
         RULE -->|"Points to spec"| CRUX
@@ -413,7 +414,7 @@ alwaysApply: true
 | Compressed (token-efficient) | `.crux.mdc` | `core-tenets.crux.mdc` |
 
 
-### 6. `detect-crux-changes.sh` - The Hook (`.cursor/hooks/`)
+### 6. `crux-detect-changes.sh` - The Hook (`.cursor/hooks/`)
 
 **Purpose**: A Cursor hook that automatically detects when source files with `crux: true` are modified and queues them for compression.
 
@@ -430,9 +431,15 @@ alwaysApply: true
 {
   "version": 1,
   "hooks": {
+    "sessionStart": [
+      {
+        "command": "bash .cursor/hooks/crux-session-start.sh",
+        "description": "Display pending CRUX compressions at session start"
+      }
+    ],
     "afterFileEdit": [
       {
-        "command": "bash .cursor/hooks/detect-crux-changes.sh",
+        "command": "bash .cursor/hooks/crux-detect-changes.sh",
         "description": "Queue modified source files for CRUX compression"
       }
     ]
@@ -443,6 +450,7 @@ alwaysApply: true
 **Benefits**:
 
 - Automatically tracks which source files need recompression
+- Displays pending compressions at session start
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
 
@@ -491,7 +499,8 @@ To use CRUX in your project, copy these files to your project root:
 | `.crux/crux.json`                            | Installed CRUX version                                                        |
 | `.crux/crux-release-files.json`              | Release manifest for backup/verification                                      |
 | `.cursor/hooks.json`                         | Hook configuration                                                            |
-| `.cursor/hooks/detect-crux-changes.sh`       | File change detection hook                                                    |
+| `.cursor/hooks/crux-detect-changes.sh`       | File change detection hook                                                    |
+| `.cursor/hooks/crux-session-start.sh`        | Session start hook                                                            |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
@@ -615,7 +624,8 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Subagent            | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor           |
 | Compress Command    | `.cursor/commands/crux-compress.md`          | Compression interface          |
 | Test Command        | `.cursor/commands/crux-test.md`              | LLM feature testing            |
-| Hook                | `.cursor/hooks/detect-crux-changes.sh`       | Auto-detect file changes       |
+| Hook                | `.cursor/hooks/crux-detect-changes.sh`       | Auto-detect file changes       |
+| Session Hook        | `.cursor/hooks/crux-session-start.sh`        | Show pending compressions      |
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
 | Utility Skill       | `.cursor/skills/CRUX-Utils/`                 | Token estimation, checksums    |
 | Install Script      | `install.sh`                                 | Curl-pipe-bash installer       |
@@ -737,7 +747,7 @@ The script checks all shell files including `install.sh`, `scripts/create-crux-z
 | ---------------------------- | ----------------------- | ------------------------------------------------- |
 | `crux-utils.sh`              | `test_crux_utils.bats`  | Token counting, checksums, ratios, error handling |
 | `scripts/create-crux-zip.sh` | `test_create_zip.bats`  | Zip contents, version embedding, structure        |
-| `detect-crux-changes.sh`     | `test_detect_hook.bats` | Frontmatter detection, queue management           |
+| `crux-detect-changes.sh`     | `test_detect_hook.bats` | Frontmatter detection, queue management           |
 | `install.sh`                 | `test_install.bats`     | Syntax validation, options, functions             |
 
 
@@ -790,7 +800,7 @@ Version bumping follows conventional commits:
 1. Push commits to `main` with conventional commit messages
 2. `version-bump.yml` analyzes commits and updates `.crux/crux.json`
 3. `release.yml` detects version change and:
-  - Generates checksums and updates `scripts/crux-release-files.json` manifest
+  - Generates checksums and updates `.crux/crux-release-files.json` manifest
   - Builds versioned zip via `scripts/create-crux-zip.sh`
   - Creates GitHub Release with tag `vX.X.X`
   - Attaches zip as release artifact

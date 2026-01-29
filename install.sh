@@ -322,7 +322,8 @@ create_backup_zip() {
         ".cursor/hooks.json"
         ".cursor/agents/crux-cursor-rule-manager.md"
         ".cursor/commands/crux-compress.md"
-        ".cursor/hooks/detect-crux-changes.sh"
+        ".cursor/hooks/crux-detect-changes.sh"
+        ".cursor/hooks/crux-session-start.sh"
         ".cursor/rules/_CRUX-RULE.mdc"
         ".cursor/skills/CRUX-Utils/SKILL.md"
         ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
@@ -485,6 +486,67 @@ upsert_agents_crux_block() {
     log_verbose "Removed AGENTS.crux.md"
 }
 
+# Merge CRUX hooks into hooks.json
+# If hooks.json doesn't exist, create it
+# If it exists, upsert CRUX hooks into each array (avoiding duplicates)
+merge_hooks_json() {
+    local staging_hooks="$1"
+    local target_hooks=".cursor/hooks.json"
+    
+    if [[ ! -f "$staging_hooks" ]]; then
+        log_warn "No hooks.json in staging, skipping hooks merge"
+        return
+    fi
+    
+    mkdir -p .cursor
+    
+    if [[ ! -f "$target_hooks" ]]; then
+        # No existing hooks.json - just copy the new one
+        cp "$staging_hooks" "$target_hooks"
+        log_success "Created $target_hooks"
+        return
+    fi
+    
+    # Existing hooks.json found - need to merge
+    log_verbose "Merging CRUX hooks into existing $target_hooks..."
+    
+    if command -v jq &>/dev/null; then
+        # Use jq for proper JSON merging
+        local temp_file
+        temp_file=$(mktemp)
+        
+        # Merge each hook array, avoiding duplicates based on command
+        jq -s '
+            # Define a function to merge hook arrays by command (avoiding duplicates)
+            def merge_hooks(existing; new):
+                (existing // []) + [new[] | select(. as $n | (existing // []) | all(.command != $n.command))];
+            
+            # $existing is .[0], $new is .[1]
+            .[0] as $existing | .[1] as $new |
+            
+            # Start with existing, update hooks
+            $existing | .hooks = {
+                "sessionStart": merge_hooks($existing.hooks.sessionStart; $new.hooks.sessionStart),
+                "afterFileEdit": merge_hooks($existing.hooks.afterFileEdit; $new.hooks.afterFileEdit),
+                "stop": merge_hooks($existing.hooks.stop; $new.hooks.stop)
+            }
+        ' "$target_hooks" "$staging_hooks" > "$temp_file"
+        
+        if [[ -s "$temp_file" ]]; then
+            mv "$temp_file" "$target_hooks"
+            log_success "Merged CRUX hooks into $target_hooks"
+        else
+            rm -f "$temp_file"
+            log_warn "Failed to merge hooks.json with jq, copying fresh"
+            cp "$staging_hooks" "$target_hooks"
+        fi
+    else
+        # Fallback without jq - just copy (user will need to manually merge)
+        log_warn "jq not available - overwriting hooks.json (manual merge may be needed)"
+        cp "$staging_hooks" "$target_hooks"
+    fi
+}
+
 # Download and stage the release (without installing)
 download_and_stage() {
     local version="$1"
@@ -520,12 +582,27 @@ install_from_staging() {
     
     log "Installing CRUX files..."
     
-    # Copy all files from staging to current directory
+    # Save staging hooks.json path before copying (for merge later)
+    local staging_hooks=""
+    if [[ -f "$staging_dir/.cursor/hooks.json" ]]; then
+        staging_hooks=$(mktemp)
+        cp "$staging_dir/.cursor/hooks.json" "$staging_hooks"
+    fi
+    
+    # Copy all files from staging to current directory, excluding hooks.json
     if command -v rsync &>/dev/null; then
-        rsync -a "$staging_dir/" .
+        rsync -a --exclude='.cursor/hooks.json' "$staging_dir/" .
     else
+        # Remove hooks.json from staging before copy to avoid overwrite
+        rm -f "$staging_dir/.cursor/hooks.json" 2>/dev/null || true
         cp -r "$staging_dir/"* . 2>/dev/null || true
         cp -r "$staging_dir/".* . 2>/dev/null || true
+    fi
+    
+    # Merge CRUX hooks into hooks.json (upsert, preserving user hooks)
+    if [[ -n "$staging_hooks" && -f "$staging_hooks" ]]; then
+        merge_hooks_json "$staging_hooks"
+        rm -f "$staging_hooks"
     fi
     
     # Upsert CRUX block into AGENTS.md and remove AGENTS.crux.md
@@ -534,7 +611,8 @@ install_from_staging() {
     fi
     
     # Make scripts executable
-    chmod +x .cursor/hooks/detect-crux-changes.sh 2>/dev/null || true
+    chmod +x .cursor/hooks/crux-detect-changes.sh 2>/dev/null || true
+    chmod +x .cursor/hooks/crux-session-start.sh 2>/dev/null || true
     chmod +x .cursor/skills/CRUX-Utils/scripts/crux-utils.sh 2>/dev/null || true
 }
 
@@ -569,7 +647,8 @@ show_completion_report() {
         echo -e "  ${CYAN}# Remove installed CRUX files${NC}"
         echo "  rm -rf .crux .cursor/agents/crux-cursor-rule-manager.md \\"
         echo "         .cursor/commands/crux-compress.md \\"
-        echo "         .cursor/hooks/detect-crux-changes.sh \\"
+        echo "         .cursor/hooks/crux-detect-changes.sh \\"
+        echo "         .cursor/hooks/crux-session-start.sh \\"
         echo "         .cursor/rules/_CRUX-RULE.mdc \\"
         echo "         .cursor/skills/CRUX-Utils CRUX.md"
         echo ""

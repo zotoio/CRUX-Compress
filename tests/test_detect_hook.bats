@@ -8,17 +8,18 @@ setup() {
     # Create a mock project structure
     mkdir -p "$TEST_TEMP_DIR/.cursor/rules"
     mkdir -p "$TEST_TEMP_DIR/.cursor/hooks"
+    mkdir -p "$TEST_TEMP_DIR/.crux"
     
     # Copy the hook script
     cp "$DETECT_HOOK" "$TEST_TEMP_DIR/.cursor/hooks/"
-    chmod +x "$TEST_TEMP_DIR/.cursor/hooks/detect-crux-changes.sh"
+    chmod +x "$TEST_TEMP_DIR/.cursor/hooks/crux-detect-changes.sh"
 }
 
 teardown() {
     cleanup_temp_dir
 }
 
-@test "detect-crux-changes.sh exists and is executable" {
+@test "crux-detect-changes.sh exists and is executable" {
     assert_file_exists "$DETECT_HOOK"
     [[ -x "$DETECT_HOOK" ]] || chmod +x "$DETECT_HOOK"
 }
@@ -36,13 +37,13 @@ EOF
     cd "$TEST_TEMP_DIR"
     
     # Simulate the hook being called with JSON input
-    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Check that the file was queued
-    assert_file_exists "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
     
     # Verify the file is in the queue
-    run cat "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    run cat "$TEST_TEMP_DIR/.crux/pending-compression.json"
     assert_output_contains ".cursor/rules/test-rule.md"
 }
 
@@ -59,10 +60,10 @@ EOF
     cd "$TEST_TEMP_DIR"
     
     # Simulate the hook being called
-    echo '{"file_path": ".cursor/rules/no-crux.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/no-crux.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Check that no pending file was created
-    assert_file_not_exists "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
 
 @test "hook ignores .crux.mdc files" {
@@ -79,10 +80,10 @@ EOF
     cd "$TEST_TEMP_DIR"
     
     # Simulate the hook being called
-    echo '{"file_path": ".cursor/rules/test.crux.mdc"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/test.crux.mdc"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Check that no pending file was created
-    assert_file_not_exists "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
 
 @test "hook ignores files outside .cursor/rules" {
@@ -99,10 +100,10 @@ EOF
     cd "$TEST_TEMP_DIR"
     
     # Simulate the hook being called
-    echo '{"file_path": "docs/test.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": "docs/test.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Check that no pending file was created
-    assert_file_not_exists "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
 
 @test "hook avoids duplicate entries in queue" {
@@ -118,12 +119,12 @@ EOF
     cd "$TEST_TEMP_DIR"
     
     # Call the hook twice for the same file
-    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/detect-crux-changes.sh
-    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Count occurrences of the file path
     local count
-    count=$(grep -o 'test-rule.md' "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json" | wc -l)
+    count=$(grep -o 'test-rule.md' "$TEST_TEMP_DIR/.crux/pending-compression.json" | wc -l)
     
     [[ "$count" -eq 1 ]]
 }
@@ -140,10 +141,10 @@ EOF
     
     cd "$TEST_TEMP_DIR"
     
-    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/test-rule.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
     # Validate JSON with jq
-    run jq '.' "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    run jq '.' "$TEST_TEMP_DIR/.crux/pending-compression.json"
     assert_exit_code 0
 }
 
@@ -159,7 +160,7 @@ EOF
     
     cd "$TEST_TEMP_DIR"
     
-    echo '{"file_path": ".cursor/rules/spaced.md"}' | bash .cursor/hooks/detect-crux-changes.sh
+    echo '{"file_path": ".cursor/rules/spaced.md"}' | bash .cursor/hooks/crux-detect-changes.sh
     
-    assert_file_exists "$TEST_TEMP_DIR/.cursor/hooks/pending-crux-compress.json"
+    assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }

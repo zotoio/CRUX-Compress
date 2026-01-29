@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-28 15:42
-sourceChecksum: "2179275645"
+generated: 2026-01-30 14:32
+sourceChecksum: 2179275645
 beforeTokens: 480
-afterTokens: 345
-confidence: 96%
+afterTokens: 307
+confidence: 95%
 alwaysApply: true
 description: A test rule for compress command testing
 ---
@@ -15,49 +15,34 @@ description: A test rule for compress command testing
 
 ```crux
 ⟦CRUX:compress-test.md
-Ρ{test coding standards+best practices for test suite}
-Κ{test=BATS test; fx=fixture; tmp=$BATS_TMPDIR}
-
+Ρ{test coding standards for BATS suite}
+Κ{fx=fixture; tmp=$BATS_TMPDIR}
 R.naming{
   unit=test_*.bats; fx=*.md|*.mdc; helper=helpers.bash
 }
-
-R.structure{
-  setup()→init env; teardown()→cleanup tmp
-  ¬leave artifacts!; use tmp for temp files
+R.struct{
+  setup()→init env!; teardown()→clean tmp!
+  ¬artifacts in workdir; use tmp for temp files
 }
-
-R.assertions{
-  assert_success←cmd.ok; assert_failure←cmd.fail
-  assert_output --partial←substr; assert_line←specific lines
+R.assert{
+  assert_success→cmd pass; assert_failure→cmd fail
+  assert_output --partial→substr match
+  assert_line→check specific ln
 }
-
-E.⊤{
-  @test "fn handles empty input" {
-    run my_function ""
-    assert_failure
-    assert_output --partial "Error: empty input"
-  }
+E.patterns{
+  ⊤:@test "fn handles X" {run fn "";assert_failure;assert_output --partial "Error:"}
+  ⊥:@test "test" {fn ""} #no run|assert→avoid!
 }
-
-E.⊥{
-  @test "test something" {
-    my_function ""  # No run, no assertions
-  }
-}
-
-Λ.apply{+new BATS tests; review test PRs; debug failures}
-
+Λ.apply{+BATS tests; review test PRs; debug fails}
 P.critical{
-  ¬skip run before assert!
-  ∀teardown→cleanup tmp!
-  test.name=descriptive!
-  ¬hardcoded paths→use vars!
+  ⊛¬skip `run` before assert!
+  ⊛teardown clean tmp!
+  ⊛descriptive test names!
+  ¬hardcoded paths→use vars
 }
-
-Γ.fail{
-  $output→err msgs; $status→exit code
-  $lines→line-by-line; set -x→debug
+R.err{
+  fail→check $output+$status+$lines
+  debug→set -x temp
 }
 ⟧
 ```

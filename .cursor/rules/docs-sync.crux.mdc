@@ -1,9 +1,9 @@
 ---
-generated: 2026-01-28 15:42
-sourceChecksum: 3062732295
-beforeTokens: 389
-afterTokens: 265
-confidence: 96% 
+generated: 2026-01-30 00:15
+sourceChecksum: 3474841693
+beforeTokens: 468
+afterTokens: 316
+confidence: 98%
 alwaysApply: true
 crux: true
 ---
@@ -18,32 +18,38 @@ crux: true
 Ρ{doc sync rule}
 Κ{doc=documentation}
 E.docs{
-  README.md←install|usage|feature Δ
-  CONTRIBUTORS.md←CI/CD|testing|contrib Δ
+ README.md←install|usage|feature Δ
+ CONTRIBUTORS.md←CI/CD|testing|contrib Δ
+ web/compress.md/←landing|examples|feature highlights
 }
 Γ.README{
-  install.sh→upd install
-  CRUX.md→upd spec+examples
-  .cursor/commands/*→upd cmd usage
-  .cursor/skills/*/SKILL.md→upd skill desc
+ install.sh→upd install
+ CRUX.md→upd spec+examples
+ .cursor/commands/*→upd cmd usage
+ .cursor/skills/*/SKILL.md→upd skill desc
 }
 Γ.CONTRIBUTORS{
-  .github/workflows/*.yml→upd CI/CD flow+desc
-  tests/*.bats→upd test struct|run
-  scripts/*.sh→upd dev setup
-  tests/helpers.bash→upd test helper doc
+ .github/workflows/*.yml→upd CI/CD flow+desc
+ tests/*.bats→upd test struct|run
+ scripts/*.sh→upd dev setup
+ tests/helpers.bash→upd test helper doc
+}
+Γ.web{
+ CRUX.md→upd spec examples on landing
+ +feature→upd feature highlights
+ .cursor/agents/*→upd agent/tooling desc
 }
 R.upd{
-  surgical; ¬rewrite
-  format=consistent
-  upd ver+paths+examples
-  +workflow|test→+tables/lists
-  CI/CD flow diagram=accurate
+ surgical; ¬rewrite
+ format=consistent
+ upd ver+paths+examples
+ +workflow|test→+tables/lists
+ CI/CD flow diagram=accurate
 }
 P.skip{
-  .cursor/rules/example/*
-  temp|gen files
-  ¬spec features→doc existing only
+ .cursor/rules/example/*
+ temp|gen files
+ ¬spec features→doc existing only
 }
 ⟧
 ```

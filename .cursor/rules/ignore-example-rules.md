@@ -20,4 +20,6 @@ Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow
 
 ## Why This Matters
 
-The example rules contain generic coding standards (naming conventions, testing requirements, etc.) that are meant to demonstrate compression capabilities. Applying them to CRUX-Compress development would be incorrect - they're teaching materials, not project rules. 
+The example rules contain generic coding standards (naming conventions, testing requirements, etc.) that are meant to demonstrate compression capabilities. Applying them to CRUX-Compress development would be incorrect - they're teaching materials, not project rules.
+
+

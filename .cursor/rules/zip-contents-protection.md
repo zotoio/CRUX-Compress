@@ -45,7 +45,8 @@ AGENTS.crux.md (extracted from AGENTS.md)
 .cursor/hooks.json
 .cursor/agents/crux-cursor-rule-manager.md
 .cursor/commands/crux-compress.md
-.cursor/hooks/detect-crux-changes.sh
+.cursor/hooks/crux-detect-changes.sh
+.cursor/hooks/crux-session-start.sh
 .cursor/rules/_CRUX-RULE.mdc
 .cursor/skills/CRUX-Utils/SKILL.md
 .cursor/skills/CRUX-Utils/scripts/crux-utils.sh
