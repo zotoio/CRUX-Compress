@@ -242,12 +242,14 @@ Push to main
 │  ├─ Check if release-relevant files changed                     │
 │  │   (skips if only docs, tests, or non-release files changed) │
 │  ├─ Analyze commit message for bump type (feat→minor, fix→patch)│
-│  └─ Update VERSION and CRUX.md, commit with [skip ci]           │
+│  └─ Update .crux/crux.json and CRUX.md, commit with [skip ci]   │
 └────────────────────────────┬────────────────────────────────────┘
-                             │ VERSION changed
+                             │ Version changed
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  Release Workflow (.github/workflows/release.yml)               │
+│  ├─ Generate checksums for release files                        │
+│  ├─ Update scripts/crux-release-files.json manifest             │
 │  ├─ Build distribution zip (CRUX-Compress-vX.Y.Z.zip)           │
 │  ├─ Create GitHub Release with tag vX.Y.Z                       │
 │  ├─ Generate release notes from commits                         │
@@ -263,6 +265,8 @@ Version bumps only occur when these files change (matches distribution zip conte
 |-----------|-------------|
 | `CRUX.md` | Core specification |
 | `AGENTS.md` | Agent awareness block |
+| `.crux/crux.json` | Version metadata |
+| `.crux/crux-release-files.json` | Release manifest with checksums |
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Subagent definition |
 | `.cursor/commands/crux-compress.md` | Command definition |

@@ -382,7 +382,7 @@ STANDARD_BLOCKS:
 │  │   ├── agents/crux-cursor-rule-manager.md                   │
 │  │   ├── commands/crux-compress.md                            │
 │  │   └── hooks/detect-crux-changes.sh                         │
-│  └── VERSION                                                   │
+│  └── .crux/crux.json                                           │
 │                                                                 │
 │  Then:                                                          │
 │  1. Add `crux: true` to any rule file's frontmatter            │

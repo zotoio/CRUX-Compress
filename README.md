@@ -221,7 +221,8 @@ The installer creates/updates these files in your project:
 | -------------------------------------------- | ------------------------ |
 | `CRUX.md`                                    | Specification (READONLY) |
 | `AGENTS.md`                                  | Agent awareness notice   |
-| `VERSION`                                    | Installed CRUX version   |
+| `.crux/crux.json`                            | Installed CRUX version   |
+| `.crux/crux-release-files.json`              | Release manifest         |
 | `.cursor/hooks.json`                         | Hook configuration       |
 | `.cursor/hooks/detect-crux-changes.sh`       | File change detection    |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
@@ -487,6 +488,8 @@ To use CRUX in your project, copy these files to your project root:
 | -------------------------------------------- | ----------------------------------------------------------------------------- |
 | `CRUX.md`                                    | Specification (READONLY)                                                      |
 | `AGENTS.md`                                  | Agent awareness notice (or add the `<CRUX>` block to your existing AGENTS.md) |
+| `.crux/crux.json`                            | Installed CRUX version                                                        |
+| `.crux/crux-release-files.json`              | Release manifest for backup/verification                                      |
 | `.cursor/hooks.json`                         | Hook configuration                                                            |
 | `.cursor/hooks/detect-crux-changes.sh`       | File change detection hook                                                    |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
@@ -606,6 +609,8 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | ------------------- | -------------------------------------------- | ------------------------------ |
 | Specification       | `CRUX.md`                                    | Defines notation syntax        |
 | Agent Notice        | `AGENTS.md` (CRUX block)                     | High-visibility awareness      |
+| Version Metadata    | `.crux/crux.json`                            | Installed CRUX version         |
+| Release Manifest    | `.crux/crux-release-files.json`              | File checksums for backup      |
 | Always-Applied Rule | `.cursor/rules/_CRUX-RULE.mdc`               | Runtime instructions           |
 | Subagent            | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor           |
 | Compress Command    | `.cursor/commands/crux-compress.md`          | Compression interface          |
@@ -764,7 +769,7 @@ CRUX Compress uses GitHub Actions for automated testing and releases.
 | ------------------ | -------------- | ------------------------------------------------ |
 | `test.yml`         | PR, Push       | Runs BATS tests, validates zip, checks scripts   |
 | `version-bump.yml` | Push to main   | Auto-bumps version based on conventional commits |
-| `release.yml`      | VERSION change | Creates GitHub Release with zip artifact         |
+| `release.yml`      | Version change | Creates GitHub Release with zip artifact         |
 
 
 ### Conventional Commits
@@ -783,8 +788,9 @@ Version bumping follows conventional commits:
 ### Release Process
 
 1. Push commits to `main` with conventional commit messages
-2. `version-bump.yml` analyzes commits and updates `VERSION`
+2. `version-bump.yml` analyzes commits and updates `.crux/crux.json`
 3. `release.yml` detects version change and:
+  - Generates checksums and updates `scripts/crux-release-files.json` manifest
   - Builds versioned zip via `scripts/create-crux-zip.sh`
   - Creates GitHub Release with tag `vX.X.X`
   - Attaches zip as release artifact

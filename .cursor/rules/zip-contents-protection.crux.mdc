@@ -33,7 +33,7 @@ P.only{Δ zip when user says:
   4.warn: +file→ver bump}
 
 M.zip{
-  CRUX.md;VERSION;AGENTS.crux.md←AGENTS.md;
+  CRUX.md;.crux/crux.json;AGENTS.crux.md←AGENTS.md;
   .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
     commands/crux-compress.md,hooks/detect-crux-changes.sh,
     rules/_CRUX-RULE.mdc,skills/CRUX-Utils/[SKILL.md,scripts/crux-utils.sh]]}

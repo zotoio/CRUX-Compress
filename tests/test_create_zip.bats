@@ -63,7 +63,7 @@ teardown() {
     assert_output_contains "</CRUX>"
 }
 
-@test "create-crux-zip.sh zip contains VERSION" {
+@test "create-crux-zip.sh zip contains .crux/crux.json" {
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
     
@@ -71,7 +71,7 @@ teardown() {
     zip_file=$(ls "$TEST_TEMP_DIR"/CRUX-Compress-v*.zip)
     
     run unzip -l "$zip_file"
-    assert_output_contains "VERSION"
+    assert_output_contains ".crux/crux.json"
 }
 
 @test "create-crux-zip.sh zip contains .cursor/hooks.json" {
@@ -141,9 +141,13 @@ teardown() {
     assert_output_contains ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
 }
 
-@test "create-crux-zip.sh version in filename matches VERSION" {
+@test "create-crux-zip.sh version in filename matches .crux/crux.json" {
     local expected_version
-    expected_version=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
+    if command -v jq &> /dev/null; then
+        expected_version=$(jq -r '.version' "$PROJECT_ROOT/.crux/crux.json")
+    else
+        expected_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$PROJECT_ROOT/.crux/crux.json" | sed 's/.*"\([^"]*\)"$/\1/')
+    fi
     
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
@@ -151,9 +155,13 @@ teardown() {
     assert_file_exists "$TEST_TEMP_DIR/CRUX-Compress-v${expected_version}.zip"
 }
 
-@test "create-crux-zip.sh extracted VERSION matches source" {
+@test "create-crux-zip.sh extracted .crux/crux.json version matches source" {
     local expected_version
-    expected_version=$(cat "$PROJECT_ROOT/VERSION" | tr -d '[:space:]')
+    if command -v jq &> /dev/null; then
+        expected_version=$(jq -r '.version' "$PROJECT_ROOT/.crux/crux.json")
+    else
+        expected_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$PROJECT_ROOT/.crux/crux.json" | sed 's/.*"\([^"]*\)"$/\1/')
+    fi
     
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
@@ -165,7 +173,27 @@ teardown() {
     unzip -q "$zip_file" -d "$TEST_TEMP_DIR/extracted"
     
     local extracted_version
-    extracted_version=$(cat "$TEST_TEMP_DIR/extracted/VERSION" | tr -d '[:space:]')
+    if command -v jq &> /dev/null; then
+        extracted_version=$(jq -r '.version' "$TEST_TEMP_DIR/extracted/.crux/crux.json")
+    else
+        extracted_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$TEST_TEMP_DIR/extracted/.crux/crux.json" | sed 's/.*"\([^"]*\)"$/\1/')
+    fi
     
     [[ "$extracted_version" == "$expected_version" ]]
+}
+
+@test "create-crux-zip.sh zip contains release manifest if it exists" {
+    # Create the manifest file if it doesn't exist
+    if [[ -f "$PROJECT_ROOT/scripts/crux-release-files.json" ]]; then
+        run "$CREATE_ZIP" "$TEST_TEMP_DIR"
+        assert_exit_code 0
+        
+        local zip_file
+        zip_file=$(ls "$TEST_TEMP_DIR"/CRUX-Compress-v*.zip)
+        
+        run unzip -l "$zip_file"
+        assert_output_contains ".crux/crux-release-files.json"
+    else
+        skip "Release manifest file does not exist"
+    fi
 }

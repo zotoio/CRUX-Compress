@@ -87,7 +87,7 @@ crux: true
       .cursor/agents/crux-cursor-rule-manager.md
       .cursor/commands/crux-compress.md
       .cursor/hooks/detect-crux-changes.sh
-      VERSION}
+      .crux/crux.json}
     usage{1.+`crux:true` to frontmatter; 2.run `/crux-compress ALL`; 3."Watch ctx breathe"}
     links=["View on GitHub→","Read Full Docs→","Report Issue→"]}
 

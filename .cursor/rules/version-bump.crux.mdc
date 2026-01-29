@@ -23,8 +23,8 @@ R.commit_type{
   BREAKING CHANGE:|!→M
 }
 Λ.apply{
-  ⊲commit→analyze msg type»bump VERSION before stage
-  VERSION+other Δ→single commit
+  ⊲commit→analyze msg type»bump .crux/crux.json before stage
+  .crux/crux.json+other Δ→single commit
 }
 P{
   1bump/commit→use highest impact type
