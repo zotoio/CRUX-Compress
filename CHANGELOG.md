@@ -5,6 +5,12 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.4.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.4.1) - 2026-01-29
+
+- chore: update release manifest for v2.4.1 [skip ci] (804c107)
+- fix: handle multi-line CRUX block in AGENTS.md upsert (6434d4a)
+- docs: update CHANGELOG.md for v2.4.0 [skip ci] (ff64662)
+
 ## [v2.4.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.4.0) - 2026-01-29
 
 - chore: update release manifest for v2.4.0 [skip ci] (cbaefc0)
