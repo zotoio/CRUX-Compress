@@ -32,6 +32,7 @@ env:
   RELEASE_PATHS: |
     CRUX.md
     AGENTS.md
+    install.sh
     .cursor/hooks.json
     .cursor/agents/crux-cursor-rule-manager.md
     .cursor/commands/crux-compress.md
