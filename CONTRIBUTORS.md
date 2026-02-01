@@ -1,5 +1,8 @@
 # Contributing to CRUX Compress
 
+![CRUX CI/CD and Hooks](crux-cicd-and-hooks.png)
+
+
 Thank you for your interest in contributing to CRUX Compress! This document provides guidelines and information for contributors.
 
 ## Table of Contents
@@ -11,6 +14,7 @@ Thank you for your interest in contributing to CRUX Compress! This document prov
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
 - [Reporting Issues](#reporting-issues)
+- [Release Process](#release-process)
 
 ## Code of Conduct
 

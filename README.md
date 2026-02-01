@@ -1,6 +1,31 @@
 # ΣCRUX Compress
 
+![CRUX Overview](crux-overview.png)
+
 **Repository**: [github.com/zotoio/CRUX-Compress](https://github.com/zotoio/CRUX-Compress)
+
+## Table of Contents
+
+- [The Problem](#the-problem)
+- [The Approach](#the-approach)
+- [Demonstration](#demonstration)
+- [Etymology](#etymology)
+- [Quick Install](#quick-install)
+  - [Install Options](#install-options)
+  - [What Gets Installed](#what-gets-installed)
+  - [Upgrading](#upgrading)
+- [How They Work Together](#how-they-work-together)
+  - [Compression Flow](#compression-flow)
+- [Installation in Another Project](#installation-in-another-project)
+- [CRUX Components](#crux-components)
+  - [1. The Specification (`CRUX.md`)](#1-the-specification-cruxmd)
+  - [2. Agent Awareness (`AGENTS.md`)](#2-agent-awareness-agentsmd)
+  - [3. `crux-cursor-rule-manager` - The Subagent](#3-crux-cursor-rule-manager---the-subagent)
+  - [4. `/crux-compress` - The Command](#4-crux-compress---the-command)
+  - [5. `crux-session-start.sh` - The Hook](#5-crux-session-startsh---the-hook)
+  - [6. `crux-detect-changes.sh` - The Hook](#6-crux-detect-changessh---the-hook)
+  - [7. `CRUX-Utils` - The Skill](#7-crux-utils---the-skill)
+
 
 ## The Problem
 
@@ -488,8 +513,7 @@ alwaysApply: true
 See `.cursor/skills/CRUX-Utils/SKILL.md` for detailed usage.
 
 ## Installation in Another Project
-
-To use CRUX in your project, copy these files to your project root:
+To use CRUX in your project, see [Quick Install](#quick-install).
 
 
 | File                                         | Purpose                                                                       |
