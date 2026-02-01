@@ -37,6 +37,8 @@ Users want to manage their rules in readable, natural language markdown. But LLM
 
 CRUX extracts the essential meaning from natural language markdown rules and compresses it into a logic-based Domain Specific Language (DSL) that all LLMs understand without additional instructions.
 
+> CRUX compression works for more than just rules, but this is the current focus.
+
 **How it works:**
 
 1. **You write rules in natural language markdown** — readable, maintainable, version-controllable
