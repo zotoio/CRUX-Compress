@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/compress.md/**'
+  # Triggered after Release workflow completes successfully
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+    branches: [main]
+  # Manual trigger
+  workflow_dispatch:
+
+# Sets permissions for GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skip runs queued between in-progress and latest
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run if Release workflow succeeded, direct push to web/, or manual trigger
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      github.event_name == 'push' ||
+      github.event.workflow_run.conclusion == 'success'
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the web/compress.md directory as the site root
+          path: 'web/compress.md'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "## Pages Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
