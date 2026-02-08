@@ -5,6 +5,13 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.6.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.6.0) - 2026-02-08
+
+- chore: update release manifest for v2.6.0 [skip ci] (996da56)
+- chore: sync CRUX.md version to 2.6.0 [skip ci] (d2e60f1)
+- feat: enhance landing page with real rule compression example and section linking (cbfaae7)
+- docs: update CHANGELOG.md for v2.5.0 [skip ci] (08dfedd)
+
 ## [v2.5.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.5.0) - 2026-02-08
 
 - chore: update release manifest for v2.5.0 [skip ci] (683d4fb)
