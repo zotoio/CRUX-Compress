@@ -127,31 +127,18 @@ All errors must be:
       
       <div class="compression-demo" id="compression-demo">
         <div class="demo-panel demo-panel--before">
-          <div class="demo-panel-header">
-            <span class="demo-panel-title">BEFORE</span>
-            <span class="demo-panel-tokens" id="demo-before-tokens">625 tokens</span>
+          <div class="demo-panel-header demo-panel-header--tabbed">
+            <div class="demo-panel-tabs">
+              <button class="demo-tab demo-tab--active" data-target="original">ORIGINAL</button>
+              <button class="demo-tab" data-target="decompressed">DECOMPRESSED</button>
+            </div>
+            <span class="demo-panel-tokens" id="demo-source-tokens">873 lines &middot; ~6,278 tokens</span>
           </div>
-          <div class="demo-panel-content">
-            <pre><code id="demo-before-code"># Team Development Standards
-
-## Style Rules
-
-### Indentation & Formatting
-* Use **2 spaces** for all indentation throughout the codebase
-* **Never use tabs!** This is enforced by our linting rules
-* Lines must not exceed **100 characters** in length
-
-### Naming Conventions
-| Element | Convention | Example |
-|---------|------------|---------|
-| Functions | camelCase | fetchUserData |
-| Classes | PascalCase | DataProcessor |
-| Constants | UPPER_SNAKE | MAX_CONNECTIONS |
-
-### Documentation
-- All public functions require JSDoc comments
-- Include @param and @returns annotations
-- Document exceptions with @throws</code></pre>
+          <div class="demo-panel-content" id="demo-original-panel">
+            <pre><code id="demo-original-code" class="language-markdown" data-src="assets/rule-example/sample-rule.md.txt">Loading...</code></pre>
+          </div>
+          <div class="demo-panel-content demo-panel-content--hidden" id="demo-decompressed-panel">
+            <pre><code id="demo-decompressed-code" class="language-markdown" data-src="assets/rule-example/sample-rule-decompressed.md">Loading...</code></pre>
           </div>
         </div>
         
@@ -163,8 +150,8 @@ All errors must be:
         
         <div class="demo-panel demo-panel--after">
           <div class="demo-panel-header">
-            <span class="demo-panel-title">AFTER</span>
-            <span class="demo-panel-tokens" id="demo-after-tokens">112 tokens</span>
+            <span class="demo-panel-title">CRUX COMPRESSED</span>
+            <span class="demo-panel-tokens" id="demo-after-tokens">83 lines &middot; ~1,059 tokens</span>
           </div>
           <div class="demo-panel-content">
             <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
@@ -173,16 +160,7 @@ All errors must be:
                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
               </svg>
             </button>
-            <pre><code id="demo-after-code" class="language-crux">⟦CRUX:coding-standards.md
-Ρ{team dev standards}
-R.style{
-  indent=2sp; ¬tabs!; line≤100ch
-  naming{fn=camelCase; cls=PascalCase; const=UPPER_SNAKE}
-}
-R.docs{
-  ∀pub fn→JSDoc; +@param,@returns; exceptions→@throws
-}
-⟧</code></pre>
+            <pre><code id="demo-crux-code" class="language-crux" data-src="assets/rule-example/sample-rule.crux.md" data-extract="crux">Loading...</code></pre>
           </div>
         </div>
       </div>
@@ -191,8 +169,9 @@ R.docs{
         <div class="reduction-bar">
           <div class="reduction-bar-fill" id="reduction-bar-fill"></div>
         </div>
-        <p class="reduction-text"><strong>82% reduction</strong> — same semantic information</p>
+        <p class="reduction-text" id="demo-reduction-text"><strong>83% reduction</strong> — same semantic information</p>
       </div>
+      
     </div>
   </section>
 
@@ -1034,5 +1013,6 @@ E.lighting{
   <script src="scripts/compression-demo.js"></script>
   <script src="scripts/spec-expander.js"></script>
   <script src="scripts/code-loader.js"></script>
+  <script src="scripts/section-linker.js"></script>
 </body>
 </html>

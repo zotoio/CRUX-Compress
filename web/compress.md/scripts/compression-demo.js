@@ -67,106 +67,10 @@ class CompressionDemo {
       
       setTimeout(() => {
         this.reductionFill.style.transition = 'width 1s ease-out';
-        this.reductionFill.style.width = '82%';
+        this.reductionFill.style.width = '83%';
       }, 800);
     }
 
-    // Animate line-by-line highlighting (optional enhancement)
-    this.animateCodeLines();
-  }
-
-  animateCodeLines() {
-    const beforeCode = document.getElementById('demo-before-code');
-    const afterCode = document.getElementById('demo-after-code');
-    
-    if (!beforeCode || !afterCode) return;
-
-    // Add highlighting effect to show transformation
-    const beforeLines = beforeCode.textContent.split('\n');
-    const afterLines = afterCode.textContent.split('\n');
-
-    // Wrap lines in spans for animation (join without \n since spans are display:block)
-    beforeCode.innerHTML = beforeLines.map((line, i) => 
-      `<span class="code-line" style="animation-delay: ${i * 50}ms">${this.escapeHtml(line)}</span>`
-    ).join('');
-
-    afterCode.innerHTML = afterLines.map((line, i) => 
-      `<span class="code-line code-line--crux" style="animation-delay: ${i * 100 + 500}ms">${this.highlightCrux(line)}</span>`
-    ).join('');
-
-    // Add animation styles
-    this.addAnimationStyles();
-  }
-
-  highlightCrux(line) {
-    // Highlight CRUX symbols - avoid = and ; as they break HTML attributes
-    const symbols = ['⟦', '⟧', 'Ρ', 'Κ', 'Λ', 'Ω', '→', '←', '∀', '¬', '≻', '⊤', '⊥', '≤', '≥'];
-    const blocks = ['⟦CRUX:', '.style', '.docs'];
-    
-    let result = this.escapeHtml(line);
-    
-    // Highlight symbols first (before adding HTML that contains these chars)
-    symbols.forEach(symbol => {
-      result = result.replace(new RegExp(this.escapeRegex(symbol), 'g'), 
-        `<span class="crux-symbol">${symbol}</span>`);
-    });
-    
-    // Highlight block identifiers (these don't conflict with HTML)
-    blocks.forEach(block => {
-      const escapedBlock = this.escapeHtml(block);
-      result = result.replace(new RegExp(this.escapeRegex(escapedBlock), 'g'), 
-        `<span class="crux-block">${escapedBlock}</span>`);
-    });
-    
-    return result;
-  }
-
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  escapeRegex(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  addAnimationStyles() {
-    if (document.getElementById('compression-demo-styles')) return;
-    
-    const style = document.createElement('style');
-    style.id = 'compression-demo-styles';
-    style.textContent = `
-      .code-line {
-        display: block;
-        opacity: 0;
-        animation: fadeInLine 0.3s ease forwards;
-      }
-      
-      @keyframes fadeInLine {
-        from { opacity: 0; transform: translateX(-10px); }
-        to { opacity: 1; transform: translateX(0); }
-      }
-      
-      .code-line--crux {
-        animation-name: fadeInCruxLine;
-      }
-      
-      @keyframes fadeInCruxLine {
-        from { opacity: 0; transform: translateX(10px); }
-        to { opacity: 1; transform: translateX(0); }
-      }
-      
-      .crux-symbol {
-        color: #f0c674;
-        font-weight: 600;
-      }
-      
-      .crux-block {
-        color: #d4915a;
-      }
-    `;
-    document.head.appendChild(style);
   }
 
   setupCopyButtons() {

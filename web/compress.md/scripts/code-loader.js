@@ -212,4 +212,5 @@
 
   // Highlight and number existing inline code blocks
   highlightInlineBlocks();
+
 })();
