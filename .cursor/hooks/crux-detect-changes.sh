@@ -12,7 +12,7 @@ pending_file=".crux/pending-compression.json"
 # Function to check if a file is valid for CRUX compression
 is_valid_crux_file() {
     local file="$1"
-    # Must be under .cursor/rules/, end with .md, not be .crux.mdc or .crux.md
+    # Must be under .cursor/rules/, end with .md, not be .crux.md or .crux.mdc (outputs)
     [[ "$file" == .cursor/rules/*.md ]] && \
     [[ "$file" != *.crux.mdc ]] && \
     [[ "$file" != *.crux.md ]] && \

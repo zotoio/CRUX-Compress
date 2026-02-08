@@ -1,12 +1,12 @@
 ---
-name: crux-rule-compression-specification
-version: 2.4.1
-description: Semantic compressor for Markdown rules. Converts rules to CRUX notation achieving 5-10x token reduction while preserving all actionable information in a form LLMs understand.
+name: crux-compression-specification
+version: 2.5.0
+description: Semantic compressor for markdown, code, and images. Converts source files to CRUX notation achieving 5-10x token reduction while preserving all actionable information in a form LLMs understand.
 readonly: true
 ---
-# CRUX Rule Compression Specification v2.4.1
+# CRUX Compression Specification v2.5.0
 
-A semantic compression notation for reducing markdown rules to ≤20% of original rule file token count while preserving all actionable information.
+A semantic compression notation for reducing markdown rules, code files, and images to ≤20% of original token count while preserving all actionable information.
 
 ## Etymology
 
@@ -191,17 +191,200 @@ setting:type=default
 
 # Contains/membership
 archetype∋[rules,plugins,deps,structure]
+
+# Function signature (code compression)
+Λ.fnName{params→ReturnType; body_intent}
+
+# Error handling (code compression)
+P.err{condition→action; fallback→alternative}
+
+# Type definitions (code compression)
+E.types{TypeName{field:type; field2:type2}}
+
+# Import grouping (code compression)
+Κ{mod1,mod2,mod3; Types=@pkg/types}
+
+# IO channels (code compression)
+io{stdout→data; stderr→log; return→result}
+
+# Iteration pattern (code compression)
+∀item{condition→action; else→skip}
+
+# Visual element (image compression)
+E.name{shape:form;style:color+effect;label="text"}
+
+# Spatial layout (image compression)
+Π.layout{flow:L→R; element@position→element@position}
+
+# Visual metaphor (image compression)
+Ω.metaphor{concept(visual)→meaning; msg="takeaway"}
+```
+
+---
+
+## Image Compression
+
+CRUX can compress images by extracting their **semantic visual description** into notation. This is inherently **lossy** — it preserves meaning, not pixels.
+
+### How It Works
+
+1. An LLM with vision reads the source image
+2. The semantic content is encoded using standard CRUX blocks
+3. Output is a `.crux.md` file (not `.crux.mdc` — images are not Cursor rules)
+4. "Decompression" = feeding the `.crux.md` to an LLM with image generation
+
+### Visual Description Blocks
+
+Use standard blocks with visual-specific semantics:
+
+| Block | Visual Purpose | Example |
+|-------|---------------|---------|
+| `Ρ{}` | Image purpose/context | `Ρ{architecture diagram; hero visual}` |
+| `Κ{}` | Visual vocabulary/key | `Κ{prism=engine; beam=data flow}` |
+| `Π.layout{}` | Spatial composition | `Π.layout{L→R flow; A@left→B@center→C@right}` |
+| `E.name{}` | Visual element | `E.input{shape:cube; style:blue+glass; label="Title"}` |
+| `Ω.metaphor{}` | Conceptual meaning | `Ω.metaphor{big→small; msg="compression"}` |
+
+### Visual Element Properties
+
+| Property | Purpose | Example |
+|----------|---------|---------|
+| `shape:` | Geometric form | `shape:cube\|diamond\|circle\|arrow` |
+| `style:` | Color, transparency, effects | `style:blue+glass;lg` or `style:golden+glow;sm` |
+| `label=` | Visible text (verbatim) | `label="Compressed CRUX Notation (20% Size)"` |
+| `∋` | Sub-elements contained | `face∋[Ρ,Λ,Π,Ω] symbols` |
+| `@` | Position in layout | `element@left\|center\|right\|top\|bottom` |
+
+### Image Quality Gates
+
+```crux
+Ω.image{
+  preserve_text    = ⊤   # All visible text/labels verbatim
+  layout_accurate  = ⊤   # Spatial relationships described
+  elements_complete = ⊤   # All visual elements enumerated
+  style_captured   = ⊤   # Colors, effects, scale noted
+  metaphor_clear   = ⊤   # Conceptual meaning articulated
+  reconstructable  = ⊤   # LLM+image gen could recreate
+}
+```
+
+**Note**: Image compression has no token ratio target. The goal is semantic fidelity — an LLM with image generation should produce a recognizably similar result from the `.crux.md` description alone.
+
+---
+
+## Code Compression
+
+CRUX can compress source code files by extracting their **semantic structure** into notation. This preserves function signatures, control flow intent, and architectural patterns while eliminating syntactic verbosity.
+
+### How It Works
+
+1. An LLM reads the source code file
+2. The semantic structure is encoded using standard CRUX blocks with code-specific mappings
+3. Output is a `.crux.md` file (not `.crux.mdc` — code files are not Cursor rules)
+4. "Decompression" = an LLM reconstructing functionally equivalent code from the `.crux.md`
+
+### Code Block Mappings
+
+Use standard blocks with code-specific semantics:
+
+| Block | Code Purpose | Example |
+|-------|-------------|---------|
+| `Λ{}` | Functions/methods | `Λ.fetchData{url,opts→Promise<Response>; retry(3)»fetch»validate}` |
+| `Γ{}` | Orchestration/main flow | `Γ.main{init»configure»run»cleanup}` |
+| `Κ{}` | Imports/dependencies | `Κ{fs,path,axios; Types=@pkg/types}` |
+| `Φ{}` | Configuration/constants | `Φ{MAX_RETRIES=3; TIMEOUT=5000; ENV=prod}` |
+| `E{}` | Types/interfaces/entities | `E{Config{host:str; port:num; tls:bool}}` |
+| `P.err{}` | Error handling patterns | `P.err{fetch→retry»throw; parse→log+default}` |
+| `M{}` | State/memory/storage | `M{cache:Map<k,v>; db:singleton}` |
+| `Ρ{}` | Module purpose/context | `Ρ{HTTP client wrapper;TS;Node}` |
+| `P.security{}` | Security patterns | `P.security{input→sanitize; path∈allowed}` |
+| `Ω.decomp{}` | Decompression guidance | `Ω.decomp{emulate=tsc --strict;src=ts;focus=[...]}` |
+
+### Code-Specific Compression Rules
+
+In addition to the general compression rules:
+
+1. **PRESERVE** function/method names verbatim — these are the API contract
+2. **PRESERVE** type signatures for public interfaces (`params→ReturnType`)
+3. **COLLAPSE** function bodies to intent chains (`parse»validate»transform→result`)
+4. **ENCODE** IO semantics explicitly — distinguish stdout vs stderr, return channels
+5. **ENCODE** error handling patterns concisely (`try→catch→retry|throw`)
+6. **GROUP** imports by source (`Κ{stdlib; external; internal}`)
+7. **ABBREVIATE** common patterns: `async/await` implied, `Promise<T>` can shorten to just `T` when obvious
+8. **GENERATE** `Ω.decomp` block with language-specific tool emulation
+
+### Code Quality Gates
+
+```crux
+Ω.code{
+  fn_names_verbatim = ⊤   # Function names preserved exactly
+  type_sigs_present = ⊤   # Public interface types included
+  io_semantics      = ⊤   # stdout/stderr/return distinguished
+  error_patterns    = ⊤   # Error handling encoded
+  control_flow      = ⊤   # Branching/loops/conditionals captured
+  decomp_block      = ⊤   # Ω.decomp present with emulate=
+  no_hallucination  = ⊤   # Only encode what's in source
+  target_ratio      ≤ 0.2 # Aim for ≤20% of original token count
+}
+```
+
+### Template (Code)
+
+```
+⟦CRUX:{filename of source code}
+Ρ{module purpose; language; framework}
+Κ{imports and dependencies}
+Φ{constants and configuration}
+E{types, interfaces, entities}
+Λ.functionName{params→ReturnType; intent}
+Γ.orchestration{flow description}
+P.err{error handling patterns}
+P.security{security patterns if applicable}
+M{state management if applicable}
+Ω.decomp{emulate=tool;src=ext;focus=[...]}
+⟧
 ```
 
 ---
 
 ## Output Format
 
-### Template
+All CRUX compression produces `*.crux.md` files — a universal, IDE-agnostic format. For Cursor IDE users, an automatic adapter step copies the `.crux.md` to `.crux.mdc` with Cursor-specific frontmatter injected (see Cursor Adapter below).
+
+### Template (Markdown)
 
 ```
 ⟦CRUX:{filename of source markdown rules}
 {blocks in logical order, one concept per line, max ~80 chars/line}
+⟧
+```
+
+### Template (Code)
+
+```
+⟦CRUX:{filename of source code file}
+Ρ{module purpose; language; framework}
+Κ{imports and dependencies}
+Φ{constants and configuration}
+E{types, interfaces, entities}
+Λ.functionName{params→ReturnType; intent}
+Γ.orchestration{flow description}
+P.err{error handling patterns}
+M{state management}
+Ω.decomp{emulate=tool;src=ext;focus=[...]}
+⟧
+```
+
+### Template (Image)
+
+```
+⟦CRUX:{filename of source image}
+Ρ{image purpose/context}
+Κ{visual vocabulary mappings}
+Π.layout{spatial composition and flow}
+E.element1{shape; style; label; contents}
+E.element2{...}
+Ω.metaphor{conceptual meaning}
 ⟧
 ```
 
@@ -210,7 +393,7 @@ archetype∋[rules,plugins,deps,structure]
 - Start immediately with `⟦CRUX:{source_file}`
 - Use single line per logical unit
 - Group related items with namespaces
-- Preserve all actionable information
+- Preserve all actionable information (text, layout, meaning for images)
 - End with `⟧`
 
 ### Don't
@@ -219,6 +402,44 @@ archetype∋[rules,plugins,deps,structure]
 - Invent information not in source
 - Use multiple lines for simple lists
 - Include redundant metadata
+
+---
+
+## Cursor Adapter
+
+CRUX compression is IDE-agnostic — all output uses the universal `.crux.md` format. For **Cursor IDE** users, a post-compression adapter step produces a `.crux.mdc` copy that Cursor recognizes as a rule file.
+
+### How It Works
+
+1. Compression always produces `[filename].crux.md` (universal)
+2. If the source file is in `.cursor/rules/` (auto-detected) or `--cursor` flag is passed:
+   - Copy `.crux.md` content to `[filename].crux.mdc`
+   - Inject `alwaysApply` and other Cursor-specific frontmatter from the source file
+3. The `.crux.mdc` is a **derived artifact** — the `.crux.md` is the source of truth
+
+### File Relationship
+
+```
+Source: .cursor/rules/my-rule.md
+    │
+    ├─→ .cursor/rules/my-rule.crux.md     (universal CRUX, no alwaysApply)
+    │
+    └─→ .cursor/rules/my-rule.crux.mdc    (Cursor adapter: + alwaysApply)
+```
+
+### When the Adapter Runs
+
+- **Automatic**: Source file is in `.cursor/rules/` directory
+- **Explicit**: `--cursor` flag passed to `/crux-compress`
+- **Skipped**: Source file is outside `.cursor/rules/` and no `--cursor` flag
+
+### Cursor-Specific Frontmatter
+
+The adapter copies these fields from the source file's frontmatter into the `.crux.mdc`:
+- `alwaysApply` (defaults to `false` if not present)
+- Any other Cursor-recognized frontmatter fields
+
+These fields are **not** included in the universal `.crux.md` output.
 
 ---
 
@@ -242,6 +463,47 @@ archetype∋[rules,plugins,deps,structure]
 - [ ] All commands reconstructable
 - [ ] No hallucinated content
 - [ ] Semantic equivalence maintained
+- [ ] `Ω.decomp` block present (code files only)
+
+### `Ω.decomp` — Decompression Guidance
+
+The `Ω.decomp` block embeds a hint for LLMs reconstructing code from CRUX notation. It instructs the decompressing LLM to mentally emulate the validation tool appropriate for the source language, catching issues that compression operates above (e.g., shell quoting semantics, type narrowing).
+
+**Syntax:**
+```crux
+Ω.decomp{emulate=<tool>;src=<ext>;focus=[<areas>]}
+```
+
+**Fields:**
+- `emulate=` — The validation tool to mentally emulate during decompression (self-documenting)
+- `src=` — Source file extension (determines language context)
+- `focus=` — Array of specific areas where compression loses fidelity
+
+**Standard Tool Mapping:**
+
+| Source Extension | `emulate=` Value | Focus Areas |
+|-----------------|-----------------|-------------|
+| `.sh`, `.bash` | `shellcheck` | quoting, word splitting, io redirection, subshell capture |
+| `.ts`, `.tsx` | `tsc --strict` | type narrowing, null checks, async/await, generics |
+| `.js`, `.jsx` | `eslint --recommended` | type coercion, scope, hoisting, prototype chain |
+| `.py` | `mypy --strict` | type hints, None checks, import resolution |
+| `.rs` | `cargo clippy` | ownership, borrowing, lifetimes, unsafe blocks |
+| `.go` | `go vet` | error handling, goroutine leaks, interface satisfaction |
+| `.java` | `spotbugs` | null safety, resource management, concurrency |
+| `.sql` | `sqlfluff` | injection, join semantics, index usage |
+| `.css`, `.scss` | `stylelint` | specificity, cascade, browser compat |
+
+**Why `emulate=` instead of `ext→tool`:**
+
+The `→` operator is ambiguous in CRUX — it could mean "run tool" or "pipe to tool." The `emulate=` keyword is self-documenting: any LLM reading `emulate=shellcheck` understands "act as this tool would" without needing the CRUX specification loaded.
+
+**Example (bash):**
+```crux
+Ω.decomp{emulate=shellcheck;src=sh;
+  focus=[io_redir(log fn→stderr via >&2),
+  quoting(word_split+glob in array assign),
+  subshell_capture(echo→stdout only;log→stderr)]}
+```
 
 ---
 
@@ -426,3 +688,62 @@ Tracking: maintain mental model of requirements (R), code state (C), and changes
 
 `Ω{¬halluc;verified only}`
 Quality: never hallucinate (¬halluc); base all suggestions on verified information only
+
+---
+
+## Image Example
+
+### Input (image)
+
+A concept diagram showing: a large translucent blue cube labeled "Bulky Documentation (Verbose English & Markdown)" on the left, with text visible on its faces. Lines converge into a central diamond/prism shape displaying CRUX symbols (Ρ, Λ, Π, Ω) and encoding symbols (→, ⊕, ∀, ¬). Labels "Automation", "Validation", "Semantic Preservation" float nearby. A golden beam exits to a small golden diamond labeled "Compressed CRUX Notation (20% Size)". Dark blue background with circuit-board traces.
+
+### Output (.crux.md file)
+
+```crux
+⟦CRUX:concept-diagram.png
+Ρ{CRUX-Compress concept diagram; marketing/hero visual}
+Κ{prism=compression engine; beam=data flow; cube=input; gem=output}
+
+Π.layout{
+ L→R flow; dark blue bg+circuit traces
+ input:cube@left→prism@center→output:gem@right
+}
+
+E.input{
+ cube:translucent blue+glass;lg
+ label="Bulky Documentation (Verbose English & Markdown)"
+ face∋visible code+markdown text ln
+}
+
+E.prism{
+ shape:diamond/crystal;white+blue glow
+ face∋[Ρ,Λ,Π,Ω] CRUX block symbols
+ base∋[→,⊕,∀,¬] encoding symbols
+ beams:input→prism=many thin white ln converging
+}
+
+E.output{
+ shape:sm golden diamond;bright glow+flare
+ label="Compressed CRUX Notation (20% Size)"
+ beam:prism→output=single golden ray
+}
+
+E.labels{
+ float@prism.right=[Automation,Validation,Semantic Preservation]
+ style=cyan+icon badges
+}
+
+Ω.metaphor{
+ verbose docs(lg)→CRUX engine(prism+symbols)→compact output(sm,20%)
+ visual=light refraction analogy; many rays→1 focused beam
+ msg="CRUX distills bulky rules to their essential meaning"
+}
+⟧
+```
+
+### Key differences from text compression
+
+- **Lossy**: Decompression produces a semantically similar but not pixel-identical image
+- **No token ratio**: Goal is semantic fidelity, not a percentage target
+- **Visual vocabulary**: Uses `shape:`, `style:`, `label=`, `@position` for spatial description
+- **Decompression**: Feed `.crux.md` to any LLM with image generation capabilities

@@ -20,6 +20,8 @@ REPO_NAME="CRUX-Compress"
 GITHUB_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
 DOWNLOAD_BASE="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download"
 RAW_BASE="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main"
+JSDELIVR_CDN="https://cdn.jsdelivr.net/gh/${REPO_OWNER}/${REPO_NAME}"
+JSDELIVR_API="https://data.jsdelivr.com/v1/packages/gh/${REPO_OWNER}/${REPO_NAME}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -198,22 +200,39 @@ confirm() {
     fi
 }
 
-# Get the latest release version from GitHub API
+# Get the latest release version from GitHub API (with jsDelivr fallback)
 get_latest_version() {
-    local version
+    local version=""
+    local api_response
     
-    if command -v jq &> /dev/null; then
-        version=$(curl -fsSL "$GITHUB_API" | jq -r '.tag_name' 2>/dev/null)
-    else
-        # Fallback: parse JSON with grep/sed
-        version=$(curl -fsSL "$GITHUB_API" | grep -o '"tag_name": *"[^"]*"' | sed 's/.*"v\?\([^"]*\)".*/\1/')
+    # Try GitHub API first
+    if api_response=$(curl -fsSL "$GITHUB_API" 2>/dev/null); then
+        if command -v jq &> /dev/null; then
+            version=$(echo "$api_response" | jq -r '.tag_name' 2>/dev/null)
+        else
+            # Fallback: parse JSON with grep/sed
+            version=$(echo "$api_response" | grep -o '"tag_name": *"[^"]*"' | sed 's/.*"v\?\([^"]*\)".*/\1/')
+        fi
+    fi
+    
+    # Fallback to jsDelivr data API if GitHub is unreachable
+    if [[ -z "$version" || "$version" == "null" ]]; then
+        log_verbose "GitHub API unavailable, trying jsDelivr..."
+        if api_response=$(curl -fsSL "$JSDELIVR_API" 2>/dev/null); then
+            if command -v jq &> /dev/null; then
+                version=$(echo "$api_response" | jq -r '.versions[0]' 2>/dev/null)
+            else
+                # Normalize JSON and extract first version from versions array
+                version=$(echo "$api_response" | tr -d '\n ' | grep -o '"versions":\["[^"]*"' | sed 's/.*\["\([^"]*\)".*/\1/')
+            fi
+        fi
     fi
     
     # Remove 'v' prefix if present
     version="${version#v}"
     
     if [[ -z "$version" || "$version" == "null" ]]; then
-        log_error "Failed to fetch latest version from GitHub"
+        log_error "Failed to fetch latest version from GitHub and jsDelivr"
         exit 1
     fi
     
@@ -584,6 +603,74 @@ merge_hooks_json() {
     fi
 }
 
+# Download release files individually from jsDelivr CDN (fallback when GitHub is blocked)
+download_from_cdn() {
+    local version="$1"
+    local target_dir="$2"
+    local cdn_base="${JSDELIVR_CDN}@v${version}"
+
+    # Files included in CRUX release (mirrors scripts/create-crux-zip.sh)
+    local release_files=(
+        "CRUX.md"
+        ".crux/crux.json"
+        ".crux/crux-release-files.json"
+        ".cursor/hooks.json"
+        ".cursor/agents/crux-cursor-rule-manager.md"
+        ".cursor/commands/crux-compress.md"
+        ".cursor/hooks/crux-detect-changes.sh"
+        ".cursor/hooks/crux-session-start.sh"
+        ".cursor/rules/_CRUX-RULE.mdc"
+        ".cursor/skills/CRUX-Utils/SKILL.md"
+        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+    )
+
+    local failed=0
+    local succeeded=0
+
+    for file in "${release_files[@]}"; do
+        local dir
+        dir=$(dirname "$file")
+        mkdir -p "$target_dir/$dir"
+
+        if curl -fsSL "${cdn_base}/${file}" -o "$target_dir/$file" 2>/dev/null; then
+            ((succeeded++))
+            log_verbose "Downloaded: $file"
+        else
+            ((failed++))
+            log_verbose "Skipped (not found): $file"
+        fi
+    done
+
+    # AGENTS.crux.md is dynamically generated from AGENTS.md in the release zip.
+    # Download AGENTS.md and extract the <CRUX> block to replicate this.
+    if curl -fsSL "${cdn_base}/AGENTS.md" -o "$target_dir/AGENTS.md.tmp" 2>/dev/null; then
+        sed -n '/<CRUX/,/<\/CRUX>/p' "$target_dir/AGENTS.md.tmp" > "$target_dir/AGENTS.crux.md"
+        rm -f "$target_dir/AGENTS.md.tmp"
+        if [[ -s "$target_dir/AGENTS.crux.md" ]]; then
+            ((succeeded++))
+            log_verbose "Extracted: AGENTS.crux.md from AGENTS.md"
+        else
+            ((failed++))
+            rm -f "$target_dir/AGENTS.crux.md"
+            log_verbose "Skipped: AGENTS.crux.md (no CRUX block found)"
+        fi
+    else
+        ((failed++))
+        log_verbose "Skipped (not found): AGENTS.md"
+    fi
+
+    if [[ $succeeded -eq 0 ]]; then
+        log_error "Failed to download any files from jsDelivr CDN"
+        rm -rf "$(dirname "$target_dir")"
+        exit 1
+    fi
+
+    log_success "Downloaded $succeeded files via jsDelivr CDN"
+    if [[ $failed -gt 0 ]]; then
+        log_warn "$failed files were not available (may be optional)"
+    fi
+}
+
 # Download and stage the release (without installing)
 download_and_stage() {
     local version="$1"
@@ -596,20 +683,21 @@ download_and_stage() {
     log "Downloading CRUX Compress v${version}..."
     log_verbose "URL: $download_url"
     
-    if ! curl -fsSL "$download_url" -o "$staging_dir/$zip_name"; then
-        log_error "Failed to download release"
-        rm -rf "$staging_dir"
-        exit 1
+    if curl -fsSL "$download_url" -o "$staging_dir/$zip_name" 2>/dev/null; then
+        # Extract to staging directory
+        if ! unzip -o -q "$staging_dir/$zip_name" -d "$staging_dir/content"; then
+            log_error "Failed to extract archive"
+            rm -rf "$staging_dir"
+            exit 1
+        fi
+        rm "$staging_dir/$zip_name"
+    else
+        # Fallback: download individual files from jsDelivr CDN
+        log_warn "GitHub download failed, trying jsDelivr CDN..."
+        mkdir -p "$staging_dir/content"
+        download_from_cdn "$version" "$staging_dir/content"
     fi
     
-    # Extract to staging directory
-    if ! unzip -o -q "$staging_dir/$zip_name" -d "$staging_dir/content"; then
-        log_error "Failed to extract archive"
-        rm -rf "$staging_dir"
-        exit 1
-    fi
-    
-    rm "$staging_dir/$zip_name"
     echo "$staging_dir/content"
 }
 
@@ -653,13 +741,18 @@ install_from_staging() {
     chmod +x .cursor/skills/CRUX-Utils/scripts/crux-utils.sh 2>/dev/null || true
 }
 
-# Download update.sh for future updates
+# Download update.sh for future updates (with jsDelivr fallback)
 download_update_script() {
     mkdir -p .crux
     log_verbose "Downloading update script..."
     if curl -fsSL "${RAW_BASE}/install.sh" -o ".crux/update.sh" 2>/dev/null; then
         chmod +x ".crux/update.sh"
         log_verbose "Update script saved to .crux/update.sh"
+    elif curl -fsSL "${JSDELIVR_CDN}@main/install.sh" -o ".crux/update.sh" 2>/dev/null; then
+        chmod +x ".crux/update.sh"
+        log_verbose "Update script saved to .crux/update.sh (via jsDelivr)"
+    else
+        log_warn "Could not download update script"
     fi
 }
 

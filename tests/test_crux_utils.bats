@@ -5,7 +5,7 @@ load 'helpers'
 setup() {
     setup_temp_dir
     create_sample_md "$TEST_TEMP_DIR/sample.md"
-    create_sample_crux "$TEST_TEMP_DIR/sample.crux.mdc"
+    create_sample_crux "$TEST_TEMP_DIR/sample.crux.md"
 }
 
 teardown() {
@@ -47,7 +47,7 @@ teardown() {
 }
 
 @test "crux-utils.sh --token-count --ratio compares two files" {
-    run "$CRUX_UTILS" --token-count --ratio "$TEST_TEMP_DIR/sample.md" "$TEST_TEMP_DIR/sample.crux.mdc"
+    run "$CRUX_UTILS" --token-count --ratio "$TEST_TEMP_DIR/sample.md" "$TEST_TEMP_DIR/sample.crux.md"
     assert_exit_code 0
     assert_output_contains "Compression Ratio Analysis"
     assert_output_contains "Compression Summary"
@@ -93,7 +93,7 @@ teardown() {
 
 @test "crux-utils.sh token count for CRUX file counts special chars" {
     # Create a file with CRUX special characters
-    cat > "$TEST_TEMP_DIR/special.crux.mdc" << 'EOF'
+    cat > "$TEST_TEMP_DIR/special.crux.md" << 'EOF'
 # Test
 ⟦CRUX:test.md
 Κ{code→clean}
@@ -102,7 +102,7 @@ R.style{indent→consistent}
 ⟧
 EOF
     
-    run "$CRUX_UTILS" --token-count "$TEST_TEMP_DIR/special.crux.mdc"
+    run "$CRUX_UTILS" --token-count "$TEST_TEMP_DIR/special.crux.md"
     assert_exit_code 0
     assert_output_contains "Special tokens"
 }

@@ -37,7 +37,7 @@ Modes:
 
 Examples:
   crux-utils.sh --token-count myfile.md
-  crux-utils.sh --token-count --ratio source.md source.crux.mdc
+  crux-utils.sh --token-count --ratio source.md source.crux.md
   crux-utils.sh --cksum myfile.md
 EOF
 }

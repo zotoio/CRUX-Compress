@@ -26,15 +26,15 @@ Execute the following tests in order:
 
 ### Pre-Test Cleanup
 
-**Purpose**: Delete existing `.crux.mdc` files so freshly generated versions can be committed.
+**Purpose**: Delete existing CRUX output files so freshly generated versions can be committed.
 
 Before running any tests, delete the following files if they exist:
-- `tests/fixtures/sample-rule.crux.mdc`
-- `tests/fixtures/compress-test.crux.mdc`
+- `tests/fixtures/sample-rule.crux.md`
+- `tests/fixtures/compress-test.crux.md`
 
 This ensures the compression tests generate fresh output that reflects the current state of the source files and can be included in commits.
 
-**Note**: Do NOT delete `tests/fixtures/no-change.crux.mdc` - it is a permanent baseline for drift detection.
+**Note**: Do NOT delete `tests/fixtures/no-change.crux.md` - it is a permanent baseline for drift detection.
 
 **Alternative**: The `--force` flag in `/crux-compress` can be used to achieve the same effect by deleting CRUX files before recompression. However, for test isolation, we delete files explicitly in this pre-test phase.
 
@@ -48,7 +48,7 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 1. Read the sample rule file at `tests/fixtures/sample-rule.md`
 2. Spawn a `crux-cursor-rule-manager` subagent to compress it
-3. Verify the output was created at `tests/fixtures/sample-rule.crux.mdc`
+3. Verify the output was created at `tests/fixtures/sample-rule.crux.md`
 4. Check the output has required frontmatter fields:
    - `generated` (timestamp)
    - `sourceChecksum` (checksum value)
@@ -63,7 +63,7 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 **Purpose**: Verify LLMs can understand CRUX notation without the specification.
 
-1. Read the compressed file `tests/fixtures/sample-rule.crux.mdc`
+1. Read the compressed file `tests/fixtures/sample-rule.crux.md`
 2. **Without reading CRUX.md**, explain what the compressed notation means
 3. List the key rules/guidelines encoded in the CRUX
 4. Compare your interpretation to the original source
@@ -125,7 +125,7 @@ This ensures the compression tests generate fresh output that reflects the curre
      ```
      Perform semantic validation on this CRUX file:
      - Source: tests/fixtures/sample-rule.md
-     - CRUX: tests/fixtures/sample-rule.crux.mdc
+     - CRUX: tests/fixtures/sample-rule.crux.md
      - DO NOT use the CRUX specification - evaluate purely on semantic understanding
      - Compare meaning and completeness between source and CRUX
      - Evaluate on these dimensions:
@@ -139,7 +139,7 @@ This ensures the compression tests generate fresh output that reflects the curre
      - Flag any issues if confidence < 80%
      ```
 2. The validation agent returns the confidence score and dimension breakdown
-3. Update the `.crux.mdc` frontmatter with `confidence: XX%` (replacing "pending")
+3. Update the `.crux.md` frontmatter with `confidence: XX%` (replacing "pending")
 4. Record: PASS/FAIL (pass if ≥80%), individual scores, overall confidence
 
 **Why Fresh Agent?** Using a separate agent instance ensures:
@@ -168,9 +168,9 @@ This ensures the compression tests generate fresh output that reflects the curre
 1. **Setup**: Verify `tests/fixtures/compress-test.md` exists (permanent test fixture with `crux: true`)
 2. **Simulate the command**: Follow the `/crux-compress` workflow:
    - Spawn a `crux-cursor-rule-manager` subagent to compress `tests/fixtures/compress-test.md`
-   - Verify output created at `tests/fixtures/compress-test.crux.mdc`
+   - Verify output created at `tests/fixtures/compress-test.crux.md`
    - Spawn a fresh validation subagent to get confidence score
-   - Update the `.crux.mdc` frontmatter with confidence
+   - Update the `.crux.md` frontmatter with confidence
 3. **Verify the complete workflow**:
    - Compression subagent created the CRUX file
    - Validation subagent returned confidence ≥80%
@@ -180,7 +180,7 @@ This ensures the compression tests generate fresh output that reflects the curre
    - Verify by checking that `generated` timestamp didn't change
 5. Record: PASS/FAIL, workflow completion status, skip-if-unchanged working
 
-**Note**: `compress-test.md` is a permanent source fixture. The `compress-test.crux.mdc` file are regenerated each test run and can be committed.
+**Note**: `compress-test.md` is a permanent source fixture. The `compress-test.crux.md` file is regenerated each test run and can be committed.
 
 ---
 
@@ -190,7 +190,7 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 1. **Setup**: Verify both files exist:
    - Source: `tests/fixtures/no-change.md` (testing standards)
-   - Baseline: `tests/fixtures/no-change.crux.mdc` (permanent CRUX baseline)
+   - Baseline: `tests/fixtures/no-change.crux.md` (permanent CRUX baseline)
 2. **Verify source unchanged**:
    - Calculate checksum of `no-change.md` using CRUX-Utils
    - Compare to `sourceChecksum` in the baseline frontmatter
@@ -224,18 +224,18 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 **Purpose**: Verify the `--force` flag correctly bypasses checksum-based skip and forces fresh recompression.
 
-1. **Setup**: Ensure `tests/fixtures/compress-test.crux.mdc` exists from Test 8
+1. **Setup**: Ensure `tests/fixtures/compress-test.crux.md` exists from Test 8
 2. **Record baseline state**:
    - Note the current `generated` timestamp in the CRUX frontmatter
    - Note the current `sourceChecksum` value
 3. **Simulate `--force` behavior**:
-   - Delete `tests/fixtures/compress-test.crux.mdc` (as `--force` would)
-   - Log: "Deleted: tests/fixtures/compress-test.crux.mdc (--force)"
+   - Delete `tests/fixtures/compress-test.crux.md` (as `--force` would)
+   - Log: "Deleted: tests/fixtures/compress-test.crux.md (--force)"
 4. **Recompress without source changes**:
    - Spawn a `crux-cursor-rule-manager` subagent to compress `tests/fixtures/compress-test.md`
    - Since the CRUX file was deleted, compression should proceed (not skip)
 5. **Verify force behavior worked**:
-   - Confirm new `tests/fixtures/compress-test.crux.mdc` was created
+   - Confirm new `tests/fixtures/compress-test.crux.md` was created
    - Verify `generated` timestamp is newer than baseline
    - Verify `sourceChecksum` matches (source unchanged, but compression happened)
 6. **Compare to normal skip behavior**:
@@ -296,7 +296,7 @@ After running all tests, create `CRUX-TEST-REPORT.md` with this structure:
 ## Metrics
 
 - **Source tokens** (sample-rule.md): X
-- **CRUX tokens** (sample-rule.crux.mdc): X
+- **CRUX tokens** (sample-rule.crux.md): X
 - **Compression ratio**: X% of original
 - **Semantic confidence**: X%
 

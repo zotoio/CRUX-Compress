@@ -60,12 +60,12 @@ CRUX Compress uses [BATS](https://github.com/bats-core/bats-core) (Bash Automate
 ```
 tests/
 ├── fixtures/               # Test fixtures and sample files
-│   ├── compress-test.crux.mdc
+│   ├── compress-test.crux.md
 │   ├── compress-test.md
-│   ├── no-change.crux.mdc
+│   ├── no-change.crux.md
 │   ├── no-change.md
 │   ├── no-crux-frontmatter.mdc
-│   ├── sample-rule.crux.mdc
+│   ├── sample-rule.crux.md
 │   ├── sample-rule.md
 │   └── special-chars.md
 ├── helpers.bash            # Shared test utilities and assertions
@@ -258,13 +258,6 @@ Push to main
 │  ├─ Create GitHub Release with tag vX.Y.Z                       │
 │  ├─ Generate release notes from commits                         │
 │  └─ Update CHANGELOG.md and commit                              │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ success
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Deploy Pages Workflow (.github/workflows/deploy-pages.yml)     │
-│  ├─ Publish web/compress.md/ to GitHub Pages                    │
-│  └─ Deploy to https://<user>.github.io/CRUX-Compress/           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -287,16 +280,6 @@ Version bumps only occur when these files change (matches distribution zip conte
 | `.cursor/skills/CRUX-Utils/**` | Utility skill |
 
 Changes to other files (README, tests, examples, scripts) do **not** trigger releases.
-
-### GitHub Pages Deployment
-
-The landing page at `web/compress.md/` is automatically deployed to GitHub Pages. Deployment triggers on:
-
-- Successful completion of the Release workflow
-- Direct pushes to `web/compress.md/**` files
-- Manual workflow dispatch
-
-The site is published to `https://<user>.github.io/CRUX-Compress/`.
 
 ### Manual Version Bump
 

@@ -66,15 +66,36 @@ EOF
     assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
 
-@test "hook ignores .crux.mdc files" {
-    # Create a .crux.mdc file
-    cat > "$TEST_TEMP_DIR/.cursor/rules/test.crux.mdc" << 'EOF'
+@test "hook ignores .crux.md files" {
+    # Create a .crux.md file (universal CRUX output)
+    cat > "$TEST_TEMP_DIR/.cursor/rules/test.crux.md" << 'EOF'
 ---
 crux: true
 generated: 2024-01-01
 ---
 
 # Compressed Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    # Simulate the hook being called
+    echo '{"file_path": ".cursor/rules/test.crux.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    # Check that no pending file was created
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+}
+
+@test "hook ignores .crux.mdc files" {
+    # Create a .crux.mdc file (Cursor adapter)
+    cat > "$TEST_TEMP_DIR/.cursor/rules/test.crux.mdc" << 'EOF'
+---
+crux: true
+generated: 2024-01-01
+alwaysApply: true
+---
+
+# Compressed Rule (Cursor adapter)
 EOF
     
     cd "$TEST_TEMP_DIR"

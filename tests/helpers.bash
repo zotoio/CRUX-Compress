@@ -74,7 +74,6 @@ sourceChecksum: "1234567890"
 beforeTokens: 500
 afterTokens: 100
 confidence: 95%
-alwaysApply: true
 ---
 
 > [!IMPORTANT]

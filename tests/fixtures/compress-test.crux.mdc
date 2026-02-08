@@ -1,10 +1,11 @@
 ---
-generated: 2026-01-30 14:32
-sourceChecksum: 2179275645
+generated: 2026-02-08 01:06
+sourceChecksum: "2179275645"
 beforeTokens: 480
-afterTokens: 307
-confidence: 95%
+afterTokens: 340
+confidence: 96%
 alwaysApply: true
+crux: true
 description: A test rule for compress command testing
 ---
 
@@ -15,34 +16,42 @@ description: A test rule for compress command testing
 
 ```crux
 ⟦CRUX:compress-test.md
-Ρ{test coding standards for BATS suite}
-Κ{fx=fixture; tmp=$BATS_TMPDIR}
+Ρ{test suite coding standards}
+Κ{unit=test_*.bats;fixture=*.md|*.mdc;helper=helpers.bash}
 R.naming{
-  unit=test_*.bats; fx=*.md|*.mdc; helper=helpers.bash
+ unit→test_*.bats;fixture→*.md|*.mdc;helper→helpers.bash
+ ex{test_utils.bats,sample-rule.md,helpers.bash}
 }
-R.struct{
-  setup()→init env!; teardown()→clean tmp!
-  ¬artifacts in workdir; use tmp for temp files
+R.structure{
+ setup()→init env;teardown()→cleanup
+ ¬artifacts in wd;$BATS_TMPDIR for temp files
 }
 R.assert{
-  assert_success→cmd pass; assert_failure→cmd fail
-  assert_output --partial→substr match
-  assert_line→check specific ln
+ success→assert_success;fail→assert_failure
+ partial→assert_output --partial;line→assert_line
 }
-E.patterns{
-  ⊤:@test "fn handles X" {run fn "";assert_failure;assert_output --partial "Error:"}
-  ⊥:@test "test" {fn ""} #no run|assert→avoid!
+E.good{
+ @test "scenario desc"{
+  run fn args
+  assert_failure|success
+  assert_output --partial "msg"
+ }
 }
-Λ.apply{+BATS tests; review test PRs; debug fails}
-P.critical{
-  ⊛¬skip `run` before assert!
-  ⊛teardown clean tmp!
-  ⊛descriptive test names!
-  ¬hardcoded paths→use vars
+E.bad{
+ @test "test something"{
+  fn args  # ¬run,¬assertions
+ }
 }
-R.err{
-  fail→check $output+$status+$lines
-  debug→set -x temp
+R.apply{
+ new BATS tests|review PR|debug failures
 }
+R.critical{
+ ¬skip run before assert;teardown→clean temp files
+ test names=descriptive;¬hardcoded paths→vars
+}
+Λ.error{
+ fail→check[$output,$status,$lines];debug→set -x temp
+}
+Ω{standards→test quality;cleanup→reliability}
 ⟧
 ```

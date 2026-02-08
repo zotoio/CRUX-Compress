@@ -46,7 +46,7 @@ Compare source file vs CRUX file and calculate compression ratio.
 
 === Token Estimate: source.md ===
 ...
-=== Token Estimate: source.crux.mdc ===
+=== Token Estimate: source.crux.md ===
 ...
 
 === Compression Summary ===

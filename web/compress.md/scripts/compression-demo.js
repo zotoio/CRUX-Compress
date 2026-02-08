@@ -195,6 +195,34 @@ class CompressionDemo {
         }
       });
     });
+
+    // CRUX output copy overlay buttons
+    document.querySelectorAll('.crux-copy-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const container = button.parentElement;
+        const code = container.querySelector('code');
+        if (!code) return;
+
+        try {
+          await navigator.clipboard.writeText(code.textContent);
+
+          const originalHTML = button.innerHTML;
+          button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          `;
+          button.classList.add('copied');
+
+          setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy CRUX:', err);
+        }
+      });
+    });
   }
 }
 

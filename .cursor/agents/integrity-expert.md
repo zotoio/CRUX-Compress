@@ -16,7 +16,7 @@ Proactively identify and report issues affecting codebase integrity, including c
 |--------|-------|
 | **Shell Scripts** | `scripts/*.sh`, `install.sh`, `.cursor/hooks/*.sh`, `tests/*.bats` |
 | **CI/CD** | `.github/workflows/*.yml` |
-| **CRUX Notation** | `.cursor/rules/*.crux.mdc`, synchronization with source `.md` files |
+| **CRUX Notation** | `.cursor/rules/*.crux.mdc`, `*.crux.md` (code), synchronization with source files |
 | **Tests** | `tests/*.bats`, `tests/helpers.bash`, test coverage and quality |
 | **Configuration** | `.crux/*.json`, `.cursor/hooks.json`, `package.json` if present |
 | **Documentation** | `README.md`, `CONTRIBUTORS.md`, `AGENTS.md`, `CRUX.md` |
@@ -70,18 +70,21 @@ Check test infrastructure:
 
 ### 3. CRUX Synchronization
 
-For each `.crux.mdc` file:
-- Verify source `.md` file exists
+For each `.crux.md` file (universal output) and `.crux.mdc` file (Cursor adapter):
+- Verify the corresponding source file exists (`.md` for markdown, original extension for code)
 - Compare `sourceChecksum` in frontmatter against actual source checksum
 - Flag stale CRUX files needing regeneration
 - Check `generated` timestamp freshness
+- For `.crux.mdc` files: verify a corresponding `.crux.md` exists (`.crux.mdc` is derived from `.crux.md`)
 
 **Report format:**
 ```
 ### CRUX Sync Status
 | CRUX File | Source | Status | Action Needed |
 |-----------|--------|--------|---------------|
-| rule.crux.mdc | rule.md | STALE | Regenerate |
+| rule.crux.md | rule.md | STALE | Regenerate |
+| rule.crux.mdc | rule.crux.md | CURRENT | None (Cursor adapter) |
+| install.crux.md | install.sh | CURRENT | None |
 ```
 
 ### 4. CI/CD Workflow Integrity

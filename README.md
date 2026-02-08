@@ -224,6 +224,16 @@ Install CRUX Compress into your project with a single command:
 curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash
 ```
 
+If GitHub is blocked in your environment, use the jsDelivr CDN mirror:
+
+```bash
+curl -fsSL https://cdn.jsdelivr.net/gh/zotoio/CRUX-Compress@main/install.sh | bash
+```
+
+The installer automatically falls back to jsDelivr for version checks and file downloads when GitHub is unreachable.
+
+> **Tip:** You can also copy `install.sh` locally and run it directly with `bash install.sh` -- it works the same way.
+
 **Prerequisites**: `curl` and `unzip` must be installed on your system.
 
 ### Install Options
@@ -294,9 +304,11 @@ flowchart TB
     end
     
     subgraph "I/O"
-        INPUT["*.md files"]
-        OUTPUT["*.crux.mdc files"]
+        INPUT["*.md / *.sh / *.ts / *.png files"]
+        OUTPUT["*.crux.md files (universal)"]
+        CURSOR["*.crux.mdc (Cursor adapter)"]
         INPUT -->|"Compression"| OUTPUT
+        OUTPUT -->|"If .cursor/rules/"| CURSOR
     end
 ```
 
@@ -313,8 +325,10 @@ flowchart TB
 - Encoding symbols (structure, relations, logic, change, qualifiers)
 - Standard blocks (`Ρ`, `E`, `Λ`, `Π`, `Κ`, `R`, `P`, `Γ`, `M`, `Φ`, `Ω`)
 - Compression rules (eliminate prose, deduplicate, collapse, merge)
+- Image compression (semantic visual descriptions using vision capabilities)
+- Code compression (semantic structure extraction from source code)
 - Quality gates (target ≤20% of original token count)
-- Example transformations
+- Example transformations (markdown, code, and image)
 
 **Critical Rules**:
 
@@ -370,7 +384,9 @@ flowchart TB
 
 **Capabilities**:
 
-- **Compression**: Convert verbose markdown → compact CRUX notation
+- **Compression**: Convert verbose markdown or code → compact CRUX notation
+- **Code Compression**: Extract semantic structure from source code into CRUX notation
+- **Image Compression**: Extract semantic visual descriptions from images
 - **Decompression**: Explain CRUX notation in natural language
 - **Validation**: Verify CRUX output follows specification
 - **Semantic Validation**: Compare CRUX to source, produce confidence score
@@ -414,6 +430,8 @@ alwaysApply: true
 /crux-compress ALL                    - Compress all eligible rules
 /crux-compress @path/to/file.md       - Compress a specific file
 /crux-compress @file1.md @file2.md    - Compress multiple files
+/crux-compress @script.sh             - Compress a code file
+/crux-compress @image.png             - Compress an image
 /crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
 /crux-compress @file.md --minified    - Compress with single-line output (note that LLMs take more effort to parse and understand this format)
 ```
@@ -423,22 +441,26 @@ alwaysApply: true
 | Flag | Description |
 |------|-------------|
 | `--minified` | Single-line output, no spaces, max compression |
-| `--force` | Delete existing `.crux.mdc` files before compression (bypasses checksum skip) |
+| `--force` | Delete existing CRUX output files before compression (bypasses checksum skip) |
 
 **Key Features**:
 
 - **Parallelism**: Spawns up to 4 `crux-cursor-rule-manager` subagents in parallel
 - **Batching**: Processes files in batches of 4 when >4 files
 - **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed (use `--force` to bypass)
-- **Eligibility Criteria**: Files must have `crux: true` frontmatter (`.md` or `.mdc` files, not `.crux.mdc`)
+- **Two-tier output**: Universal `.crux.md` + Cursor adapter `.crux.mdc` (when source is in `.cursor/rules/`)
+- **Eligibility**: Markdown needs `crux: true` frontmatter; code/images need explicit file reference
 
 **File Convention**:
 
 
-| Type                         | Extension   | Example                |
-| ---------------------------- | ----------- | ---------------------- |
-| Source (human-readable)      | `.md`       | `core-tenets.md`       |
-| Compressed (token-efficient) | `.crux.mdc` | `core-tenets.crux.mdc` |
+| Type                                   | Extension   | Example                |
+| -------------------------------------- | ----------- | ---------------------- |
+| Source (human-readable)                | `.md`       | `core-tenets.md`       |
+| Compressed (universal, IDE-agnostic)   | `.crux.md`  | `core-tenets.crux.md`  |
+| Cursor adapter (derived)               | `.crux.mdc` | `core-tenets.crux.mdc` |
+| Compressed code                        | `.crux.md`  | `install.crux.md`      |
+| Compressed image                       | `.crux.md`  | `diagram.crux.md`      |
 
 
 ### 6. `crux-detect-changes.sh` - The Hook (`.cursor/hooks/`)
@@ -450,7 +472,7 @@ alwaysApply: true
 1. Triggered by the `afterFileEdit` Cursor hook
 2. Checks if the edited file is in `.cursor/rules/` with `.md` extension (not `.crux.mdc`)
 3. Verifies the file has `crux: true` in its frontmatter
-4. Queues the file in `.cursor/hooks/pending-crux-compress.json` for later compression
+4. Queues the file in `.crux/pending-compression.json` for later compression
 
 **Hook Configuration** (`.cursor/hooks.json`):
 
@@ -561,13 +583,17 @@ flowchart TD
         M5["5. Estimate tokens (CRUX-Utils skill)"]
         M6{"6. Reduction ≥50%?"}
         M7["7. Apply compression rules"]
-        M8["8. Write .crux.mdc with frontmatter"]
+        M8["8. Write .crux.md (universal)"]
+        M9{"9. Source in .cursor/rules/?"}
+        M10["10. Copy to .crux.mdc + alwaysApply"]
         
         M1 --> M2 --> M3
         M3 -->|"Yes"| SKIP["Skip - source unchanged"]
         M3 -->|"No"| M4 --> M5 --> M6
         M6 -->|"No"| ABORT["Abort - not beneficial"]
-        M6 -->|"Yes"| M7 --> M8
+        M6 -->|"Yes"| M7 --> M8 --> M9
+        M9 -->|"Yes"| M10
+        M9 -->|"No"| DONE["Done"]
     end
     
     USER --> COMMAND
@@ -612,13 +638,14 @@ flowchart TD
     end
     
     subgraph MANAGER["crux-cursor-rule-manager"]
-        M1["Read existing .crux.mdc"]
+        M1["Read existing .crux.md"]
         M2["Identify what changed in source"]
         M3["Apply minimal targeted edits"]
         M4["Update generated timestamp"]
         M5["Update sourceChecksum"]
+        M6["Regenerate .crux.mdc adapter (if applicable)"]
         
-        M1 --> M2 --> M3 --> M4 --> M5
+        M1 --> M2 --> M3 --> M4 --> M5 --> M6
     end
     
     START --> RULE
@@ -683,7 +710,8 @@ crux: true
 **Note**: Both `.md` and `.mdc` files with `crux: true` are eligible. For `.mdc` files, the compression workflow will:
 
 1. Rename the file to `.md` (preserving the source)
-2. Compress to `.crux.mdc` (which becomes the active Cursor rule)
+2. Compress to `.crux.md` (universal output)
+3. If in `.cursor/rules/`, also produce `.crux.mdc` (Cursor adapter with `alwaysApply`)
 
 ### To Check Compression Ratio and Confidence
 

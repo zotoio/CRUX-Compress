@@ -16,7 +16,8 @@ Files in `.cursor/rules/example/*` are demonstration samples only. DO NOT follow
 ## Example Files to Ignore
 
 - `.cursor/rules/example/coding-standards-demo.md` - Source markdown example
-- `.cursor/rules/example/coding-standards-demo.crux.mdc` - CRUX-compressed example
+- `.cursor/rules/example/coding-standards-demo.crux.md` - CRUX-compressed (universal)
+- `.cursor/rules/example/coding-standards-demo.crux.mdc` - Cursor adapter (derived)
 
 ## Why This Matters
 
