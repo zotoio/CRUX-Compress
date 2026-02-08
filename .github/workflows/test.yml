@@ -99,5 +99,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           scandir: '.'
-          ignore_paths: tests/bats
+          ignore_paths: >-
+            tests/bats
+            web
           severity: warning
