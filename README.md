@@ -9,6 +9,7 @@
 
 - [The Problem](#the-problem)
 - [The Approach](#the-approach)
+- [Next Feature Idea: Multi-Target Adapter Export](#next-feature-idea-multi-target-adapter-export)
 - [Demonstration](#demonstration)
 - [Etymology](#etymology)
 - [Quick Install](#quick-install)
@@ -48,6 +49,65 @@ CRUX extracts the essential meaning from natural language markdown rules and com
 4. **LLMs interpret the notation natively** — no decompression needed, semantic meaning preserved, although the spec is added for completeness and reinforcement
 
 The result: your context window stays lean while your rules remain powerful.
+
+## Next Feature Idea: Multi-Target Adapter Export
+
+Draft proposal: turn CRUX into a distribution layer that can generate
+assistant-specific outputs from one canonical `.crux.md` source.
+
+Today, the repo already has a universal CRUX output plus a Cursor adapter. The
+next useful expansion is to export the same source material to multiple
+assistant surfaces such as Cursor, Claude, ChatGPT, and Copilot.
+
+This is not limited to the current repository themes. The same export layer can
+support engineering rules, onboarding packs, research handoff notes, policy
+briefs, and support playbooks.
+
+### Quantifiable Benefit
+
+For 4 assistant targets, 12 monthly instruction changes, and 8 minutes per
+target update:
+
+| Workflow | Monthly edits | Time |
+| --- | ---: | ---: |
+| Manual copy/paste across 4 targets | 48 | 384 minutes |
+| One canonical source with export | 12 | 96 minutes |
+
+That is:
+
+- **75% fewer duplicated edits**
+- **36 manual target edits avoided per month**
+- **4.8 hours reclaimed per month**
+
+### Pros
+
+- One source of truth for assistant instructions
+- Quantifiable maintenance savings
+- Broadens CRUX beyond Cursor-specific workflows
+- Easy to explain and demo on the website
+
+### Cons
+
+- Target-specific conventions can drift over time
+- Semantic parity is harder to validate than a single output
+- Some teams may still prefer hand-tuned assistant-specific files
+
+### Alternate Approaches Considered
+
+| Approach | Strength | Why it is not the first choice |
+| --- | --- | --- |
+| Context Budget Planner | Very measurable and low-risk | Analyzes opportunities, but does not remove cross-assistant duplication |
+| Session Pack Builder | Expands into meetings, tickets, and handoffs | Larger scope and validation surface for a first expansion |
+| Delta Compression for diffs | Efficient for iterative change review | More complex and higher-risk than adapter export |
+
+### Why This Idea Is the Most Useful
+
+It builds on an existing CRUX pattern, creates measurable value quickly, and
+opens new categories of use without requiring the project to abandon its core
+strength: a single compact semantic source that can be reused everywhere.
+
+See the full draft PR description in
+[`docs/draft-prs/2026-03-05-feature-idea.md`](docs/draft-prs/2026-03-05-feature-idea.md).
 
 ## Demonstration
 

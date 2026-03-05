@@ -9,6 +9,7 @@ This landing page features:
 - **Animated Hero Section**: CSS-based particle visualization with compression theming
 - **Live Compression Demo**: Side-by-side before/after comparison of verbose markdown vs CRUX notation
 - **Interactive Spec Explorer**: Expandable sections documenting all CRUX symbols and blocks
+- **Feature Idea Preview**: Multi-target adapter export demo with quantified maintenance savings
 - **Quickstart Guide**: Installation and usage instructions
 
 ## Tech Stack
@@ -65,6 +66,7 @@ compress.md/
 ├── scripts/
 │   ├── camera-controller.js # Scroll-linked animations
 │   ├── compression-demo.js  # Before/after animation
+│   ├── adapter-export-demo.js # Feature idea tabs and savings calculator
 │   └── spec-expander.js   # Interactive specification explorer
 ├── assets/
 │   ├── favicon.svg        # CRUX-themed favicon

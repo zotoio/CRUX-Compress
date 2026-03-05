@@ -13,6 +13,7 @@ Thank you for your interest in contributing to CRUX Compress! This document prov
 - [Testing](#testing)
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
+- [Feature Proposal Reviews](#feature-proposal-reviews)
 - [Reporting Issues](#reporting-issues)
 - [Release Process](#release-process)
 
@@ -210,6 +211,24 @@ BREAKING CHANGE: The arrow operator → is now required"
 - [ ] Documentation updated (if applicable)
 - [ ] Commit messages follow conventional commits
 - [ ] No merge conflicts with main
+
+## Feature Proposal Reviews
+
+When a PR proposes a new adapter or export target rather than a fully shipped
+implementation, reviewers should still ask for concrete evidence:
+
+1. **Canonical source example**: Include one representative `.crux.md` source
+2. **Target examples**: Show at least 3 exported target outputs or mocks
+3. **Parity checklist**: Call out which requirements must survive conversion
+4. **Quantified upside**: Include maintenance or token savings math
+5. **Risk notes**: Document target-specific ambiguity and validation gaps
+
+For multi-target instruction proposals, the review should explicitly check:
+
+- which target conventions are official vs inferred
+- where output formatting may change behavior
+- whether the proposal reduces manual duplication enough to justify the added
+  adapter surface area
 
 ## Reporting Issues
 

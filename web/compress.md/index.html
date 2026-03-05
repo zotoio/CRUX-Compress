@@ -896,6 +896,179 @@ E.lighting{
     </div>
   </section>
 
+  <!-- S3d: Next Feature Idea - Multi-target Adapter Export -->
+  <section id="adapter-export" class="section section--adapter-export">
+    <div class="section-content">
+      <h2 class="section-title">Next Feature Idea: Multi-target Adapter Export</h2>
+      <p class="section-intro">Keep one canonical <code>.crux.md</code> source, then generate assistant-ready outputs for Cursor, Claude, ChatGPT, and Copilot without manually maintaining four separate instruction files.</p>
+
+      <div class="adapter-value-grid">
+        <div class="adapter-value-card">
+          <span class="adapter-value-number">1 -&gt; 4</span>
+          <span class="adapter-value-label">one CRUX source, four target outputs</span>
+        </div>
+        <div class="adapter-value-card">
+          <span class="adapter-value-number">75%</span>
+          <span class="adapter-value-label">fewer duplicated edits at 4 targets</span>
+        </div>
+        <div class="adapter-value-card">
+          <span class="adapter-value-number">4.8h</span>
+          <span class="adapter-value-label">monthly time reclaimed in the default model</span>
+        </div>
+      </div>
+
+      <div class="adapter-demo" id="adapter-export-demo">
+        <div class="adapter-demo-grid">
+          <div class="adapter-panel">
+            <div class="adapter-panel-header">
+              <span class="adapter-panel-title">Canonical CRUX Source</span>
+              <span class="adapter-panel-meta">single source of truth</span>
+            </div>
+            <div class="adapter-panel-body">
+              <pre><code class="language-crux">⟦CRUX:assistant-policy.md
+Ρ{assistant behavior baseline}
+R.style{tone=direct+succinct; bullets=prefer}
+R.security{secrets→mask; credentials→never echo}
+R.quality{cite.paths=⊤; unknown→say_uncertain}
+P{¬invent APIs; ¬claim tests passed if unrun}
+Ω{accuracy≻speed; clarity≻verbosity}
+⟧</code></pre>
+            </div>
+          </div>
+
+          <div class="adapter-panel">
+            <div class="adapter-panel-header adapter-panel-header--stacked">
+              <div>
+                <span class="adapter-panel-title">Target Outputs</span>
+                <span class="adapter-panel-meta">same meaning, target-specific wrappers</span>
+              </div>
+              <div class="adapter-target-tabs" role="tablist" aria-label="Assistant export targets">
+                <button class="adapter-target-button adapter-target-button--active" type="button" data-target="cursor" aria-selected="true">Cursor</button>
+                <button class="adapter-target-button" type="button" data-target="claude" aria-selected="false">Claude</button>
+                <button class="adapter-target-button" type="button" data-target="chatgpt" aria-selected="false">ChatGPT</button>
+                <button class="adapter-target-button" type="button" data-target="copilot" aria-selected="false">Copilot</button>
+              </div>
+            </div>
+            <div class="adapter-panel-body">
+              <div class="adapter-output-panel adapter-output-panel--active" data-target-panel="cursor">
+                <pre><code class="language-markdown">---
+alwaysApply: true
+---
+
+> [!IMPORTANT]
+> Exported from assistant-policy.crux.md
+
+⟦CRUX:assistant-policy.md
+Ρ{assistant behavior baseline}
+R.style{tone=direct+succinct; bullets=prefer}
+R.security{secrets→mask; credentials→never echo}
+R.quality{cite.paths=⊤; unknown→say_uncertain}
+P{¬invent APIs; ¬claim tests passed if unrun}
+Ω{accuracy≻speed; clarity≻verbosity}
+⟧</code></pre>
+              </div>
+              <div class="adapter-output-panel" data-target-panel="claude">
+                <pre><code class="language-markdown">Project instructions:
+
+- Use the exported CRUX policy as the semantic source of truth.
+- Keep responses direct and succinct.
+- Prefer bullet lists when they improve scanning.
+- Never reveal secrets or echo credentials.
+- Cite file paths when discussing repository changes.
+- If uncertain, say so explicitly.
+- Do not invent APIs or claim tests passed unless they were run.</code></pre>
+              </div>
+              <div class="adapter-output-panel" data-target-panel="chatgpt">
+                <pre><code class="language-markdown">System message snippet:
+
+You are operating with the following policy:
+- direct, succinct tone
+- prefer bullets for clarity
+- mask secrets and never echo credentials
+- cite repository file paths when making code claims
+- if a fact is uncertain, say that it is uncertain
+- do not invent APIs
+- do not claim tests passed unless they were actually run</code></pre>
+              </div>
+              <div class="adapter-output-panel" data-target-panel="copilot">
+                <pre><code class="language-markdown"># Repository instructions
+
+- Keep code review comments concise and specific.
+- Preserve security constraints from the canonical CRUX policy.
+- Reference files and line numbers where possible.
+- Never fabricate implementation details.
+- Do not report successful validation steps unless they were executed.</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="adapter-calculator">
+          <div class="adapter-calculator-header">
+            <h3>Quantifiable benefit calculator</h3>
+            <p>Estimate how much duplicated prompt maintenance disappears when one source exports to multiple assistant targets.</p>
+          </div>
+          <div class="adapter-calculator-grid">
+            <label class="adapter-calculator-field">
+              <span>Assistant targets</span>
+              <input id="adapter-target-count" class="adapter-calculator-input" type="number" min="2" max="10" value="4">
+            </label>
+            <label class="adapter-calculator-field">
+              <span>Instruction updates per month</span>
+              <input id="adapter-update-count" class="adapter-calculator-input" type="number" min="1" max="100" value="12">
+            </label>
+            <label class="adapter-calculator-field">
+              <span>Minutes per target update</span>
+              <input id="adapter-minutes-per-target" class="adapter-calculator-input" type="number" min="1" max="120" value="8">
+            </label>
+          </div>
+          <div class="adapter-stat-grid">
+            <div class="adapter-stat-card">
+              <span class="adapter-stat-value"><span id="adapter-reduction-percent">75</span>%</span>
+              <span class="adapter-stat-label">maintenance reduction</span>
+            </div>
+            <div class="adapter-stat-card">
+              <span class="adapter-stat-value"><span id="adapter-duplicated-edits">36</span></span>
+              <span class="adapter-stat-label">duplicated edits avoided per month</span>
+            </div>
+            <div class="adapter-stat-card">
+              <span class="adapter-stat-value"><span id="adapter-hours-saved">4.8</span>h</span>
+              <span class="adapter-stat-label">monthly time reclaimed</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="adapter-decision-grid">
+          <div class="adapter-decision-card">
+            <h3>Pros</h3>
+            <ul>
+              <li>One semantic source of truth</li>
+              <li>Less prompt drift across assistants</li>
+              <li>Easy to explain with measurable upside</li>
+              <li>Extends beyond current repo themes into onboarding, policy, and support playbooks</li>
+            </ul>
+          </div>
+          <div class="adapter-decision-card">
+            <h3>Cons</h3>
+            <ul>
+              <li>Every target has different conventions</li>
+              <li>Parity validation is harder than single-output compression</li>
+              <li>Some teams will still want hand-tuned target files</li>
+            </ul>
+          </div>
+          <div class="adapter-decision-card">
+            <h3>Why pick this over similar ideas?</h3>
+            <ul>
+              <li><strong>Context Budget Planner:</strong> measurable, but it does not remove cross-assistant duplication</li>
+              <li><strong>Session Pack Builder:</strong> broader scope, but much larger validation surface</li>
+              <li><strong>Delta Compression:</strong> highly novel, but riskier and harder to communicate</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- S4: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">
@@ -1000,7 +1173,7 @@ E.lighting{
       </div>
       
       <div class="footer-meta">
-        <span class="footer-version">v2.5.0</span>
+        <span class="footer-version">v2.6.1</span>
         <span class="footer-license">MIT License</span>
       </div>
     </div>
@@ -1014,5 +1187,6 @@ E.lighting{
   <script src="scripts/spec-expander.js"></script>
   <script src="scripts/code-loader.js"></script>
   <script src="scripts/section-linker.js"></script>
+  <script src="scripts/adapter-export-demo.js"></script>
 </body>
 </html>
