@@ -1,0 +1,106 @@
+# Incident Review Transcript - Payments Latency
+
+**Session type:** SEV-1 review and shift handoff  
+**Date:** 2026-02-14  
+**Duration:** 43 minutes  
+**Participants:** Maya (incident commander), Luis (SRE), Priya (payments engineer), Jordan (support lead), Nia (product)
+
+## Context
+
+This transcript captures the live review that happened after the checkout slowdown affecting European customers. The team is trying to answer three questions at once: what is broken, how to stabilize service quickly, and what follow-up work should be assigned before the next traffic peak. The meeting includes repeated restatements because new people join partway through the call.
+
+## Transcript
+
+**09:02 Maya:** Thanks everyone for joining quickly. We are treating this as a SEV-1 until the checkout failure rate is clearly below baseline. The support queue is growing and leadership wants a confident status update in the next thirty minutes.
+
+**09:03 Jordan:** Support is seeing complaints from merchants in Germany, France, and the Netherlands. The common theme is that checkout hangs for several seconds, then the customer retries, and sometimes the second attempt works. That is creating duplicate support tickets because people think the first order disappeared.
+
+**09:04 Luis:** Alert fired on checkout latency at 09:03 UTC. P95 is up from about 820 milliseconds to 4.8 seconds. Database CPU on the primary is hovering around ninety-four percent. Replica lag is also climbing, which means the read path is not healthy either.
+
+**09:05 Priya:** The only production change in the last hour was the broader rollout of the risk-shadowing query. It should have been read-only, but it adds extra fan-out on the payment authorization path. I need a minute to confirm whether the fallback cache path is missing for some merchants.
+
+**09:06 Nia:** Just to restate for everyone, we are not yet saying that the rollout caused the issue, correct? I want to avoid putting that in the customer update until we know.
+
+**09:06 Maya:** Correct. We can say we are investigating a correlation with the latest payments-risk release, but not a confirmed cause. Let's keep language precise.
+
+**09:07 Jordan:** Customers are asking whether they should turn off fraud controls entirely. I do not want support improvising instructions. We need a simple sentence they can send right now.
+
+**09:08 Maya:** Interim guidance is "Do not change settings yet; we are mitigating centrally." Jordan, please use exactly that wording.
+
+**09:09 Luis:** I am looking at query traces now. The authorization service is issuing six lookups where it used to issue one. Four of those are timing out when the merchant profile cache is cold. That lines up with the CPU saturation and the spike in lock wait time on the primary.
+
+**09:10 Priya:** I see the bug. Shadow mode still writes a per-merchant audit marker when the account has custom routing rules. That means the supposedly safe read path actually triggers a synchronous write and bypasses the warm cache. It is not the only problem, but it is definitely a problem.
+
+**09:11 Maya:** Can we disable shadow mode without bouncing the whole payments stack?
+
+**09:11 Priya:** Yes, feature flag only. It will take effect in about two minutes. There is still a question about whether we need to prewarm the top merchants because cache miss rates are already high.
+
+**09:12 Luis:** I recommend we do both. Disable shadow mode first, then run the cache warmer for the top one hundred merchants by volume. Otherwise we may improve the database and still leave users stuck behind cold authorization state.
+
+**09:13 Nia:** Is there any reason not to do the cache warm immediately in parallel?
+
+**09:13 Priya:** Only that I want one clean change in the timeline for attribution. If we flip three things at once and it gets better, we will not know which action mattered. That said, I am okay with parallel work if Maya wants speed over diagnostic clarity.
+
+**09:14 Maya:** Speed wins. We are in customer-impact mode, not lab mode. Priya, disable shadow mode. Luis, warm the top merchants. Please narrate in the channel as you do it so we have a written sequence.
+
+**09:15 Jordan:** Copy that. Also, support is now seeing merchants report delayed confirmations instead of hard failures. That may be a good sign, or it may just mean retries are landing eventually.
+
+**09:16 Luis:** Shadow mode is off. Cache warmer started. Database CPU is still high but not rising. Replica lag stopped getting worse. We should know in three to five minutes whether that holds.
+
+**09:17 Maya:** I want a decision point at 09:20. If latency is still above three seconds at P95, we consider partial traffic shaping or a rollback of the broader payments release.
+
+**09:18 Priya:** One thing to note: rollback is not clean because the release also contains a fix for duplicate webhook settlement. If we revert the entire package, we reintroduce that bug. I would rather isolate the risk-shadowing path than roll back everything.
+
+**09:19 Nia:** That tradeoff matters for the executive update. We can say rollback is available but carries known side effects on settlement correctness. That makes the current mitigation path easier to defend.
+
+**09:20 Luis:** New numbers: checkout P95 is down to 2.9 seconds. Authorization timeout rate dropped from eleven percent to four percent. Primary CPU is eighty-two percent. Replica lag is trending down from forty seconds to fifteen.
+
+**09:21 Maya:** Good. Not healthy yet, but enough improvement to avoid immediate rollback. Decision: hold the release, keep shadow mode disabled, continue cache warm, and reassess in ten minutes.
+
+**09:22 Jordan:** Support is asking for a merchant-facing ETA. Can I say "service is stabilizing, next update in fifteen minutes"?
+
+**09:22 Maya:** Yes. Do not promise full recovery time. Say we have identified a mitigation and are observing recovery.
+
+**09:23 Priya:** I want to capture a follow-up now so it does not get lost later: we need a load test specifically for fan-out growth on merchant-specific routing rules. Our current benchmark suite never exercised that branch at realistic cardinality.
+
+**09:24 Luis:** Agreed. Another follow-up: add an alert on query fan-out per authorization request, not just service latency. We saw the symptom late because aggregate latency hid the path explosion until the database was already pinned.
+
+**09:25 Nia:** Also, customer communication templates need a middle state between "investigating" and "resolved." Support kept improvising because we did not have a phrase for "mitigation applied, recovery in progress."
+
+**09:26 Maya:** Good captures. I want owners before we end. Keep surfacing them as we go.
+
+**09:27 Jordan:** Quick customer note: our biggest marketplace account says they nearly disabled 3-D Secure to cope with the slowdown. This could have turned into a policy issue if the incident lasted much longer.
+
+**09:28 Priya:** That is another reason we should treat the risk service integration as a first-class dependency in performance reviews, not an optional sidecar. The code path is logically "shadow" but operationally on the critical path.
+
+**09:29 Luis:** Latest numbers look better. P95 is 1.6 seconds. Timeout rate is under two percent. CPU is seventy percent. Error budget burn is still ugly for the hour, but customer experience is much closer to baseline.
+
+**09:30 Maya:** I am downgrading from SEV-1 active mitigation to SEV-1 monitoring. We are not closing the incident. We are switching attention from firefighting to making sure the gains hold and that we have a safe overnight posture.
+
+**09:31 Nia:** For the leadership note, I want one sentence on customer impact avoided. Can anyone estimate orders at risk?
+
+**09:31 Luis:** Rough estimate only. Based on order volume during the worst fifteen minutes, I would say around twelve thousand checkout attempts were exposed to elevated latency and about one hundred ninety thousand dollars of gross merchandise value was at risk. That is directional, not finance-grade.
+
+**09:32 Maya:** That is enough for a directional update. Mark it clearly as estimate.
+
+**09:33 Priya:** I have a patch ready that removes the audit marker write from shadow mode entirely. I do not want to ship it during the incident, but I can have it reviewed today and ready behind a separate flag.
+
+**09:34 Jordan:** Please include support in the review notes. When engineering says "shadow mode" we understand the feature name, but not the merchant behavior. We need language that maps to what customers felt.
+
+**09:35 Maya:** Good point. Follow-up item: engineering write-up must include technical cause, customer symptom, and safe support language.
+
+**09:36 Luis:** Stable for the last six minutes. Cache hit rate is back to ninety-two percent for the top merchants. Replica lag is under five seconds. I think the immediate emergency is behind us.
+
+**09:37 Maya:** Then let's shift to explicit owners. Priya owns the code patch and the benchmark gap. Luis owns the new observability signal and a runbook update about fan-out explosions. Jordan owns support template changes. Nia owns the leadership recap and customer-communications review.
+
+**09:38 Nia:** I also want a product question captured: should merchant-specific routing rules require a performance review checklist before rollout? We have treated them as configuration, but they clearly behave like code.
+
+**09:39 Priya:** I support that. The current rollout checklist only asks whether a feature is user-visible, not whether it expands critical-path query shape. That gap is exactly why this slipped.
+
+**09:40 Maya:** Final decision summary before we hand off: no full rollback, shadow mode remains disabled, cache warm stays scheduled until traffic normalizes, and we create a follow-up package by end of day. Next checkpoint is 10:00 UTC in the incident channel unless metrics worsen.
+
+**09:41 Jordan:** Support update sent. Merchants are reporting faster confirmation times. Ticket creation rate is slowing down.
+
+**09:42 Luis:** Metrics still improving. I am comfortable calling service recovered but degraded for another hour while caches settle and we watch for secondary effects.
+
+**09:43 Maya:** Good. Closing the live call. Please post your owned items within ten minutes while context is fresh.

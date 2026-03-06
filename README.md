@@ -9,6 +9,7 @@
 
 - [The Problem](#the-problem)
 - [The Approach](#the-approach)
+- [Draft Feature Idea: Memory Capsules](#draft-feature-idea-memory-capsules)
 - [Demonstration](#demonstration)
 - [Etymology](#etymology)
 - [Quick Install](#quick-install)
@@ -48,6 +49,26 @@ CRUX extracts the essential meaning from natural language markdown rules and com
 4. **LLMs interpret the notation natively** — no decompression needed, semantic meaning preserved, although the spec is added for completeness and reinforcement
 
 The result: your context window stays lean while your rules remain powerful.
+
+## Draft Feature Idea: Memory Capsules
+
+One promising next step for CRUX is a **draft** feature aimed at transcript-heavy workflows: compressing incident reviews, customer calls, and long planning meetings into reusable CRUX memory capsules.
+
+Why this direction is compelling:
+
+- a 60-minute transcript can easily reach **12,000-16,000 tokens**
+- a memory capsule could target **700-1,100 tokens**
+- that means roughly **91-95% reduction** and **14x-18x more historical sessions** fitting into the same 128k context window
+
+This expands CRUX beyond rules, code, and images into operational memory and agent handoff. The goal is not just summarization, but a structured artifact that preserves:
+
+- timeline
+- decisions
+- owners
+- customer impact
+- unresolved questions
+
+See the [draft feature proposal](docs/feature-ideas/2026-03-06-feature-idea.md) for pros, cons, alternatives, and rationale.
 
 ## Demonstration
 

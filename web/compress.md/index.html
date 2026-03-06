@@ -896,6 +896,98 @@ E.lighting{
     </div>
   </section>
 
+  <!-- S3d: Feature Idea - Transcript Memory Capsules -->
+  <section id="feature-idea" class="section section--feature-idea">
+    <div class="section-content">
+      <div class="section-heading section-heading--split">
+        <div>
+          <p class="section-kicker">Feature idea - draft</p>
+          <h2 class="section-title">Memory Capsules for Transcripts</h2>
+          <p class="section-intro">A possible next frontier for CRUX: compress incident calls, customer interviews, and long meeting transcripts into compact handoff artifacts that agents can reload quickly.</p>
+        </div>
+        <span class="draft-pill">Roadmap concept</span>
+      </div>
+
+      <div class="idea-overview">
+        <div class="idea-copy">
+          <p>Transcripts are one of the biggest hidden token sinks in AI workflows. A single 60-minute call can exceed the code an agent actually needs to reason about.</p>
+          <p>This draft concept introduces a CRUX <strong>Memory Capsule</strong> that preserves the timeline, decisions, owners, customer impact, and open questions without dragging an entire conversation back into context.</p>
+        </div>
+
+        <div class="idea-metrics">
+          <div class="idea-metric">
+            <span class="idea-metric-value">91-95%</span>
+            <span class="idea-metric-label">projected token reduction on long transcripts</span>
+          </div>
+          <div class="idea-metric">
+            <span class="idea-metric-value">14x-18x</span>
+            <span class="idea-metric-label">more historical sessions in the same 128k context window</span>
+          </div>
+          <div class="idea-metric">
+            <span class="idea-metric-value">1-2 pages</span>
+            <span class="idea-metric-label">for a capsule instead of a 20-40 page raw transcript</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compression-demo idea-demo">
+        <div class="demo-panel demo-panel--before">
+          <div class="demo-panel-header">
+            <span class="demo-panel-title">INCIDENT TRANSCRIPT</span>
+            <span class="demo-panel-tokens">107 lines &middot; ~2,580 tokens</span>
+          </div>
+          <div class="demo-panel-content">
+            <pre><code class="language-markdown" data-src="assets/transcript-example/incident-review-transcript.md.txt">Loading...</code></pre>
+          </div>
+        </div>
+
+        <div class="demo-arrow">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="demo-panel demo-panel--after">
+          <div class="demo-panel-header">
+            <span class="demo-panel-title">CRUX MEMORY CAPSULE</span>
+            <span class="demo-panel-tokens">51 lines &middot; ~511 tokens</span>
+          </div>
+          <div class="demo-panel-content">
+            <button class="crux-copy-btn" aria-label="Copy Memory Capsule output" title="Copy to clipboard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+            </button>
+            <pre><code class="language-crux" data-src="assets/transcript-example/incident-review-transcript.crux.md" data-extract="crux">Loading...</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-reduction demo-reduction--idea">
+        <div class="reduction-bar">
+          <div class="reduction-bar-fill reduction-bar-fill--static" style="width: 80%;"></div>
+        </div>
+        <p class="reduction-text"><strong>80% reduction in this demo</strong> - projected 91-95% on longer real-world transcripts with more repeated speaker context</p>
+      </div>
+
+      <div class="idea-notes-grid">
+        <div class="idea-note">
+          <h3>Why this idea first</h3>
+          <p>Operational memory is repeatedly reloaded across incidents, customer calls, and planning sessions. That makes transcript compression more leverage-rich than another purely code-adjacent extension.</p>
+        </div>
+        <div class="idea-note">
+          <h3>Alternatives considered</h3>
+          <p>Standard summaries, chunking plus retrieval, and timeline-only extractors all help, but they are less portable and less structured for multi-agent handoff.</p>
+        </div>
+        <div class="idea-note">
+          <h3>Main risk</h3>
+          <p>Conversational nuance can disappear if the capsule is too aggressive, so transcript support should ship only with stronger semantic validation and privacy guardrails.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- S4: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">
@@ -1000,7 +1092,7 @@ E.lighting{
       </div>
       
       <div class="footer-meta">
-        <span class="footer-version">v2.5.0</span>
+        <span class="footer-version">v2.7.0</span>
         <span class="footer-license">MIT License</span>
       </div>
     </div>
