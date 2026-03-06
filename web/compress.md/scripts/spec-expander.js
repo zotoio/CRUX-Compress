@@ -121,7 +121,7 @@ class SpecExpander {
  */
 class ScrollAnimator {
   constructor() {
-    this.elements = document.querySelectorAll('.section-title, .section-intro, .experimental-warning, .install-section, .installed-section, .usage-section');
+    this.elements = document.querySelectorAll('.section-title, .section-intro, .experimental-warning, .install-section, .installed-section, .usage-section, .feature-idea-metric, .feature-idea-command, .feature-idea-card, .feature-idea-note');
     this.init();
   }
 

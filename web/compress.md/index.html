@@ -896,7 +896,86 @@ E.lighting{
     </div>
   </section>
 
-  <!-- S4: Quickstart -->
+  <!-- S4: Feature Idea Draft -->
+  <section id="feature-idea" class="section section--feature-idea">
+    <div class="section-content">
+      <p class="feature-idea-eyebrow">Draft PR &middot; [2026-03-06] feature idea</p>
+      <h2 class="section-title">What CRUX could do next: Review Packs</h2>
+      <p class="section-intro">Generate audience-specific briefs from one source so product, security, support, and exec reviewers each get the same facts in the right shape.</p>
+
+      <div class="feature-idea-layout">
+        <div class="feature-idea-primary">
+          <div class="feature-idea-metric">
+            <span class="feature-idea-metric-label">Modeled benefit</span>
+            <strong>72% to 90% less irrelevant context per reviewer</strong>
+            <p>On a 6,000-token launch brief, audience packs target 600 to 900 tokens each and can save an estimated 32 to 48 minutes per cross-functional review cycle.</p>
+          </div>
+
+          <div class="feature-idea-command">
+            <h3>Proposed workflow</h3>
+            <pre><code>/crux-pack @launch-brief.md --for product,security,support,exec</code></pre>
+          </div>
+
+          <div class="feature-idea-audiences">
+            <div class="feature-idea-audience">
+              <span class="feature-idea-audience-label">Product</span>
+              <span class="feature-idea-audience-meta">Scope, rollout, tradeoffs</span>
+            </div>
+            <div class="feature-idea-audience">
+              <span class="feature-idea-audience-label">Security</span>
+              <span class="feature-idea-audience-meta">Trust boundaries, risk, mitigations</span>
+            </div>
+            <div class="feature-idea-audience">
+              <span class="feature-idea-audience-label">Support</span>
+              <span class="feature-idea-audience-meta">Customer impact, failure modes, playbooks</span>
+            </div>
+            <div class="feature-idea-audience">
+              <span class="feature-idea-audience-label">Exec</span>
+              <span class="feature-idea-audience-meta">Outcome, timeline, decision risk</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-idea-secondary">
+          <div class="feature-idea-card">
+            <h3>Why it matters</h3>
+            <p>CRUX becomes more than an authoring aid. It becomes a delivery layer for cross-functional decisions, not just rules, code, and images.</p>
+          </div>
+
+          <div class="feature-idea-card">
+            <h3>Pros</h3>
+            <ul>
+              <li>Expands CRUX into launch reviews, incident handoffs, and executive updates</li>
+              <li>Creates measurable wins in tokens, reading time, and review latency</li>
+              <li>Fits the existing command, checksum, and validation model</li>
+            </ul>
+          </div>
+
+          <div class="feature-idea-card">
+            <h3>Cons</h3>
+            <ul>
+              <li>Audience-specific emphasis raises the bar for validation</li>
+              <li>One source may fan out into several maintained outputs</li>
+              <li>Poor audience presets could make the feature feel noisy</li>
+            </ul>
+          </div>
+
+          <div class="feature-idea-card">
+            <h3>Alternatives considered</h3>
+            <ul>
+              <li><strong>One-size summary:</strong> simpler, but still generic</li>
+              <li><strong>Manual prompts:</strong> cheaper, but inconsistent</li>
+              <li><strong>RAG over originals:</strong> flexible, but reactive</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <p class="feature-idea-note">This is a draft idea for discussion, not a shipped feature. The detailed proposal lives in the repository PR draft body for this branch.</p>
+    </div>
+  </section>
+
+  <!-- S5: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">
       <h2 class="section-title">Quickstart</h2>
@@ -983,7 +1062,7 @@ E.lighting{
     </div>
   </section>
 
-  <!-- S5: Footer -->
+  <!-- S6: Footer -->
   <footer id="footer" class="footer">
     <div class="footer-content">
       <div class="footer-brand">
@@ -1000,7 +1079,7 @@ E.lighting{
       </div>
       
       <div class="footer-meta">
-        <span class="footer-version">v2.5.0</span>
+        <span class="footer-version">v2.7.0</span>
         <span class="footer-license">MIT License</span>
       </div>
     </div>
