@@ -1788,6 +1788,214 @@ code.has-line-numbers {
    Syntax Highlighting Overrides (highlight.js)
    ============================================ */
 
+/* ============================================
+   S3d: Knowledge Packets Section
+   ============================================ */
+
+.section--knowledge-packets {
+  background: var(--bg-secondary);
+}
+
+.kp-concept {
+  margin: 3rem 0;
+}
+
+.kp-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.kp-flow-step {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  min-width: 180px;
+  max-width: 220px;
+  flex: 1;
+}
+
+.kp-flow-step--highlight {
+  border-color: var(--accent-compressed);
+  background: rgba(212, 145, 90, 0.08);
+  box-shadow: 0 0 20px rgba(212, 145, 90, 0.1);
+}
+
+.kp-flow-icon {
+  margin-bottom: 1rem;
+  color: var(--accent-symbol);
+}
+
+.kp-flow-step--highlight .kp-flow-icon {
+  color: var(--accent-compressed);
+}
+
+.kp-flow-step h4 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.kp-flow-step p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.kp-flow-arrow {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.kp-demo {
+  margin: 3rem 0;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.kp-demo-header {
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.kp-demo-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent-compressed);
+  font-weight: 500;
+}
+
+.kp-demo pre {
+  margin: 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+}
+
+.kp-demo code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.kp-benefits {
+  margin: 3rem 0;
+}
+
+.kp-benefits h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.kp-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.kp-benefit {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+}
+
+.kp-benefit-stat {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--accent-compressed);
+  margin-bottom: 0.5rem;
+}
+
+.kp-benefit-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.kp-usage {
+  margin: 3rem 0;
+}
+
+.kp-usage h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.kp-usecases {
+  margin: 3rem 0;
+}
+
+.kp-usecases h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.kp-usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.kp-usecase {
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+}
+
+.kp-usecase h4 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--accent-symbol);
+  margin: 0 0 0.75rem;
+}
+
+.kp-usecase p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+@media (max-width: 768px) {
+  .kp-flow {
+    flex-direction: column;
+  }
+  .kp-flow-arrow {
+    transform: rotate(90deg);
+  }
+  .kp-flow-step {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* ============================================
+   Highlight.js Overrides
+   ============================================ */
+
 /* Make highlight.js backgrounds transparent so our card backgrounds show */
 pre code.hljs {
   background: transparent;

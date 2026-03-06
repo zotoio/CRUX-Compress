@@ -896,6 +896,151 @@ E.lighting{
     </div>
   </section>
 
+  <!-- S3d: CRUX Knowledge Packets -->
+  <section id="knowledge-packets" class="section section--knowledge-packets">
+    <div class="section-content">
+      <h2 class="section-title">Knowledge Packets: Cross-Model Context Transfer</h2>
+      <p class="section-intro">Bundle compressed CRUX files into portable <em>knowledge packets</em> — transferable between agents, models, repositories, and teams. One format, every modality, any LLM.</p>
+      
+      <div class="kp-concept">
+        <div class="kp-flow">
+          <div class="kp-flow-step">
+            <div class="kp-flow-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="4" y="4" width="14" height="14" rx="2"/>
+                <rect x="22" y="4" width="14" height="14" rx="2"/>
+                <rect x="4" y="22" width="14" height="14" rx="2"/>
+                <rect x="22" y="22" width="14" height="14" rx="2"/>
+              </svg>
+            </div>
+            <h4>Multi-Modal Sources</h4>
+            <p>Rules, code, images — all as .crux.md</p>
+          </div>
+          <div class="kp-flow-arrow">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M6 16h20M20 10l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="kp-flow-step kp-flow-step--highlight">
+            <div class="kp-flow-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20 4L36 12V28L20 36L4 28V12L20 4Z"/>
+                <path d="M20 20L36 12M20 20L4 12M20 20V36"/>
+              </svg>
+            </div>
+            <h4>Knowledge Packet</h4>
+            <p>Single portable JSON bundle</p>
+          </div>
+          <div class="kp-flow-arrow">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M6 16h20M20 10l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="kp-flow-step">
+            <div class="kp-flow-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="14" r="6"/>
+                <circle cx="28" cy="14" r="6"/>
+                <circle cx="20" cy="28" r="6"/>
+                <path d="M16.5 17.5L18 24M23.5 17.5L22 24M18 14H22"/>
+              </svg>
+            </div>
+            <h4>Any Model</h4>
+            <p>Claude, GPT, Gemini — all interpret CRUX</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="kp-demo">
+        <div class="kp-demo-header">
+          <span class="kp-demo-label">Example Knowledge Packet</span>
+        </div>
+        <pre><code class="language-json">{
+  "crux_kp_version": "1.0.0",
+  "crux_spec_version": "2.6.0",
+  "packet_id": "a7f3c2e1-...",
+  "created": "2026-03-06T12:00:00Z",
+  "source_model": "claude-4",
+  "target_model": "gpt-4o",
+  "label": "Frontend sprint context handoff",
+  "modalities": ["text", "code", "image"],
+  "block_count": 3,
+  "total_tokens": 847,
+  "blocks": [
+    { "source": "coding-standards.md", "type": "text",
+      "language": "markdown", "tokens": 112, "crux": "⟦CRUX:..." },
+    { "source": "deploy.sh", "type": "code",
+      "language": "shell", "tokens": 340, "crux": "⟦CRUX:..." },
+    { "source": "architecture.png", "type": "image",
+      "language": "png", "tokens": 395, "crux": "⟦CRUX:..." }
+  ]
+}</code></pre>
+      </div>
+
+      <div class="kp-benefits">
+        <h3>Why Knowledge Packets?</h3>
+        <div class="kp-benefits-grid">
+          <div class="kp-benefit">
+            <div class="kp-benefit-stat">5-8x</div>
+            <div class="kp-benefit-label">fewer tokens in agent-to-agent handoffs vs. raw context</div>
+          </div>
+          <div class="kp-benefit">
+            <div class="kp-benefit-stat">3</div>
+            <div class="kp-benefit-label">modalities in one portable format (text, code, images)</div>
+          </div>
+          <div class="kp-benefit">
+            <div class="kp-benefit-stat">N</div>
+            <div class="kp-benefit-label">models supported — any LLM interprets CRUX notation natively</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kp-usage">
+        <h3>How It Works</h3>
+        <ol class="usage-steps">
+          <li>
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <strong>Pack</strong> — Bundle CRUX files from your project<br>
+              <code>crux-pack.sh --dir .cursor/rules/ -o context.crux.json</code>
+            </div>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <strong>Transfer</strong> — Share the packet across agents, models, or teams
+            </div>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <strong>Unpack</strong> — Extract and validate at the destination<br>
+              <code>crux-unpack.sh --extract context.crux.json --output-dir ./rules/</code>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="kp-usecases">
+        <h3>Use Cases</h3>
+        <div class="kp-usecases-grid">
+          <div class="kp-usecase">
+            <h4>Cross-Model Handoff</h4>
+            <p>Agent A (Claude) compresses project rules, passes the packet to Agent B (GPT-4o) for a different task — zero context loss, minimal tokens.</p>
+          </div>
+          <div class="kp-usecase">
+            <h4>Team Onboarding</h4>
+            <p>Share a team's compressed coding standards, architecture diagrams, and deployment scripts as a single file new members drop into their project.</p>
+          </div>
+          <div class="kp-usecase">
+            <h4>Multi-Agent Pipelines</h4>
+            <p>In orchestrated workflows, agents pass knowledge packets instead of raw text — reducing pipeline token costs by 5-8x while preserving semantic fidelity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- S4: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">
