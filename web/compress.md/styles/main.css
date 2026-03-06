@@ -1835,3 +1835,165 @@ pre code.hljs {
 .hljs-subst {
   color: var(--text-primary);
 }
+
+/* ============================================
+   S3d: Concordance Section
+   ============================================ */
+
+.section--concordance {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  padding: 6rem 0;
+}
+
+.concordance-demo {
+  margin: 3rem 0;
+}
+
+.concordance-concept {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.concordance-flow {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.concordance-artifact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  text-align: center;
+  min-width: 140px;
+}
+
+.concordance-artifact small {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.concordance-artifact-icon {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent-compressed);
+  font-family: var(--font-mono);
+}
+
+.concordance-arrow-down {
+  color: var(--text-tertiary);
+}
+
+.concordance-analyzer {
+  padding: 0.75rem 2rem;
+  background: var(--accent-compressed);
+  color: var(--bg-primary);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.concordance-result {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+}
+
+.concordance-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.concordance-score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-verbose);
+  font-family: var(--font-mono);
+}
+
+.concordance-score-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concordance-drift-tag {
+  padding: 0.35rem 0.75rem;
+  background: rgba(230, 126, 34, 0.15);
+  color: var(--accent-verbose);
+  border: 1px solid rgba(230, 126, 34, 0.3);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.concordance-output {
+  margin: 2rem 0;
+}
+
+.concordance-output pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.concordance-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.concordance-feature {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+}
+
+.concordance-feature h3 {
+  font-size: 1.1rem;
+  color: var(--accent-compressed);
+  margin-bottom: 0.5rem;
+}
+
+.concordance-feature p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.concordance-usage {
+  margin-top: 2rem;
+}
+
+.concordance-usage h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .concordance-flow {
+    flex-direction: column;
+    align-items: center;
+  }
+  .concordance-features {
+    grid-template-columns: 1fr;
+  }
+}

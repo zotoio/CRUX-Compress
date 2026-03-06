@@ -26,6 +26,7 @@
   - [5. `crux-session-start.sh` - The Hook](#5-crux-session-startsh---the-hook)
   - [6. `crux-detect-changes.sh` - The Hook](#6-crux-detect-changessh---the-hook)
   - [7. `CRUX-Utils` - The Skill](#7-crux-utils---the-skill)
+  - [8. `crux-concordance` - Cross-Modal Drift Detection](#8-crux-concordance---cross-modal-drift-detection-scripts)
 
 
 ## The Problem
@@ -537,6 +538,47 @@ alwaysApply: true
 
 See `.cursor/skills/CRUX-Utils/SKILL.md` for detailed usage.
 
+### 8. `crux-concordance` - Cross-Modal Drift Detection (`scripts/`)
+
+**Purpose**: Compares entity graphs extracted from multiple CRUX-compressed artifacts to detect semantic drift — inconsistencies between how different artifacts (code, docs, images) describe the same system.
+
+**Usage**:
+
+```
+/crux-concordance @arch.crux.md @code.crux.md           - Compare two artifacts
+/crux-concordance @docs.crux.md @code.crux.md @img.crux.md - Compare multiple artifacts
+```
+
+**CLI**:
+
+```bash
+bash scripts/crux-concordance.sh file1.crux.md file2.crux.md
+bash scripts/crux-concordance.sh --dir .cursor/rules/ --threshold 80
+bash scripts/crux-concordance.sh --json file1.crux.md file2.crux.md
+```
+
+**Key Features**:
+
+- **Multi-modal**: Compares CRUX from any source (code, images, docs, rules)
+- **Polyglot**: Language-agnostic — works with CRUX from Python, Go, TypeScript, Rust, etc.
+- **Cross-model**: Any LLM compresses, deterministic scripts compare
+- **Quantifiable**: Jaccard similarity produces 0-100% concordance score
+- **CI/CD ready**: Exit code 2 when concordance falls below threshold
+
+**Entity Extraction**:
+
+Parses all CRUX standard blocks (`Ρ`, `E`, `Λ`, `Π`, `Κ`, `R`, `P`, `Γ`, `M`, `Φ`, `Ω`) to extract named entities, key-value pairs, and relationship identifiers.
+
+**Concordance Score**:
+
+Uses Jaccard similarity: `|shared entities| / |all unique entities| × 100`
+
+| Score | Interpretation |
+|-------|---------------|
+| ≥80%  | High concordance — artifacts are well-aligned |
+| 70-79% | Moderate — review recommended |
+| <70%  | Low — semantic drift detected |
+
 ## Installation in Another Project
 To use CRUX in your project, see [Quick Install](#quick-install).
 
@@ -683,6 +725,8 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
 | Utility Skill       | `.cursor/skills/CRUX-Utils/`                 | Token estimation, checksums    |
 | Install Script      | `install.sh`                                 | Curl-pipe-bash installer       |
+| Concordance         | `scripts/crux-concordance.sh`                | Cross-modal drift detection    |
+| Concordance Command | `.cursor/commands/crux-concordance.md`       | Concordance Cursor command     |
 | Zip Builder         | `scripts/create-crux-zip.sh`                 | Build distribution zip         |
 | Shellcheck          | `scripts/shellcheck.sh`                      | Lint all shell scripts         |
 | Tests               | `tests/*.bats`                               | BATS test suite                |
@@ -804,6 +848,7 @@ The script checks all shell files including `install.sh`, `scripts/create-crux-z
 | `scripts/create-crux-zip.sh` | `test_create_zip.bats`  | Zip contents, version embedding, structure        |
 | `crux-detect-changes.sh`     | `test_detect_hook.bats` | Frontmatter detection, queue management           |
 | `install.sh`                 | `test_install.bats`     | Syntax validation, options, functions             |
+| `crux-concordance.sh`        | `test_concordance.bats` | Entity extraction, drift detection, JSON output   |
 
 
 ### LLM Feature Testing

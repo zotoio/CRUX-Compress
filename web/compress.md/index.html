@@ -896,6 +896,133 @@ E.lighting{
     </div>
   </section>
 
+  <!-- S3d: Concordance — Cross-Modal Drift Detection -->
+  <section id="concordance" class="section section--concordance">
+    <div class="section-content">
+      <h2 class="section-title">Concordance: Cross-Modal Drift Detection</h2>
+      <p class="section-intro">Your architecture diagram and your code tell different stories. CRUX finds the plot holes — across <em>any</em> modality, <em>any</em> language, <em>any</em> model.</p>
+      
+      <div class="concordance-demo">
+        <div class="concordance-concept">
+          <div class="concordance-flow">
+            <div class="concordance-artifact">
+              <div class="concordance-artifact-icon">Π</div>
+              <span>Architecture<br><small>.crux.md</small></span>
+            </div>
+            <div class="concordance-artifact">
+              <div class="concordance-artifact-icon">Λ</div>
+              <span>Source Code<br><small>.crux.md</small></span>
+            </div>
+            <div class="concordance-artifact">
+              <div class="concordance-artifact-icon">Ω</div>
+              <span>API Docs<br><small>.crux.md</small></span>
+            </div>
+          </div>
+          <div class="concordance-arrow-down">
+            <svg width="32" height="48" viewBox="0 0 32 48" fill="none">
+              <path d="M16 4v36M8 32l8 8 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="concordance-analyzer">
+            <code>crux-concordance</code>
+          </div>
+          <div class="concordance-arrow-down">
+            <svg width="32" height="48" viewBox="0 0 32 48" fill="none">
+              <path d="M16 4v36M8 32l8 8 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="concordance-result">
+            <div class="concordance-score">
+              <span class="concordance-score-value">62%</span>
+              <span class="concordance-score-label">Concordance</span>
+            </div>
+            <div class="concordance-drift-tag">Drift Detected</div>
+          </div>
+        </div>
+        
+        <div class="concordance-output">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-block-label">Concordance Report</span>
+            </div>
+            <pre><code>╔══════════════════════════════════════════════════════════════╗
+║           CRUX Concordance Analysis Report                  ║
+╚══════════════════════════════════════════════════════════════╝
+
+Files Analyzed:
+  [1] architecture.crux.md (24 entities)
+  [2] api-handlers.crux.md (31 entities)
+
+Pairwise Concordance:
+  ────────────────────────────────────────────
+  architecture.crux.md ↔ api-handlers.crux.md
+    Score: 62%  │  Shared: 18  │  Only-A: 6  │  Only-B: 13
+
+    ⚠ DRIFT DETECTED — below threshold of 70%
+    Only in architecture.crux.md:
+      - e.authservice
+      - π.src/legacy/
+    Only in api-handlers.crux.md:
+      - e.identityprovider
+      - λ.webhook_handler
+      - π.lib/handlers/
+  ────────────────────────────────────────────
+
+Summary:
+  Average Concordance: 62%
+  Minimum Concordance: 62%
+  Threshold:           70%
+
+✗ Semantic drift detected — concordance below threshold</code></pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="concordance-features">
+        <div class="concordance-feature">
+          <h3>Multi-Modal</h3>
+          <p>Compare compressed images, code, and documentation in the same analysis. CRUX normalizes all modalities into one symbolic language.</p>
+        </div>
+        <div class="concordance-feature">
+          <h3>Polyglot</h3>
+          <p>Language-agnostic entity extraction. Python, Go, TypeScript, Rust — all compress to the same CRUX blocks, enabling cross-language drift detection.</p>
+        </div>
+        <div class="concordance-feature">
+          <h3>Cross-Model</h3>
+          <p>Any LLM compresses, deterministic scripts compare. Claude compresses the docs, GPT compresses the code — concordance still works.</p>
+        </div>
+        <div class="concordance-feature">
+          <h3>Quantifiable</h3>
+          <p>Jaccard similarity produces a concrete 0-100% concordance score. Set thresholds, track over time, gate CI/CD on drift.</p>
+        </div>
+      </div>
+      
+      <div class="concordance-usage">
+        <h3>How It Works</h3>
+        <ol class="usage-steps">
+          <li>
+            <span class="step-number">1</span>
+            <div class="step-content">
+              Compress related artifacts: <code>/crux-compress @arch.png @src/main.ts @README.md</code>
+            </div>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <div class="step-content">
+              Run concordance: <code>/crux-concordance @arch.crux.md @main.crux.md @README.crux.md</code>
+            </div>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <div class="step-content">
+              Review the drift report — shared entities, missing entities, concordance score
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
   <!-- S4: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">

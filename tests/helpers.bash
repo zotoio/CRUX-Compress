@@ -9,6 +9,7 @@ export CRUX_UTILS="${PROJECT_ROOT}/.cursor/skills/CRUX-Utils/scripts/crux-utils.
 export CREATE_ZIP="${PROJECT_ROOT}/scripts/create-crux-zip.sh"
 export DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/crux-detect-changes.sh"
 export INSTALL_SCRIPT="${PROJECT_ROOT}/install.sh"
+export CONCORDANCE_SCRIPT="${PROJECT_ROOT}/scripts/crux-concordance.sh"
 
 # Path to test fixtures
 export FIXTURES="${PROJECT_ROOT}/tests/fixtures"

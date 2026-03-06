@@ -65,6 +65,7 @@ SCRIPTS=(
     "$PROJECT_ROOT/.cursor/skills/token-count-estimator/scripts/count-tokens.sh"
     "$PROJECT_ROOT/.cursor/hooks/crux-detect-changes.sh"
     "$PROJECT_ROOT/.cursor/hooks/crux-session-start.sh"
+    "$PROJECT_ROOT/scripts/crux-concordance.sh"
     "$PROJECT_ROOT/tests/helpers.bash"
 )
 
