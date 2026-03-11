@@ -19,7 +19,7 @@
     '</svg>';
 
   var MODEL_DISPLAY_NAMES = {
-    'unknown': 'LLM',
+    'unknown': 'Markdown',
     'html': 'HTML Page',
     'nano-banana-2': 'Nano Banana 2',
     'gpt4o': 'GPT-4o',
@@ -283,7 +283,7 @@
     // Decompressed
     if (item.decompressed.length > 0) {
       var decompSection = el('div', { className: 'code-demo-decompressed' });
-      decompSection.appendChild(el('h3', { textContent: 'Decompressed by ' + displayModel(item.decompressed[0].model) }));
+      decompSection.appendChild(el('h3', { textContent: 'Decompressed as ' + displayModel(item.decompressed[0].model) }));
 
       var decompCards = [];
       item.decompressed.forEach(function (d, i) {
@@ -306,7 +306,7 @@
 
       var ms = modelSelector(item.decompressed, function (d) {
         var heading = decompSection.querySelector('h3');
-        if (heading) heading.textContent = 'Decompressed by ' + displayModel(d.model);
+        if (heading) heading.textContent = 'Decompressed as ' + displayModel(d.model);
         decompCards.forEach(function (c) {
           c.style.display = c.getAttribute('data-model') === d.model ? '' : 'none';
         });
@@ -350,7 +350,7 @@
         var dCard = el('div', { className: 'image-demo-card image-demo-card--decompressed', 'data-model': d.model });
         if (i > 0) dCard.style.display = 'none';
         var dHeader = el('div', { className: 'image-demo-card-header' });
-        dHeader.appendChild(el('span', { className: 'image-demo-card-label', textContent: 'Decompressed by ' + displayModel(d.model) + ' (from .crux.md)' }));
+        dHeader.appendChild(el('span', { className: 'image-demo-card-label', textContent: 'Decompressed as ' + displayModel(d.model) + ' (from .crux.md)' }));
         dCard.appendChild(dHeader);
         var dContent = el('div', { className: 'image-demo-card-content' });
         dContent.appendChild(el('img', { src: basePath + '/' + item.name + '.decompressed-' + d.model + '.' + d.ext, alt: item.title + ' decompressed by ' + displayModel(d.model), loading: 'lazy' }));
@@ -439,7 +439,7 @@
     srcCard.appendChild(srcHeader);
     var srcContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
     if (item.sourceUrl) {
-      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts' }));
+      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
     } else if (item.hasSource) {
       var srcPre = el('pre');
       srcPre.appendChild(el('code', { className: 'language-markdown', 'data-src': basePath + '/' + item.name + '.source.' + item.sourceExt, textContent: 'Loading...' }));
@@ -480,7 +480,7 @@
     // Decompressed
     if (item.decompressed.length > 0) {
       var decompSection = el('div', { className: 'url-demo-decompressed' });
-      decompSection.appendChild(el('h3', { textContent: 'Decompressed by ' + displayModel(item.decompressed[0].model) }));
+      decompSection.appendChild(el('h3', { textContent: 'Decompressed as ' + displayModel(item.decompressed[0].model) }));
 
       var decompPanels = [];
       item.decompressed.forEach(function (d, i) {
@@ -509,7 +509,7 @@
 
       var ms = modelSelector(item.decompressed, function (d) {
         var heading = decompSection.querySelector('h3');
-        if (heading) heading.textContent = 'Decompressed by ' + displayModel(d.model);
+        if (heading) heading.textContent = 'Decompressed as ' + displayModel(d.model);
         decompPanels.forEach(function (p) {
           p.style.display = p.getAttribute('data-model') === d.model ? '' : 'none';
         });
