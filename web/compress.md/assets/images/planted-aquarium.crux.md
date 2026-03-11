@@ -1,5 +1,6 @@
 ---
-generated: 2026-03-09 15:42
+generated: 2026-03-09T15:42:00Z
+cruxLevel: 80
 beforeSize: 13040535
 afterSize: 3487
 reducedBy: 99.97%

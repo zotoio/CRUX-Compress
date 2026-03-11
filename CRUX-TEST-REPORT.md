@@ -87,7 +87,7 @@ A fresh agent (readonly, without reading CRUX.md) interpreted `tests/fixtures/sa
 | CRUX tokens | 1826 |
 | Ratio | 29.0% of original |
 | Reduction | 71.0% |
-| Target (<=20%) | NO |
+| Target (<=25%) | NO |
 
 All output fields present: prose, code, special, total, ratio, reduction.
 

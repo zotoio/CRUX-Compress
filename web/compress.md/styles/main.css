@@ -20,6 +20,7 @@
   --accent-verbose: #5b8a9a;
   --accent-compressed: #d4915a;
   --accent-symbol: #f0c674;
+  --accent-original: #5b8a9a;
   
   /* Interactive Colors */
   --link: #7ab3c2;
@@ -66,13 +67,21 @@
   
   /* Border Variants */
   --border-subtle: #223030;
-  
+
   /* Border Radius */
   --radius-sm: 3px;
   --radius-lg: 8px;
-  
+
   /* RGB variants for rgba() usage */
   --accent-compressed-rgb: 212, 145, 90;
+
+  /* Aliases for gallery and common components */
+  --surface-2: var(--bg-secondary);
+  --surface-3: var(--bg-tertiary);
+  --border: var(--border-default);
+  --accent: var(--accent-compressed);
+  --radius: var(--radius-sm);
+  --text-muted: var(--text-tertiary);
 }
 
 /* Reset & Base */
@@ -1830,8 +1839,6 @@ code {
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-secondary);
-  display: flex;
-  flex-direction: column;
 }
 
 .url-demo-card--crux {

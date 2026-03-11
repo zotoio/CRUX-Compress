@@ -176,8 +176,7 @@
       });
       if (ms) ms.style.display = target === 'decompressed' ? '' : 'none';
       if (tokenSpan) {
-        tokenSpan.textContent = (target === 'decompressed' && item.meta.decompressedTokens
-          ? item.meta.decompressedTokens : item.meta.sourceTokens) + ' tokens';
+        tokenSpan.textContent = item.meta.sourceTokens + ' tokens';
       }
     }
 
@@ -217,7 +216,11 @@
       fill.style.width = item.meta.reduction;
       bar.appendChild(fill);
       reduction.appendChild(bar);
-      reduction.appendChild(el('p', { className: 'reduction-text', innerHTML: '<strong>' + item.meta.reduction + ' reduction</strong> — same semantic information' }));
+      var reductionText = el('p', { className: 'reduction-text' });
+      var strong = el('strong', { textContent: item.meta.reduction + ' reduction' });
+      reductionText.appendChild(strong);
+      reductionText.appendChild(document.createTextNode(' — same semantic information'));
+      reduction.appendChild(reductionText);
       frag.appendChild(reduction);
     }
     return frag;
@@ -433,7 +436,7 @@
     srcCard.appendChild(srcHeader);
     var srcContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
     if (item.sourceUrl) {
-      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
+      srcContent.appendChild(el('iframe', { 'data-src': item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
     } else if (item.hasSource) {
       var srcPre = el('pre');
       srcPre.appendChild(el('code', { className: 'language-markdown', 'data-src': basePath + '/' + item.name + '.source.' + item.sourceExt, textContent: 'Loading...' }));
@@ -488,7 +491,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
+          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');

@@ -1,8 +1,8 @@
 ---
 generated: 2026-03-11 15:42
 cruxLevel: 80
-beforeBytes: 8530339
-afterTokens: ~650
+beforeSize: 8530339
+afterSize: ~650
 confidence: 96%
 ---
 
