@@ -494,7 +494,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
+          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');
@@ -547,6 +547,10 @@
     });
 
     container.appendChild(itemsWrap);
+
+    if (items.length === 1) {
+      itemsWrap.querySelector('.gallery-item').style.position = 'relative';
+    }
 
     // Carousel nav (only when multiple items)
     if (items.length > 1) {

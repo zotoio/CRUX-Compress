@@ -222,23 +222,6 @@
     galleryContainer = document.querySelector('[data-gallery="rules"]');
     if (!galleryContainer) return;
 
-    // Install a MutationObserver once to re-initialize when the active item changes
-    if (!observerInstalled) {
-      observerInstalled = true;
-      var navObserver = new MutationObserver(function (mutations) {
-        for (var mi = 0; mi < mutations.length; mi++) {
-          var m = mutations[mi];
-          if (m.type === 'attributes' && m.attributeName === 'class' &&
-              m.target.classList && m.target.classList.contains('gallery-item') &&
-              m.target.classList.contains('gallery-item--active')) {
-            setTimeout(reinit, 100);
-            return;
-          }
-        }
-      });
-      navObserver.observe(galleryContainer, { subtree: true, attributes: true, attributeFilter: ['class'] });
-    }
-
     var activeItem = galleryContainer.querySelector('.gallery-item--active');
     if (!activeItem) { setTimeout(init, 300); return; }
 
