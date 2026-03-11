@@ -5,6 +5,29 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.7.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.7.0) - 2026-03-11
+
+- chore: update release manifest for v2.7.0 [skip ci] (a7f5ee2)
+- chore: sync CRUX.md version to 2.7.0 [skip ci] (f823ab4)
+- fix: update iframe src attribute and adjust gallery item positioning (fe313e7)
+- Initial plan (c5e3089)
+- Initial plan (0e1be54)
+- fix: apply CodeRabbit auto-fixes (31744b2)
+- Update web/compress.md/assets/urls/cursor-hooks.decompressed-html.html (2ac9ece)
+- Update .cursor/agents/crux-cursor-rule-manager.md (b97f617)
+- fix: re-initialize section-linker on gallery navigation via MutationObserver (cedffd6)
+- fix: re-run lockHeight() after async CodeLoader/image content finishes loading (9d153d4)
+- fix: remove allow-same-origin from iframe sandbox to prevent XSS risk (b6546d5)
+- Initial plan (855995c)
+- Initial plan (bc99a62)
+- Initial plan (63ae4ab)
+- fix: apply CodeRabbit auto-fixes (6fce1b5)
+- Fix review feedback: security, robustness, and correctness improvements (a20687b)
+- Initial plan (c71a335)
+- Potential fix for pull request finding 'Unused variable, import, function or class' (b700d7b)
+- feat: update CRUX compression specification and enhance functionality (eb0acbf)
+- docs: update CHANGELOG.md for v2.6.0 [skip ci] (b330ea5)
+
 ## [v2.6.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.6.0) - 2026-02-08
 
 - chore: update release manifest for v2.6.0 [skip ci] (996da56)
