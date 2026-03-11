@@ -63,7 +63,7 @@ find_decompressed() {
     model_and_ext="${basename#"${shortname}.decompressed-"}"
     ext="${model_and_ext##*.}"
     model="${model_and_ext%.*}"
-    results+=("{\"model\":\"${model}\",\"ext\":\"${ext}\"}")
+    results+=("$(jq -n --arg model "$model" --arg ext "$ext" '{model:$model,ext:$ext}')")
   done
   if [[ ${#results[@]} -eq 0 ]]; then
     echo "[]"
@@ -76,31 +76,33 @@ find_decompressed() {
 
 build_meta() {
   local file="$1" type="$2"
-  local parts=()
   if [[ "$type" == "images" ]]; then
     local before_size after_size reduced
     before_size=$(extract_frontmatter_value "$file" "beforeSize")
     [[ -z "$before_size" ]] && before_size=$(extract_frontmatter_value "$file" "originalSize")
     after_size=$(extract_frontmatter_value "$file" "afterSize")
     reduced=$(extract_frontmatter_value "$file" "reducedBy")
-    [[ -n "$before_size" ]] && parts+=("\"beforeSize\":\"$before_size\"")
-    [[ -n "$after_size" ]] && parts+=("\"afterSize\":\"$after_size\"")
-    [[ -n "$reduced" ]] && parts+=("\"reduction\":\"${reduced}\"")
+    jq -n \
+      --arg beforeSize  "$before_size" \
+      --arg afterSize   "$after_size" \
+      --arg reduction   "$reduced" \
+      '{ beforeSize: (if $beforeSize != "" then $beforeSize else empty end),
+         afterSize:  (if $afterSize  != "" then $afterSize  else empty end),
+         reduction:  (if $reduction  != "" then $reduction  else empty end) }
+       | with_entries(select(.value != null))'
   else
     local before_tokens after_tokens reduced
     before_tokens=$(extract_frontmatter_value "$file" "beforeTokens")
     after_tokens=$(extract_frontmatter_value "$file" "afterTokens")
     reduced=$(extract_frontmatter_value "$file" "reducedBy")
-    [[ -n "$before_tokens" ]] && parts+=("\"sourceTokens\":\"~${before_tokens}\"")
-    [[ -n "$after_tokens" ]] && parts+=("\"cruxTokens\":\"~${after_tokens}\"")
-    [[ -n "$reduced" ]] && parts+=("\"reduction\":\"${reduced}\"")
-  fi
-  if [[ ${#parts[@]} -eq 0 ]]; then
-    echo "{}"
-  else
-    local joined
-    joined=$(printf ",%s" "${parts[@]}")
-    echo "{${joined:1}}"
+    jq -n \
+      --arg sourceTokens "$([ -n "$before_tokens" ] && echo "~${before_tokens}" || echo "")" \
+      --arg cruxTokens   "$([ -n "$after_tokens"  ] && echo "~${after_tokens}"  || echo "")" \
+      --arg reduction    "$reduced" \
+      '{ sourceTokens: (if $sourceTokens != "" then $sourceTokens else empty end),
+         cruxTokens:   (if $cruxTokens   != "" then $cruxTokens   else empty end),
+         reduction:    (if $reduction    != "" then $reduction     else empty end) }
+       | with_entries(select(.value != null))'
   fi
 }
 
@@ -136,32 +138,28 @@ for type in "${TYPES[@]}"; do
       src_url=$(extract_frontmatter_value "$crux_file" "sourceUrl")
       has_screenshot=$([[ -f "$type_dir/${shortname}.screenshot.png" ]] && echo "true" || echo "false")
       has_html=$([[ -f "$type_dir/${shortname}.source.html" ]] && echo "true" || echo "false")
-      cat >> "$tmpfile" <<ITEM
-    {
-      "name": "$shortname",
-      "title": "$title",
-      "sourceExt": "$source_ext",
-      "hasSource": $has_source,
-      "hasCrux": true,
-      "decompressed": $decompressed,
-      "meta": $meta,
-      "sourceUrl": "$src_url",
-      "hasScreenshot": $has_screenshot,
-      "hasSourceHtml": $has_html
-    }
-ITEM
+      jq -n \
+        --arg     name         "$shortname" \
+        --arg     title        "$title" \
+        --arg     sourceExt    "$source_ext" \
+        --argjson hasSource    "$has_source" \
+        --argjson decompressed "$decompressed" \
+        --argjson meta         "$meta" \
+        --arg     sourceUrl    "$src_url" \
+        --argjson hasScreenshot "$has_screenshot" \
+        --argjson hasSourceHtml "$has_html" \
+        '{name:$name,title:$title,sourceExt:$sourceExt,hasSource:$hasSource,hasCrux:true,decompressed:$decompressed,meta:$meta,sourceUrl:$sourceUrl,hasScreenshot:$hasScreenshot,hasSourceHtml:$hasSourceHtml}' \
+        >> "$tmpfile"
     else
-      cat >> "$tmpfile" <<ITEM
-    {
-      "name": "$shortname",
-      "title": "$title",
-      "sourceExt": "$source_ext",
-      "hasSource": $has_source,
-      "hasCrux": true,
-      "decompressed": $decompressed,
-      "meta": $meta
-    }
-ITEM
+      jq -n \
+        --arg     name         "$shortname" \
+        --arg     title        "$title" \
+        --arg     sourceExt    "$source_ext" \
+        --argjson hasSource    "$has_source" \
+        --argjson decompressed "$decompressed" \
+        --argjson meta         "$meta" \
+        '{name:$name,title:$title,sourceExt:$sourceExt,hasSource:$hasSource,hasCrux:true,decompressed:$decompressed,meta:$meta}' \
+        >> "$tmpfile"
     fi
     item_idx=$((item_idx + 1))
     echo "  [$type] $shortname -> $title"

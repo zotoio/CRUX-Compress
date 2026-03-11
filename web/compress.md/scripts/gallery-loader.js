@@ -72,6 +72,8 @@
       navigator.clipboard.writeText(text).then(function () {
         btn.classList.add('copied');
         setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+      }).catch(function () {
+        btn.title = 'Copy failed – please copy manually';
       });
     });
     return btn;
@@ -433,7 +435,7 @@
     srcCard.appendChild(srcHeader);
     var srcContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
     if (item.sourceUrl) {
-      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
+      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts' }));
     } else if (item.hasSource) {
       var srcPre = el('pre');
       srcPre.appendChild(el('code', { className: 'language-markdown', 'data-src': basePath + '/' + item.name + '.source.' + item.sourceExt, textContent: 'Loading...' }));
@@ -488,7 +490,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
+          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');
@@ -576,6 +578,19 @@
       }
 
       lockHeight();
+
+      // Re-run lockHeight after async content (code/images) finishes loading
+      // so the locked height reflects final rendered dimensions.
+      var heightTimer;
+      function scheduleLockHeight() {
+        clearTimeout(heightTimer);
+        heightTimer = setTimeout(lockHeight, 150);
+      }
+      var heightObserver = new MutationObserver(scheduleLockHeight);
+      heightObserver.observe(itemsWrap, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+      // Also re-lock after a short delay to catch images/iframes that load late
+      setTimeout(lockHeight, 500);
+      setTimeout(lockHeight, 1500);
 
       var resizeTimer;
       window.addEventListener('resize', function () {

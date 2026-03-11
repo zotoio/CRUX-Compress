@@ -267,9 +267,40 @@
     addHoverHint(demo);
   }
 
+  // Reinitialize row arrays and state when the active gallery item changes
+  function reinit() {
+    originalRows = [];
+    cruxRows = [];
+    decompressedRows = [];
+    currentHighlight = null;
+    lockedSection = null;
+    if (lockIndicator && lockIndicator.parentNode) {
+      lockIndicator.parentNode.removeChild(lockIndicator);
+    }
+    lockIndicator = null;
+    init();
+  }
+
+  // Watch for active-item changes in the rules gallery
+  function startObserver() {
+    var gc = document.querySelector('[data-gallery="rules"]');
+    if (!gc) return;
+    var observer = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        var m = mutations[i];
+        if (m.type === 'attributes' && m.attributeName === 'class' &&
+            m.target.classList.contains('gallery-item--active')) {
+          reinit();
+          return;
+        }
+      }
+    });
+    observer.observe(gc, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 500); });
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(function () { init(); startObserver(); }, 500); });
   } else {
-    setTimeout(init, 500);
+    setTimeout(function () { init(); startObserver(); }, 500);
   }
 })();

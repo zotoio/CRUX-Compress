@@ -944,7 +944,7 @@ code {
 
 .spec-table td:last-child {
   font-family: var(--font-mono);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: var(--text-xs);
 }
 
@@ -2323,8 +2323,8 @@ pre code.hljs {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -2337,9 +2337,9 @@ pre code.hljs {
 }
 
 .gallery-nav:hover {
-  background: var(--surface-3);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-compressed);
 }
 
 .gallery-nav--prev {
@@ -2363,21 +2363,21 @@ pre code.hljs {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  background: var(--bg-secondary);
   cursor: pointer;
   padding: 0;
   transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .gallery-dot:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-compressed);
   transform: scale(1.2);
 }
 
 .gallery-dot--active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-compressed);
+  border-color: var(--accent-compressed);
 }
 
 /* Model Selector */
@@ -2395,8 +2395,8 @@ pre code.hljs {
   font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 999px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -2404,13 +2404,13 @@ pre code.hljs {
 }
 
 .model-selector-btn:hover {
-  background: var(--surface-3);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
 }
 
 .model-selector-btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-compressed);
+  border-color: var(--accent-compressed);
   color: #fff;
 }
 
@@ -2421,9 +2421,9 @@ pre code.hljs {
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  background: var(--surface-2);
+  background: var(--bg-secondary);
   border-radius: var(--radius);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
