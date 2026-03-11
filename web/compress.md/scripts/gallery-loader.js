@@ -491,7 +491,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
+          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');
