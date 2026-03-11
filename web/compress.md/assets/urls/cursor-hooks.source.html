@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor Hooks — Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-raised: #1a1a26;
+    --border: #2a2a3a;
+    --border-accent: #3d3d55;
+    --text: #e0e0ec;
+    --text-dim: #8888a0;
+    --text-muted: #5a5a72;
+    --accent: #7b6ef6;
+    --accent-glow: #7b6ef622;
+    --green: #4ec9b0;
+    --orange: #d19a66;
+    --pink: #e06c9f;
+    --blue: #61afef;
+    --yellow: #e5c07b;
+    --red: #e06c75;
+    --cyan: #56b6c2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Layout */
+  .page { display: flex; min-height: 100vh; }
+
+  /* Sidebar nav */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 2rem 0;
+    z-index: 10;
+  }
+
+  .sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .sidebar a {
+    display: block;
+    padding: 0.4rem 1.5rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .sidebar a:hover {
+    color: var(--text);
+    background: var(--accent-glow);
+    border-left-color: var(--accent);
+  }
+
+  .sidebar a.sub {
+    padding-left: 2.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .sidebar a.sub:hover { color: var(--text-dim); }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 1.5rem;
+  }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    max-width: 900px;
+    padding: 3rem 4rem 6rem;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 4rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.6s ease-out;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-glow);
+    border: 1px solid #7b6ef633;
+    border-radius: 4px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .hero h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  .hero-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.4rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--green);
+    background: #4ec9b010;
+    border: 1px solid #4ec9b020;
+    border-radius: 3px;
+    padding: 0.2rem 0.55rem;
+  }
+
+  /* Section styling */
+  section {
+    margin-bottom: 3.5rem;
+    animation: fadeUp 0.5s ease-out both;
+  }
+
+  section:nth-child(2) { animation-delay: 0.05s; }
+  section:nth-child(3) { animation-delay: 0.1s; }
+  section:nth-child(4) { animation-delay: 0.15s; }
+
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  h2 .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+
+  h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--orange);
+    margin: 2rem 0 0.8rem;
+  }
+
+  p { margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.92rem; }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .card-title .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .card p { font-size: 0.82rem; margin-bottom: 0; color: var(--text-muted); }
+
+  /* Hook event blocks */
+  .hook-event {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1rem 0;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .hook-event:hover { border-color: var(--border-accent); }
+
+  .hook-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.2rem;
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .hook-header:hover { background: #1e1e2e; }
+
+  .hook-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--cyan);
+  }
+
+  .hook-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    margin-left: auto;
+  }
+
+  .badge-blocking { color: var(--orange); background: #d19a6615; border: 1px solid #d19a6625; }
+  .badge-observe { color: var(--green); background: #4ec9b010; border: 1px solid #4ec9b020; }
+  .badge-fire-forget { color: var(--text-muted); background: #5a5a7210; border: 1px solid #5a5a7220; }
+
+  .hook-chevron {
+    color: var(--text-muted);
+    transition: transform 0.2s;
+    font-size: 0.75rem;
+  }
+
+  .hook-event.open .hook-chevron { transform: rotate(90deg); }
+
+  .hook-body {
+    display: none;
+    padding: 1rem 1.2rem;
+  }
+
+  .hook-event.open .hook-body { display: block; }
+
+  .field-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0;
+  }
+
+  .field-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field-table td {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #1a1a26;
+    vertical-align: top;
+  }
+
+  .field-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--pink);
+    white-space: nowrap;
+  }
+
+  .field-table td:last-child { color: var(--text-dim); }
+
+  /* Inline code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8em;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    color: var(--pink);
+  }
+
+  /* Config table */
+  .config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 1rem 0;
+  }
+
+  .config-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .config-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--yellow);
+    margin-bottom: 0.4rem;
+  }
+
+  .config-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    word-break: break-all;
+  }
+
+  .config-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* Priority chain */
+  .priority-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 1.2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .priority-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text);
+    position: relative;
+  }
+
+  .priority-arrow {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin: 0 0.3rem;
+  }
+
+  .priority-node:first-child { border-color: var(--accent); color: var(--accent); }
+
+  /* Matcher table */
+  .matcher-grid {
+    margin: 1rem 0;
+  }
+
+  .matcher-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #15151f;
+    align-items: baseline;
+  }
+
+  .matcher-hook {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--cyan);
+    min-width: 200px;
+  }
+
+  .matcher-target {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  /* Partners section */
+  .partner-group {
+    margin: 1rem 0;
+  }
+
+  .partner-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .partner-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .partner-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.35rem 0.7rem;
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+
+  .partner-chip:hover { border-color: var(--border-accent); color: var(--text); }
+
+  .partner-chip .role { color: var(--text-muted); font-size: 0.68rem; margin-left: 0.3rem; }
+
+  /* Env vars */
+  .env-grid { margin: 1rem 0; }
+
+  .env-row {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #15151f;
+    align-items: baseline;
+  }
+
+  .env-var {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--green);
+    min-width: 240px;
+  }
+
+  .env-desc { font-size: 0.82rem; color: var(--text-dim); }
+
+  /* Script config */
+  .script-param {
+    display: flex;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #15151f;
+    align-items: baseline;
+  }
+
+  .script-param-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--pink);
+    min-width: 130px;
+  }
+
+  .script-param-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 140px;
+  }
+
+  .script-param-desc { font-size: 0.82rem; color: var(--text-dim); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { padding: 2rem 1.5rem 4rem; }
+    .config-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-title">Cursor Hooks</div>
+  <a href="#overview">Overview</a>
+  <a href="#capabilities">Capabilities</a>
+  <a href="#configuration">Configuration</a>
+  <a href="#hook-types">Hook Types</a>
+  <a href="#script-config">Script Config</a>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-title">Events</div>
+  <a href="#agent-hooks" class="sub">Agent Hooks</a>
+  <a href="#session-lifecycle" class="sub">Session Lifecycle</a>
+  <a href="#tool-hooks" class="sub">Tool Use Hooks</a>
+  <a href="#subagent-hooks" class="sub">Subagent Hooks</a>
+  <a href="#shell-mcp" class="sub">Shell & MCP</a>
+  <a href="#file-hooks" class="sub">File Hooks</a>
+  <a href="#prompt-hooks" class="sub">Prompt & Response</a>
+  <a href="#tab-hooks" class="sub">Tab Hooks</a>
+  <a href="#stop-compact" class="sub">Stop & Compact</a>
+  <div class="sidebar-divider"></div>
+  <a href="#common-input">Common Input</a>
+  <a href="#matchers">Matchers</a>
+  <a href="#env-vars">Environment</a>
+  <a href="#partners">Partners</a>
+  <a href="#distribution">Distribution</a>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Hero -->
+  <header class="hero" id="overview">
+    <div class="hero-badge">cursor-hooks.md</div>
+    <h1>Cursor Hooks</h1>
+    <p>Observe, control, and extend the Cursor agent loop via custom scripts. Spawned processes communicate over JSON via stdio, running before or after agent stages.</p>
+    <div class="hero-tags">
+      <span class="hero-tag">JSON over stdio</span>
+      <span class="hero-tag">pre / post hooks</span>
+      <span class="hero-tag">cmd &amp; prompt types</span>
+      <span class="hero-tag">Tab + Agent scopes</span>
+    </div>
+  </header>
+
+  <!-- Capabilities -->
+  <section id="capabilities">
+    <h2><span class="icon" style="background:#7b6ef618;color:var(--accent);">⚡</span> Capabilities</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--green);"></span> Context Injection</div>
+        <p>Inject context at session start to prime agent behavior</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--blue);"></span> Subagent Control</div>
+        <p>Control and gate Task tool subagent spawning</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--orange);"></span> Risk Gating</div>
+        <p>Gate risky operations like SQL writes before execution</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--pink);"></span> PII / Secret Scanning</div>
+        <p>Scan for PII and secrets in tool inputs and outputs</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--yellow);"></span> Analytics</div>
+        <p>Add analytics tracking across agent actions</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--cyan);"></span> Post-edit Formatters</div>
+        <p>Run code formatters automatically after file edits</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Configuration -->
+  <section id="configuration">
+    <h2><span class="icon" style="background:#d19a6618;color:var(--orange);">⚙</span> Configuration</h2>
+    <p>Hooks are defined in <code>hooks.json</code> files (schema version 1). Location determines scope and priority.</p>
+
+    <div class="config-grid">
+      <div class="config-item">
+        <div class="config-label">Project</div>
+        <div class="config-path">.cursor/hooks.json</div>
+        <div class="config-desc">Runs from project root. Commit to VCS for team sharing.</div>
+      </div>
+      <div class="config-item">
+        <div class="config-label">User</div>
+        <div class="config-path">~/.cursor/hooks.json</div>
+        <div class="config-desc">Runs from home directory. Personal hooks.</div>
+      </div>
+      <div class="config-item">
+        <div class="config-label">Team</div>
+        <div class="config-path">Web Dashboard (Enterprise)</div>
+        <div class="config-desc">Managed hooks dir. Syncs to members every 30 min.</div>
+      </div>
+      <div class="config-item">
+        <div class="config-label">Enterprise</div>
+        <div class="config-path">
+          macOS: /Library/Application Support/Cursor/hooks.json<br>
+          Linux: /etc/cursor/hooks.json<br>
+          Windows: C:\ProgramData\Cursor\hooks.json
+        </div>
+        <div class="config-desc">System-level managed deployment via MDM.</div>
+      </div>
+    </div>
+
+    <h3>Priority Order</h3>
+    <div class="priority-chain">
+      <div class="priority-node">Enterprise</div>
+      <span class="priority-arrow">›</span>
+      <div class="priority-node">Team</div>
+      <span class="priority-arrow">›</span>
+      <div class="priority-node">Project</div>
+      <span class="priority-arrow">›</span>
+      <div class="priority-node">User</div>
+    </div>
+    <p>All matching hooks run. On conflict, higher priority wins the merge.</p>
+  </section>
+
+  <!-- Hook Types -->
+  <section id="hook-types">
+    <h2><span class="icon" style="background:#e06c9f18;color:var(--pink);">⟡</span> Hook Types</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--cyan);"></span> Command</div>
+        <p>Shell script. Receives JSON on stdin, writes JSON to stdout. Exit 0 = success (use JSON output). Exit 2 = deny (permission denied). Other exit = fail, proceed (fail-open default).</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--yellow);"></span> Prompt</div>
+        <p>LLM-evaluated natural language condition. Optional model override (fast model default). <code>$ARGUMENTS</code> auto-replaced with hook input JSON. Returns <code>{ok, reason?}</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Script Config -->
+  <section id="script-config">
+    <h2><span class="icon" style="background:#56b6c218;color:var(--cyan);">◈</span> Per-Script Configuration</h2>
+    <div class="env-grid">
+      <div class="script-param">
+        <span class="script-param-name">command</span>
+        <span class="script-param-type">string (required)</span>
+        <span class="script-param-desc">Script path or shell command to execute</span>
+      </div>
+      <div class="script-param">
+        <span class="script-param-name">type</span>
+        <span class="script-param-type">"command" | "prompt"</span>
+        <span class="script-param-desc">Hook type. Defaults to "command"</span>
+      </div>
+      <div class="script-param">
+        <span class="script-param-name">timeout</span>
+        <span class="script-param-type">number (seconds)</span>
+        <span class="script-param-desc">Platform default timeout for script execution</span>
+      </div>
+      <div class="script-param">
+        <span class="script-param-name">loop_limit</span>
+        <span class="script-param-type">number | null</span>
+        <span class="script-param-desc">Max iterations for stop/subagentStop. Default 5 (Cursor), null (Claude Code)</span>
+      </div>
+      <div class="script-param">
+        <span class="script-param-name">failClosed</span>
+        <span class="script-param-type">boolean = false</span>
+        <span class="script-param-desc">If true, block operation on failure (crash, timeout, bad JSON)</span>
+      </div>
+      <div class="script-param">
+        <span class="script-param-name">matcher</span>
+        <span class="script-param-type">string | null</span>
+        <span class="script-param-desc">Filter expression to control when hook fires</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agent Hooks -->
+  <section id="agent-hooks">
+    <h2><span class="icon" style="background:#61afef18;color:var(--blue);">◉</span> Agent Hooks</h2>
+    <p>Scopes: <code>Tab</code> = inline completions. <code>Agent</code> = Cmd+K and Agent Chat.</p>
+  </section>
+
+  <!-- Session Lifecycle -->
+  <section id="session-lifecycle">
+    <h3>Session Lifecycle</h3>
+
+    <div class="hook-event open" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">sessionStart</span>
+        <span class="hook-badge badge-fire-forget">fire &amp; forget</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires at session start. Non-blocking.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>session_id</td><td>Unique session identifier</td></tr>
+          <tr><td>is_background_agent</td><td>Boolean — true if background agent session</td></tr>
+          <tr><td>composer_mode</td><td>Optional: "agent" | "ask" | "edit"</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>env</td><td>Key-value pairs set for all subsequent hooks in session</td></tr>
+          <tr><td>additional_context</td><td>Context injected into the session</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">sessionEnd</span>
+        <span class="hook-badge badge-fire-forget">fire &amp; forget</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires when session ends.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>session_id</td><td>Session identifier</td></tr>
+          <tr><td>reason</td><td>"completed" | "aborted" | "error" | "window_close" | "user_close"</td></tr>
+          <tr><td>duration_ms</td><td>Total session duration in milliseconds</td></tr>
+          <tr><td>is_background_agent</td><td>Boolean</td></tr>
+          <tr><td>final_status</td><td>Final session status</td></tr>
+          <tr><td>error_message</td><td>Optional error message if applicable</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tool Hooks -->
+  <section id="tool-hooks">
+    <h3>Tool Use Hooks</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">preToolUse</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires before any tool execution. Can allow, deny, or modify the tool input.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>tool_name</td><td>Name of the tool being invoked</td></tr>
+          <tr><td>tool_input</td><td>Object — the tool's input parameters</td></tr>
+          <tr><td>tool_use_id</td><td>Unique tool use identifier</td></tr>
+          <tr><td>cwd</td><td>Current working directory</td></tr>
+          <tr><td>model</td><td>Model being used</td></tr>
+          <tr><td>agent_message</td><td>The agent's message context</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny"</td></tr>
+          <tr><td>user_message</td><td>Optional message shown to user</td></tr>
+          <tr><td>agent_message</td><td>Optional message to agent</td></tr>
+          <tr><td>updated_input</td><td>Optional modified tool input object</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">postToolUse</span>
+        <span class="hook-badge badge-observe">post-exec</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires after successful tool execution. Can inject additional context or replace MCP tool output.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>tool_name</td><td>Name of the tool</td></tr>
+          <tr><td>tool_input</td><td>Tool input parameters</td></tr>
+          <tr><td>tool_output</td><td>String (JSON) — the tool's result</td></tr>
+          <tr><td>tool_use_id</td><td>Unique identifier</td></tr>
+          <tr><td>cwd</td><td>Working directory</td></tr>
+          <tr><td>duration</td><td>Execution duration in milliseconds</td></tr>
+          <tr><td>model</td><td>Model used</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>updated_mcp_tool_output</td><td>MCP only — replaces the tool output</td></tr>
+          <tr><td>additional_context</td><td>String injected after tool result</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">postToolUseFailure</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires when a tool fails, times out, or is permission-denied. Output is empty (observe only).</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>tool_name</td><td>Name of the failed tool</td></tr>
+          <tr><td>tool_input</td><td>Tool input parameters</td></tr>
+          <tr><td>tool_use_id</td><td>Unique identifier</td></tr>
+          <tr><td>cwd</td><td>Working directory</td></tr>
+          <tr><td>error_message</td><td>Error description</td></tr>
+          <tr><td>failure_type</td><td>"error" | "timeout" | "permission_denied"</td></tr>
+          <tr><td>duration</td><td>Duration in milliseconds</td></tr>
+          <tr><td>is_interrupt</td><td>Boolean — was this an interrupt</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Subagent Hooks -->
+  <section id="subagent-hooks">
+    <h3>Subagent (Task) Hooks</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">subagentStart</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires before a Task tool subagent is spawned. Can allow or deny.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>subagent_id</td><td>Unique subagent identifier</td></tr>
+          <tr><td>subagent_type</td><td>"generalPurpose" | "explore" | "shell" | ...</td></tr>
+          <tr><td>task</td><td>Task description</td></tr>
+          <tr><td>parent_conversation_id</td><td>Parent conversation reference</td></tr>
+          <tr><td>tool_call_id</td><td>Originating tool call</td></tr>
+          <tr><td>subagent_model</td><td>Model for the subagent</td></tr>
+          <tr><td>is_parallel_worker</td><td>Boolean — parallel execution flag</td></tr>
+          <tr><td>git_branch</td><td>Optional git branch context</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny" (ask → deny)</td></tr>
+          <tr><td>user_message</td><td>Optional user-facing message</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">subagentStop</span>
+        <span class="hook-badge badge-observe">post-exec</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires when a subagent completes. Can trigger auto-followup. Subject to loop_limit (default 5).</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>subagent_type</td><td>Type of subagent</td></tr>
+          <tr><td>status</td><td>"completed" | "error" | "aborted"</td></tr>
+          <tr><td>task</td><td>Original task description</td></tr>
+          <tr><td>description</td><td>Subagent description</td></tr>
+          <tr><td>summary</td><td>Completion summary</td></tr>
+          <tr><td>duration_ms</td><td>Duration in milliseconds</td></tr>
+          <tr><td>message_count</td><td>Total messages exchanged</td></tr>
+          <tr><td>tool_call_count</td><td>Tools invoked</td></tr>
+          <tr><td>loop_count</td><td>Iteration count (starts at 0)</td></tr>
+          <tr><td>modified_files</td><td>Array of modified file paths</td></tr>
+          <tr><td>agent_transcript_path</td><td>Optional transcript path</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>followup_message</td><td>Auto-continues agent (only when status = completed)</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shell & MCP -->
+  <section id="shell-mcp">
+    <h3>Shell & MCP Hooks</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">beforeShellExecution</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>command</td><td>Shell command string</td></tr>
+          <tr><td>cwd</td><td>Working directory</td></tr>
+          <tr><td>sandbox</td><td>Boolean — sandboxed execution</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny" | "ask"</td></tr>
+          <tr><td>user_message</td><td>Optional user message</td></tr>
+          <tr><td>agent_message</td><td>Optional agent message</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterShellExecution</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>command</td><td>Executed command</td></tr>
+          <tr><td>output</td><td>Command output</td></tr>
+          <tr><td>duration</td><td>Milliseconds</td></tr>
+          <tr><td>sandbox</td><td>Boolean</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">beforeMCPExecution</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <p>Recommended: <code>failClosed: true</code> for MCP hooks.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>tool_name</td><td>MCP tool name</td></tr>
+          <tr><td>tool_input</td><td>Tool input parameters</td></tr>
+          <tr><td>url | command</td><td>MCP server URL or command</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny" | "ask"</td></tr>
+          <tr><td>user_message</td><td>Optional</td></tr>
+          <tr><td>agent_message</td><td>Optional</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterMCPExecution</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>tool_name</td><td>MCP tool name</td></tr>
+          <tr><td>tool_input</td><td>Input parameters</td></tr>
+          <tr><td>result_json</td><td>Result as JSON</td></tr>
+          <tr><td>duration</td><td>Milliseconds</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- File Hooks -->
+  <section id="file-hooks">
+    <h3>File Hooks</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">beforeReadFile</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>file_path</td><td>Absolute file path</td></tr>
+          <tr><td>content</td><td>File contents</td></tr>
+          <tr><td>attachments</td><td>Array of {type: "file"|"rule", file_path}</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny"</td></tr>
+          <tr><td>user_message</td><td>Optional</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterFileEdit</span>
+        <span class="hook-badge badge-observe">post-exec</span>
+      </div>
+      <div class="hook-body">
+        <p>Useful for running formatters after agent edits.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>file_path</td><td>Absolute path to edited file</td></tr>
+          <tr><td>edits</td><td>Array of {old_string, new_string}</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prompt & Response -->
+  <section id="prompt-hooks">
+    <h3>Prompt & Response Hooks</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">beforeSubmitPrompt</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires after user sends a prompt, before it reaches the backend.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>prompt</td><td>The user's prompt text</td></tr>
+          <tr><td>attachments</td><td>Array of {type, file_path}</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>continue</td><td>Boolean — proceed with submission</td></tr>
+          <tr><td>user_message</td><td>Optional message to user</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterAgentResponse</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>text</td><td>The agent's response text</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterAgentThought</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>text</td><td>The agent's thought/reasoning text</td></tr>
+          <tr><td>duration_ms</td><td>Optional thinking duration</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Hooks -->
+  <section id="tab-hooks">
+    <h3>Tab Hooks (Inline Completions)</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">beforeTabFileRead</span>
+        <span class="hook-badge badge-blocking">blocking</span>
+      </div>
+      <div class="hook-body">
+        <p>Same as beforeReadFile but without attachments. For Tab completion file reads.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>file_path</td><td>File path being read</td></tr>
+          <tr><td>content</td><td>File contents</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>permission</td><td>"allow" | "deny"</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">afterTabFileEdit</span>
+        <span class="hook-badge badge-observe">observe</span>
+      </div>
+      <div class="hook-body">
+        <p>Extended edit info including line/column ranges for Tab completions.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>file_path</td><td>Edited file path</td></tr>
+          <tr><td>edits</td><td>Array with old_string, new_string, range (start/end line+column), old_line, new_line</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stop & Compact -->
+  <section id="stop-compact">
+    <h3>Stop & Compact</h3>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">stop</span>
+        <span class="hook-badge badge-blocking">auto-followup</span>
+      </div>
+      <div class="hook-body">
+        <p>Fires when the agent loop ends. Can trigger auto-followup via <code>followup_message</code>. Subject to loop_limit (default 5, null = unlimited).</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>status</td><td>"completed" | "aborted" | "error"</td></tr>
+          <tr><td>loop_count</td><td>Number of loop iterations</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>followup_message</td><td>Auto-submitted as the next user message</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="hook-event" onclick="this.classList.toggle('open')">
+      <div class="hook-header">
+        <span class="hook-chevron">▶</span>
+        <span class="hook-name">preCompact</span>
+        <span class="hook-badge badge-observe">observe only</span>
+      </div>
+      <div class="hook-body">
+        <p>Observe-only. Cannot block or modify compaction.</p>
+        <table class="field-table">
+          <tr><th>Input</th><th>Description</th></tr>
+          <tr><td>trigger</td><td>"auto" | "manual"</td></tr>
+          <tr><td>context_usage_percent</td><td>Percentage of context used</td></tr>
+          <tr><td>context_tokens</td><td>Current token count</td></tr>
+          <tr><td>context_window_size</td><td>Max context window</td></tr>
+          <tr><td>message_count</td><td>Messages in conversation</td></tr>
+          <tr><td>messages_to_compact</td><td>Messages targeted for compaction</td></tr>
+          <tr><td>is_first_compaction</td><td>Boolean</td></tr>
+        </table>
+        <table class="field-table">
+          <tr><th>Output</th><th>Description</th></tr>
+          <tr><td>user_message</td><td>Optional informational message</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Common Input -->
+  <section id="common-input">
+    <h2><span class="icon" style="background:#4ec9b018;color:var(--green);">◎</span> Common Input Fields</h2>
+    <p>All hooks receive these fields in their input JSON:</p>
+    <div class="env-grid">
+      <div class="env-row"><span class="env-var">conversation_id</span><span class="env-desc">Current conversation identifier</span></div>
+      <div class="env-row"><span class="env-var">generation_id</span><span class="env-desc">Current generation identifier</span></div>
+      <div class="env-row"><span class="env-var">model</span><span class="env-desc">Model in use</span></div>
+      <div class="env-row"><span class="env-var">hook_event_name</span><span class="env-desc">Name of the hook event firing</span></div>
+      <div class="env-row"><span class="env-var">cursor_version</span><span class="env-desc">Cursor version string (e.g. "1.7.2")</span></div>
+      <div class="env-row"><span class="env-var">workspace_roots</span><span class="env-desc">Array of workspace root paths</span></div>
+      <div class="env-row"><span class="env-var">user_email</span><span class="env-desc">Optional — logged-in user email</span></div>
+      <div class="env-row"><span class="env-var">transcript_path</span><span class="env-desc">Optional — path to session transcript</span></div>
+    </div>
+  </section>
+
+  <!-- Matchers -->
+  <section id="matchers">
+    <h2><span class="icon" style="background:#e5c07b18;color:var(--yellow);">◆</span> Matchers</h2>
+    <p>Matchers filter which hooks fire based on event-specific criteria.</p>
+    <div class="matcher-grid">
+      <div class="matcher-row"><span class="matcher-hook">beforeShell / afterShell</span><span class="matcher-target">Matches on command string</span></div>
+      <div class="matcher-row"><span class="matcher-hook">subagentStart / subagentStop</span><span class="matcher-target">Matches on subagent_type</span></div>
+      <div class="matcher-row"><span class="matcher-hook">preToolUse / postToolUse / postToolUseFailure</span><span class="matcher-target">Matches on tool_name: Shell, Read, Write, Grep, Delete, Task, "MCP: &lt;name&gt;"</span></div>
+      <div class="matcher-row"><span class="matcher-hook">afterFileEdit</span><span class="matcher-target">Matches on tool_type: TabWrite, Write</span></div>
+      <div class="matcher-row"><span class="matcher-hook">beforeReadFile</span><span class="matcher-target">Matches on tool_type: TabRead, Read</span></div>
+      <div class="matcher-row"><span class="matcher-hook">afterAgentThought</span><span class="matcher-target">Matches: "AgentThought"</span></div>
+      <div class="matcher-row"><span class="matcher-hook">afterAgentResponse</span><span class="matcher-target">Matches: "AgentResponse"</span></div>
+      <div class="matcher-row"><span class="matcher-hook">stop</span><span class="matcher-target">Matches: "Stop"</span></div>
+      <div class="matcher-row"><span class="matcher-hook">beforeSubmitPrompt</span><span class="matcher-target">Matches: "UserPromptSubmit"</span></div>
+    </div>
+  </section>
+
+  <!-- Environment Variables -->
+  <section id="env-vars">
+    <h2><span class="icon" style="background:#61afef18;color:var(--blue);">⬡</span> Environment Variables</h2>
+    <p>Available to all hook scripts via process environment.</p>
+    <div class="env-grid">
+      <div class="env-row"><span class="env-var">CURSOR_PROJECT_DIR</span><span class="env-desc">Workspace root (always set)</span></div>
+      <div class="env-row"><span class="env-var">CURSOR_VERSION</span><span class="env-desc">Cursor version string (always set)</span></div>
+      <div class="env-row"><span class="env-var">CURSOR_USER_EMAIL</span><span class="env-desc">User email (if logged in)</span></div>
+      <div class="env-row"><span class="env-var">CURSOR_TRANSCRIPT_PATH</span><span class="env-desc">Transcript path (if enabled)</span></div>
+      <div class="env-row"><span class="env-var">CURSOR_CODE_REMOTE</span><span class="env-desc">"true" if remote workspace</span></div>
+      <div class="env-row"><span class="env-var">CLAUDE_PROJECT_DIR</span><span class="env-desc">Alias for compatibility</span></div>
+    </div>
+    <p style="margin-top:0.8rem;">Environment variables set in <code>sessionStart</code> output propagate to all subsequent hooks in the session.</p>
+  </section>
+
+  <!-- Partners -->
+  <section id="partners">
+    <h2><span class="icon" style="background:#e06c7518;color:var(--red);">⬢</span> Integration Partners</h2>
+
+    <div class="partner-group">
+      <div class="partner-label">MCP Governance</div>
+      <div class="partner-list">
+        <div class="partner-chip">MintMCP <span class="role">inventory + monitor + scan</span></div>
+        <div class="partner-chip">Oasis Security <span class="role">least-privilege + audit</span></div>
+        <div class="partner-chip">Runlayer <span class="role">MCP broker + control</span></div>
+      </div>
+    </div>
+
+    <div class="partner-group">
+      <div class="partner-label">Code Security</div>
+      <div class="partner-list">
+        <div class="partner-chip">Corridor <span class="role">realtime code feedback</span></div>
+        <div class="partner-chip">Semgrep <span class="role">vuln scan + auto-regenerate</span></div>
+      </div>
+    </div>
+
+    <div class="partner-group">
+      <div class="partner-label">Dependency Security</div>
+      <div class="partner-list">
+        <div class="partner-chip">Endor Labs <span class="role">malicious pkg detect + supply chain</span></div>
+      </div>
+    </div>
+
+    <div class="partner-group">
+      <div class="partner-label">Agent Security</div>
+      <div class="partner-list">
+        <div class="partner-chip">Snyk <span class="role">Evo Agent Guard + prompt injection</span></div>
+      </div>
+    </div>
+
+    <div class="partner-group">
+      <div class="partner-label">Secrets</div>
+      <div class="partner-list">
+        <div class="partner-chip">1Password <span class="role">env validation + JIT secrets (never on disk)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Distribution -->
+  <section id="distribution">
+    <h2><span class="icon" style="background:#7b6ef618;color:var(--accent);">⟐</span> Distribution</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--green);"></span> Project (VCS)</div>
+        <p>Commit <code>.cursor/hooks.json</code> to repo. Auto-loads in trusted workspaces.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--orange);"></span> MDM</div>
+        <p>Deploy hooks.json + scripts to <code>~/.cursor/</code> or system directories.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--blue);"></span> Cloud (Enterprise)</div>
+        <p>Dashboard-managed. Auto-syncs to all team members every 30 minutes.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--pink);"></span> 3rd Party</div>
+        <p>Supported in Claude Code with compatibility layer.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+  // Open first hook by default (already done via class), close others on page load
+  // Toggle logic is handled by onclick on .hook-event elements
+</script>
+</body>
+</html>

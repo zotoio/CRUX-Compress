@@ -3,6 +3,7 @@ generated: 2026-02-06
 sourceChecksum: "3344498055"
 beforeTokens: ~7400
 afterTokens: ~1079
+reducedBy: 85%
 ---
 
 # CRUX Compress Installer

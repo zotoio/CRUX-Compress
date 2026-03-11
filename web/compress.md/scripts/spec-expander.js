@@ -172,44 +172,58 @@ class SmoothScroll {
 }
 
 /**
- * Context Window Animation
- * Animates the problem visualization
+ * Parallax Intro
+ * Floating symbols move at different scroll speeds; cards reveal on scroll
  */
-class ContextWindowAnimation {
+class ParallaxIntro {
   constructor() {
-    this.contextWindow = document.querySelector('.context-window');
-    this.rulesSegment = document.querySelector('.context-segment--rules');
-    
-    if (this.contextWindow) {
-      this.setupObserver();
-    }
+    this.section = document.querySelector('.section--intro');
+    if (!this.section) return;
+
+    this.symbols = this.section.querySelectorAll('.intro-symbol');
+    this.cards = this.section.querySelectorAll('.intro-card');
+    this.ticking = false;
+
+    this.setupParallax();
+    this.setupCardReveal();
   }
 
-  setupObserver() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+  setupParallax() {
+    var self = this;
+    window.addEventListener('scroll', function () {
+      if (!self.ticking) {
+        requestAnimationFrame(function () {
+          self.updateParallax();
+          self.ticking = false;
+        });
+        self.ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  updateParallax() {
+    var rect = this.section.getBoundingClientRect();
+    var viewH = window.innerHeight;
+    if (rect.bottom < 0 || rect.top > viewH) return;
+
+    var scrolled = viewH - rect.top;
+    this.symbols.forEach(function (sym) {
+      var speed = parseFloat(sym.dataset.speed) || 0.15;
+      sym.style.transform = 'translateY(' + (-(scrolled * speed)) + 'px)';
+    });
+  }
+
+  setupCardReveal() {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          this.animate();
+          entry.target.classList.add('is-visible');
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.15 });
 
-    observer.observe(this.contextWindow);
-  }
-
-  animate() {
-    if (this.rulesSegment) {
-      // Animate the rules segment growing
-      this.rulesSegment.style.transition = 'width 1.5s ease-out';
-      
-      // Start small, grow to show the problem
-      this.rulesSegment.style.width = '10%';
-      
-      setTimeout(() => {
-        this.rulesSegment.style.width = '70%';
-      }, 500);
-    }
+    this.cards.forEach(function (card) { observer.observe(card); });
   }
 }
 
@@ -218,5 +232,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.specExpander = new SpecExpander();
   new ScrollAnimator();
   new SmoothScroll();
-  new ContextWindowAnimation();
+  new ParallaxIntro();
 });

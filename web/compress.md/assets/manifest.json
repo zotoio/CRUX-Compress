@@ -1,0 +1,112 @@
+{
+  "rules": [
+    {
+      "name": "sample-rule",
+      "title": "Comprehensive Team Coding Standards",
+      "sourceExt": "md",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"md"}],
+      "meta": {"sourceTokens":"~6278","cruxTokens":"~1059","decompressedTokens":"~2352","reduction":"83%"}
+    }
+  ]
+,
+  "code": [
+    {
+      "name": "install-script",
+      "title": "System Health Check Script",
+      "sourceExt": "sh",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"chatgpt52","ext":"sh"}],
+      "meta": {"sourceTokens":"~9764","cruxTokens":"~1665","reduction":"83%"}
+    }
+  ]
+,
+  "images": [
+    {
+      "name": "bethesda-terrace",
+      "title": "Bethesda Terrace Arcade",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"png"}],
+      "meta": {"beforeSize":"301684","afterSize":"2415","reduction":"99.2%"}
+    }
+,
+    {
+      "name": "crux-concept",
+      "title": "CRUX-Compress concept diagram",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"png"}],
+      "meta": {"beforeSize":"5713258","afterSize":"1039","reduction":"99.98%"}
+    }
+,
+    {
+      "name": "goldfish-pond",
+      "title": "Goldfish School in Dual-Light Water Environment",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"nano-banana-2","ext":"png"}],
+      "meta": {"beforeSize":"4271011","afterSize":"15938","reduction":"99.6%"}
+    }
+,
+    {
+      "name": "japanese-garden",
+      "title": "Japanese Garden with Koi Pond",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"png"}],
+      "meta": {"beforeSize":"18757009","afterSize":"2133","reduction":"99.99%"}
+    }
+,
+    {
+      "name": "planted-aquarium",
+      "title": "Nature Aquarium - Planted Tank Aquascape",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"png"}],
+      "meta": {"beforeSize":"13040535","afterSize":"3487","reduction":"99.97%"}
+    }
+,
+    {
+      "name": "steampunk",
+      "title": "Steampunk mixed-media art",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"unknown","ext":"png"}],
+      "meta": {"beforeSize":"2233417","afterSize":"2154","reduction":"99.9%"}
+    }
+,
+    {
+      "name": "horses",
+      "title": "Pastoral Horses Landscape - Australia",
+      "sourceExt": "png",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"nano-banana-2","ext":"png"}],
+      "meta": {"beforeSize":"8530339","afterSize":"3070","reduction":"99.96%"}
+    }
+  ]
+,
+  "urls": [
+    {
+      "name": "cursor-hooks",
+      "title": "Cursor Hooks Documentation",
+      "sourceExt": "md",
+      "hasSource": true,
+      "hasCrux": true,
+      "decompressed": [{"model":"html","ext":"html"},{"model":"unknown","ext":"md"}],
+      "meta": {"sourceTokens":"~6800","cruxTokens":"~1200","reduction":"82%"},
+      "sourceUrl": "https://cursor.com/docs/hooks",
+      "hasScreenshot": true,
+      "hasSourceHtml": true
+    }
+  ]
+}

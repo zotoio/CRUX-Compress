@@ -47,6 +47,8 @@ CRUX extracts the essential meaning from natural language markdown rules and com
 3. **Compressed rules load into context** — achieving 5-10x token reduction (target ≤20% of original)
 4. **LLMs interpret the notation natively** — no decompression needed, semantic meaning preserved, although the spec is added for completeness and reinforcement
 
+CRUX can compress markdown rules, source code, images, and even public webpages. URL sources are automatically saved to `.crux/out/` for easy access.
+
 The result: your context window stays lean while your rules remain powerful.
 
 ## Demonstration
@@ -400,7 +402,7 @@ flowchart TB
 3. Check if existing CRUX `sourceChecksum` matches → skip if unchanged
 4. Estimate token reduction using `CRUX-Utils` skill → abort if <50% reduction
 5. Apply compression rules from specification
-6. Generate output with frontmatter (generated, sourceChecksum, beforeTokens, afterTokens)
+6. Generate output with frontmatter (generated, sourceChecksum/sourceUrl, beforeTokens, afterTokens, reducedBy)
 7. Verify quality gates (target ≤20% of original)
 8. **Semantic validation**: Fresh agent instance compares CRUX to source, produces confidence score
 9. Update frontmatter with `confidence: XX%`
@@ -413,6 +415,7 @@ generated: YYYY-MM-DD HH:MM
 sourceChecksum: "1234567890"
 beforeTokens: 2500
 afterTokens: 400
+reducedBy: 84%
 confidence: 92%
 alwaysApply: true
 ---
@@ -433,6 +436,7 @@ alwaysApply: true
 /crux-compress @file1.md @file2.md    - Compress multiple files
 /crux-compress @script.sh             - Compress a code file
 /crux-compress @image.png             - Compress an image
+/crux-compress https://example.com/   - Compress a public webpage (outputs to .crux/out/)
 /crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
 /crux-compress @file.md --minified    - Compress with single-line output (note that LLMs take more effort to parse and understand this format)
 ```
@@ -449,6 +453,8 @@ alwaysApply: true
 - **Parallelism**: Spawns up to 4 `crux-cursor-rule-manager` subagents in parallel
 - **Batching**: Processes files in batches of 4 when >4 files
 - **Source Checksum Tracking**: Skips files whose sourceChecksum hasn't changed (use `--force` to bypass)
+- **URL Compression**: Compress public webpages using `sourceUrl` instead of `sourceChecksum` (outputs to `.crux/out/`)
+- **Default Output Location**: URL sources and unspecified locations output to `.crux/out/`
 - **Two-tier output**: Universal `.crux.md` + Cursor adapter `.crux.mdc` (when source is in `.cursor/rules/`)
 - **Eligibility**: Markdown needs `crux: true` frontmatter; code/images need explicit file reference
 
@@ -462,6 +468,7 @@ alwaysApply: true
 | Cursor adapter (derived)               | `.crux.mdc` | `core-tenets.crux.mdc` |
 | Compressed code                        | `.crux.md`  | `install.crux.md`      |
 | Compressed image                       | `.crux.md`  | `diagram.crux.md`      |
+| Compressed webpage (URL)               | `.crux.md`  | `.crux/out/page.crux.md` |
 
 
 ### 6. `crux-detect-changes.sh` - The Hook (`.cursor/hooks/`)
@@ -721,6 +728,7 @@ Compressed files include metrics in frontmatter:
 ```yaml
 beforeTokens: 2500  # Original
 afterTokens: 400    # Compressed (16% of original)
+reducedBy: 84%      # Compression percentage
 confidence: 92%     # Semantic validation score
 ```
 

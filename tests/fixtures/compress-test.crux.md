@@ -1,8 +1,10 @@
 ---
-generated: 2026-02-08 14:32
-sourceChecksum: 2179275645
+generated: 2026-03-11 14:32
+sourceChecksum: "2179275645"
+cruxLevel: 25
 beforeTokens: 480
-afterTokens: 291
+afterTokens: 313
+reducedBy: 35%
 confidence: 93%
 ---
 
@@ -13,40 +15,42 @@ confidence: 93%
 
 ```crux
 ⟦CRUX:compress-test.md
-Ρ{test coding standards; BATS test suite}
-Κ{test=unit test; fixture=test data file}
+Ρ{test coding standards; BATS test suite best practices}
+Κ{ut=unit test; fix=fixture; tmp=$BATS_TMPDIR}
 
 R.naming{
-  tests=test_*.bats; fixtures=*.md|*.mdc; helpers=helpers.bash
+  ut=test_*.bats; fix=*.md|*.mdc; helpers=helpers.bash
 }
 
-R.structure{
-  setup()→init env; teardown()→cleanup tmp!
-  ¬artifacts in workdir; tmp→$BATS_TMPDIR
+R.struct{
+  setup()→init env; teardown()→cleanup tmp
+  ¬artifacts in workdir!; tmp files→$BATS_TMPDIR
 }
 
-R.assertions{
+R.assert{
   success→assert_success; fail→assert_failure
   substr→assert_output --partial; line→assert_line
 }
 
-E.patterns{
-  ⊤:@test "desc"{run fn ""»assert_failure»assert_output --partial "err"}
-  ⊥:@test "test"{fn "" #¬run,¬assert}
+E.good{
+  @test "fn handles empty input"→run fn ""»assert_failure»
+    assert_output --partial "Error: empty input"
 }
 
-Γ.apply{
+E.bad{
+  @test "test something"→fn "" # ¬run,¬assert!
+}
+
+Λ.apply{
   +BATS tests; review test PRs; debug test fails
 }
 
 P.critical{
-  ⊛¬skip run⊲assertions!
-  ⊛cleanup tmp@teardown!
-  ⊛descriptive test names!
-  ⊛¬hardcoded paths→use vars
+  ¬skip run⊲assert!; ∀teardown→cleanup tmp!
+  test names=descriptive!; ¬hardcoded paths→use vars
 }
 
-P.err{
+R.err{
   fail→check $output+$status+$lines
   debug→set -x temp
 }

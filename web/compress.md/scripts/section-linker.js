@@ -1,13 +1,12 @@
 /**
  * Section Linker — Links corresponding sections across the Original,
- * CRUX Compressed, and Decompressed panels.
+ * CRUX Compressed, and Decompressed panels in the rules gallery.
  *
  * - Hover: temporarily highlights the matching section in both panels.
- * - Click: locks the highlight so it persists across tab switches,
- *          letting users compare the same section in Original vs Decompressed.
+ * - Click: locks the highlight so it persists across tab switches.
  * - Click again (or click outside): unlocks.
  *
- * Also manages the Original/Decompressed tab switching.
+ * Waits for gallery-loader + code-loader to finish before initializing.
  */
 (function () {
   'use strict';
@@ -20,20 +19,19 @@
     { id: 'errors',   original: /### Error Handling/,      crux: /P\.err\{|E\.err\{/,           decompressed: /## 6\) Error/ },
     { id: 'test',     original: /## Testing/,              crux: /R\.test\{/,                   decompressed: /## 7\) Testing/ },
     { id: 'arch',     original: /## Architecture/,         crux: /Π\.arch\{|Π\.src\{/,          decompressed: /## 8\) Architecture/ },
-    { id: 'api',      original: /## API Design/,           crux: /R\.api\{/,                    decompressed: /## 9\) API/ },
-    { id: 'git',      original: /## Git Workflow/,         crux: /R\.git\{/,                    decompressed: /## 10\) Git/ },
+    { id: 'api',      original: /## API Design/,           crux: /R\.api\{/,                   decompressed: /## 9\) API/ },
+    { id: 'git',      original: /## Git Workflow/,         crux: /R\.git\{/,                   decompressed: /## 10\) Git/ },
     { id: 'security', original: /## Security/,             crux: /P\.security\{/,               decompressed: /## 11\) Security/ },
-    { id: 'db',       original: /## Database/,             crux: /R\.db\{/,                     decompressed: /## 12\) Database/ },
-    { id: 'log',      original: /## Logging/,              crux: /R\.log\{/,                    decompressed: /## 13\) Logging/ },
-    { id: 'perf',     original: /## Performance/,          crux: /R\.perf\{/,                   decompressed: /## 14\) Performance/ },
-    { id: 'review',   original: /## Code Review/,          crux: /R\.review\{/,                 decompressed: /## 15\) Code review/ },
-    { id: 'flags',    original: /## Feature Flags/,        crux: /E\.feature_flag\{/,           decompressed: /## 16\) Feature/ },
-    { id: 'a11y',     original: /## Accessibility/,        crux: /R\.a11y\{/,                   decompressed: /## 17\) Accessibility/ },
-    { id: 'release',  original: /## Release/,              crux: /R\.release\{/,                decompressed: /## 18\) Release/ },
-    { id: 'summary',  original: /## Summary/,              crux: /^Ω\{/,                       decompressed: /## 19\) Quality/ }
+    { id: 'db',       original: /## Database/,             crux: /R\.db\{/,                    decompressed: /## 12\) Database/ },
+    { id: 'log',      original: /## Logging/,              crux: /R\.log\{/,                   decompressed: /## 13\) Logging/ },
+    { id: 'perf',     original: /## Performance/,          crux: /R\.perf\{/,                  decompressed: /## 14\) Performance/ },
+    { id: 'review',   original: /## Code Review/,          crux: /R\.review\{/,                decompressed: /## 15\) Code review/ },
+    { id: 'flags',    original: /## Feature Flags/,        crux: /E\.feature_flag\{/,          decompressed: /## 16\) Feature/ },
+    { id: 'a11y',     original: /## Accessibility/,        crux: /R\.a11y\{/,                  decompressed: /## 17\) Accessibility/ },
+    { id: 'release',  original: /## Release/,              crux: /R\.release\{/,               decompressed: /## 18\) Release/ },
+    { id: 'summary',  original: /## Summary/,              crux: /^Ω\{/,                      decompressed: /## 19\) Quality/ }
   ];
 
-  // Section display names for the lock indicator
   var SECTION_NAMES = {
     header: 'Header', naming: 'Naming', style: 'Code Style', docs: 'Docs',
     errors: 'Errors', test: 'Testing', arch: 'Architecture', api: 'API',
@@ -59,11 +57,8 @@
     for (var i = 0; i < rows.length; i++) {
       var text = getLineText(rows[i]);
       var match = findMatch(text, field);
-      if (match) {
-        current = match;
-      } else if (/^#{1,2}\s/.test(text)) {
-        current = null;
-      }
+      if (match) current = match;
+      else if (/^#{1,2}\s/.test(text)) current = null;
       if (current) rows[i].setAttribute('data-section', current);
     }
   }
@@ -73,36 +68,29 @@
     for (var i = 0; i < rows.length; i++) {
       var text = getLineText(rows[i]);
       var match = findMatch(text, 'crux');
-      if (match) {
-        current = match;
-      } else if (text.trim() === '') {
-        current = null;
-      }
+      if (match) current = match;
+      else if (text.trim() === '') current = null;
       if (current) rows[i].setAttribute('data-section', current);
     }
   }
 
-  // State
   var originalRows = [];
   var cruxRows = [];
   var decompressedRows = [];
-  var activeTab = 'original';
   var currentHighlight = null;
-  var lockedSection = null;      // null = unlocked, section id = locked
-  var lockIndicator = null;      // DOM element for the lock badge
-
-  function activeLeftRows() {
-    return activeTab === 'original' ? originalRows : decompressedRows;
-  }
+  var lockedSection = null;
+  var lockIndicator = null;
+  var galleryContainer = null;
+  var observerSetup = false;
+  var reinitTimer = null;
 
   function visibleRows() {
-    return activeLeftRows().concat(cruxRows);
+    return originalRows.concat(cruxRows);
   }
 
-  /** Apply highlight/dim classes to visible rows for a given section. */
   function applyHighlight(sectionId, sourcePanel) {
     currentHighlight = sectionId;
-    var visible = visibleRows();
+    var visible = originalRows.concat(cruxRows, decompressedRows);
     var firstOther = null;
 
     for (var i = 0; i < visible.length; i++) {
@@ -111,7 +99,10 @@
         row.classList.add('section-active');
         row.classList.remove('section-dimmed');
         if (!firstOther && row.dataset.panel !== sourcePanel) {
-          firstOther = row;
+          var panel = row.closest('.demo-panel-content');
+          if (panel && !panel.classList.contains('demo-panel-content--hidden')) {
+            firstOther = row;
+          }
         }
       } else {
         row.classList.remove('section-active');
@@ -119,19 +110,14 @@
       }
     }
 
-    // Scroll the other panel to reveal the highlighted section
     if (firstOther) {
       var container = firstOther.closest('.demo-panel-content');
       if (container) {
         var rowRect = firstOther.getBoundingClientRect();
         var containerRect = container.getBoundingClientRect();
-        var isVisible = rowRect.top >= containerRect.top &&
-                        rowRect.bottom <= containerRect.bottom;
+        var isVisible = rowRect.top >= containerRect.top && rowRect.bottom <= containerRect.bottom;
         if (!isVisible) {
-          container.scrollBy({
-            top: rowRect.top - containerRect.top - containerRect.height / 3,
-            behavior: 'smooth'
-          });
+          container.scrollBy({ top: rowRect.top - containerRect.top - containerRect.height / 3, behavior: 'smooth' });
         }
       }
     }
@@ -145,9 +131,7 @@
     }
   }
 
-  // ---- Lock indicator ----
-
-  function createLockIndicator() {
+  function createLockIndicator(afterEl) {
     var el = document.createElement('div');
     el.className = 'section-lock-indicator';
     el.innerHTML =
@@ -158,24 +142,17 @@
       '<span class="section-lock-name"></span>' +
       '<button class="section-lock-close" aria-label="Unlock section" title="Click to unlock">&times;</button>';
     el.style.display = 'none';
-
-    // Insert after the panel tabs header
-    var header = document.querySelector('.demo-panel-header--tabbed');
-    if (header) header.parentNode.insertBefore(el, header.nextSibling);
-
-    // Close button unlocks
+    if (afterEl) afterEl.parentNode.insertBefore(el, afterEl.nextSibling);
     el.querySelector('.section-lock-close').addEventListener('click', function (e) {
       e.stopPropagation();
       unlock();
     });
-
     return el;
   }
 
   function showLockIndicator(sectionId) {
     if (!lockIndicator) return;
-    lockIndicator.querySelector('.section-lock-name').textContent =
-      SECTION_NAMES[sectionId] || sectionId;
+    lockIndicator.querySelector('.section-lock-name').textContent = SECTION_NAMES[sectionId] || sectionId;
     lockIndicator.style.display = '';
   }
 
@@ -183,14 +160,11 @@
     if (lockIndicator) lockIndicator.style.display = 'none';
   }
 
-  // ---- Lock / unlock ----
-
   function lock(sectionId) {
     lockedSection = sectionId;
     applyHighlight(sectionId, null);
     showLockIndicator(sectionId);
-    // Add locked class to demo for visual feedback
-    var demo = document.getElementById('compression-demo');
+    var demo = galleryContainer ? galleryContainer.querySelector('.compression-demo') : null;
     if (demo) demo.classList.add('section-locked');
   }
 
@@ -198,185 +172,162 @@
     lockedSection = null;
     clearHighlights();
     hideLockIndicator();
-    var demo = document.getElementById('compression-demo');
+    var demo = galleryContainer ? galleryContainer.querySelector('.compression-demo') : null;
     if (demo) demo.classList.remove('section-locked');
   }
-
-  // ---- Hover + Click handlers ----
 
   var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
   function setupInteraction(panelContent, panelId) {
-    // Hover: preview highlight (only on non-touch and when not locked)
     if (!isTouch) {
       panelContent.addEventListener('mouseover', function (e) {
         if (lockedSection) return;
         var tr = e.target.closest('tr[data-section]');
-        if (tr) {
-          applyHighlight(tr.dataset.section, panelId);
-        } else {
-          clearHighlights();
-        }
+        if (tr) applyHighlight(tr.dataset.section, panelId);
+        else clearHighlights();
       });
-
       panelContent.addEventListener('mouseleave', function () {
         if (lockedSection) return;
         clearHighlights();
       });
     }
-
-    // Click / tap: toggle lock
     panelContent.addEventListener('click', function (e) {
       var tr = e.target.closest('tr[data-section]');
-      if (!tr) {
-        if (lockedSection) unlock();
-        return;
-      }
-
+      if (!tr) { if (lockedSection) unlock(); return; }
       var sectionId = tr.dataset.section;
-      if (lockedSection === sectionId) {
-        unlock();
-      } else {
-        lock(sectionId);
-      }
+      if (lockedSection === sectionId) unlock();
+      else lock(sectionId);
     });
   }
 
-  // ---- Tooltip hint ----
-
-  function addHoverHint() {
-    var demo = document.getElementById('compression-demo');
-    if (!demo) return;
+  function addHoverHint(demoEl) {
+    if (!demoEl) return;
     var hint = document.createElement('p');
     hint.className = 'section-hover-hint';
-    var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     hint.textContent = isTouch
       ? 'Tap a section to lock \u00B7 Tap again to unlock \u00B7 Switch tabs to compare'
       : 'Hover to preview sections \u00B7 Click to lock \u00B7 Switch tabs to compare';
-    demo.parentNode.insertBefore(hint, demo.nextSibling);
+    demoEl.parentNode.insertBefore(hint, demoEl.nextSibling);
   }
 
-  // ---- Tab management ----
+  function scheduleReinit() {
+    // Debounce re-initialization: multiple class mutations can fire in rapid
+    // succession during a carousel transition; clearing the previous timer
+    // ensures init() runs only once after the dust settles.
+    clearTimeout(reinitTimer);
+    reinitTimer = setTimeout(init, 300);
+  }
 
-  function switchTab(target) {
-    if (target === activeTab) return;
-    activeTab = target;
+  function init() {
+    galleryContainer = document.querySelector('[data-gallery="rules"]');
+    if (!galleryContainer) return;
 
-    // Toggle panel visibility
-    var originalPanel = document.getElementById('demo-original-panel');
-    var decompressedPanel = document.getElementById('demo-decompressed-panel');
+    var activeItem = galleryContainer.querySelector('.gallery-item--active');
+    if (!activeItem) { setTimeout(init, 300); return; }
 
-    if (target === 'original') {
-      originalPanel.classList.remove('demo-panel-content--hidden');
-      decompressedPanel.classList.add('demo-panel-content--hidden');
-    } else {
-      originalPanel.classList.add('demo-panel-content--hidden');
-      decompressedPanel.classList.remove('demo-panel-content--hidden');
+    var codeBlocks = activeItem.querySelectorAll('code.has-line-numbers');
+    if (codeBlocks.length < 2) { setTimeout(init, 300); return; }
+
+    var beforePanel = activeItem.querySelector('.demo-panel--before');
+    var afterPanel = activeItem.querySelector('.demo-panel--after');
+    if (!beforePanel || !afterPanel) return;
+
+    var origPanelContent = beforePanel.querySelector('.demo-panel-content:not(.demo-panel-content--hidden)');
+    var cruxPanelContent = afterPanel.querySelector('.demo-panel-content');
+    var decompPanelContents = beforePanel.querySelectorAll('.demo-panel-content.demo-panel-content--hidden');
+
+    if (!origPanelContent || !cruxPanelContent) return;
+
+    var origCode = origPanelContent.querySelector('code.has-line-numbers');
+    var cruxCode = cruxPanelContent.querySelector('code.has-line-numbers');
+    if (!origCode || !cruxCode) { setTimeout(init, 300); return; }
+
+    // Remove any existing hover hints before rebuilding
+    var oldHints = galleryContainer.querySelectorAll('.section-hover-hint');
+    for (var h = 0; h < oldHints.length; h++) {
+      oldHints[h].parentNode.removeChild(oldHints[h]);
     }
 
-    // Toggle tab active state
-    var tabs = document.querySelectorAll('.demo-tab');
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].dataset.target === target) {
-        tabs[i].classList.add('demo-tab--active');
-      } else {
-        tabs[i].classList.remove('demo-tab--active');
+    // Clear state before rebuilding
+    originalRows = [];
+    cruxRows = [];
+    decompressedRows = [];
+    clearHighlights();
+    if (lockedSection) {
+      lockedSection = null;
+      if (lockIndicator && lockIndicator.parentNode) {
+        lockIndicator.parentNode.removeChild(lockIndicator);
+        lockIndicator = null;
       }
     }
 
-    // Update source tokens display
-    var tokensEl = document.getElementById('demo-source-tokens');
-    if (tokensEl) {
-      tokensEl.textContent = target === 'original'
-        ? '873 lines \u00B7 ~6,278 tokens'
-        : '504 lines \u00B7 ChatGPT 5.2';
+    var origTableRows = origCode.querySelectorAll('tr');
+    var cruxTableRows = cruxCode.querySelectorAll('tr');
+
+    tagMarkdownRows(origTableRows, 'original');
+    tagCruxRows(cruxTableRows);
+
+    for (var i = 0; i < origTableRows.length; i++) {
+      origTableRows[i].dataset.panel = 'original';
+      originalRows.push(origTableRows[i]);
+    }
+    for (var j = 0; j < cruxTableRows.length; j++) {
+      cruxTableRows[j].dataset.panel = 'crux';
+      cruxRows.push(cruxTableRows[j]);
     }
 
-    // Update reduction text
-    var reductionText = document.getElementById('demo-reduction-text');
-    var reductionFill = document.getElementById('reduction-bar-fill');
-    if (target === 'original') {
-      if (reductionText) reductionText.innerHTML = '<strong>83% reduction</strong> \u2014 same semantic information';
-      if (reductionFill) reductionFill.style.width = '83%';
-    } else {
-      if (reductionText) reductionText.innerHTML = '<strong>504 lines</strong> reconstructed from 83 lines of CRUX';
-      if (reductionFill) reductionFill.style.width = '83%';
+    for (var d = 0; d < decompPanelContents.length; d++) {
+      var decompCode = decompPanelContents[d].querySelector('code.has-line-numbers');
+      if (decompCode) {
+        var decRows = decompCode.querySelectorAll('tr');
+        tagMarkdownRows(decRows, 'decompressed');
+        for (var k = 0; k < decRows.length; k++) {
+          decRows[k].dataset.panel = 'decompressed';
+          decompressedRows.push(decRows[k]);
+        }
+      }
     }
 
-    // Re-apply locked section to new visible rows
-    if (lockedSection) {
-      clearHighlights();
-      applyHighlight(lockedSection, null);
-    }
-  }
+    var tabbedHeader = beforePanel.querySelector('.demo-panel-header--tabbed');
+    if (tabbedHeader) lockIndicator = createLockIndicator(tabbedHeader);
 
-  function setupTabs() {
-    var tabs = document.querySelectorAll('.demo-tab');
-    for (var i = 0; i < tabs.length; i++) {
-      tabs[i].addEventListener('click', function () {
-        switchTab(this.dataset.target);
+    setupInteraction(origPanelContent, 'original');
+    setupInteraction(cruxPanelContent, 'crux');
+    for (var dp = 0; dp < decompPanelContents.length; dp++) {
+      setupInteraction(decompPanelContents[dp], 'decompressed');
+    }
+
+    var demo = activeItem.querySelector('.compression-demo');
+    addHoverHint(demo);
+
+    // Set up gallery-navigation observers once to avoid duplicate registrations.
+    // Uses a MutationObserver to detect when a gallery item gains the
+    // gallery-item--active class (carousel navigation), then clears and rebuilds
+    // the row arrays so they always point to the current active item's DOM.
+    if (!observerSetup) {
+      observerSetup = true;
+      var navObserver = new MutationObserver(function (mutations) {
+        for (var mutationIndex = 0; mutationIndex < mutations.length; mutationIndex++) {
+          var target = mutations[mutationIndex].target;
+          if (target.classList &&
+              target.classList.contains('gallery-item') &&
+              target.classList.contains('gallery-item--active')) {
+            scheduleReinit();
+            return;
+          }
+        }
+      });
+      navObserver.observe(galleryContainer, {
+        attributes: true,
+        attributeFilter: ['class'],
+        subtree: true
       });
     }
   }
 
-  // ---- Init ----
-
-  function init() {
-    var origCode = document.getElementById('demo-original-code');
-    var cruxCode = document.getElementById('demo-crux-code');
-    var decompCode = document.getElementById('demo-decompressed-code');
-
-    if (!origCode || !cruxCode || !decompCode ||
-        !origCode.classList.contains('has-line-numbers') ||
-        !cruxCode.classList.contains('has-line-numbers') ||
-        !decompCode.classList.contains('has-line-numbers')) {
-      setTimeout(init, 200);
-      return;
-    }
-
-    var origRows = origCode.querySelectorAll('tr');
-    var crRows = cruxCode.querySelectorAll('tr');
-    var decRows = decompCode.querySelectorAll('tr');
-
-    tagMarkdownRows(origRows, 'original');
-    tagCruxRows(crRows);
-    tagMarkdownRows(decRows, 'decompressed');
-
-    for (var i = 0; i < origRows.length; i++) {
-      origRows[i].dataset.panel = 'original';
-      originalRows.push(origRows[i]);
-    }
-    for (var j = 0; j < crRows.length; j++) {
-      crRows[j].dataset.panel = 'crux';
-      cruxRows.push(crRows[j]);
-    }
-    for (var k = 0; k < decRows.length; k++) {
-      decRows[k].dataset.panel = 'decompressed';
-      decompressedRows.push(decRows[k]);
-    }
-
-    // Create lock indicator
-    lockIndicator = createLockIndicator();
-
-    // Attach interaction handlers
-    var originalPanel = document.getElementById('demo-original-panel');
-    var cruxPanel = cruxCode.closest('.demo-panel-content');
-    var decompPanel = document.getElementById('demo-decompressed-panel');
-
-    if (originalPanel) setupInteraction(originalPanel, 'original');
-    if (cruxPanel) setupInteraction(cruxPanel, 'crux');
-    if (decompPanel) setupInteraction(decompPanel, 'decompressed');
-
-    // Tabs and hint
-    setupTabs();
-    addHoverHint();
-  }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(init, 300);
-    });
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 500); });
   } else {
-    setTimeout(init, 300);
+    setTimeout(init, 500);
   }
 })();
