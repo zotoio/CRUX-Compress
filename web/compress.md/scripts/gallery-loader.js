@@ -580,6 +580,47 @@
 
       lockHeight();
 
+      // Re-lock height after async content finishes loading (CodeLoader fetches / images).
+      // MutationObserver watches for DOM node additions caused by CodeLoader injecting code.
+      var heightUpdateTimer;
+      // Capture count at build time; all code[data-src] blocks exist in the static template.
+      var totalBlocks = itemsWrap.querySelectorAll('code[data-src]').length;
+
+      function disconnectObserver() {
+        heightObserver.disconnect();
+      }
+
+      function scheduleHeightUpdate() {
+        clearTimeout(heightUpdateTimer);
+        heightUpdateTimer = setTimeout(function () {
+          lockHeight();
+          // Disconnect once all data-src code blocks have been processed.
+          // Relies on CodeLoader adding the 'has-line-numbers' class after injection;
+          // the 10 s fallback below handles the case where this class is never applied.
+          var processed = itemsWrap.querySelectorAll('code[data-src].has-line-numbers').length;
+          if (processed >= totalBlocks && totalBlocks > 0) {
+            disconnectObserver();
+          }
+        }, 100);
+      }
+
+      var heightObserver = new MutationObserver(scheduleHeightUpdate);
+      heightObserver.observe(itemsWrap, { subtree: true, childList: true });
+
+      // Fallback: always disconnect after 10 s to avoid leaks if CodeLoader never
+      // applies .has-line-numbers (e.g. on network error).
+      if (totalBlocks > 0) {
+        setTimeout(disconnectObserver, 10000);
+      }
+
+      // Also re-lock when any gallery images finish loading.
+      var galleryImgs = itemsWrap.querySelectorAll('img');
+      for (var k = 0; k < galleryImgs.length; k++) {
+        if (!galleryImgs[k].complete) {
+          galleryImgs[k].addEventListener('load', scheduleHeightUpdate, { once: true });
+        }
+      }
+
       var resizeTimer;
       window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
