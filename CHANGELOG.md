@@ -5,6 +5,13 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.7.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.7.1) - 2026-03-11
+
+- chore: update release manifest for v2.7.1 [skip ci] (2c2f555)
+- chore: sync CRUX.md version to 2.7.1 [skip ci] (1efc0ae)
+- fix: update gallery loader text labels and iframe sandbox (38e1cb8)
+- docs: update CHANGELOG.md for v2.7.0 [skip ci] (ea972ed)
+
 ## [v2.7.0](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.7.0) - 2026-03-11
 
 - chore: update release manifest for v2.7.0 [skip ci] (a7f5ee2)
