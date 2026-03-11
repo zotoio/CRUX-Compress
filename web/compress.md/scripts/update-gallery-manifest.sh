@@ -136,32 +136,28 @@ for type in "${TYPES[@]}"; do
       src_url=$(extract_frontmatter_value "$crux_file" "sourceUrl")
       has_screenshot=$([[ -f "$type_dir/${shortname}.screenshot.png" ]] && echo "true" || echo "false")
       has_html=$([[ -f "$type_dir/${shortname}.source.html" ]] && echo "true" || echo "false")
-      cat >> "$tmpfile" <<ITEM
-    {
-      "name": "$shortname",
-      "title": "$title",
-      "sourceExt": "$source_ext",
-      "hasSource": $has_source,
-      "hasCrux": true,
-      "decompressed": $decompressed,
-      "meta": $meta,
-      "sourceUrl": "$src_url",
-      "hasScreenshot": $has_screenshot,
-      "hasSourceHtml": $has_html
-    }
-ITEM
+      jq -n \
+        --arg name "$shortname" \
+        --arg title "$title" \
+        --arg sourceExt "$source_ext" \
+        --argjson hasSource "$has_source" \
+        --argjson decompressed "$decompressed" \
+        --argjson meta "$meta" \
+        --arg sourceUrl "$src_url" \
+        --argjson hasScreenshot "$has_screenshot" \
+        --argjson hasSourceHtml "$has_html" \
+        '{name:$name,title:$title,sourceExt:$sourceExt,hasSource:$hasSource,hasCrux:true,decompressed:$decompressed,meta:$meta,sourceUrl:$sourceUrl,hasScreenshot:$hasScreenshot,hasSourceHtml:$hasSourceHtml}' \
+        >> "$tmpfile"
     else
-      cat >> "$tmpfile" <<ITEM
-    {
-      "name": "$shortname",
-      "title": "$title",
-      "sourceExt": "$source_ext",
-      "hasSource": $has_source,
-      "hasCrux": true,
-      "decompressed": $decompressed,
-      "meta": $meta
-    }
-ITEM
+      jq -n \
+        --arg name "$shortname" \
+        --arg title "$title" \
+        --arg sourceExt "$source_ext" \
+        --argjson hasSource "$has_source" \
+        --argjson decompressed "$decompressed" \
+        --argjson meta "$meta" \
+        '{name:$name,title:$title,sourceExt:$sourceExt,hasSource:$hasSource,hasCrux:true,decompressed:$decompressed,meta:$meta}' \
+        >> "$tmpfile"
     fi
     item_idx=$((item_idx + 1))
     echo "  [$type] $shortname -> $title"

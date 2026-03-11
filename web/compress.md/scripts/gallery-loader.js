@@ -72,6 +72,9 @@
       navigator.clipboard.writeText(text).then(function () {
         btn.classList.add('copied');
         setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+      }).catch(function () {
+        btn.title = 'Copy failed – check clipboard permissions';
+        setTimeout(function () { btn.title = 'Copy to clipboard'; }, 2000);
       });
     });
     return btn;
@@ -433,7 +436,7 @@
     srcCard.appendChild(srcHeader);
     var srcContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
     if (item.sourceUrl) {
-      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
+      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts' }));
     } else if (item.hasSource) {
       var srcPre = el('pre');
       srcPre.appendChild(el('code', { className: 'language-markdown', 'data-src': basePath + '/' + item.name + '.source.' + item.sourceExt, textContent: 'Loading...' }));
@@ -488,7 +491,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
+          dContent.appendChild(el('iframe', { src: dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');
@@ -576,6 +579,17 @@
       }
 
       lockHeight();
+
+      // Re-run lockHeight after async content (code/image loads) expands the items
+      var CONTENT_SETTLE_TIMEOUT_MS = 10000;
+      var _lhTimer;
+      var _lhObserver = new MutationObserver(function () {
+        clearTimeout(_lhTimer);
+        _lhTimer = setTimeout(lockHeight, 150);
+      });
+      _lhObserver.observe(itemsWrap, { subtree: true, childList: true });
+      // Stop observing after initial content has settled
+      setTimeout(function () { _lhObserver.disconnect(); }, CONTENT_SETTLE_TIMEOUT_MS);
 
       var resizeTimer;
       window.addEventListener('resize', function () {
