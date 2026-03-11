@@ -72,6 +72,9 @@
       navigator.clipboard.writeText(text).then(function () {
         btn.classList.add('copied');
         setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+      }).catch(function () {
+        btn.title = 'Copy failed – check clipboard permissions';
+        setTimeout(function () { btn.title = 'Copy to clipboard'; }, 2000);
       });
     });
     return btn;
@@ -436,7 +439,7 @@
     srcCard.appendChild(srcHeader);
     var srcContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
     if (item.sourceUrl) {
-      srcContent.appendChild(el('iframe', { 'data-src': item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts allow-same-origin' }));
+      srcContent.appendChild(el('iframe', { src: item.sourceUrl, title: srcLabel, sandbox: 'allow-scripts' }));
     } else if (item.hasSource) {
       var srcPre = el('pre');
       srcPre.appendChild(el('code', { className: 'language-markdown', 'data-src': basePath + '/' + item.name + '.source.' + item.sourceExt, textContent: 'Loading...' }));
@@ -491,7 +494,7 @@
         var dContent;
         if (d.ext === 'html') {
           dContent = el('div', { className: 'url-demo-card-content url-demo-card-content--iframe' });
-          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts allow-same-origin' }));
+          dContent.appendChild(el('iframe', { 'data-src': dSrc, title: item.title + ' decompressed by ' + displayModel(d.model), sandbox: 'allow-scripts' }));
         } else {
           dContent = el('div', { className: 'url-demo-card-content' });
           var dPre = el('pre');

@@ -17,7 +17,7 @@ is_valid_crux_file() {
     [[ "$file" != *.crux.mdc ]] && \
     [[ "$file" != *.crux.md ]] && \
     [[ -f "$file" ]] && \
-    head -20 "$file" 2>/dev/null | grep -qE "crux:[[:space:]]*(true|[1-9][0-9]{0,2})[[:space:]]*$"
+    head -20 "$file" 2>/dev/null | grep -qE "crux:[[:space:]]*(true|([1-9][0-9]?|100))[[:space:]]*$"
 }
 
 # Function to normalize path to repo-relative

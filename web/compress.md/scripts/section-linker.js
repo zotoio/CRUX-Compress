@@ -81,6 +81,8 @@
   var lockedSection = null;
   var lockIndicator = null;
   var galleryContainer = null;
+  var observerSetup = false;
+  var reinitTimer = null;
 
   function visibleRows() {
     return originalRows.concat(cruxRows);
@@ -208,9 +210,34 @@
     demoEl.parentNode.insertBefore(hint, demoEl.nextSibling);
   }
 
+  function scheduleReinit() {
+    // Debounce re-initialization: multiple class mutations can fire in rapid
+    // succession during a carousel transition; clearing the previous timer
+    // ensures init() runs only once after the dust settles.
+    clearTimeout(reinitTimer);
+    reinitTimer = setTimeout(init, 300);
+  }
+
   function init() {
     galleryContainer = document.querySelector('[data-gallery="rules"]');
     if (!galleryContainer) return;
+
+    // Install a MutationObserver once to re-initialize when the active item changes
+    if (!observerInstalled) {
+      observerInstalled = true;
+      var navObserver = new MutationObserver(function (mutations) {
+        for (var mi = 0; mi < mutations.length; mi++) {
+          var m = mutations[mi];
+          if (m.type === 'attributes' && m.attributeName === 'class' &&
+              m.target.classList && m.target.classList.contains('gallery-item') &&
+              m.target.classList.contains('gallery-item--active')) {
+            setTimeout(reinit, 100);
+            return;
+          }
+        }
+      });
+      navObserver.observe(galleryContainer, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    }
 
     var activeItem = galleryContainer.querySelector('.gallery-item--active');
     if (!activeItem) { setTimeout(init, 300); return; }
@@ -231,6 +258,12 @@
     var origCode = origPanelContent.querySelector('code.has-line-numbers');
     var cruxCode = cruxPanelContent.querySelector('code.has-line-numbers');
     if (!origCode || !cruxCode) { setTimeout(init, 300); return; }
+
+    // Remove any existing hover hints before rebuilding
+    var oldHints = galleryContainer.querySelectorAll('.section-hover-hint');
+    for (var h = 0; h < oldHints.length; h++) {
+      oldHints[h].parentNode.removeChild(oldHints[h]);
+    }
 
     // Clear state before rebuilding
     originalRows = [];
@@ -284,16 +317,27 @@
     var demo = activeItem.querySelector('.compression-demo');
     addHoverHint(demo);
 
-    // Rebind on slide changes or model selector changes
-    if (galleryContainer) {
-      galleryContainer.addEventListener('galleryChange', function () {
-        setTimeout(init, 300);
+    // Set up gallery-navigation observers once to avoid duplicate registrations.
+    // Uses a MutationObserver to detect when a gallery item gains the
+    // gallery-item--active class (carousel navigation), then clears and rebuilds
+    // the row arrays so they always point to the current active item's DOM.
+    if (!observerSetup) {
+      observerSetup = true;
+      var navObserver = new MutationObserver(function (mutations) {
+        for (var mutationIndex = 0; mutationIndex < mutations.length; mutationIndex++) {
+          var target = mutations[mutationIndex].target;
+          if (target.classList &&
+              target.classList.contains('gallery-item') &&
+              target.classList.contains('gallery-item--active')) {
+            scheduleReinit();
+            return;
+          }
+        }
       });
-    }
-    var modelSelectors = activeItem.querySelectorAll('.model-selector-btn');
-    for (var m = 0; m < modelSelectors.length; m++) {
-      modelSelectors[m].addEventListener('click', function () {
-        setTimeout(init, 300);
+      navObserver.observe(galleryContainer, {
+        attributes: true,
+        attributeFilter: ['class'],
+        subtree: true
       });
     }
   }
