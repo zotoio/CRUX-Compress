@@ -101,7 +101,7 @@ Read: CRUX.md if not already known.
      - **Level 16-30**: Key elements, layout, and primary meaning
      - **Level 31-50**: All significant elements, spatial relationships, color scheme, text
      - **Level 51-75**: Detailed description including textures, gradients, secondary elements
-     - **Level 76-100** (default range): Maximum detail — every visual element, subtle effects, precise positioning
+     - **Level 76-100**: Maximum detail — every visual element, subtle effects, precise positioning (default 80)
    - Record `cruxLevel` in the output frontmatter
 
 7. **For URL compression tasks** (when source is a URL):
