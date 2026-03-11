@@ -53,6 +53,10 @@ get_source_ext() {
   fi
 }
 
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\n/\\n/g; s/\r/\\r/g'
+}
+
 find_decompressed() {
   local dir="$1" shortname="$2"
   local results=()
@@ -63,6 +67,8 @@ find_decompressed() {
     model_and_ext="${basename#"${shortname}.decompressed-"}"
     ext="${model_and_ext##*.}"
     model="${model_and_ext%.*}"
+    model=$(json_escape "$model")
+    ext=$(json_escape "$ext")
     results+=("{\"model\":\"${model}\",\"ext\":\"${ext}\"}")
   done
   if [[ ${#results[@]} -eq 0 ]]; then
@@ -87,12 +93,14 @@ build_meta() {
     [[ -n "$after_size" ]] && parts+=("\"afterSize\":\"$after_size\"")
     [[ -n "$reduced" ]] && parts+=("\"reduction\":\"${reduced}\"")
   else
-    local before_tokens after_tokens reduced
+    local before_tokens after_tokens reduced decompressed_tokens
     before_tokens=$(extract_frontmatter_value "$file" "beforeTokens")
     after_tokens=$(extract_frontmatter_value "$file" "afterTokens")
     reduced=$(extract_frontmatter_value "$file" "reducedBy")
+    decompressed_tokens=$(extract_frontmatter_value "$file" "decompressedTokens")
     [[ -n "$before_tokens" ]] && parts+=("\"sourceTokens\":\"~${before_tokens}\"")
     [[ -n "$after_tokens" ]] && parts+=("\"cruxTokens\":\"~${after_tokens}\"")
+    [[ -n "$decompressed_tokens" ]] && parts+=("\"decompressedTokens\":\"~${decompressed_tokens}\"")
     [[ -n "$reduced" ]] && parts+=("\"reduction\":\"${reduced}\"")
   fi
   if [[ ${#parts[@]} -eq 0 ]]; then
@@ -124,9 +132,12 @@ for type in "${TYPES[@]}"; do
     [[ -f "$crux_file" ]] || continue
 
     shortname=$(basename "$crux_file" .crux.md)
+    shortname=$(json_escape "$shortname")
     source_ext=$(get_source_ext "$type_dir" "$shortname")
+    source_ext=$(json_escape "$source_ext")
     has_source=$([[ -n "$source_ext" ]] && echo "true" || echo "false")
     title=$(extract_title "$crux_file" "$shortname")
+    title=$(json_escape "$title")
     decompressed=$(find_decompressed "$type_dir" "$shortname")
     meta=$(build_meta "$crux_file" "$type")
 
@@ -134,6 +145,7 @@ for type in "${TYPES[@]}"; do
 
     if [[ "$type" == "urls" ]]; then
       src_url=$(extract_frontmatter_value "$crux_file" "sourceUrl")
+      src_url=$(json_escape "$src_url")
       has_screenshot=$([[ -f "$type_dir/${shortname}.screenshot.png" ]] && echo "true" || echo "false")
       has_html=$([[ -f "$type_dir/${shortname}.source.html" ]] && echo "true" || echo "false")
       jq -n \

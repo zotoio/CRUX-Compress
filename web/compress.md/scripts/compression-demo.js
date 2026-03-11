@@ -200,25 +200,25 @@ function animateHeroStats() {
 
 // Sticky nav: show after scrolling past hero, highlight active section
 function initSiteNav() {
-  var nav = document.getElementById('site-nav');
-  var hero = document.getElementById('hero');
+  const nav = document.getElementById('site-nav');
+  const hero = document.getElementById('hero');
   if (!nav || !hero) return;
 
-  var links = nav.querySelectorAll('.site-nav-link');
-  var sections = [];
+  const links = nav.querySelectorAll('.site-nav-link');
+  const sections = [];
   links.forEach(function (link) {
-    var id = link.getAttribute('href').replace('#', '');
-    var el = document.getElementById(id);
+    const id = link.getAttribute('href').replace('#', '');
+    const el = document.getElementById(id);
     if (el) sections.push({ id: id, el: el, link: link });
   });
 
   function update() {
-    var heroBottom = hero.getBoundingClientRect().bottom;
+    const heroBottom = hero.getBoundingClientRect().bottom;
     nav.classList.toggle('is-visible', heroBottom < 0);
 
-    var scrollY = window.scrollY + 80;
-    var active = null;
-    for (var i = sections.length - 1; i >= 0; i--) {
+    const scrollY = window.scrollY + 80;
+    let active = null;
+    for (let i = sections.length - 1; i >= 0; i--) {
       if (sections[i].el.offsetTop <= scrollY) { active = sections[i].id; break; }
     }
     links.forEach(function (l) {
@@ -226,7 +226,7 @@ function initSiteNav() {
     });
   }
 
-  var ticking = false;
+  let ticking = false;
   window.addEventListener('scroll', function () {
     if (!ticking) {
       requestAnimationFrame(function () { update(); ticking = false; });

@@ -737,13 +737,13 @@
   <section id="session-lifecycle">
     <h3>Session Lifecycle</h3>
 
-    <div class="hook-event open" onclick="this.classList.toggle('open')">
-      <div class="hook-header">
+    <div class="hook-event open">
+      <button class="hook-header" aria-controls="hook-sessionStart" aria-expanded="true" onclick="this.parentElement.classList.toggle('open'); this.setAttribute('aria-expanded', this.parentElement.classList.contains('open'))">
         <span class="hook-chevron">▶</span>
         <span class="hook-name">sessionStart</span>
         <span class="hook-badge badge-fire-forget">fire &amp; forget</span>
-      </div>
-      <div class="hook-body">
+      </button>
+      <div class="hook-body" id="hook-sessionStart">
         <p>Fires at session start. Non-blocking.</p>
         <table class="field-table">
           <tr><th>Input</th><th>Description</th></tr>
@@ -759,13 +759,13 @@
       </div>
     </div>
 
-    <div class="hook-event" onclick="this.classList.toggle('open')">
-      <div class="hook-header">
+    <div class="hook-event">
+      <button class="hook-header" aria-controls="hook-sessionEnd" aria-expanded="false" onclick="this.parentElement.classList.toggle('open'); this.setAttribute('aria-expanded', this.parentElement.classList.contains('open'))">
         <span class="hook-chevron">▶</span>
         <span class="hook-name">sessionEnd</span>
         <span class="hook-badge badge-fire-forget">fire &amp; forget</span>
-      </div>
-      <div class="hook-body">
+      </button>
+      <div class="hook-body" id="hook-sessionEnd">
         <p>Fires when session ends.</p>
         <table class="field-table">
           <tr><th>Input</th><th>Description</th></tr>

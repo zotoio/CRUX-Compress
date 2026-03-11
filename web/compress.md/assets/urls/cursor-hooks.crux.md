@@ -111,13 +111,13 @@ E.subagentStop{⊲subagent done;
  out={?followup_message→auto-continue(only status=completed)};
  loop_limit applies(default 5)}
 
-E.beforeShell{in+={command,cwd,sandbox:bool};
+E.beforeShellExecution{in+={command,cwd,sandbox:bool};
  out={permission:"allow"|"deny"|"ask",?user_message,?agent_message}}
-E.beforeMCP{in+={tool_name,tool_input,url|command};
+E.beforeMCPExecution{in+={tool_name,tool_input,url|command};
  out={permission:"allow"|"deny"|"ask",?user_message,?agent_message};
  failClosed=⊤ recommended}
-E.afterShell{in+={command,output,duration:ms,sandbox:bool}}
-E.afterMCP{in+={tool_name,tool_input,result_json,duration:ms}}
+E.afterShellExecution{in+={command,output,duration:ms,sandbox:bool}}
+E.afterMCPExecution{in+={tool_name,tool_input,result_json,duration:ms}}
 
 E.afterFileEdit{in+={file_path:abs,edits:[{old_string,new_string}]}}
 E.beforeReadFile{
@@ -156,7 +156,7 @@ E.preCompact{observe only;¬block|modify;
  out={?user_message}}
 
 M.matchers{
- beforeShell|afterShell→cmd string;
+ beforeShellExecution|afterShellExecution→cmd string;
  subagentStart|subagentStop→subagent_type;
  preToolUse|postToolUse|postToolUseFailure→tool_name
   [Shell,Read,Write,Grep,Delete,Task,"MCP: <name>"];

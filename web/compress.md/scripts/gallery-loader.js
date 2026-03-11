@@ -179,8 +179,7 @@
       });
       if (ms) ms.style.display = target === 'decompressed' ? '' : 'none';
       if (tokenSpan) {
-        tokenSpan.textContent = (target === 'decompressed' && item.meta.decompressedTokens
-          ? item.meta.decompressedTokens : item.meta.sourceTokens) + ' tokens';
+        tokenSpan.textContent = item.meta.sourceTokens + ' tokens';
       }
     }
 
@@ -220,7 +219,11 @@
       fill.style.width = item.meta.reduction;
       bar.appendChild(fill);
       reduction.appendChild(bar);
-      reduction.appendChild(el('p', { className: 'reduction-text', innerHTML: '<strong>' + item.meta.reduction + ' reduction</strong> — same semantic information' }));
+      var reductionText = el('p', { className: 'reduction-text' });
+      var strong = el('strong', { textContent: item.meta.reduction + ' reduction' });
+      reductionText.appendChild(strong);
+      reductionText.appendChild(document.createTextNode(' — same semantic information'));
+      reduction.appendChild(reductionText);
       frag.appendChild(reduction);
     }
     return frag;

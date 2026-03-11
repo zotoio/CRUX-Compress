@@ -15,6 +15,14 @@
 (function () {
   'use strict';
 
+  // Shared selector array for demo code blocks
+  var DEMO_CODE_SELECTORS = [
+    '.code-demo-card-content pre code',
+    '.image-demo-card-content pre code',
+    '.demo-panel-content pre code',
+    '.url-demo-card-content pre code'
+  ];
+
   // Register a custom CRUX language for highlight.js
   if (typeof hljs !== 'undefined') {
     hljs.registerLanguage('crux', function () {
@@ -185,13 +193,7 @@
     if (typeof hljs === 'undefined') return;
 
     // Target code blocks in demo panels and card contents
-    var selectors = [
-      '.code-demo-card-content pre code',
-      '.image-demo-card-content pre code',
-      '.demo-panel-content pre code',
-      '.url-demo-card-content pre code'
-    ];
-    var blocks = document.querySelectorAll(selectors.join(','));
+    var blocks = document.querySelectorAll(DEMO_CODE_SELECTORS.join(','));
 
     for (var i = 0; i < blocks.length; i++) {
       var block = blocks[i];
@@ -210,13 +212,7 @@
     for (var i = 0; i < elements.length; i++) {
       loadCode(elements[i]);
     }
-    var selectors = [
-      '.code-demo-card-content pre code',
-      '.image-demo-card-content pre code',
-      '.demo-panel-content pre code',
-      '.url-demo-card-content pre code'
-    ];
-    var blocks = container.querySelectorAll(selectors.join(','));
+    var blocks = container.querySelectorAll(DEMO_CODE_SELECTORS.join(','));
     for (var j = 0; j < blocks.length; j++) {
       var block = blocks[j];
       if (block.hasAttribute('data-src') || block.classList.contains('has-line-numbers')) continue;

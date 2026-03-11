@@ -97,7 +97,12 @@
       if (row.dataset.section === sectionId) {
         row.classList.add('section-active');
         row.classList.remove('section-dimmed');
-        if (!firstOther && row.dataset.panel !== sourcePanel) firstOther = row;
+        if (!firstOther && row.dataset.panel !== sourcePanel) {
+          var panel = row.closest('.demo-panel-content');
+          if (panel && !panel.classList.contains('demo-panel-content--hidden')) {
+            firstOther = row;
+          }
+        }
       } else {
         row.classList.remove('section-active');
         row.classList.add('section-dimmed');
@@ -259,6 +264,19 @@
     var cruxCode = cruxPanelContent.querySelector('code.has-line-numbers');
     if (!origCode || !cruxCode) { setTimeout(init, 300); return; }
 
+    // Clear state before rebuilding
+    originalRows = [];
+    cruxRows = [];
+    decompressedRows = [];
+    clearHighlights();
+    if (lockedSection) {
+      lockedSection = null;
+      if (lockIndicator && lockIndicator.parentNode) {
+        lockIndicator.parentNode.removeChild(lockIndicator);
+        lockIndicator = null;
+      }
+    }
+
     var origTableRows = origCode.querySelectorAll('tr');
     var cruxTableRows = cruxCode.querySelectorAll('tr');
 
@@ -297,6 +315,19 @@
 
     var demo = activeItem.querySelector('.compression-demo');
     addHoverHint(demo);
+
+    // Rebind on slide changes or model selector changes
+    if (galleryContainer) {
+      galleryContainer.addEventListener('galleryChange', function () {
+        setTimeout(init, 300);
+      });
+    }
+    var modelSelectors = activeItem.querySelectorAll('.model-selector-btn');
+    for (var m = 0; m < modelSelectors.length; m++) {
+      modelSelectors[m].addEventListener('click', function () {
+        setTimeout(init, 300);
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
