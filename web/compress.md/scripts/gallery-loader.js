@@ -635,8 +635,14 @@
         if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
       }
 
-      container.addEventListener('mouseenter', function () { hovering = true; });
-      container.addEventListener('mouseleave', function () { hovering = false; });
+      container.addEventListener('mouseenter', function () {
+        hovering = true;
+        stopAuto();
+      });
+      container.addEventListener('mouseleave', function () {
+        hovering = false;
+        startAuto();
+      });
 
       startAuto();
     }
