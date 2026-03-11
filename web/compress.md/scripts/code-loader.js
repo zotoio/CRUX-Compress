@@ -188,7 +188,8 @@
     var selectors = [
       '.code-demo-card-content pre code',
       '.image-demo-card-content pre code',
-      '.demo-panel-content pre code'
+      '.demo-panel-content pre code',
+      '.url-demo-card-content pre code'
     ];
     var blocks = document.querySelectorAll(selectors.join(','));
 
@@ -204,6 +205,25 @@
     }
   }
 
+  function processContainer(container) {
+    var elements = container.querySelectorAll('code[data-src]');
+    for (var i = 0; i < elements.length; i++) {
+      loadCode(elements[i]);
+    }
+    var selectors = [
+      '.code-demo-card-content pre code',
+      '.image-demo-card-content pre code',
+      '.demo-panel-content pre code',
+      '.url-demo-card-content pre code'
+    ];
+    var blocks = container.querySelectorAll(selectors.join(','));
+    for (var j = 0; j < blocks.length; j++) {
+      var block = blocks[j];
+      if (block.hasAttribute('data-src') || block.classList.contains('has-line-numbers')) continue;
+      if (block.textContent.trim().length > 0) processCodeElement(block);
+    }
+  }
+
   // Load all data-src code blocks
   var elements = document.querySelectorAll('code[data-src]');
   for (var i = 0; i < elements.length; i++) {
@@ -212,5 +232,12 @@
 
   // Highlight and number existing inline code blocks
   highlightInlineBlocks();
+
+  window.CodeLoader = {
+    loadCode: loadCode,
+    processCodeElement: processCodeElement,
+    extractCruxBlock: extractCruxBlock,
+    processContainer: processContainer
+  };
 
 })();

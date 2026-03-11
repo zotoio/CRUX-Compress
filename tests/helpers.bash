@@ -64,6 +64,28 @@ This rule ensures code quality across the project.
 EOF
 }
 
+# Create a sample markdown file with a numeric crux level
+create_sample_md_with_level() {
+    local path="$1"
+    local level="$2"
+    cat > "$path" << EOF
+---
+crux: ${level}
+alwaysApply: true
+---
+
+# Sample Rule (Level ${level})
+
+This is a sample rule with compression level ${level}.
+
+## Guidelines
+
+1. Always write clean code
+2. Follow naming conventions
+3. Add proper documentation
+EOF
+}
+
 # Create a sample CRUX file for testing
 create_sample_crux() {
     local path="$1"

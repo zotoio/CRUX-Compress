@@ -3,6 +3,7 @@ generated: 2026-02-08 14:32
 sourceChecksum: 1689381612
 beforeTokens: ~9764
 afterTokens: ~1665
+reducedBy: 83%
 confidence: 90%
 ---
 

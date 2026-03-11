@@ -21,8 +21,8 @@ Read: CRUX.md if not already known.
 ## Your Expertise
 
 - **CRUX Notation**: Encoding symbols, structure blocks, relation operators
-- **Semantic Compression**: Reducing prose while preserving meaning
-- **Token Optimization**: Achieving ≤20% of original file size
+- **Semantic Compression**: Reducing prose while preserving meaning at configurable verbosity levels
+- **Token Optimization**: Achieving target ratio based on compression level (default ≤25%)
 - **Decompression**: Interpreting and explaining CRUX notation to LLMs
 - **Semantic Validation**: Evaluating CRUX output against source for semantic equivalence
 
@@ -43,6 +43,11 @@ Read: CRUX.md if not already known.
    - **Semantic Validation** → Compare CRUX output to source for semantic equivalence and produce confidence score
 
 3. **For compression tasks**:
+   - **Resolve compression level**: 
+     - If `compressionLevel` parameter was provided by orchestrator, use it
+     - Else if source frontmatter has `crux: <n>` (numeric), use `n`
+     - Else if source frontmatter has `crux: true`, use default `25` (or `80` for image sources)
+     - Valid range: 1-100. Reject values outside this range.
    - **Get source file's checksum** using `CRUX-Utils` skill (`--cksum` mode)
    - **Check if CRUX file exists** - if so, read its `sourceChecksum` frontmatter
    - **Skip if unchanged**: If existing `sourceChecksum` matches current source checksum, report "Source unchanged (checksum: <checksum>)" and skip compression
@@ -51,13 +56,18 @@ Read: CRUX.md if not already known.
      - If `CRUX-Utils` skill is available, use `--token-count` mode
      - Fallback: LLM estimation (prose: 4 chars/token, code: 3.5 chars/token, CRUX symbols: 1 token each)
    - **Estimate token reduction BEFORE writing output** - if reduction would be <50%, ABORT and inform the user the file is already compact
-   - Apply compression rules from the specification
+   - **Apply compression rules from the specification**, calibrated to the compression level:
+     - **Level ≤15**: Maximum aggression — collapse everything to symbols, minimal prose, deepest abbreviation
+     - **Level 16-30** (default range): Standard compression — balanced symbol use and abbreviation
+     - **Level 31-50**: Moderate compression — preserve more structure and occasional prose
+     - **Level 51-75**: Light compression — maintain most readability, abbreviate only obvious terms
+     - **Level 76-100**: Minimal compression — largely preserve original structure, use CRUX blocks for organization only
    - Use standard blocks appropriately and don't invent new block types
-   - **Add `sourceChecksum` to frontmatter** with the checksum value
+   - **Add `sourceChecksum` and `cruxLevel` to frontmatter**
    - **After writing CRUX file**, estimate its tokens using the same method
    - **Compare tokens**: Use the skill's ratio mode if available, otherwise calculate from LLM estimates
    - Report the token counts and percentage reduction
-   - Verify quality gates are met (target ≤20% of original)
+   - Verify quality gates are met (target ≤ level% of original)
    - **If target ratio not achieved, DO NOT write the CRUX file** - inform user compression is not beneficial
 
 4. **For surgical diff updates** (when source rule file changed):
@@ -85,20 +95,48 @@ Read: CRUX.md if not already known.
    - **Return the confidence score** to the caller
    - If confidence < 80%, flag specific issues found
 
-6. **For output files**:
-   - INPUT: `[filename].md` → OUTPUT: `[filename].crux.md` (universal, target ≤20%)
+6. **For image compression tasks** (when source is an image):
+   - **Resolve compression level** (same precedence as text, but image default is 80)
+   - The level controls **detail retention** in the semantic visual description:
+     - **Level 1-15**: Essential concept only — primary subject, dominant color, core meaning
+     - **Level 16-30**: Key elements, layout, and primary meaning
+     - **Level 31-50**: All significant elements, spatial relationships, color scheme, text
+     - **Level 51-75**: Detailed description including textures, gradients, secondary elements
+     - **Level 76-100** (default range): Maximum detail — every visual element, subtle effects, precise positioning
+   - Record `cruxLevel` in the output frontmatter
+
+7. **For URL compression tasks** (when source is a URL):
+   - Receive the fetched webpage content and source URL from the orchestrator
+   - Treat the fetched content as the source material for compression
+   - Derive the output filename from the URL's hostname/path (e.g., `https://agents.md/specification` → `agents-md-specification.crux.md`)
+   - Store `sourceUrl` in frontmatter instead of `sourceChecksum` (URLs have no local checksum)
+   - Apply the same compression rules, token estimation, and quality gates as for local files
+   - Output is always written to `.crux/out/` (see output path rules below)
+
+8. **For output files**:
+   - INPUT: `[filename].md` → OUTPUT: `[filename].crux.md` (universal, target ≤ level%)
    - **Cursor adapter**: Also produce `[filename].crux.mdc` (copy of `.crux.md` with `alwaysApply` injected from source frontmatter)
+
+### Output Path Rules
+
+   - **Local file with explicit path** (e.g., `@.cursor/rules/my-rule.md`): output goes alongside the source file (same directory)
+   - **URL source** (e.g., `https://agents.md/`): output goes to `.crux/out/` — the agent has no local source directory to place it alongside
+   - **No implied location**: if the source context does not imply a specific directory, output defaults to `.crux/out/`
+   - The `.crux/out/` directory is created automatically if it does not exist
 
 ## Compression Checklist
 
 When compressing, verify:
+- [ ] **Compression level resolved** (CLI flag > frontmatter > default 25 text / 80 images)
 - [ ] **Source checksum obtained** via `CRUX-Utils` skill
 - [ ] **Skip check performed** - if existing CRUX `sourceChecksum` matches, skip update
-- [ ] **Significant reduction achieved** (≥50% reduction, target ≤20% of original) - ABORT if not met
+- [ ] **Significant reduction achieved** (≥50% reduction, target ≤ level% of original) - ABORT if not met
 - [ ] `generated` timestamp in frontmatter (YYYY-MM-DD HH:MM format)
 - [ ] `sourceChecksum` in frontmatter (checksum value only)
+- [ ] `cruxLevel` in frontmatter (resolved compression level, 1-100)
 - [ ] `beforeTokens` populated (skill if available, else LLM estimation)
 - [ ] `afterTokens` populated (skill if available, else LLM estimation)
+- [ ] `reducedBy` populated — `round((1 - afterTokens/beforeTokens) * 100)%`
 - [ ] `confidence` populated after validation (see below)
 - [ ] All file paths preserved verbatim
 - [ ] All commands reconstructable
@@ -151,14 +189,27 @@ For compression output files:
 ---
 generated: YYYY-MM-DD HH:MM
 sourceChecksum: [checksum from CRUX-Utils skill]
+cruxLevel: [compression level 1-100, default 25]
 beforeTokens: [estimated token count of source file]
 afterTokens: [estimated token count of this CRUX file]
+reducedBy: [XX% - calculated as round((1 - afterTokens/beforeTokens) * 100)]
+confidence: [XX% - added after semantic validation by separate agent]
+---
+
+**URL source variant** (`.crux.md` — when source is a URL):
+---
+generated: YYYY-MM-DD HH:MM
+sourceUrl: [the original URL]
+cruxLevel: [compression level 1-100, default 25]
+beforeTokens: [estimated token count of fetched content]
+afterTokens: [estimated token count of this CRUX file]
+reducedBy: [XX% - calculated as round((1 - afterTokens/beforeTokens) * 100)]
 confidence: [XX% - added after semantic validation by separate agent]
 ---
 
 **Cursor adapter** (`.crux.mdc` — derived from `.crux.md` when source is in `.cursor/rules/`):
 ---
-[all fields from .crux.md above]
+[all fields from .crux.md above, including cruxLevel and reducedBy]
 alwaysApply: [from source file frontmatter, default false]
 [any other Cursor-specific frontmatter from source]
 ---
@@ -221,7 +272,9 @@ When the `--minified` flag is specified, output single-line CRUX:
 **IMPORTANT**: 
 - The `generated` field is REQUIRED and must be updated every time the CRUX file is created or modified. Use the current date and time in `YYYY-MM-DD HH:MM` format (24-hour time).
 - The `sourceChecksum` field is REQUIRED. Use the `CRUX-Utils` skill (`--cksum` mode). Store the checksum value only. This enables skip-if-unchanged optimization.
+- The `cruxLevel` field is REQUIRED. Record the resolved compression level (1-100). Default is 25 when `crux: true` or no level specified.
 - The `beforeTokens` and `afterTokens` fields are REQUIRED. Use the `CRUX-Utils` skill (`--token-count` mode) if available. Fallback: LLM estimation using prose=4 chars/token, code=3.5 chars/token, CRUX symbols=1 token each.
+- The `reducedBy` field is REQUIRED. Calculate as `round((1 - afterTokens/beforeTokens) * 100)%`. Example: beforeTokens=1614, afterTokens=388 → reducedBy: 76%.
 - The `confidence` field is REQUIRED and must be populated after a separate validation agent evaluates the CRUX against the source.
 
 ## Critical Knowledge

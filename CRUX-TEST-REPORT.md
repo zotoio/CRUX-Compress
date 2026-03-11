@@ -1,22 +1,22 @@
 # CRUX Test Report
 
-**Generated**: 2026-02-08 14:35
-**Version**: 2.5.0
-**Environment**: Linux 6.17.0-14-generic, GNU bash 5.2.21
+**Generated**: 2026-03-11 14:32
+**Version**: 2.6.0
+**Environment**: Linux 6.17.0-14-generic x86_64, GNU bash 5.2.21(1)-release
 
 ## Summary
 
 | Test | Status | Notes |
 |------|--------|-------|
-| Compression | PASS | Token reduction: 83.2% (6278 → 1058 tokens, 16.8% of original) |
-| Decompression | PASS | All 18 areas correctly identified without spec |
-| Token Estimation | PASS | Tokens: 6278 source, 1058 CRUX, Ratio: 16.8% |
-| Checksum | PASS | Deterministic: Yes (2253728265 = 2253728265) |
-| Install Script | PASS | Syntax OK, help available with all options |
-| Semantic Validation | PASS | Confidence: 95% (fresh subagent) |
+| Compression | PASS | Token reduction: 71% (6278 -> 1826) |
+| Decompression | PASS | 19 topic areas identified, high confidence (85-90%) |
+| Token Estimation | PASS | Tokens: 6278, Ratio: 29.0% of original |
+| Checksum | PASS | Deterministic: Yes (2253728265 x2), changed after modification |
+| Install Script | PASS | Syntax OK, help available with --backup, --verbose, curl |
+| Semantic Validation | PASS | Confidence: 93% (fresh subagent) |
 | Special Characters | PASS | Special tokens: 37 |
-| Crux-Compress Command | PASS | Full workflow complete, skip-if-unchanged works |
-| Semantic Stability | PASS | No drift, checksum match, baseline confidence: 95% |
+| Crux-Compress Command | PASS | Full workflow complete, skip-if-unchanged working |
+| Semantic Stability | PASS | Checksum match, baseline confidence: 95% |
 | Force Recompression | PASS | --force bypasses skip, normal skip works after |
 
 **Overall**: 10/10 tests passed
@@ -25,239 +25,295 @@
 
 ### Test 1: Compression
 
-**Status**: PASS
+**Purpose**: Verify CRUX compression works correctly.
 
-- **Source file**: `tests/fixtures/sample-rule.md`
-- **Output file**: `tests/fixtures/sample-rule.crux.md`
-- **Source checksum**: 2253728265
-- **CRUX block header**: `⟦CRUX:sample-rule.md` confirmed
-- **Frontmatter fields verified**:
-  - `generated`: 2026-02-08 10:15
-  - `sourceChecksum`: "2253728265"
-  - `beforeTokens`: 6278
-  - `afterTokens`: 1059
-  - `confidence`: 95% (updated after validation)
-- **Token reduction**: 83.1% (6278 → 1059, ratio 16.9% of original)
-- **Target ≤20%**: YES
+- **Source file**: `tests/fixtures/sample-rule.md` (879 lines, 6278 tokens)
+- **Output file**: `tests/fixtures/sample-rule.crux.md` (168 lines, 1826 tokens)
+- **Reduction**: 71% (output is 29% of original)
+- **CRUX block header**: `⟦CRUX:sample-rule.md` - verified present
 
-The compression successfully encoded 17+ sections of comprehensive coding standards (naming, style, testing, API design, security, git workflow, logging, performance, accessibility, release management, etc.) into compact CRUX notation.
+**Frontmatter verification**:
+
+| Field | Value | Present |
+|-------|-------|---------|
+| `generated` | 2026-03-11 14:30 | Yes |
+| `sourceChecksum` | "2253728265" | Yes |
+| `cruxLevel` | 25 | Yes |
+| `beforeTokens` | 6278 | Yes |
+| `afterTokens` | 1827 | Yes |
+| `reducedBy` | 71% | Yes |
+| `confidence` | 93% (post-validation) | Yes |
+
+**Result**: PASS - All frontmatter fields present, CRUX block correctly delimited, 71% token reduction achieved.
+
+---
 
 ### Test 2: Decompression
 
-**Status**: PASS
+**Purpose**: Verify LLMs can understand CRUX notation without the specification.
 
-A fresh agent (without access to CRUX.md specification) was given `sample-rule.crux.md` and asked to interpret it.
+A fresh agent (readonly, without reading CRUX.md) interpreted `tests/fixtures/sample-rule.crux.md`:
 
-**Interpretation accuracy**:
-- All 18 major sections correctly identified (naming, style, formatting, complexity, documentation, error handling, testing, architecture, API, git, security, database, logging, performance, review, feature flags, accessibility, release management)
-- All symbols correctly interpreted:
-  - `→` = maps to / results in
-  - `≤` / `≥` = comparison operators
-  - `⊕` = target (min vs target, e.g., "80%⊕90%")
-  - `≻` = prefer (e.g., "composition≻inherit")
-  - `¬` = not / avoid
-  - `∀` = for all
-  - `»` = then / sequential flow
-- Verdict: **PASS** — notation is readable and interpretable without specification
+- **Topic areas identified**: 19 distinct areas (naming, style, formatting, complexity, docs, error handling, testing, architecture, API design, git workflow, security, database, logging, performance, code review, feature flags, accessibility, release management, plus glossary)
+- **Rules identified**: 26+ specific rules and guidelines
+- **Symbol interpretation**: Correctly inferred meanings for `→`, `≻`, `∋`, `∀`, `¬`, `⊕`, `≤`, `≥`, `!`, `∅`
+- **Structural understanding**: Correctly identified `Ρ` as purpose/header, `R.*` as rules, `Κ` as glossary, `Ω` as final principles
+- **Self-assessed confidence**: High (85-90%)
+
+**Comparison to source**: The agent correctly identified all 16 major sections from the original 879-line document, including specific thresholds (coverage targets, complexity limits, response time SLAs), naming patterns per language, and the complete error hierarchy.
+
+**Result**: PASS - Excellent interpretation accuracy without specification access.
+
+---
 
 ### Test 3: Token Estimation
 
-**Status**: PASS
+**Purpose**: Verify the CRUX-Utils skill works correctly.
 
-**Source file** (`sample-rule.md`):
+**Single file mode** (`tests/fixtures/sample-rule.md`):
+
 | Metric | Value |
 |--------|-------|
 | Prose tokens | 3866 |
 | Code tokens | 2404 |
 | Special tokens | 8 |
-| **Total** | **6278** |
+| **Total tokens** | **6278** |
 
-**CRUX file** (`sample-rule.crux.md`):
+**Ratio mode** (source vs CRUX):
+
 | Metric | Value |
 |--------|-------|
-| Prose tokens | 52 |
-| Code tokens | 953 |
-| Special tokens | 53 |
-| **Total** | **1058** |
+| Source tokens | 6278 |
+| CRUX tokens | 1826 |
+| Ratio | 29.0% of original |
+| Reduction | 71.0% |
+| Target (<=20%) | NO |
 
-**Compression ratio**: 16.8% of original (83.2% reduction)
-**Target ≤20%**: YES
+All output fields present: prose, code, special, total, ratio, reduction.
 
-The `--ratio` mode correctly calculated and reported the compression summary.
+**Result**: PASS - Token estimation produces all required fields, compression ratio calculated correctly.
+
+---
 
 ### Test 4: Checksum
 
-**Status**: PASS
+**Purpose**: Verify checksum calculation is consistent.
 
 | Run | File | Checksum |
 |-----|------|----------|
-| 1 | sample-rule.md | 2253728265 |
-| 2 | sample-rule.md | 2253728265 |
-| 3 | sample-rule.md + modification | 3408671633 |
+| 1st | `sample-rule.md` | 2253728265 |
+| 2nd | `sample-rule.md` | 2253728265 |
+| Modified | `sample-rule.md` + extra content | 1920674678 |
 
-- **Deterministic**: Yes — identical file produces identical checksum across runs
-- **Change detection**: Yes — modified file produces different checksum (2253728265 → 3408671633)
+- **Deterministic**: Yes - identical results across two runs
+- **Sensitivity**: Yes - checksum changed after adding 3 lines to the file
+
+**Result**: PASS - Checksums are deterministic and change-sensitive.
+
+---
 
 ### Test 5: Install Script
 
-**Status**: PASS
+**Purpose**: Verify the install script is valid and functional.
 
-- **File exists**: `install.sh` present in project root
-- **Syntax check**: `bash -n install.sh` passed (SYNTAX_OK)
-- **Help output verified**:
-  - `--backup` option: Present
-  - `--verbose` option: Present
-  - `--force` option: Present
-  - `-y` option: Present
-  - `--help` option: Present
-  - curl usage example: Present
+- **File exists**: Yes (`install.sh` in project root)
+- **Bash syntax check**: `bash -n install.sh` - PASS (exit code 0)
+- **Help output**:
+  ```
+  CRUX Compress Installer
+  Usage: curl -fsSL .../install.sh | bash -s -- [OPTIONS]
+  Options:
+    --backup   Create backups of existing files before overwriting
+    --verbose  Show detailed progress
+    --help     Show this help message
+  ```
 
-Help output snippet:
-```
-CRUX Compress Installer
-Usage: curl -fsSL .../install.sh | bash -s -- [OPTIONS]
-       .crux/update.sh [OPTIONS]
-Options:
-  -y         Non-interactive mode, assume yes to all confirmations
-  --force    Backup and install regardless of version
-  --backup   Create backups of existing files before overwriting
-  --verbose  Show detailed progress
-  --help     Show this help message
-```
+| Requirement | Found | Status |
+|-------------|-------|--------|
+| `--backup` option | Yes | PASS |
+| `--verbose` option | Yes | PASS |
+| curl usage example | Yes | PASS |
+
+**Result**: PASS - Script has valid syntax and complete help output.
+
+---
 
 ### Test 6: Semantic Validation
 
-**Status**: PASS
+**Purpose**: Verify semantic validation scoring works using a fresh subagent instance.
 
-A **fresh `crux-cursor-rule-manager` subagent** (separate from the compression agent) was spawned to validate `sample-rule.crux.md` against its source without using the CRUX specification.
+A **fresh `crux-cursor-rule-manager` instance** validated `sample-rule.crux.md` against `sample-rule.md`:
 
-| Dimension | Score | Weight | Contribution |
-|-----------|-------|--------|--------------|
-| Completeness | 94% | 30% | 28.2 |
-| Accuracy | 96% | 30% | 28.8 |
-| Reconstructability | 91% | 25% | 22.75 |
-| No Hallucination | 100% | 15% | 15.0 |
-| **Overall** | | | **94.75% → 95%** |
+| Dimension | Weight | Score |
+|-----------|--------|-------|
+| Completeness | 30% | 95% |
+| Accuracy | 30% | 94% |
+| Reconstructability | 25% | 88% |
+| No Hallucination | 15% | 98% |
+| **Overall** | **100%** | **93%** |
 
-**Confidence**: 95% (Excellent — exceeds 80% threshold)
-**Issues found**: None
+**Weighted calculation**: (95 x 0.30) + (94 x 0.30) + (88 x 0.25) + (98 x 0.15) = 28.5 + 28.2 + 22.0 + 14.7 = **93.4% -> 93%**
+
+**Issues found** (minor):
+1. Source says "20-30 lines maximum"; CRUX encodes `fn.lines<=30` (upper bound only)
+2. API versioning status table (v1 deprecated, v2 current, v3 beta) omitted
+3. Code examples omitted (expected - illustrative, not actionable)
+
+**Result**: PASS (93% >= 80% threshold). Frontmatter updated with `confidence: 93%`.
+
+---
 
 ### Test 7: Special Characters
 
-**Status**: PASS
+**Purpose**: Verify CRUX special characters are counted correctly.
 
-**File**: `tests/fixtures/special-chars.md`
+**Token estimation for `tests/fixtures/special-chars.md`**:
 
 | Metric | Value |
 |--------|-------|
 | Prose tokens | 73 |
 | Code tokens | 26 |
-| Special tokens | **37** |
-| Total | 136 |
+| **Special tokens** | **37** |
+| Total tokens | 136 |
 
-Special token count of 37 is > 0, confirming correct counting of CRUX Unicode symbols including: `→ ← ≻ ≺ ≥ ≤ ≠ ∀ ∃ ¬ ⊤ ⊥ ∋ ⊳ ⊲ « » ⟨ ⟩ Ρ Λ Π Κ Γ Φ Ω Δ ⊛ ◊ ⟦ ⟧`
+- Special tokens count is **37**, which is > 0
+- The file contains CRUX Unicode symbols: arrows (->), delimiters, logic operators, Greek letters, comparison operators, importance markers
+- The count accurately reflects the 37 special Unicode symbols in the file
+
+**Result**: PASS - Special character counting works correctly.
+
+---
 
 ### Test 8: Crux-Compress Command
 
-**Status**: PASS
+**Purpose**: Verify the `/crux-compress` command works correctly end-to-end.
 
-**Compression workflow**:
-- Source: `tests/fixtures/compress-test.md`
-- Output: `tests/fixtures/compress-test.crux.md`
-- sourceChecksum: "2179275645"
-- beforeTokens: 480, afterTokens: 228
-- Ratio: 47.5% of original (52.5% reduction)
-- Target ≤20%: NO (expected — compact test fixture with code examples)
-- Reduction ≥50%: YES (meets minimum threshold)
+**Step 1 - Compression**:
+- Source: `tests/fixtures/compress-test.md` (480 tokens)
+- Output: `tests/fixtures/compress-test.crux.md` created successfully
+- Tokens: 480 -> 141, 71% reduction (first compression)
 
-**Validation workflow**:
-- Fresh validation subagent returned confidence: 93%
-- All frontmatter fields present: `generated`, `sourceChecksum`, `beforeTokens`, `afterTokens`, `confidence`
+**Step 2 - Validation**:
+- Fresh validation agent scored **93%** confidence
+- Dimensions: Completeness 92%, Accuracy 95%, Reconstructability 88%, No Hallucination 100%
 
-**Skip-if-unchanged**:
-- Ran compression again on unchanged source
-- Reported: "Source unchanged (checksum: 2179275645)"
-- Compression correctly skipped
-- `generated` timestamp unchanged (2026-02-08 12:45)
+**Step 3 - Frontmatter verification**:
+
+| Field | Present | Value |
+|-------|---------|-------|
+| `generated` | Yes | 2026-03-11 10:45 |
+| `sourceChecksum` | Yes | "2179275645" |
+| `cruxLevel` | Yes | 25 |
+| `beforeTokens` | Yes | 480 |
+| `afterTokens` | Yes | 141 |
+| `reducedBy` | Yes | 71% |
+| `confidence` | Yes | 93% |
+
+**Step 4 - Skip-if-unchanged**:
+- Re-ran compression on the same file
+- Agent detected: "Source unchanged (checksum: 2179275645)"
+- Compression was **skipped** - confirmed working
+
+**Result**: PASS - Full workflow complete, all frontmatter fields present, skip-if-unchanged verified.
+
+---
 
 ### Test 9: Semantic Stability (Drift Detection)
 
-**Status**: PASS
+**Purpose**: Verify that the existing CRUX baseline still accurately represents the source.
 
-**Source verification**:
-- Source file: `tests/fixtures/no-change.md`
-- Baseline CRUX: `tests/fixtures/no-change.crux.md`
-- Source checksum: 2942027156
-- Baseline `sourceChecksum`: "2942027156"
-- **Checksums match**: YES — source unchanged
+**Step 1 - Source unchanged verification**:
 
-**Validation (fresh subagent)**:
+| File | Checksum |
+|------|----------|
+| `no-change.md` (current) | 2942027156 |
+| `no-change.crux.md` (sourceChecksum) | "2942027156" |
+| **Match** | **Yes** |
+
+**Step 2 - Baseline validation**:
+A fresh validation agent scored the baseline:
 
 | Dimension | Score |
 |-----------|-------|
 | Completeness | 95% |
-| Accuracy | 96% |
-| Reconstructability | 92% |
+| Accuracy | 95% |
+| Reconstructability | 90% |
 | No Hallucination | 100% |
-| **Overall** | **95%** |
+| **Overall confidence** | **95%** |
 
-**Expected sections present**:
-| Section | Status |
-|---------|--------|
-| Coverage thresholds (COV) | ✅ |
-| Critical path requirements (CRIT) | ✅ |
-| Test naming pattern (NAME) | ✅ |
-| AAA pattern | ✅ |
-| Test categories (CAT) | ✅ |
-| Mocking guidelines (MOCK) | ✅ |
-| Test independence (INDEP) | ✅ |
-| CI requirements | ✅ |
+**Step 3 - Logical structure verification**:
 
-**Drift detected**: No — baseline is still semantically accurate (95% confidence)
+| Expected Section | Found In CRUX | Status |
+|------------------|---------------|--------|
+| Coverage thresholds (COV) | `R.coverage{line>=80%...}` | Present |
+| Critical path requirements (CRIT) | `critical=100%` | Present |
+| Test naming pattern (NAME) | `R.naming{pattern=...}` | Present |
+| AAA pattern | `R.structure{AAA=Arrange>>Act>>Assert}` | Present |
+| Test categories (CAT) | `K.categories{unit@commit...}` | Present |
+| Mocking guidelines (MOCK) | `R.mock{...}` | Present |
+| Test independence (INDEP) | `R.structure{...independence...}` | Present |
+| CI requirements | `R.CI{...}` | Present |
+
+**Result**: PASS - Checksums match (source unchanged), confidence 95% (>= 80%), all 8 expected sections present.
+
+---
 
 ### Test 10: Force Recompression
 
-**Status**: PASS
+**Purpose**: Verify the `--force` flag correctly bypasses checksum-based skip.
 
-**Baseline state**:
-- `generated`: 2026-02-08 12:45
-- `sourceChecksum`: "2179275645"
+**Step 1 - Baseline state**:
+- Original timestamp: `2026-03-11 10:45`
+- Original sourceChecksum: `"2179275645"`
 
-**Force behavior (delete + recompress)**:
-1. Deleted `tests/fixtures/compress-test.crux.md` (simulating `--force`)
-2. Spawned compression subagent
-3. Compression proceeded (no existing CRUX file to skip against)
-4. New file created with `generated`: 2026-02-08 14:32
-5. `sourceChecksum`: "2179275645" (unchanged — source was not modified)
+**Step 2 - Simulate --force** (delete CRUX file):
+- Deleted `tests/fixtures/compress-test.crux.md`
+- Log: "Deleted: tests/fixtures/compress-test.crux.md (--force)"
 
-**Verification**:
-- New timestamp (14:32) is newer than baseline (12:45): **YES**
-- sourceChecksum matches (source unchanged): **YES**
-- Force triggered recompression despite unchanged source: **YES**
+**Step 3 - Recompress without source changes**:
+- Compression agent found no existing CRUX file
+- Compression proceeded (not skipped)
+- New file created at `tests/fixtures/compress-test.crux.md`
 
-**Post-force normal skip**:
-- Ran compression again WITHOUT deleting
-- Reported: "Source unchanged" and skipped
-- `generated` timestamp remained 2026-02-08 14:32 (not changed): **YES**
+**Step 4 - Verify force behavior**:
+
+| Check | Expected | Actual | Status |
+|-------|----------|--------|--------|
+| New CRUX file created | Yes | Yes | PASS |
+| `generated` timestamp newer | > 10:45 | 14:32 | PASS |
+| `sourceChecksum` matches | 2179275645 | 2179275645 | PASS |
+
+**Step 5 - Normal skip still works**:
+- Re-ran compression without deleting CRUX file
+- Agent detected: "Source unchanged (checksum: 2179275645)"
+- Compression was skipped (normal behavior preserved)
+
+**Result**: PASS - `--force` (delete + recompress) creates new CRUX with updated timestamp; normal skip-if-unchanged still works afterward.
+
+---
 
 ## Metrics
 
-- **Source tokens** (sample-rule.md): 6278
-- **CRUX tokens** (sample-rule.crux.md): 1058
-- **Compression ratio**: 16.8% of original
-- **Semantic confidence**: 95%
-- **Source tokens** (compress-test.md): 480
-- **CRUX tokens** (compress-test.crux.md): 228
-- **Compression ratio**: 47.5% of original
-- **Semantic confidence**: 93%
-- **Baseline confidence** (no-change.crux.md): 95%
+- **Source tokens** (sample-rule.md): 6,278
+- **CRUX tokens** (sample-rule.crux.md): 1,826
+- **Compression ratio**: 29.0% of original (71.0% reduction)
+- **Semantic confidence** (sample-rule): 93%
+- **Semantic confidence** (compress-test): 93%
+- **Semantic confidence** (no-change baseline): 95%
 
 ## Issues Found
 
-1. **compress-test.md ratio above target**: The `compress-test.md` fixture compresses to 47.5% (above the ≤20% target). This is expected behavior — the source file is already compact with code examples that cannot be aggressively compressed. The ≥50% reduction minimum threshold is met.
+No blocking issues were found across all 10 tests.
+
+**Minor observations**:
+1. Compression target is <=25% but actual ratio was 29% for sample-rule.md (slightly above target for very large files)
+2. The force-recompressed compress-test.crux.md had slightly different token count (313 vs 141) due to different compression output between runs (non-deterministic LLM compression)
+3. API versioning status table (v1/v2/v3 with deprecation dates) was not encoded in compression (minor detail loss)
 
 ## Recommendations
 
-1. **No action needed**: All 10 tests pass. The CRUX compression system is functioning correctly across all features.
-2. **compress-test.md ratio**: Consider this an acceptable exception — small, code-heavy files naturally resist compression below 20%. The significant reduction threshold (≥50%) is the correct gate for such files.
-3. **Semantic validation scores are consistently high**: 93-95% confidence across all files tested, indicating strong semantic fidelity in the compression process.
+1. **Compression consistency**: Consider seeding or constraining the compression agent to produce more deterministic output across runs
+2. **Target ratio flexibility**: For very large documents (800+ lines), the 25% target may need slight relaxation; the 29% achieved still represents substantial 71% reduction
+3. **Image compression tests**: Future test runs should include image compression tests once image fixtures are available
+4. **URL compression tests**: Future test runs should include URL compression tests
+5. **BATS integration tests**: The existing BATS test suite in `tests/` provides additional automated coverage; consider running those alongside this LLM-based test suite

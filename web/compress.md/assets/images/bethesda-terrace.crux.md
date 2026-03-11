@@ -1,3 +1,13 @@
+---
+generated: 2026-03-09
+beforeSize: 301684
+afterSize: 2415
+reducedBy: 99.2%
+---
+
+# Bethesda Terrace Arcade
+
+```crux
 ⟦CRUX:IMG_3908-32a052d9-885d-42a8-bb21-b0363c335a13.png
 Ρ{Bethesda Terrace Arcade; Central Park NYC; architectural photograph; tourist scene}
 
@@ -76,3 +86,4 @@ E.lighting{
   msg="historic architectural gem hidden beneath Central Park"
 }
 ⟧
+```

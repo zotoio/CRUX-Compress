@@ -17,7 +17,7 @@ is_valid_crux_file() {
     [[ "$file" != *.crux.mdc ]] && \
     [[ "$file" != *.crux.md ]] && \
     [[ -f "$file" ]] && \
-    head -20 "$file" 2>/dev/null | grep -q "crux:[[:space:]]*true"
+    head -20 "$file" 2>/dev/null | grep -qE "crux:[[:space:]]*(true|[1-9][0-9]{0,2})[[:space:]]*$"
 }
 
 # Function to normalize path to repo-relative
@@ -57,7 +57,11 @@ cleanup_invalid_entries() {
     
     # Only update file if entries actually changed
     if [[ "$current_files_json" != "$new_files_json" ]]; then
-        echo "{\"files\": $new_files_json, \"updated\": \"$(date -Iseconds)\"}" > "$pending_file"
+        if [[ ${#valid_files[@]} -gt 0 ]]; then
+            echo "{\"files\": $new_files_json, \"updated\": \"$(date -Iseconds)\"}" > "$pending_file"
+        else
+            echo '{"files": []}' > "$pending_file"
+        fi
     fi
 }
 
@@ -80,7 +84,7 @@ if is_valid_crux_file "$file_path"; then
     
     # Ensure file always exists with valid structure
     if [[ ! -f "$pending_file" ]] || ! jq -e '.files' "$pending_file" > /dev/null 2>&1; then
-        echo '{"files": [], "updated": ""}' > "$pending_file"
+        echo '{"files": []}' > "$pending_file"
     fi
     
     # Add entry to array if not already present

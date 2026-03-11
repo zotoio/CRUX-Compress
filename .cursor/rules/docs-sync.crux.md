@@ -6,7 +6,6 @@ beforeTokens: 468
 afterTokens: 314
 reducedBy: 33%
 confidence: 92%
-alwaysApply: true
 crux: true
 ---
 

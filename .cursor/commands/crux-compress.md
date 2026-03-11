@@ -14,10 +14,15 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 /crux-compress ALL --minified         - Compress all with single-line output
 /crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
 /crux-compress @file.md --force       - Force recompression of specific file
+/crux-compress @file.md --40          - Compress targeting 40% of original size
+/crux-compress @file.md --10          - Aggressive compression targeting 10%
 /crux-compress @script.sh              - Compress a code file
 /crux-compress @src/app.ts @lib/utils.py - Compress multiple code files
 /crux-compress @image.png             - Compress an image (semantic visual description)
+/crux-compress @image.png --80        - Compress image retaining 80% detail
 /crux-compress @img1.png @img2.jpg    - Compress multiple images
+/crux-compress https://example.com/page  - Compress a webpage (URL source)
+/crux-compress https://a.com https://b.com - Compress multiple URLs
 ```
 
 ### Flags
@@ -26,8 +31,24 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 |------|-------------|----------|
 | `--minified` | Single-line output, no spaces, max compression | Copy-paste demos, LLM testing |
 | `--force` | Delete existing `.crux.md` and `.crux.mdc` files before compression | Force fresh recompression, bypass checksum skip |
+| `--<n>` | Set compression level to `n`% (1-100). Overrides frontmatter `crux: <n>`. Default: 25 | `--40` for 40% target, `--10` for aggressive compression |
 
-**Note**: Flags can be combined: `/crux-compress ALL --force --minified`
+**Note**: Flags can be combined: `/crux-compress ALL --force --minified --40`
+
+### Compression Level
+
+The compression level controls the target output size as a percentage of the original:
+
+| Level | Target | Effect |
+|-------|--------|--------|
+| `--10` | ≤10% of original | Very aggressive — heavy abbreviation, symbols only |
+| `--25` (default) | ≤25% of original | Standard compression |
+| `--40` | ≤40% of original | Moderate — more prose preserved |
+| `--80` | ≤80% of original | Light — close to original structure |
+
+The level can also be set in the source file's frontmatter as `crux: <n>` (e.g., `crux: 40`). The CLI flag overrides frontmatter when both are present.
+
+For **images**, the level controls detail retention (100 = maximum detail, 1 = minimal; default 80). For **text sources**, it controls the token ratio target (default 25).
 
 ### Output Formats
 
@@ -63,6 +84,21 @@ This optimization prevents redundant recompression of unchanged files.
 
 ## Instructions
 
+### Compression Level Resolution
+
+Before processing any files, resolve the compression level:
+
+1. **Check CLI flags** for `--<n>` where `n` is 1-100 (e.g., `--40`, `--10`). This is the highest priority.
+2. **Check source frontmatter** for `crux: <n>` where `n` is a number. `crux: true` is equivalent to `crux: 25`.
+3. **Default**: 25 for text sources, 80 for images (if neither CLI flag nor numeric frontmatter is present)
+
+The resolved level is:
+- Passed to each `crux-cursor-rule-manager` subagent as `compressionLevel: <n>`
+- Recorded in output frontmatter as `cruxLevel: <n>`
+- Used to set the target ratio: `target_ratio = level / 100`
+
+**Validation**: If the level is outside 1-100, reject with an error message and do not proceed.
+
 ### Force Flag Pre-processing (`--force`)
 
 When the `--force` flag is passed, **before any compression**:
@@ -94,10 +130,14 @@ When any referenced file has a supported image extension (`.png`, `.jpg`, `.jpeg
      Compress this image into CRUX notation (semantic visual description):
      - Source: <image file path>
      - Output: <image path with extension replaced by .crux.md>
+     - Compression level: <resolved level, default 80>
      - Use vision capabilities to analyze the image
      - Describe semantic content using CRUX blocks (Ρ, Κ, Π.layout, E.element, Ω.metaphor)
      - Preserve all visible text/labels verbatim
      - Capture spatial relationships, visual style, and conceptual meaning
+     - Detail retention: level controls how much visual detail to describe
+       (100 = maximum detail, every element; 80 = detailed with textures and secondary elements;
+        25 = key elements and meaning; 10 = essential concept only)
      - Follow CRUX.md specification for notation
      - Report original file size and .crux.md file size
      ```
@@ -108,6 +148,44 @@ When any referenced file has a supported image extension (`.png`, `.jpg`, `.jpeg
    - Any issues encountered
 
 **Note**: Image compression does not use `sourceChecksum` tracking, `crux: true` frontmatter, or the `--minified` flag. Semantic validation is not automated for images — visual fidelity must be verified manually by feeding the `.crux.md` file to an LLM with image generation.
+
+### When invoked with URL(s) (`https://...`)
+
+When any argument is a URL (starts with `http://` or `https://`):
+
+1. **If `--force` flag is passed**, delete existing `.crux.md` files in `.crux/out/` for matching URL-derived filenames first
+
+2. **For each URL**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
+   - Process URLs in batches of up to 4 parallel agents
+   - **Before spawning**: fetch the webpage content using the `WebFetch` tool
+   - **Derive output filename** from the URL: strip protocol, replace `/` and special chars with `-`, remove trailing `-`, append `.crux.md`
+     - `https://agents.md/` → `agents-md.crux.md`
+     - `https://example.com/docs/api` → `example-com-docs-api.crux.md`
+   - **Output directory**: `.crux/out/` (create if it doesn't exist)
+   - Task the subagent:
+     ```
+     Compress this webpage content into CRUX notation:
+     - Source URL: <url>
+     - Content: <fetched webpage content>
+     - Output: .crux/out/<derived-filename>.crux.md
+     - Format: <formatted (default) OR minified if --minified flag was passed>
+     - Compression level: <resolved level, default 25>
+     - Use sourceUrl in frontmatter instead of sourceChecksum
+     - Include reducedBy percentage and cruxLevel in frontmatter
+     - Follow CRUX.md specification for notation
+     - Report before/after token counts
+     ```
+
+3. **After compression completes**, spawn a **fresh validation agent** (same as for markdown)
+
+4. **Collect results** and report:
+   - URL processed
+   - Output file path (in `.crux/out/`)
+   - Token reduction achieved and `reducedBy` percentage
+   - Confidence score from validation
+   - Any issues encountered
+
+**Note**: URL compression uses `sourceUrl` instead of `sourceChecksum` in frontmatter. No Cursor adapter (`.crux.mdc`) is produced for URL sources. URLs are NOT included in `ALL` scans — they must be explicitly provided.
 
 ### When invoked with code file reference(s) (`@path/to/file.sh`, `@path/to/file.ts`, etc.)
 
@@ -123,6 +201,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      - Source: <code file path>
      - Output: <code path with extension replaced by .crux.md>
      - Format: <formatted (default) OR minified if --minified flag was passed>
+     - Compression level: <resolved level, default 25>
      - Use code block mappings: Λ for functions, Γ for orchestration, Φ for config
      - Preserve function names verbatim, type signatures for public interfaces
      - Encode IO semantics explicitly (stdout vs stderr, return channels)
@@ -156,11 +235,12 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      - Source: <file path>
      - Output: <file path with .crux.md extension>
      - Format: <formatted (default) OR minified if --minified flag was passed>
+     - Compression level: <resolved level, default 25>
      - Follow CRUX.md specification
      - Do NOT include alwaysApply or other IDE-specific frontmatter in .crux.md
      - Check source checksum vs existing CRUX sourceChecksum - skip if unchanged
      - Report before/after token counts using `CRUX-Utils` skill (or "skipped - source unchanged")
-     - If source lacks `crux: true` frontmatter, add it first
+     - If source lacks `crux: true` or `crux: <n>` frontmatter, add `crux: true` first
      - Ensure source uses .md extension (rename from .mdc if needed)
      ```
 
@@ -201,7 +281,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - Remove any files from the `files` array that were just processed (successfully compressed or skipped)
    - Do NOT remove files that were not part of this compression run (preserve newly added pending files)
    - Write the updated JSON back to the file
-   - If the `files` array is now empty, write `{"files": [], "updated": "<timestamp>"}`
+   - If the `files` array is now empty, write `{"files": []}` (omit the `updated` field)
 
 ### When invoked with `ALL`
 
@@ -211,9 +291,10 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - This ensures all eligible sources will be freshly compressed
 
 2. **Find all eligible files**:
-   - Search `.cursor/rules/**/*.md` and `.cursor/rules/**/*.mdc` for files with frontmatter `crux: true`
+   - Search `.cursor/rules/**/*.md` and `.cursor/rules/**/*.mdc` for files with frontmatter `crux: true` or `crux: <n>`
    - Exclude files that already have a `.crux.md` or `.crux.mdc` extension (they are outputs, not sources)
    - For `.mdc` files found: apply pre-processing (rename to `.md`, add `crux: true` if missing) before compression
+   - Extract numeric `crux` value from frontmatter if present (used as per-file compression level unless CLI `--<n>` overrides)
    
 3. **For each eligible file**, spawn a **separate `crux-cursor-rule-manager` subagent instance**:
    - Task the subagent to compress the source file
@@ -247,7 +328,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - Remove any files from the `files` array that were just processed (successfully compressed or skipped)
    - Do NOT remove files that were not part of this compression run (preserve newly added pending files)
    - Write the updated JSON back to the file
-   - If the `files` array is now empty, write `{"files": [], "updated": "<timestamp>"}`
+   - If the `files` array is now empty, write `{"files": []}` (omit the `updated` field)
 
 ## Eligibility Criteria
 
@@ -255,12 +336,12 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
 
 A markdown file is eligible for CRUX compression if:
 - Has `.md` or `.mdc` extension
-- Has `crux: true` in YAML frontmatter
+- Has `crux: true` or `crux: <n>` (where `n` is 1-100) in YAML frontmatter
 - Is not already a `.crux.md` or `.crux.mdc` file (outputs are not recompressed)
 - For `ALL` scans: must be in `.cursor/rules/` directory
 - For explicit file references: can be located anywhere
 
-**Note**: `.mdc` files with `crux: true` will be pre-processed (renamed to `.md`) before compression. The resulting `.crux.md` is the universal output. If the source is in `.cursor/rules/`, a `.crux.mdc` Cursor adapter file is also produced.
+**Note**: `.mdc` files with `crux: true` or `crux: <n>` will be pre-processed (renamed to `.md`) before compression. The resulting `.crux.md` is the universal output. If the source is in `.cursor/rules/`, a `.crux.mdc` Cursor adapter file is also produced.
 
 ### Code Files
 
@@ -271,6 +352,15 @@ A code file is eligible for CRUX compression if:
 - Can be located anywhere in the project
 
 **Note**: Code files are NOT included in `ALL` scans. They must always be explicitly referenced. No `crux: true` frontmatter opt-in is needed. No Cursor adapter (`.crux.mdc`) is produced for code files.
+
+### URLs (Webpages)
+
+A URL is eligible for CRUX compression if:
+- Starts with `http://` or `https://`
+- Returns fetchable text content (HTML/markdown)
+- Is explicitly provided as an argument (not via file reference)
+
+**Note**: URL compression always outputs to `.crux/out/`. No `sourceChecksum` is used — `sourceUrl` replaces it in frontmatter. No Cursor adapter (`.crux.mdc`) is produced. URLs are NOT included in `ALL` scans.
 
 ### Images
 
@@ -286,11 +376,18 @@ An image file is eligible for CRUX compression if:
 To make a rule file eligible for CRUX compression:
 
 1. Ensure the source file uses `.md` extension (not `.mdc`)
-2. Add `crux: true` to the YAML frontmatter:
+2. Add `crux: true` (or `crux: <n>` for a specific compression level) to the YAML frontmatter:
    ```yaml
    ---
-   crux: true
-   alwaysApply: true  # or other frontmatter
+   crux: true          # default 25% target
+   alwaysApply: true   # or other frontmatter
+   ---
+   ```
+   Or with a specific level:
+   ```yaml
+   ---
+   crux: 40            # 40% target (more verbose output)
+   alwaysApply: true
    ---
    ```
 3. Run `/crux-compress ALL` or `/crux-compress @path/to/file.md`
@@ -306,6 +403,18 @@ To make a rule file eligible for CRUX compression:
 | Compressed code (semantic structure) | `.crux.md` | `install.crux.md` |
 | Source image | `.png`, `.jpg`, etc. | `diagram.png` |
 | Compressed image (semantic description) | `.crux.md` | `diagram.crux.md` |
+| Source URL (webpage) | URL | `https://agents.md/` |
+| Compressed URL (webpage content) | `.crux.md` | `.crux/out/agents-md.crux.md` |
+
+## Output Path Rules
+
+| Source Type | Output Location | Example |
+|-------------|----------------|---------|
+| Local file (`@path/to/file.md`) | Same directory as source | `path/to/file.crux.md` |
+| URL (`https://...`) | `.crux/out/` | `.crux/out/agents-md.crux.md` |
+| No implied location | `.crux/out/` | `.crux/out/content.crux.md` |
+
+The `.crux/out/` directory is created automatically if it does not exist. This provides a consistent default location for compression output when there's no local source file to place the output alongside.
 
 **Two-tier output**: All compression produces `.crux.md` (universal). When the source is in `.cursor/rules/`, a `.crux.mdc` Cursor adapter is also produced with `alwaysApply` injected. The `.crux.md` is the source of truth; `.crux.mdc` is derived.
 
@@ -374,6 +483,20 @@ Validation (after compression completes):
 
 Cursor adapter (source in .cursor/rules/):
 └── core-tenets.crux.md → core-tenets.crux.mdc (+alwaysApply)
+```
+
+### With URL(s)
+When `/crux-compress https://agents.md/specification`:
+
+```
+Fetch URL content:
+└── WebFetch → https://agents.md/specification → markdown content
+
+Compression:
+└── crux-cursor-rule-manager → agents-md-specification content → .crux/out/agents-md-specification.crux.md
+
+Validation (after compression completes):
+└── crux-cursor-rule-manager (fresh) → validate .crux/out/agents-md-specification.crux.md → confidence: 94%
 ```
 
 ### With `--force` flag

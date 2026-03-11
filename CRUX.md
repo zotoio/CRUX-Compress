@@ -6,7 +6,7 @@ readonly: true
 ---
 # CRUX Compression Specification v2.5.0
 
-A semantic compression notation for reducing markdown rules, code files, and images to ≤20% of original token count while preserving all actionable information.
+A semantic compression notation for reducing markdown rules, code files, and images to a configurable target percentage (default ≤25%) of original token count while preserving all actionable information.
 
 ## Etymology
 
@@ -324,7 +324,7 @@ In addition to the general compression rules:
   control_flow      = ⊤   # Branching/loops/conditionals captured
   decomp_block      = ⊤   # Ω.decomp present with emulate=
   no_hallucination  = ⊤   # Only encode what's in source
-  target_ratio      ≤ 0.2 # Aim for ≤20% of original token count
+  target_ratio      ≤ level/100 # Default 0.25; configurable via crux: <n>
 }
 ```
 
@@ -443,6 +443,85 @@ These fields are **not** included in the universal `.crux.md` output.
 
 ---
 
+## Compression Level
+
+The compression level controls how aggressively CRUX compresses the source material. It is expressed as a **target percentage** of the original token count — lower values mean more aggressive compression.
+
+### Setting the Level
+
+The level can be set via **frontmatter** or **CLI flag**:
+
+| Method | Example | Effect |
+|--------|---------|--------|
+| `crux: true` | Default | Target ≤25% of original |
+| `crux: 40` | Frontmatter number | Target ≤40% of original |
+| `--25` | CLI flag | Target ≤25% of original |
+| `--40` | CLI flag | Target ≤40% of original |
+
+**CLI flag overrides frontmatter** when both are present.
+
+### Valid Range
+
+- **1–100** (integer percentage)
+- `crux: true` is equivalent to `crux: 25` (or `crux: 80` for images)
+- Values outside 1–100 are rejected with an error
+
+### Behavior by Source Type
+
+| Source Type | Level Meaning | Default (`true`) |
+|-------------|--------------|-------------------|
+| **Markdown rules** | Target token ratio (e.g., 40 = keep ≤40% of tokens) | 25% |
+| **Code files** | Target token ratio | 25% |
+| **URLs** | Target token ratio | 25% |
+| **Images** | Detail retention (100 = maximum detail, 1 = minimal) | 80 |
+
+### How Level Affects Compression
+
+**For text-based sources** (markdown, code, URLs):
+- Lower values → more aggressive symbol use, deeper abbreviation, tighter merging
+- Higher values → more prose preserved, lighter abbreviation, closer to original structure
+- The `reducedBy` frontmatter field reflects the actual achieved reduction
+
+**For images**:
+- The level controls **detail retention** in the semantic visual description
+- `crux: 100` → describe every visual element, texture, color gradient, spatial relationship
+- `crux: 80` (default) → detailed description including textures, gradients, secondary elements
+- `crux: 10` → only the essential concept and primary elements
+
+### Examples
+
+```yaml
+# Default compression (25% target)
+crux: true
+
+# Moderate compression (40% target — more verbose output)
+crux: 40
+
+# Aggressive compression (10% target — very terse)
+crux: 10
+
+# Maximum detail for images (retain all visual information)
+crux: 100
+```
+
+### Frontmatter in Output
+
+The compression level is recorded in the `.crux.md` output frontmatter:
+
+```yaml
+---
+generated: 2026-03-10 14:00
+sourceChecksum: "1234567890"
+cruxLevel: 25
+beforeTokens: 1000
+afterTokens: 250
+reducedBy: 75%
+confidence: 92%
+---
+```
+
+---
+
 ## Quality Gates
 
 ```crux
@@ -452,13 +531,13 @@ These fields are **not** included in the universal `.crux.md` output.
   preserve_paths   = ⊤   # File paths verbatim
   preserve_cmds    = ⊤   # Commands verbatim (can abbreviate structure)
   semantic_equiv   = ⊤   # LLM can expand back to original meaning
-  target_ratio     ≤ 0.2 # Aim for ≤20% of original token count
+  target_ratio     ≤ level/100 # Default 0.25; configurable via crux: <n>
 }
 ```
 
 ### Checklist
 
-- [ ] Target ≤20% of original token count
+- [ ] Target ≤ level% of original token count (default 25%)
 - [ ] All file paths preserved verbatim
 - [ ] All commands reconstructable
 - [ ] No hallucinated content

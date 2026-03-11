@@ -7,7 +7,6 @@ afterTokens: 318
 reducedBy: 39%
 confidence: 95%
 crux: true
-alwaysApply: true
 ---
 
 > [!IMPORTANT]

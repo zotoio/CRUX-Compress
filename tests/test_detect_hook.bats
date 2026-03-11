@@ -185,3 +185,105 @@ EOF
     
     assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
+
+@test "hook queues file with numeric crux value" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/numeric-level.md" << 'EOF'
+---
+crux: 40
+---
+
+# Numeric Level Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/numeric-level.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    run cat "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    assert_output_contains ".cursor/rules/numeric-level.md"
+}
+
+@test "hook queues file with crux: 100" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/max-level.md" << 'EOF'
+---
+crux: 100
+---
+
+# Max Level Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/max-level.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    run cat "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    assert_output_contains ".cursor/rules/max-level.md"
+}
+
+@test "hook queues file with crux: 1" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/min-level.md" << 'EOF'
+---
+crux: 1
+---
+
+# Min Level Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/min-level.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    run cat "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    assert_output_contains ".cursor/rules/min-level.md"
+}
+
+@test "hook ignores file with crux: 0" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/zero-level.md" << 'EOF'
+---
+crux: 0
+---
+
+# Zero Level Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/zero-level.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+}
+
+@test "hook ignores file with crux: false" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/false-crux.md" << 'EOF'
+---
+crux: false
+---
+
+# False CRUX Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/false-crux.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+}
+
+@test "hook ignores file with crux: arbitrary string" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/string-crux.md" << 'EOF'
+---
+crux: something
+---
+
+# String CRUX Rule
+EOF
+    
+    cd "$TEST_TEMP_DIR"
+    
+    echo '{"file_path": ".cursor/rules/string-crux.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+    
+    assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
+}

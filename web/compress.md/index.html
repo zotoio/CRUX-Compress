@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRUX — Context Reduction Using X-encoding</title>
-  <meta name="description" content="Reclaim up to 80% of your context window. CRUX extracts semantic cores from verbose markdown rules for AI assistants.">
+  <meta name="description" content="Reclaim up to 80% of your AI context window. CRUX compresses rules, images, code, and URLs into semantic notation that LLMs interpret natively.">
   
   <!-- Open Graph -->
   <meta property="og:title" content="CRUX — Semantic Compression for AI Context">
@@ -55,123 +55,153 @@
     </div>
   </section>
 
-  <!-- S1: The Problem -->
-  <section id="problem" class="section section--problem">
+  <!-- Nav Bar -->
+  <nav class="site-nav" id="site-nav">
+    <div class="site-nav-inner">
+      <a href="#hero" class="site-nav-brand">CRUX</a>
+      <div class="site-nav-links">
+        <a href="#rules-compression" class="site-nav-link">Demos</a>
+        <a href="#notation" class="site-nav-link">Notation</a>
+        <a href="#quickstart" class="site-nav-link">Quickstart</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Parallax Intro -->
+  <section id="intro" class="section section--intro">
+    <div class="intro-symbols" aria-hidden="true">
+      <span class="intro-symbol" data-speed="0.15">Ρ</span>
+      <span class="intro-symbol" data-speed="0.25">Λ</span>
+      <span class="intro-symbol" data-speed="0.10">Π</span>
+      <span class="intro-symbol" data-speed="0.20">Ω</span>
+      <span class="intro-symbol" data-speed="0.30">Κ</span>
+      <span class="intro-symbol" data-speed="0.12">Γ</span>
+      <span class="intro-symbol" data-speed="0.22">⟦</span>
+      <span class="intro-symbol" data-speed="0.18">⟧</span>
+      <span class="intro-symbol" data-speed="0.28">→</span>
+      <span class="intro-symbol" data-speed="0.14">∀</span>
+    </div>
     <div class="section-content">
-      <div class="split-layout">
-        <div class="split-left">
-          <div class="code-block code-block--verbose">
-            <div class="code-block-header">
-              <span class="code-block-label">Verbose Markdown Rules</span>
-              <span class="code-block-tokens">~2,500 tokens</span>
-            </div>
-            <pre><code class="language-markdown"># Team Development Standards
-
-## Code Style Requirements
-
-### Indentation and Formatting
-- Always use **2 spaces** for indentation
-- **Never use tabs** under any circumstances
-- Lines must not exceed **100 characters**
-- Add trailing newline to all files
-
-### Naming Conventions
-| Element | Convention | Example |
-|---------|------------|---------|
-| Functions | camelCase | getUserData |
-| Classes | PascalCase | UserService |
-| Constants | UPPER_SNAKE | MAX_RETRIES |
-
-### Error Handling
-All errors must be:
-1. Logged with full context
-2. Wrapped in custom error classes
-3. Include stack traces in development
-
-... and so on for hundreds more lines</code></pre>
-          </div>
+      <div class="intro-headline">
+        <h2 class="intro-title">Compress <em>AI context</em> into semantic notation</h2>
+        <p class="intro-subtitle">Rules, images, code, URLs &mdash; shrink what your AI sees while preserving meaning</p>
+      </div>
+      <div class="intro-cards">
+        <div class="intro-card" data-speed="0.08">
+          <span class="intro-card-icon">R</span>
+          <span class="intro-card-label">AI Rules &amp; Context</span>
+          <span class="intro-card-stat">~83% reduction</span>
         </div>
-        <div class="split-right">
-          <div class="context-window-viz">
-            <div class="context-window">
-              <div class="context-window-header">Context Window</div>
-              <div class="context-window-bar">
-                <div class="context-segment context-segment--rules" style="width: 70%">
-                  <span>Rules: 70%</span>
-                </div>
-                <div class="context-segment context-segment--code" style="width: 20%">
-                  <span>Code</span>
-                </div>
-                <div class="context-segment context-segment--prompt" style="width: 10%">
-                  <span>?</span>
-                </div>
-              </div>
-              <p class="context-warning">Your actual work is squeezed out</p>
+        <div class="intro-card" data-speed="0.14">
+          <span class="intro-card-icon">Π</span>
+          <span class="intro-card-label">Images</span>
+          <span class="intro-card-stat">~99% reduction</span>
+        </div>
+        <div class="intro-card" data-speed="0.06">
+          <span class="intro-card-icon">Λ</span>
+          <span class="intro-card-label">Code</span>
+          <span class="intro-card-stat">~83% reduction</span>
+        </div>
+        <div class="intro-card" data-speed="0.12">
+          <span class="intro-card-icon">Γ</span>
+          <span class="intro-card-label">URLs</span>
+          <span class="intro-card-stat">~82% reduction</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2: AI Rules & Context Gallery -->
+  <section id="rules-compression" class="section section--approach">
+    <div class="section-content">
+      <h2 class="section-title">AI Rules &amp; Context</h2>
+      <p class="section-intro">CRUX extracts semantic cores. LLMs interpret it natively&mdash;no decompression, no special training.</p>
+      <div class="gallery" data-gallery="rules"></div>
+    </div>
+  </section>
+
+  <!-- S3b: Image Compression Gallery -->
+  <section id="image-compression" class="section section--image-compression">
+    <div class="section-content">
+      <h2 class="section-title">Beyond Text: Image Compression</h2>
+      <p class="section-intro">CRUX captures <em>meaning</em>, not bytes. That principle extends to images &mdash; extract the semantic visual description, discard the pixels.</p>
+      <div class="gallery" data-gallery="images"></div>
+      
+      <div class="image-demo-usage">
+        <h3>How It Works</h3>
+        <ol class="usage-steps">
+          <li>
+            <span class="step-number">1</span>
+            <div class="step-content">
+              Run <code>/crux-compress @path/to/image.png</code> in Cursor
+            </div>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <div class="step-content">
+              The agent uses vision to extract semantic content into a <code>.crux.md</code> file
+            </div>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <div class="step-content">
+              To &ldquo;decompress&rdquo;, feed the <code>.crux.md</code> to any LLM with image generation
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3c: Code Compression Gallery -->
+  <section id="code-compression" class="section section--code-compression">
+    <div class="section-content">
+      <h2 class="section-title">Code Compression</h2>
+      <p class="section-intro">CRUX captures the <em>semantic structure</em> of code &mdash; function signatures, control flow, IO patterns &mdash; while stripping syntactic verbosity. LLMs reconstruct functionally equivalent code from the notation alone.</p>
+      <div class="gallery" data-gallery="code"></div>
+      
+      <div class="code-demo-highlights">
+        <h3>What CRUX Preserves</h3>
+        <div class="code-demo-highlights-grid">
+          <div class="code-demo-highlight">
+            <div class="code-demo-highlight-icon">Λ</div>
+            <div class="code-demo-highlight-text">
+              <strong>Function signatures</strong>
+              <span>All 25+ function names preserved verbatim with parameter types and return values</span>
             </div>
           </div>
-          <div class="problem-text">
-            <h2>The Problem</h2>
-            <p>AI assistants rely on context windows. Your rules consume tokens. As your rule library grows, context balloons.</p>
-            <p class="problem-pain">You want readable, maintainable rules.<br>LLMs just need <strong>actionable information</strong>.</p>
+          <div class="code-demo-highlight">
+            <div class="code-demo-highlight-icon">Φ</div>
+            <div class="code-demo-highlight-text">
+              <strong>Configuration &amp; thresholds</strong>
+              <span>Exact threshold values, constants, and state variables maintained</span>
+            </div>
+          </div>
+          <div class="code-demo-highlight">
+            <div class="code-demo-highlight-icon">Γ</div>
+            <div class="code-demo-highlight-text">
+              <strong>Control flow &amp; orchestration</strong>
+              <span>Main execution flow, section dispatch, and exit code logic</span>
+            </div>
+          </div>
+          <div class="code-demo-highlight">
+            <div class="code-demo-highlight-icon">Ω</div>
+            <div class="code-demo-highlight-text">
+              <strong>Decompression guidance</strong>
+              <span><code>emulate=shellcheck</code> tells LLMs which linting semantics to apply</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- S2: The Approach — Live Compression Demo -->
-  <section id="approach" class="section section--approach">
+  <!-- S3d: URL Compression Gallery -->
+  <section id="url-compression" class="section section--url-compression">
     <div class="section-content">
-      <h2 class="section-title">The Approach</h2>
-      <p class="section-intro">CRUX extracts semantic cores. LLMs interpret it natively—no decompression, no special training.</p>
-      
-      <div class="compression-demo" id="compression-demo">
-        <div class="demo-panel demo-panel--before">
-          <div class="demo-panel-header demo-panel-header--tabbed">
-            <div class="demo-panel-tabs">
-              <button class="demo-tab demo-tab--active" data-target="original">ORIGINAL</button>
-              <button class="demo-tab" data-target="decompressed">DECOMPRESSED</button>
-            </div>
-            <span class="demo-panel-tokens" id="demo-source-tokens">873 lines &middot; ~6,278 tokens</span>
-          </div>
-          <div class="demo-panel-content" id="demo-original-panel">
-            <pre><code id="demo-original-code" class="language-markdown" data-src="assets/rule-example/sample-rule.md.txt">Loading...</code></pre>
-          </div>
-          <div class="demo-panel-content demo-panel-content--hidden" id="demo-decompressed-panel">
-            <pre><code id="demo-decompressed-code" class="language-markdown" data-src="assets/rule-example/sample-rule-decompressed.md">Loading...</code></pre>
-          </div>
-        </div>
-        
-        <div class="demo-arrow">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        
-        <div class="demo-panel demo-panel--after">
-          <div class="demo-panel-header">
-            <span class="demo-panel-title">CRUX COMPRESSED</span>
-            <span class="demo-panel-tokens" id="demo-after-tokens">83 lines &middot; ~1,059 tokens</span>
-          </div>
-          <div class="demo-panel-content">
-            <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2"/>
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-              </svg>
-            </button>
-            <pre><code id="demo-crux-code" class="language-crux" data-src="assets/rule-example/sample-rule.crux.md" data-extract="crux">Loading...</code></pre>
-          </div>
-        </div>
-      </div>
-      
-      <div class="demo-reduction">
-        <div class="reduction-bar">
-          <div class="reduction-bar-fill" id="reduction-bar-fill"></div>
-        </div>
-        <p class="reduction-text" id="demo-reduction-text"><strong>83% reduction</strong> — same semantic information</p>
-      </div>
-      
+      <h2 class="section-title">URL Compression</h2>
+      <p class="section-intro">Compress any public webpage into CRUX notation. Fetch, extract, compress &mdash; turn verbose documentation sites into token-efficient semantic cores.</p>
+      <div class="gallery" data-gallery="urls"></div>
     </div>
   </section>
 
@@ -198,7 +228,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="comparison">
           <button class="spec-section-header">
             <span class="spec-section-title">Comparison</span>
@@ -216,7 +245,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="priority">
           <button class="spec-section-header">
             <span class="spec-section-title">Priority</span>
@@ -230,7 +258,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="dataflow">
           <button class="spec-section-header">
             <span class="spec-section-title">Data Flow</span>
@@ -244,7 +271,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="sequence">
           <button class="spec-section-header">
             <span class="spec-section-title">Sequence</span>
@@ -257,7 +283,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="relations">
           <button class="spec-section-header">
             <span class="spec-section-title">Relations</span>
@@ -275,7 +300,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="logic">
           <button class="spec-section-header">
             <span class="spec-section-title">Logic</span>
@@ -294,7 +318,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="change">
           <button class="spec-section-header">
             <span class="spec-section-title">Change</span>
@@ -309,7 +332,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="qualifiers">
           <button class="spec-section-header">
             <span class="spec-section-title">Qualifiers</span>
@@ -326,7 +348,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="importance">
           <button class="spec-section-header">
             <span class="spec-section-title">Importance</span>
@@ -340,7 +361,6 @@ All errors must be:
             </table>
           </div>
         </div>
-        
         <div class="spec-section" data-group="blocks">
           <button class="spec-section-header">
             <span class="spec-section-title">Standard Blocks</span>
@@ -371,542 +391,10 @@ All errors must be:
     </div>
   </section>
 
-  <!-- S3b: Image Compression — Beyond Text -->
-  <section id="image-compression" class="section section--image-compression">
-    <div class="section-content">
-      <h2 class="section-title">Beyond Text: Image Compression</h2>
-      <p class="section-intro">CRUX captures <em>meaning</em>, not bytes. That principle extends to images — extract the semantic visual description, discard the pixels.</p>
-      
-      <div class="image-demo">
-        <div class="image-demo-row">
-          <div class="image-demo-card">
-            <div class="image-demo-card-header">
-              <span class="image-demo-card-label">Original Image</span>
-              <span class="image-demo-card-size">5.7 MB</span>
-            </div>
-            <div class="image-demo-card-content">
-              <img src="assets/image-example/image_original.png" alt="Original CRUX concept diagram" loading="lazy">
-            </div>
-          </div>
-          
-          <div class="image-demo-arrow">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          
-          <div class="image-demo-card image-demo-card--crux">
-            <div class="image-demo-card-header">
-              <span class="image-demo-card-label">CRUX Semantic Description</span>
-              <span class="image-demo-card-size">1.0 KB</span>
-            </div>
-            <div class="image-demo-card-content">
-              <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-              </button>
-              <pre><code class="language-crux">⟦CRUX:Generated_image.png
-Ρ{CRUX-Compress concept diagram; marketing/hero visual}
-Κ{prism=compression engine; beam=data flow; cube=input; gem=output}
-
-Π.layout{
- L→R flow; dark blue bg+circuit traces
- input:cube@left→prism@center→output:gem@right
-}
-
-E.input{
- cube:translucent blue+glass;lg
- label="Bulky Documentation (Verbose English &amp; Markdown)"
- face∋visible code+markdown text ln
-}
-
-E.prism{
- shape:diamond/crystal;white+blue glow
- face∋[Ρ,Λ,Π,Ω] CRUX block symbols
- base∋[→,⊕,∀,¬] encoding symbols
- beams:input→prism=many thin white ln converging
-}
-
-E.output{
- shape:sm golden diamond;bright glow+flare
- label="Compressed CRUX Notation (20% Size)"
- beam:prism→output=single golden ray
-}
-
-E.labels{
- float@prism.right=[Automation,Validation,Semantic Preservation]
- style=cyan+icon badges
-}
-
-Ω.metaphor{
- verbose docs(lg)→CRUX engine(prism+symbols)→compact output(sm,20%)
- visual=light refraction analogy; many rays→1 focused beam
- msg="CRUX distills bulky rules to their essential meaning"
-}
-⟧</code></pre>
-            </div>
-          </div>
-        </div>
-        
-        <div class="image-demo-reduction">
-          <div class="image-demo-stat">
-            <span class="image-demo-stat-value">5,700x</span>
-            <span class="image-demo-stat-label">size reduction</span>
-          </div>
-          <div class="image-demo-stat">
-            <span class="image-demo-stat-value">Lossy</span>
-            <span class="image-demo-stat-label">preserves meaning, not pixels</span>
-          </div>
-        </div>
-        
-        <div class="image-demo-decompressed">
-          <h3>Decompressed by LLMs</h3>
-          <p class="image-demo-decompressed-intro">Feed the <code>.crux.md</code> file to any LLM with image generation. The semantic description is enough to recreate a recognizable image.</p>
-          <div class="image-demo-row image-demo-row--decompressed">
-            <div class="image-demo-card">
-              <div class="image-demo-card-header">
-                <span class="image-demo-card-label">Claude (from .crux.md)</span>
-                <span class="image-demo-card-size">6.1 MB</span>
-              </div>
-              <div class="image-demo-card-content">
-                <img src="assets/image-example/image_decompressed.png" alt="Image recreated by Claude from CRUX description" loading="lazy">
-              </div>
-            </div>
-            <div class="image-demo-card">
-              <div class="image-demo-card-header">
-                <span class="image-demo-card-label">ChatGPT (from .crux.md)</span>
-                <span class="image-demo-card-size">2.2 MB</span>
-              </div>
-              <div class="image-demo-card-content">
-                <img src="assets/image-example/image-decompressed-chatgpt-.png" alt="Image recreated by ChatGPT from CRUX description" loading="lazy">
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="image-demo-more">
-          <h3>More Examples: From Art to Photography</h3>
-          <p class="image-demo-more-intro">CRUX captures semantic meaning regardless of image type — abstract art, complex compositions, and real-world photography all compress into rich, reconstructable notation.</p>
-          
-          <div class="image-demo-gallery">
-            <!-- Example 2: Steampunk Art -->
-            <div class="image-demo-gallery-item">
-              <div class="image-demo-gallery-header">
-                <span class="image-demo-gallery-label">Mixed-Media Art</span>
-              </div>
-              <div class="image-demo-row">
-                <div class="image-demo-card">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">Original</span>
-                    <span class="image-demo-card-size">2.2 MB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <img src="assets/image-example-2/image-original.png" alt="Steampunk mixed-media art: mind and machine concept" loading="lazy">
-                  </div>
-                </div>
-                
-                <div class="image-demo-arrow">
-                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                    <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-                
-                <div class="image-demo-card image-demo-card--crux">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">CRUX</span>
-                    <span class="image-demo-card-size">2.2 KB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/>
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                      </svg>
-                    </button>
-                    <pre><code class="language-crux">⟦CRUX:2024-07-20-05-0c38502b3e6876faa11f611ca3160cec9f392e2a437d175cf17c0864f1c5d1db.png
-Ρ{steampunk mixed-media art; mind+machine concept; digital painting}
-Κ{moon=subconscious; gears=thoughts/ideas; profile=human mind; wave=flow/connection}
-
-Π.layout{
-  L→R flow; crescent@left→gears dispersing→right edge
-  vertical: patchwork bg@top+middle; wave+circuit@bottom
-  style=painterly+textured; warm earth palette
-}
-
-E.moon_head{
-  shape:crescent moon enclosing human profile silhouette
-  profile:facing R; features=nose+lips+brow visible
-  interior:dark cosmic/starry; scattered stars+nebula texture
-  outline:cream/white curved arc; decorative flourish@top
-  position@left-center
-}
-
-E.gears{
-  collection:mechanical cogs+cogwheels; 30-50 elements
-  size:varied; lg@head→sm toward edges; dispersal gradient
-  colors:rust+copper+brown+cream+dark teal
-  notable:[
-    lg rusty cog w/ concentric circles @eye area;
-    orange-copper cog cluster @forehead;
-    dark bird-shaped cog+tail @upper-right
-  ]
-  flow:emanating from head→R+up; explosion/dispersal pattern
-  style:some solid; some outline-only; varied line weights
-}
-
-E.background{
-  pattern:patchwork rectangles; abstract color blocks
-  colors:[rust orange,sage green,cream,teal,copper,brown]
-  texture:painterly brush strokes; weathered/aged aesthetic
-  borders:dark rusty frame @edges; horizontal stripe@top
-}
-
-E.wave{
-  shape:flowing S-curve; bottom third of composition
-  layers:[
-    dotted line wave;
-    parallel curved lines;
-    small scattered gears+circles
-  ]
-  transition:organic curves→geometric circuit patterns @bottom-right
-}
-
-E.circuit{
-  position@bottom-right corner
-  pattern:technical grid lines; PCB-style traces
-  elements:rectangular paths+nodes; maze-like
-  colors:brown+rust on cream; aged tech aesthetic
-}
-
-Ω.metaphor{
-  theme:mind+machine synthesis; creativity+mechanics
-  visual=ideas(gears) flowing from subconscious(moon/profile)→outward
-  style=steampunk+mixed-media; analog+organic+technical
-  mood:contemplative+creative; warm+earthy
-  msg="thoughts emerge from the mind as mechanical processes; organic creativity meets structured logic"
-}
-⟧</code></pre>
-                  </div>
-                </div>
-              </div>
-              <div class="image-demo-row image-demo-row--decompressed">
-                <div class="image-demo-card">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">Decompressed (from .crux.md)</span>
-                    <span class="image-demo-card-size">3.4 MB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <img src="assets/image-example-2/image-decompressed.png" alt="Steampunk art recreated by LLM from CRUX description" loading="lazy">
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Example 3: Real Photography -->
-            <div class="image-demo-gallery-item">
-              <div class="image-demo-gallery-header">
-                <span class="image-demo-gallery-label">Real-World Photography</span>
-              </div>
-              <div class="image-demo-row">
-                <div class="image-demo-card">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">Original</span>
-                    <span class="image-demo-card-size">296 KB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <img src="assets/image-example-3/image-original.png" alt="Bethesda Terrace Arcade, Central Park NYC" loading="lazy">
-                  </div>
-                </div>
-                
-                <div class="image-demo-arrow">
-                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                    <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-                
-                <div class="image-demo-card image-demo-card--crux">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">CRUX</span>
-                    <span class="image-demo-card-size">2.4 KB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/>
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                      </svg>
-                    </button>
-                    <pre><code class="language-crux">⟦CRUX:IMG_3908-32a052d9-885d-42a8-bb21-b0363c335a13.png
-Ρ{Bethesda Terrace Arcade; Central Park NYC; architectural photograph; tourist scene}
-
-Κ{
-  arcade=covered walkway passage;
-  Minton=ornate Victorian encaustic tile;
-  Gothic Revival=pointed arch architectural style;
-  sandstone=warm tan carved stone
-}
-
-Π.layout{
-  POV:interior@ground level; wide angle
-  flow:L→R; dark interior@left→bright daylight@right
-  ceiling:Minton tiles→perspective converge@center-right
-  left wall:arched panels+decorative paintings
-  right side:row of Gothic arches→exterior terrace+greenery
-  floor:stone tiles;wet+reflective
-}
-
-E.ceiling{
-  shape:coffered grid panels
-  style:Minton encaustic tiles;blue+gold+rust+cream
-  pattern∋[geometric medallions,floral rosettes,intricate borders]
-  frame:dark wood+gilded trim beams
-  reflection:wet surface→mirror effect on floor
-}
-
-E.left_wall{
-  shape:Gothic pointed arches;carved sandstone surround
-  panels∋[
-    lattice window:diamond pattern;green+gold+red floral border,
-    painted murals:floral+botanical;red+green+gold on cream,
-    decorative relief:carved stonework
-  ]
-  style:warm golden tan;ornate Victorian detail
-}
-
-E.right_arches{
-  shape:row of Gothic pointed arches;~6 visible
-  style:sandstone;warm tan
-  view:bright overexposed daylight→silhouettes
-  exterior∋[terrace,greenery,sky,fountain area]
-}
-
-E.floor{
-  shape:large stone tiles;rectangular grid
-  style:gray+tan;wet+reflective
-  reflection∋ceiling patterns+people silhouettes
-}
-
-E.people{
-  count:~20-30 tourists+visitors
-  distribution:scattered throughout arcade
-  activity:[walking,standing,photographing,resting]
-  notable:[
-    woman@left:seated;stroller+luggage,
-    woman@center-left:floral dress;standing,
-    child@center:toddler;orange luggage,
-    silhouettes@right:crowd against bright arches
-  ]
-  style:casual tourist attire;summer
-}
-
-E.lighting{
-  contrast:high; interior shadow vs exterior brightness
-  left:warm golden ambient from ceiling+wall
-  right:bright overexposed daylight;blown highlights
-  floor:wet surface catches ceiling+arch reflections
-}
-
-Ω.metaphor{
-  theme:timeless grandeur meets tourist bustle
-  contrast:ornate Victorian craftsmanship vs casual modern visitors
-  atmosphere:historic elegance;warm+inviting;busy summer day
-  mood:awe at architectural beauty;sense of discovery
-  msg="historic architectural gem hidden beneath Central Park"
-}
-⟧</code></pre>
-                  </div>
-                </div>
-              </div>
-              <div class="image-demo-row image-demo-row--decompressed">
-                <div class="image-demo-card">
-                  <div class="image-demo-card-header">
-                    <span class="image-demo-card-label">Decompressed (from .crux.md)</span>
-                    <span class="image-demo-card-size">3.2 MB</span>
-                  </div>
-                  <div class="image-demo-card-content">
-                    <img src="assets/image-example-3/image-decompressed.png" alt="Bethesda Terrace recreated by LLM from CRUX description" loading="lazy">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="image-demo-usage">
-          <h3>How It Works</h3>
-          <ol class="usage-steps">
-            <li>
-              <span class="step-number">1</span>
-              <div class="step-content">
-                Run <code>/crux-compress @path/to/image.png</code> in Cursor
-              </div>
-            </li>
-            <li>
-              <span class="step-number">2</span>
-              <div class="step-content">
-                The agent uses vision to extract semantic content into a <code>.crux.md</code> file
-              </div>
-            </li>
-            <li>
-              <span class="step-number">3</span>
-              <div class="step-content">
-                To "decompress", feed the <code>.crux.md</code> to any LLM with image generation
-              </div>
-            </li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- S3c: Code Compression -->
-  <section id="code-compression" class="section section--code-compression">
-    <div class="section-content">
-      <h2 class="section-title">Code Compression</h2>
-      <p class="section-intro">CRUX captures the <em>semantic structure</em> of code — function signatures, control flow, IO patterns — while stripping syntactic verbosity. LLMs reconstruct functionally equivalent code from the notation alone.</p>
-      
-      <div class="code-demo">
-        <div class="code-demo-row">
-          <!-- Original Script -->
-          <div class="code-demo-card">
-            <div class="code-demo-card-header">
-              <span class="code-demo-card-label">Original Script</span>
-              <span class="code-demo-card-meta">1,090 lines &middot; ~9,764 tokens</span>
-            </div>
-            <div class="code-demo-card-content">
-              <pre><code class="language-bash" id="code-original" data-src="assets/code-example/script-original.sh.txt">Loading...</code></pre>
-            </div>
-          </div>
-          
-          <div class="code-demo-arrow">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <path d="M8 24h32M32 16l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          
-          <!-- CRUX Compressed -->
-          <div class="code-demo-card code-demo-card--crux">
-            <div class="code-demo-card-header">
-              <span class="code-demo-card-label">CRUX Compressed</span>
-              <span class="code-demo-card-meta">168 lines &middot; ~1,665 tokens</span>
-            </div>
-            <div class="code-demo-card-content">
-              <button class="crux-copy-btn" aria-label="Copy CRUX output" title="Copy to clipboard">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-              </button>
-              <pre><code class="language-crux" id="code-crux" data-src="assets/code-example/script-original.crux.md" data-extract="crux">Loading...</code></pre>
-            </div>
-          </div>
-        </div>
-        
-        <div class="code-demo-reduction">
-          <div class="code-demo-stat">
-            <span class="code-demo-stat-value">83%</span>
-            <span class="code-demo-stat-label">token reduction</span>
-          </div>
-          <div class="code-demo-stat">
-            <span class="code-demo-stat-value">6.5x</span>
-            <span class="code-demo-stat-label">fewer lines</span>
-          </div>
-          <div class="code-demo-stat">
-            <span class="code-demo-stat-value">90%</span>
-            <span class="code-demo-stat-label">confidence score</span>
-          </div>
-        </div>
-        
-        <div class="code-demo-decompressed">
-          <h3>Decompressed by ChatGPT</h3>
-          <p class="code-demo-decompressed-intro">An LLM given <em>only</em> the <code>.crux.md</code> file (no access to the original) reconstructed a functionally equivalent 893-line bash script — complete with platform detection, threshold checks, JSON output, and proper error handling.</p>
-          <div class="code-demo-decompressed-row">
-            <div class="code-demo-card code-demo-card--decompressed">
-              <div class="code-demo-card-header">
-                <span class="code-demo-card-label">ChatGPT 5.2 (from .crux.md only)</span>
-                <span class="code-demo-card-meta">893 lines</span>
-              </div>
-              <div class="code-demo-card-content">
-                <pre><code class="language-bash" id="code-decompressed" data-src="assets/code-example/script-decompressed-chatgpt52.sh.txt">Loading...</code></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="code-demo-highlights">
-          <h3>What CRUX Preserves</h3>
-          <div class="code-demo-highlights-grid">
-            <div class="code-demo-highlight">
-              <div class="code-demo-highlight-icon">Λ</div>
-              <div class="code-demo-highlight-text">
-                <strong>Function signatures</strong>
-                <span>All 25+ function names preserved verbatim with parameter types and return values</span>
-              </div>
-            </div>
-            <div class="code-demo-highlight">
-              <div class="code-demo-highlight-icon">Φ</div>
-              <div class="code-demo-highlight-text">
-                <strong>Configuration &amp; thresholds</strong>
-                <span>Exact threshold values, constants, and state variables maintained</span>
-              </div>
-            </div>
-            <div class="code-demo-highlight">
-              <div class="code-demo-highlight-icon">Γ</div>
-              <div class="code-demo-highlight-text">
-                <strong>Control flow &amp; orchestration</strong>
-                <span>Main execution flow, section dispatch, and exit code logic</span>
-              </div>
-            </div>
-            <div class="code-demo-highlight">
-              <div class="code-demo-highlight-icon">Ω</div>
-              <div class="code-demo-highlight-text">
-                <strong>Decompression guidance</strong>
-                <span><code>emulate=shellcheck</code> tells LLMs which linting semantics to apply</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="code-demo-usage">
-          <h3>How It Works</h3>
-          <ol class="usage-steps">
-            <li>
-              <span class="step-number">1</span>
-              <div class="step-content">
-                Run <code>/crux-compress @path/to/script.sh</code> in Cursor
-              </div>
-            </li>
-            <li>
-              <span class="step-number">2</span>
-              <div class="step-content">
-                The agent extracts semantic structure into a <code>.crux.md</code> file using <code>Λ</code>, <code>Γ</code>, <code>Φ</code> blocks
-              </div>
-            </li>
-            <li>
-              <span class="step-number">3</span>
-              <div class="step-content">
-                To "decompress", an LLM reconstructs functionally equivalent code from the <code>.crux.md</code>
-              </div>
-            </li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- S4: Quickstart -->
   <section id="quickstart" class="section section--quickstart">
     <div class="section-content">
       <h2 class="section-title">Quickstart</h2>
-      
-      <div class="experimental-warning">
-        <span class="warning-icon">⚠</span>
-        <div class="warning-text">
-          <strong>EXPERIMENTAL</strong> — Expect breaking changes. Your feedback shapes the spec.
-        </div>
-      </div>
       
       <div class="install-section">
         <h3>Installation</h3>
@@ -1013,6 +501,7 @@ E.lighting{
   <script src="scripts/compression-demo.js"></script>
   <script src="scripts/spec-expander.js"></script>
   <script src="scripts/code-loader.js"></script>
+  <script src="scripts/gallery-loader.js"></script>
   <script src="scripts/section-linker.js"></script>
 </body>
 </html>

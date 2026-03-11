@@ -1,3 +1,13 @@
+---
+generated: 2026-03-09
+beforeSize: 5713258
+afterSize: 1039
+reducedBy: 99.98%
+---
+
+# CRUX-Compress concept diagram
+
+```crux
 ⟦CRUX:Generated_image.png
 Ρ{CRUX-Compress concept diagram; marketing/hero visual}
 Κ{prism=compression engine; beam=data flow; cube=input; gem=output}
@@ -37,3 +47,4 @@ E.labels{
  msg="CRUX distills bulky rules to their essential meaning"
 }
 ⟧
+```
