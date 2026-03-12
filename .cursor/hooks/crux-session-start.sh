@@ -12,9 +12,59 @@ read -r input
 
 pending_file=".crux/pending-compression.json"
 
+# Function to check if CRUX output is already current for source
+is_crux_output_current() {
+    local source="$1"
+    local crux_md=""
+    local crux_mdc=""
+
+    case "$source" in
+        .cursor/rules/*.md)
+            crux_md="${source%.md}.crux.md"
+            crux_mdc="${source%.md}.crux.mdc"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    [[ -f "$crux_md" && ! "$source" -nt "$crux_md" ]] && return 0
+    [[ -f "$crux_mdc" && ! "$source" -nt "$crux_mdc" ]] && return 0
+    return 1
+}
+
 # Check if there are pending files from previous sessions
 if [[ -f "$pending_file" ]]; then
-    files=$(jq -r '.files[]?' "$pending_file" 2>/dev/null)
+    raw_files=$(jq -r '.files[]?' "$pending_file" 2>/dev/null)
+
+    # Filter out stale entries where CRUX output is already current.
+    files=""
+    while IFS= read -r file; do
+        [[ -z "$file" ]] && continue
+        if [[ "$file" == .cursor/rules/*.md ]] && \
+           [[ "$file" != *.crux.md ]] && \
+           [[ "$file" != *.crux.mdc ]] && \
+           [[ -f "$file" ]] && \
+           ! is_crux_output_current "$file"; then
+            if [[ -z "$files" ]]; then
+                files="$file"
+            else
+                files="${files}"$'\n'"$file"
+            fi
+        fi
+    done <<< "$raw_files"
+
+    # Persist cleanup of stale/invalid pending entries.
+    raw_count=$(printf '%s\n' "$raw_files" | sed '/^$/d' | wc -l | tr -d ' ')
+    files_count=$(printf '%s\n' "$files" | sed '/^$/d' | wc -l | tr -d ' ')
+    if [[ "$raw_count" -ne "$files_count" ]]; then
+        if [[ -n "$files" ]]; then
+            files_json=$(printf '%s\n' "$files" | jq -R . | jq -sc .)
+            echo "{\"files\": $files_json, \"updated\": \"$(date -Iseconds)\"}" > "$pending_file"
+        else
+            echo '{"files": []}' > "$pending_file"
+        fi
+    fi
     
     if [[ -n "$files" ]]; then
         # Count pending files

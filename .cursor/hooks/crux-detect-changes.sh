@@ -20,6 +20,28 @@ is_valid_crux_file() {
     head -20 "$file" 2>/dev/null | grep -qE "crux:[[:space:]]*(true|([1-9][0-9]?|100))[[:space:]]*$"
 }
 
+# Function to check if CRUX output is already current for source
+is_crux_output_current() {
+    local source="$1"
+    local crux_md=""
+    local crux_mdc=""
+
+    case "$source" in
+        .cursor/rules/*.md)
+            crux_md="${source%.md}.crux.md"
+            crux_mdc="${source%.md}.crux.mdc"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    # Consider output current if either output exists and source is not newer.
+    [[ -f "$crux_md" && ! "$source" -nt "$crux_md" ]] && return 0
+    [[ -f "$crux_mdc" && ! "$source" -nt "$crux_mdc" ]] && return 0
+    return 1
+}
+
 # Function to normalize path to repo-relative
 normalize_path() {
     local path="$1"
@@ -42,7 +64,7 @@ cleanup_invalid_entries() {
     
     local valid_files=()
     while IFS= read -r file; do
-        if [[ -n "$file" ]] && is_valid_crux_file "$file"; then
+        if [[ -n "$file" ]] && is_valid_crux_file "$file" && ! is_crux_output_current "$file"; then
             valid_files+=("$file")
         fi
     done < <(jq -r '.files[]?' "$pending_file" 2>/dev/null)

@@ -8,6 +8,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
 export CRUX_UTILS="${PROJECT_ROOT}/.cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
 export CREATE_ZIP="${PROJECT_ROOT}/scripts/create-crux-zip.sh"
 export DETECT_HOOK="${PROJECT_ROOT}/.cursor/hooks/crux-detect-changes.sh"
+export SESSION_START_HOOK="${PROJECT_ROOT}/.cursor/hooks/crux-session-start.sh"
 export INSTALL_SCRIPT="${PROJECT_ROOT}/install.sh"
 
 # Path to test fixtures

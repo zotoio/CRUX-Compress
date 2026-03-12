@@ -287,3 +287,55 @@ EOF
     
     assert_file_not_exists "$TEST_TEMP_DIR/.crux/pending-compression.json"
 }
+
+@test "hook cleanup removes stale pending entry when output is current" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/stale.md" << 'EOF'
+---
+crux: true
+---
+
+# Stale Rule
+EOF
+    cat > "$TEST_TEMP_DIR/.cursor/rules/stale.crux.md" << 'EOF'
+---
+generated: 2026-01-01 00:00
+---
+
+compressed
+EOF
+    touch -t 202601010000 "$TEST_TEMP_DIR/.cursor/rules/stale.md"
+    touch -t 202601010100 "$TEST_TEMP_DIR/.cursor/rules/stale.crux.md"
+    echo '{"files":[".cursor/rules/stale.md"]}' > "$TEST_TEMP_DIR/.crux/pending-compression.json"
+
+    cd "$TEST_TEMP_DIR"
+    echo '{"file_path":"docs/ignored.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+
+    run jq -r '.files | length' "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    assert_output_contains "0"
+}
+
+@test "hook cleanup keeps pending entry when source is newer than output" {
+    cat > "$TEST_TEMP_DIR/.cursor/rules/fresh.md" << 'EOF'
+---
+crux: true
+---
+
+# Fresh Rule
+EOF
+    cat > "$TEST_TEMP_DIR/.cursor/rules/fresh.crux.mdc" << 'EOF'
+---
+generated: 2026-01-01 00:00
+---
+
+compressed
+EOF
+    touch -t 202601010000 "$TEST_TEMP_DIR/.cursor/rules/fresh.crux.mdc"
+    touch -t 202601010100 "$TEST_TEMP_DIR/.cursor/rules/fresh.md"
+    echo '{"files":[".cursor/rules/fresh.md"]}' > "$TEST_TEMP_DIR/.crux/pending-compression.json"
+
+    cd "$TEST_TEMP_DIR"
+    echo '{"file_path":"docs/ignored.md"}' | bash .cursor/hooks/crux-detect-changes.sh
+
+    run jq -r '.files[]?' "$TEST_TEMP_DIR/.crux/pending-compression.json"
+    assert_output_contains ".cursor/rules/fresh.md"
+}
