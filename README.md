@@ -439,6 +439,7 @@ alwaysApply: true
 /crux-compress https://example.com/   - Compress a public webpage (outputs to .crux/out/)
 /crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
 /crux-compress @file.md --minified    - Compress with single-line output (note that LLMs take more effort to parse and understand this format)
+/crux-compress @file.md --plugin=frontmatter-tagger - Run a plugin while compressing
 ```
 
 **Flags**:
@@ -447,6 +448,7 @@ alwaysApply: true
 |------|-------------|
 | `--minified` | Single-line output, no spaces, max compression |
 | `--force` | Delete existing CRUX output files before compression (bypasses checksum skip) |
+| `--plugin <name>` / `--plugin=<name>` | Enable a named plugin from `.crux/plugins/registry.json` |
 
 **Key Features**:
 
@@ -457,6 +459,26 @@ alwaysApply: true
 - **Default Output Location**: URL sources and unspecified locations output to `.crux/out/`
 - **Two-tier output**: Universal `.crux.md` + Cursor adapter `.crux.mdc` (when source is in `.cursor/rules/`)
 - **Eligibility**: Markdown needs `crux: true` frontmatter; code/images need explicit file reference
+- **Plugin Hooks**: Optional lifecycle plugins (`beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`) can be enabled via command param
+
+**Plugin Registry**:
+
+Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
+
+```json
+{
+  "plugins": {
+    "frontmatter-tagger": {
+      "description": "Add standardized metadata after compression",
+      "hooks": ["afterCompress"]
+    },
+    "quality-gate": {
+      "description": "Apply extra validation policy checks",
+      "hooks": ["afterValidate"]
+    }
+  }
+}
+```
 
 **File Convention**:
 
@@ -579,8 +601,9 @@ flowchart TD
     
     subgraph COMMAND["crux-compress.md (Command)"]
         C1["Parse arguments"]
-        C2["Spawn subagent(s)"]
-        C1 --> C2
+        C2["Resolve plugins (--plugin)"]
+        C3["Spawn subagent(s)"]
+        C1 --> C2 --> C3
     end
     
     subgraph MANAGER["crux-cursor-rule-manager (Subagent)"]
