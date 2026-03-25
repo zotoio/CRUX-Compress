@@ -61,7 +61,7 @@ done
 SCRIPTS=(
     "$PROJECT_ROOT/install.sh"
     "$PROJECT_ROOT/scripts/create-crux-zip.sh"
-    "$PROJECT_ROOT/.cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+    "$PROJECT_ROOT/.cursor/skills/crux-utils/scripts/crux-utils.sh"
     "$PROJECT_ROOT/.cursor/skills/token-count-estimator/scripts/count-tokens.sh"
     "$PROJECT_ROOT/.cursor/hooks/crux-detect-changes.sh"
     "$PROJECT_ROOT/.cursor/hooks/crux-session-start.sh"

@@ -23,6 +23,8 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 /crux-compress @img1.png @img2.jpg    - Compress multiple images
 /crux-compress https://example.com/page  - Compress a webpage (URL source)
 /crux-compress https://a.com https://b.com - Compress multiple URLs
+/crux-compress @file.md --plugin=frontmatter-tagger - Run a plugin while compressing
+/crux-compress ALL --plugin quality-gate --plugin release-notes - Run multiple plugins
 ```
 
 ### Flags
@@ -32,8 +34,9 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 | `--minified` | Single-line output, no spaces, max compression | Copy-paste demos, LLM testing |
 | `--force` | Delete existing `.crux.md` and `.crux.mdc` files before compression | Force fresh recompression, bypass checksum skip |
 | `--<n>` | Set compression level to `n`% (1-100). Overrides frontmatter `crux: <n>`. Default: 25 | `--40` for 40% target, `--10` for aggressive compression |
+| `--plugin <name>` / `--plugin=<name>` | Enable a named plugin from the plugin registry | Add optional feature behavior without changing core command flow |
 
-**Note**: Flags can be combined: `/crux-compress ALL --force --minified --40`
+**Note**: Flags can be combined: `/crux-compress ALL --force --minified --40 --plugin quality-gate`
 
 ### Compression Level
 
@@ -57,6 +60,41 @@ For **images**, the level controls detail retention (100 = maximum detail, 1 = m
 | **Formatted** (default) | Multi-line, indented, ~80 char lines | `.crux.md` files for readability |
 | **Minified** (`--minified`) | Single-line, no spaces, max compression | Copy-paste demos, LLM testing |
 
+### Plugin Parameter System
+
+`/crux-compress` supports optional plugins to add feature-specific behavior via command parameters.
+
+- **Parameter format**: `--plugin <name>` or `--plugin=<name>`
+- **Repeatable**: multiple plugins can be enabled in one run
+- **Execution model**: plugins run at predefined lifecycle hooks
+- **Isolation**: plugin failures are reported per plugin and should not block base compression unless explicitly configured in the plugin
+
+#### Plugin Registry
+
+Plugins are resolved from `.crux/plugins/registry.json` (if present). Minimal shape:
+
+```json
+{
+  "plugins": {
+    "frontmatter-tagger": {
+      "description": "Add standardized metadata after compression",
+      "hooks": ["afterCompress"]
+    },
+    "quality-gate": {
+      "description": "Apply extra validation policy checks",
+      "hooks": ["afterValidate"]
+    }
+  }
+}
+```
+
+#### Standard Plugin Hooks
+
+- `beforeFetch` - URL sources only, before `WebFetch`
+- `beforeCompress` - after source resolution, before compression subagent prompt
+- `afterCompress` - after CRUX output is generated
+- `afterValidate` - after semantic validation completes
+
 ## Parallelism Limits
 
 **Maximum parallel agents: 4**
@@ -75,7 +113,7 @@ This prevents resource exhaustion and ensures reliable processing.
 
 Each `.crux.md` file includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file. Before processing:
 
-1. Agent gets current checksum using `CRUX-Utils` skill (`--cksum` mode)
+1. Agent gets current checksum using `crux-utils` skill (`--cksum` mode)
 2. If existing CRUX file's `sourceChecksum` matches, the source is unchanged - **skip update**
 3. If no match (or no existing CRUX file), proceed with compression
 4. After compression, store the new `sourceChecksum` in the output frontmatter
@@ -98,6 +136,52 @@ The resolved level is:
 - Used to set the target ratio: `target_ratio = level / 100`
 
 **Validation**: If the level is outside 1-100, reject with an error message and do not proceed.
+
+### Plugin Resolution (`--plugin`)
+
+Before source-type routing, resolve enabled plugins:
+
+1. Parse all plugin flags from both forms:
+   - `--plugin <name>`
+   - `--plugin=<name>`
+2. Normalize plugin names to lowercase and de-duplicate while preserving order.
+3. If no plugin flags are provided, continue with the base compression flow.
+4. If plugin flags are provided:
+   - Read `.crux/plugins/registry.json` (if present)
+   - Validate each requested plugin exists in `plugins`
+   - Validate each plugin declares at least one supported hook:
+     `beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`
+   - If a requested plugin is unknown, fail fast with an actionable message:
+     `"Unknown plugin: <name>. Add it to .crux/plugins/registry.json or remove the flag."`
+5. Build an in-memory execution plan:
+   - `pluginsByHook.beforeFetch[]`
+   - `pluginsByHook.beforeCompress[]`
+   - `pluginsByHook.afterCompress[]`
+   - `pluginsByHook.afterValidate[]`
+
+Pass the enabled plugin list to each compression and validation task so plugins can apply consistently across single-file and batch workflows.
+
+### Plugin Execution Contract
+
+When plugin hooks are present, execute them in this order:
+
+1. `beforeFetch` (URL sources only)
+2. `beforeCompress` (all source types)
+3. Base compression workflow
+4. `afterCompress` (if compression produced output)
+5. Base semantic validation workflow (when applicable)
+6. `afterValidate` (if validation produced a score)
+
+Execution rules:
+- Run plugins in CLI order (first `--plugin` runs first for each hook).
+- Provide each plugin with a structured context object:
+  `sourcePath|sourceUrl`, `sourceType`, `outputPath`, `compressionLevel`,
+  `format`, `force`, and current lifecycle data (`beforeTokens`, `afterTokens`,
+  `confidence` when available).
+- Plugin failures are recorded per plugin and hook in the final report.
+- Continue base compression unless the plugin explicitly declares `failClosed: true`
+  in the registry entry.
+- Plugin hooks must not mutate `CRUX.md` or bypass core quality gates.
 
 ### Force Flag Pre-processing (`--force`)
 
@@ -125,6 +209,7 @@ When any referenced file has a supported image extension (`.png`, `.jpg`, `.jpeg
 
 2. **For each image file**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
    - Process images in batches of up to 4 parallel agents
+   - Run enabled `beforeCompress` plugins for the image context
    - Task the subagent:
      ```
      Compress this image into CRUX notation (semantic visual description):
@@ -145,6 +230,7 @@ When any referenced file has a supported image extension (`.png`, `.jpg`, `.jpeg
 3. **Collect results** and report:
    - Image file processed
    - Original file size vs `.crux.md` file size
+   - Plugin execution results (if plugins were enabled)
    - Any issues encountered
 
 **Note**: Image compression does not use `sourceChecksum` tracking, `crux: true` frontmatter, or the `--minified` flag. Semantic validation is not automated for images — visual fidelity must be verified manually by feeding the `.crux.md` file to an LLM with image generation.
@@ -157,7 +243,9 @@ When any argument is a URL (starts with `http://` or `https://`):
 
 2. **For each URL**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
    - Process URLs in batches of up to 4 parallel agents
+   - Run enabled `beforeFetch` plugins before `WebFetch`
    - **Before spawning**: fetch the webpage content using the `WebFetch` tool
+   - Run enabled `beforeCompress` plugins with fetched content metadata
    - **Derive output filename** from the URL: strip protocol, replace `/` and special chars with `-`, remove trailing `-`, append `.crux.md`
      - `https://agents.md/` → `agents-md.crux.md`
      - `https://example.com/docs/api` → `example-com-docs-api.crux.md`
@@ -177,12 +265,15 @@ When any argument is a URL (starts with `http://` or `https://`):
      ```
 
 3. **After compression completes**, spawn a **fresh validation agent** (same as for markdown)
+   - Run enabled `afterCompress` plugins after each successful compression
+   - Run enabled `afterValidate` plugins after each validation result
 
 4. **Collect results** and report:
    - URL processed
    - Output file path (in `.crux/out/`)
    - Token reduction achieved and `reducedBy` percentage
    - Confidence score from validation
+   - Plugin execution results (if plugins were enabled)
    - Any issues encountered
 
 **Note**: URL compression uses `sourceUrl` instead of `sourceChecksum` in frontmatter. No Cursor adapter (`.crux.mdc`) is produced for URL sources. URLs are NOT included in `ALL` scans — they must be explicitly provided.
@@ -195,6 +286,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
 
 2. **For each code file**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
    - Process code files in batches of up to 4 parallel agents
+   - Run enabled `beforeCompress` plugins for the code context
    - Task the subagent:
      ```
      Compress this code file into CRUX notation:
@@ -212,11 +304,14 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      ```
 
 3. **After compression completes**, spawn a **fresh validation agent** (same as for markdown)
+   - Run enabled `afterCompress` plugins after each successful compression
+   - Run enabled `afterValidate` plugins after each validation result
 
 4. **Collect results** and report:
    - File processed or skipped
    - Token reduction achieved
    - Confidence score from validation
+   - Plugin execution results (if plugins were enabled)
    - Any issues encountered
 
 **Note**: Code compression does not use `alwaysApply` frontmatter, `crux: true` opt-in, or the Cursor adapter step. Code files are not included in `ALL` scans — they must be explicitly referenced.
@@ -229,6 +324,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - Each file gets its own dedicated agent instance
    - Process files in batches of up to 4 parallel agents
    - Wait for each batch to complete before starting the next
+   - Run enabled `beforeCompress` plugins for each markdown source
    - Task the subagent:
      ```
      Compress this rule file into CRUX notation:
@@ -239,7 +335,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      - Follow CRUX.md specification
      - Do NOT include alwaysApply or other IDE-specific frontmatter in .crux.md
      - Check source checksum vs existing CRUX sourceChecksum - skip if unchanged
-     - Report before/after token counts using `CRUX-Utils` skill (or "skipped - source unchanged")
+     - Report before/after token counts using `crux-utils` skill (or "skipped - source unchanged")
      - If source lacks `crux: true` or `crux: <n>` frontmatter, add `crux: true` first
      - Ensure source uses .md extension (rename from .mdc if needed)
      ```
@@ -262,6 +358,8 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      ```
    - The validation agent returns the confidence score
    - Update the `.crux.md` frontmatter with `confidence: XX%`
+   - Run enabled `afterCompress` plugins after each successful compression
+   - Run enabled `afterValidate` plugins after each validation result
 
 5. **Cursor adapter step** (if source is in `.cursor/rules/`):
    - Copy the `.crux.md` file to `.crux.mdc`
@@ -273,6 +371,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - File processed or skipped (with reason: "source unchanged" or "compression not beneficial")
    - Token reduction achieved (if processed)
    - **Confidence score** from validation
+   - Plugin execution results (if plugins were enabled)
    - Any issues encountered
    - If `--force` was used, note files that were deleted before recompression
 
@@ -303,6 +402,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      - Compress the source file
      - Create/update the `[filename].crux.md` version (universal output)
      - Report token reduction metrics
+     - Apply enabled `beforeCompress` and `afterCompress` plugin hooks
    - **Process in batches of up to 4 parallel agents**
    - Wait for each batch to complete before starting the next batch.
 
@@ -311,6 +411,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - Task: semantic validation (compare CRUX to source, produce confidence score)
    - Update the `.crux.md` frontmatter with the confidence score
    - **Cursor adapter**: Copy `.crux.md` to `.crux.mdc` with `alwaysApply` injected from source
+   - Apply enabled `afterValidate` plugin hooks
    - Validation agents can run in parallel with other compression agents (within the 4-agent limit)
 
 5. **Collect results** from all subagents and report summary:
@@ -322,6 +423,10 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - If `--force` was used, list files that were deleted before recompression
    - Total token savings
    - **Confidence scores** for each file (with average)
+   - Plugin execution summary:
+     - Plugins requested
+     - Hooks executed
+     - Any plugin failures (and whether they were fail-open or fail-closed)
 
 6. **Clear processed files from pending-compression.json**:
    - Read `.crux/pending-compression.json` if it exists
@@ -552,4 +657,4 @@ Using a **separate agent instance** for validation ensures:
 - `crux-cursor-rule-manager` subagent - The specialist that performs compression
 - `CRUX.md` - The CRUX notation specification
 - `.cursor/rules/_CRUX-RULE.mdc` - Rules for working with CRUX files
-- `CRUX-Utils` skill - Token estimation and checksum utilities
+- `crux-utils` skill - Token estimation and checksum utilities

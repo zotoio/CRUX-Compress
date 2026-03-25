@@ -195,7 +195,7 @@ For rapid checks, use these:
 |-------|---------|
 | Shell lint | `./scripts/shellcheck.sh` |
 | Run tests | `./scripts/test.sh` |
-| CRUX checksums | Use `CRUX-Utils` skill with `--cksum` mode |
+| CRUX checksums | Use `crux-utils` skill with `--cksum` mode |
 
 ## What NOT to Do
 

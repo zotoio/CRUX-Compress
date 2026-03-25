@@ -344,8 +344,8 @@ create_backup_zip() {
         ".cursor/hooks/crux-detect-changes.sh"
         ".cursor/hooks/crux-session-start.sh"
         ".cursor/rules/_CRUX-RULE.mdc"
-        ".cursor/skills/CRUX-Utils/SKILL.md"
-        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+        ".cursor/skills/crux-utils/SKILL.md"
+        ".cursor/skills/crux-utils/scripts/crux-utils.sh"
     )
     
     for file in "${standard_files[@]}"; do
@@ -620,8 +620,8 @@ download_from_cdn() {
         ".cursor/hooks/crux-detect-changes.sh"
         ".cursor/hooks/crux-session-start.sh"
         ".cursor/rules/_CRUX-RULE.mdc"
-        ".cursor/skills/CRUX-Utils/SKILL.md"
-        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+        ".cursor/skills/crux-utils/SKILL.md"
+        ".cursor/skills/crux-utils/scripts/crux-utils.sh"
     )
 
     local failed=0
@@ -738,7 +738,7 @@ install_from_staging() {
     # Make scripts executable
     chmod +x .cursor/hooks/crux-detect-changes.sh 2>/dev/null || true
     chmod +x .cursor/hooks/crux-session-start.sh 2>/dev/null || true
-    chmod +x .cursor/skills/CRUX-Utils/scripts/crux-utils.sh 2>/dev/null || true
+    chmod +x .cursor/skills/crux-utils/scripts/crux-utils.sh 2>/dev/null || true
 }
 
 # Download update.sh for future updates (with jsDelivr fallback)
@@ -780,7 +780,7 @@ show_completion_report() {
         echo "         .cursor/hooks/crux-detect-changes.sh \\"
         echo "         .cursor/hooks/crux-session-start.sh \\"
         echo "         .cursor/rules/_CRUX-RULE.mdc \\"
-        echo "         .cursor/skills/CRUX-Utils CRUX.md"
+        echo "         .cursor/skills/crux-utils CRUX.md"
         echo ""
         echo -e "  ${CYAN}# Restore from backup${NC}"
         echo "  unzip -o '$backup_zip'"

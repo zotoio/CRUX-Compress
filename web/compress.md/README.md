@@ -10,6 +10,7 @@ This landing page features:
 - **Live Compression Demo**: Side-by-side before/after comparison of verbose markdown vs CRUX notation
 - **Interactive Spec Explorer**: Expandable sections documenting all CRUX symbols and blocks
 - **Quickstart Guide**: Installation and usage instructions
+- **Plugin-Aware Command Examples**: Demonstrates optional `/crux-compress --plugin` usage
 
 ## Tech Stack
 

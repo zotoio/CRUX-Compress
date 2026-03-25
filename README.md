@@ -25,7 +25,7 @@
   - [4. `/crux-compress` - The Command](#4-crux-compress---the-command)
   - [5. `crux-session-start.sh` - The Hook](#5-crux-session-startsh---the-hook)
   - [6. `crux-detect-changes.sh` - The Hook](#6-crux-detect-changessh---the-hook)
-  - [7. `CRUX-Utils` - The Skill](#7-crux-utils---the-skill)
+  - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill)
 
 
 ## The Problem
@@ -269,7 +269,7 @@ The installer creates/updates these files in your project:
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
 | `.cursor/commands/crux-compress.md`          | Compression command      |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule      |
-| `.cursor/skills/CRUX-Utils/`                 | Utility skill            |
+| `.cursor/skills/crux-utils/`                 | Utility skill            |
 
 
 ### Upgrading
@@ -398,9 +398,9 @@ flowchart TB
 **Workflow**:
 
 1. Load `CRUX.md` specification (required first step)
-2. Get source file's checksum via `CRUX-Utils` skill
+2. Get source file's checksum via `crux-utils` skill
 3. Check if existing CRUX `sourceChecksum` matches → skip if unchanged
-4. Estimate token reduction using `CRUX-Utils` skill → abort if <50% reduction
+4. Estimate token reduction using `crux-utils` skill → abort if <50% reduction
 5. Apply compression rules from specification
 6. Generate output with frontmatter (generated, sourceChecksum/sourceUrl, beforeTokens, afterTokens, reducedBy)
 7. Verify quality gates (target ≤20% of original)
@@ -439,6 +439,7 @@ alwaysApply: true
 /crux-compress https://example.com/   - Compress a public webpage (outputs to .crux/out/)
 /crux-compress ALL --force            - Force recompression (delete existing CRUX files first)
 /crux-compress @file.md --minified    - Compress with single-line output (note that LLMs take more effort to parse and understand this format)
+/crux-compress @file.md --plugin=frontmatter-tagger - Run a plugin while compressing
 ```
 
 **Flags**:
@@ -447,6 +448,7 @@ alwaysApply: true
 |------|-------------|
 | `--minified` | Single-line output, no spaces, max compression |
 | `--force` | Delete existing CRUX output files before compression (bypasses checksum skip) |
+| `--plugin <name>` / `--plugin=<name>` | Enable a named plugin from `.crux/plugins/registry.json` |
 
 **Key Features**:
 
@@ -457,6 +459,26 @@ alwaysApply: true
 - **Default Output Location**: URL sources and unspecified locations output to `.crux/out/`
 - **Two-tier output**: Universal `.crux.md` + Cursor adapter `.crux.mdc` (when source is in `.cursor/rules/`)
 - **Eligibility**: Markdown needs `crux: true` frontmatter; code/images need explicit file reference
+- **Plugin Hooks**: Optional lifecycle plugins (`beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`) can be enabled via command param
+
+**Plugin Registry**:
+
+Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
+
+```json
+{
+  "plugins": {
+    "frontmatter-tagger": {
+      "description": "Add standardized metadata after compression",
+      "hooks": ["afterCompress"]
+    },
+    "quality-gate": {
+      "description": "Apply extra validation policy checks",
+      "hooks": ["afterValidate"]
+    }
+  }
+}
+```
 
 **File Convention**:
 
@@ -511,7 +533,7 @@ alwaysApply: true
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
 
-### 7. `CRUX-Utils` - The Skill (`.cursor/skills/`)
+### 7. `crux-utils` - The Skill (`.cursor/skills/`)
 
 **Purpose**: Multi-purpose utility for CRUX compression workflows.
 
@@ -542,7 +564,7 @@ alwaysApply: true
 - CRUX-aware (counts special Unicode symbols)
 - Used by `crux-cursor-rule-manager` for frontmatter metrics
 
-See `.cursor/skills/CRUX-Utils/SKILL.md` for detailed usage.
+See `.cursor/skills/crux-utils/SKILL.md` for detailed usage.
 
 ## Installation in Another Project
 To use CRUX in your project, see [Quick Install](#quick-install).
@@ -560,7 +582,7 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
-| `.cursor/skills/CRUX-Utils/`                 | Utility skill (token estimation, checksums)                                   |
+| `.cursor/skills/crux-utils/`                 | Utility skill (token estimation, checksums)                                   |
 
 
 Then:
@@ -579,16 +601,17 @@ flowchart TD
     
     subgraph COMMAND["crux-compress.md (Command)"]
         C1["Parse arguments"]
-        C2["Spawn subagent(s)"]
-        C1 --> C2
+        C2["Resolve plugins (--plugin)"]
+        C3["Spawn subagent(s)"]
+        C1 --> C2 --> C3
     end
     
     subgraph MANAGER["crux-cursor-rule-manager (Subagent)"]
         M1["1. Read CRUX.md specification"]
-        M2["2. Get checksum (CRUX-Utils skill)"]
+        M2["2. Get checksum (crux-utils skill)"]
         M3{"3. sourceChecksum matches?"}
         M4["4. Read source file"]
-        M5["5. Estimate tokens (CRUX-Utils skill)"]
+        M5["5. Estimate tokens (crux-utils skill)"]
         M6{"6. Reduction ≥50%?"}
         M7["7. Apply compression rules"]
         M8["8. Write .crux.md (universal)"]
@@ -688,7 +711,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Hook                | `.cursor/hooks/crux-detect-changes.sh`       | Auto-detect file changes       |
 | Session Hook        | `.cursor/hooks/crux-session-start.sh`        | Show pending compressions      |
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
-| Utility Skill       | `.cursor/skills/CRUX-Utils/`                 | Token estimation, checksums    |
+| Utility Skill       | `.cursor/skills/crux-utils/`                 | Token estimation, checksums    |
 | Install Script      | `install.sh`                                 | Curl-pipe-bash installer       |
 | Zip Builder         | `scripts/create-crux-zip.sh`                 | Build distribution zip         |
 | Shellcheck          | `scripts/shellcheck.sh`                      | Lint all shell scripts         |

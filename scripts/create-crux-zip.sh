@@ -37,7 +37,7 @@ mkdir -p "$STAGING_DIR/.cursor/agents"
 mkdir -p "$STAGING_DIR/.cursor/commands"
 mkdir -p "$STAGING_DIR/.cursor/hooks"
 mkdir -p "$STAGING_DIR/.cursor/rules"
-mkdir -p "$STAGING_DIR/.cursor/skills/CRUX-Utils/scripts"
+mkdir -p "$STAGING_DIR/.cursor/skills/crux-utils/scripts"
 
 # Copy core files
 echo "Copying core files..."
@@ -77,10 +77,10 @@ cp .cursor/hooks/crux-session-start.sh "$STAGING_DIR/.cursor/hooks/"
 # Copy always-applied rule
 cp .cursor/rules/_CRUX-RULE.mdc "$STAGING_DIR/.cursor/rules/"
 
-# Copy CRUX-Utils skill
-echo "Copying CRUX-Utils skill..."
-cp .cursor/skills/CRUX-Utils/SKILL.md "$STAGING_DIR/.cursor/skills/CRUX-Utils/"
-cp .cursor/skills/CRUX-Utils/scripts/crux-utils.sh "$STAGING_DIR/.cursor/skills/CRUX-Utils/scripts/"
+# Copy crux-utils skill
+echo "Copying crux-utils skill..."
+cp .cursor/skills/crux-utils/SKILL.md "$STAGING_DIR/.cursor/skills/crux-utils/"
+cp .cursor/skills/crux-utils/scripts/crux-utils.sh "$STAGING_DIR/.cursor/skills/crux-utils/scripts/"
 
 # Create the zip
 echo "Creating zip archive..."

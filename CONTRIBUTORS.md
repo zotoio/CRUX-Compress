@@ -70,7 +70,7 @@ tests/
 │   └── special-chars.md
 ├── helpers.bash            # Shared test utilities and assertions
 ├── test_create_zip.bats    # Tests for scripts/create-crux-zip.sh
-├── test_crux_utils.bats    # Tests for CRUX-Utils skill
+├── test_crux_utils.bats    # Tests for crux-utils skill
 ├── test_detect_hook.bats   # Tests for the crux-detect-changes.sh hook
 └── test_install.bats       # Tests for install.sh
 ```
@@ -80,7 +80,7 @@ tests/
 | Test File | Script Under Test | Coverage |
 |-----------|------------------|----------|
 | `test_install.bats` | `install.sh` | Installation script validation, CLI options, dependencies |
-| `test_crux_utils.bats` | `.cursor/skills/CRUX-Utils/scripts/crux-utils.sh` | Token counting, checksums, compression ratio |
+| `test_crux_utils.bats` | `.cursor/skills/crux-utils/scripts/crux-utils.sh` | Token counting, checksums, compression ratio |
 | `test_detect_hook.bats` | `.cursor/hooks/crux-detect-changes.sh` | Hook triggering, file filtering, queue management |
 | `test_create_zip.bats` | `scripts/create-crux-zip.sh` | Zip creation, version matching, required files |
 
@@ -277,7 +277,7 @@ Version bumps only occur when these files change (matches distribution zip conte
 | `.cursor/hooks/crux-detect-changes.sh` | File change detection hook |
 | `.cursor/hooks/crux-session-start.sh` | Session start hook |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
-| `.cursor/skills/CRUX-Utils/**` | Utility skill |
+| `.cursor/skills/crux-utils/**` | Utility skill |
 
 Changes to other files (README, tests, examples, scripts) do **not** trigger releases.
 
