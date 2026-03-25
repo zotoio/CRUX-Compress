@@ -13,7 +13,21 @@ If not already loaded in context, load `CRUX.md` and `AGENTS.md` from the projec
 ## CRUX Decompression - CRITICAL
 Always interpret, understand and adhere to the meaning compressed in CRUX notation! NEVER forget this.
 
+## Path Construction - CRITICAL
+When constructing paths, URIs, or tool calls from CRUX references, preserve the literal path, filename, and extension exactly as they exist in the repository.
+
 ## CRUX Compression - CRITICAL
 When asked to compress a markdown rule file, delegate this to the `crux-cursor-rule-manager` subagent that adheres to this spec. 
 
+## CRUX Compressed File Protection - CRITICAL
+NEVER edit files that are CRUX compression output. These are:
+- Files with `.crux.md` or `.crux.mdc` extensions
+- Files whose frontmatter contains both `generated:` and `sourceChecksum:` or `sourceUrl:`
+- Files that carry the banner `> [!IMPORTANT] > Generated file - do not edit!`
+
+Always edit the corresponding SOURCE file instead, then re-generate the derived CRUX output.
+- `[name].crux.md` / `[name].crux.mdc` -> edit the real source file such as `[name].md`
+- `AGENTS.md` is a source file in this repository; do not invent `AGENTS.source.md`
+
+If you are about to edit a file and it contains `sourceChecksum`, `sourceUrl`, or the generated-file banner, stop and move the change to the source file instead.
 
