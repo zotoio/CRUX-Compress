@@ -36,11 +36,11 @@
           "checksum": "0834acfb0e336dcc29837fc8dc56369efc6434c20afac57f73f3e0a06b6020ab",
           "size": 738
         },
-        ".cursor/skills/CRUX-Utils/SKILL.md": {
+        ".cursor/skills/crux-utils/SKILL.md": {
           "checksum": "68c01d0932f266a5d14909f6132355fba51846f3501e8489ff782f1ce01ff9d7",
           "size": 2777
         },
-        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh": {
+        ".cursor/skills/crux-utils/scripts/crux-utils.sh": {
           "checksum": "11374486021a06a5f5e15927d5534b625fe60c329201a7e96d2e2948af00d6cf",
           "size": 6746
         }
@@ -81,11 +81,11 @@
           "checksum": "0834acfb0e336dcc29837fc8dc56369efc6434c20afac57f73f3e0a06b6020ab",
           "size": 738
         },
-        ".cursor/skills/CRUX-Utils/SKILL.md": {
+        ".cursor/skills/crux-utils/SKILL.md": {
           "checksum": "68c01d0932f266a5d14909f6132355fba51846f3501e8489ff782f1ce01ff9d7",
           "size": 2777
         },
-        ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh": {
+        ".cursor/skills/crux-utils/scripts/crux-utils.sh": {
           "checksum": "11374486021a06a5f5e15927d5534b625fe60c329201a7e96d2e2948af00d6cf",
           "size": 6746
         }
@@ -125,11 +125,11 @@
       "2.2.0",
       "2.2.1"
     ],
-    ".cursor/skills/CRUX-Utils/SKILL.md": [
+    ".cursor/skills/crux-utils/SKILL.md": [
       "2.2.0",
       "2.2.1"
     ],
-    ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh": [
+    ".cursor/skills/crux-utils/scripts/crux-utils.sh": [
       "2.2.0",
       "2.2.1"
     ]

@@ -129,7 +129,7 @@ teardown() {
     assert_output_contains ".cursor/rules/_CRUX-RULE.mdc"
 }
 
-@test "create-crux-zip.sh zip contains CRUX-Utils skill" {
+@test "create-crux-zip.sh zip contains crux-utils skill" {
     run "$CREATE_ZIP" "$TEST_TEMP_DIR"
     assert_exit_code 0
     
@@ -137,8 +137,8 @@ teardown() {
     zip_file=$(ls "$TEST_TEMP_DIR"/CRUX-Compress-v*.zip)
     
     run unzip -l "$zip_file"
-    assert_output_contains ".cursor/skills/CRUX-Utils/SKILL.md"
-    assert_output_contains ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh"
+    assert_output_contains ".cursor/skills/crux-utils/SKILL.md"
+    assert_output_contains ".cursor/skills/crux-utils/scripts/crux-utils.sh"
 }
 
 @test "create-crux-zip.sh version in filename matches .crux/crux.json" {

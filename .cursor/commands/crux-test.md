@@ -10,7 +10,7 @@ Run comprehensive tests on all CRUX features via LLM interaction and produce a m
 /crux-test                    - Run all tests
 /crux-test compression        - Test compression only
 /crux-test decompression      - Test decompression only
-/crux-test utilities          - Test CRUX-Utils skill only
+/crux-test utilities          - Test crux-utils skill only
 /crux-test validation         - Test semantic validation only
 ```
 
@@ -73,9 +73,9 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 ### Test 3: Token Estimation Test
 
-**Purpose**: Verify the CRUX-Utils skill works correctly.
+**Purpose**: Verify the crux-utils skill works correctly.
 
-1. Use the `CRUX-Utils` skill to estimate tokens for `tests/fixtures/sample-rule.md`
+1. Use the `crux-utils` skill to estimate tokens for `tests/fixtures/sample-rule.md`
 2. Verify output contains:
    - Prose tokens count
    - Code tokens count
@@ -91,7 +91,7 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 **Purpose**: Verify checksum calculation is consistent.
 
-1. Use `CRUX-Utils` skill with `--cksum` mode on `tests/fixtures/sample-rule.md`
+1. Use `crux-utils` skill with `--cksum` mode on `tests/fixtures/sample-rule.md`
 2. Record the checksum value
 3. Run checksum again on the same file
 4. Verify the checksums match (deterministic)
@@ -154,7 +154,7 @@ This ensures the compression tests generate fresh output that reflects the curre
 
 **Purpose**: Verify CRUX special characters are counted correctly.
 
-1. Use `CRUX-Utils` skill on `tests/fixtures/special-chars.md`
+1. Use `crux-utils` skill on `tests/fixtures/special-chars.md`
 2. Verify "Special tokens" count is > 0
 3. Count should reflect the Unicode symbols in the file
 4. Record: PASS/FAIL, special token count
@@ -192,7 +192,7 @@ This ensures the compression tests generate fresh output that reflects the curre
    - Source: `tests/fixtures/no-change.md` (testing standards)
    - Baseline: `tests/fixtures/no-change.crux.md` (permanent CRUX baseline)
 2. **Verify source unchanged**:
-   - Calculate checksum of `no-change.md` using CRUX-Utils
+   - Calculate checksum of `no-change.md` using crux-utils
    - Compare to `sourceChecksum` in the baseline frontmatter
    - If checksums match, source is unchanged
 3. **Validate baseline still accurate**:

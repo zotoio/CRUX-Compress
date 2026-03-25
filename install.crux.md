@@ -173,7 +173,7 @@ M.standard_files{
   commands/crux-compress.md,
   hooks/[crux-detect-changes.sh,crux-session-start.sh],
   rules/_CRUX-RULE.mdc,
-  skills/CRUX-Utils/[SKILL.md,scripts/crux-utils.sh]]}
+  skills/crux-utils/[SKILL.md,scripts/crux-utils.sh]]}
 
 Ω.decomp{emulate=shellcheck;src=sh;
   focus=[io_redir(log fn→stderr via >&2),

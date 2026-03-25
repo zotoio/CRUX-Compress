@@ -29,7 +29,7 @@ Read: CRUX.md if not already known.
 ## Key Files You Should Reference
 
 - `CRUX.md` - Complete CRUX specification (REQUIRED - load first)
-- `CRUX-Utils` skill - Token estimation and checksum utilities (if available)
+- `crux-utils` skill - Token estimation and checksum utilities (if available)
 
 ## When Invoked
 
@@ -49,12 +49,12 @@ Read: CRUX.md if not already known.
      - Else if source frontmatter has `crux: <n>` (numeric), use `n`
      - Else if source frontmatter has `crux: true`, use default `25` (or `80` for image sources)
      - Valid range: 1-100. Reject values outside this range.
-   - **Get source file's checksum** using `CRUX-Utils` skill (`--cksum` mode)
+   - **Get source file's checksum** using `crux-utils` skill (`--cksum` mode)
    - **Check if CRUX file exists** - if so, read its `sourceChecksum` frontmatter
    - **Skip if unchanged**: If existing `sourceChecksum` matches current source checksum, report "Source unchanged (checksum: <checksum>)" and skip compression
    - Read the source file completely
    - **Estimate source tokens**:
-     - If `CRUX-Utils` skill is available, use `--token-count` mode
+     - If `crux-utils` skill is available, use `--token-count` mode
      - Fallback: LLM estimation (prose: 4 chars/token, code: 3.5 chars/token, CRUX symbols: 1 token each)
    - **Apply compression rules from the specification**, calibrated to the compression level:
      - **Level ≤15**: Maximum aggression — collapse everything to symbols, minimal prose, deepest abbreviation
@@ -110,7 +110,7 @@ Return this response shape:
 ```
 
 5. **For surgical diff updates** (when source rule file changed):
-   - **Get source file's checksum** using `CRUX-Utils` skill (`--cksum` mode)
+   - **Get source file's checksum** using `crux-utils` skill (`--cksum` mode)
    - Read the existing `.crux.md` file and check its `sourceChecksum` frontmatter
    - **Skip if unchanged**: If `sourceChecksum` matches current source checksum, report "Source unchanged" and skip
    - Read the modified source file to identify what changed
@@ -168,7 +168,7 @@ Return this response shape:
 
 When compressing, verify:
 - [ ] **Compression level resolved** (CLI flag > frontmatter > default 25 text / 80 images)
-- [ ] **Source checksum obtained** (local files only) via `CRUX-Utils` skill
+- [ ] **Source checksum obtained** (local files only) via `crux-utils` skill
 - [ ] **Skip check performed** (local files only) - if existing CRUX `sourceChecksum` matches, skip update
 - [ ] **Target ratio met**: compressed_tokens ≤ original_tokens * (cruxLevel/100)
 - [ ] `generated` timestamp in frontmatter (YYYY-MM-DD HH:MM format)
@@ -230,7 +230,7 @@ For compression output files:
 **Universal format** (`.crux.md` — all source types):
 ---
 generated: YYYY-MM-DD HH:MM
-sourceChecksum: [checksum from CRUX-Utils skill]
+sourceChecksum: [checksum from crux-utils skill]
 cruxLevel: [compression level 1-100, default 25]
 beforeTokens: [estimated token count of source file]
 afterTokens: [estimated token count of this CRUX file]
@@ -313,10 +313,10 @@ When the `--minified` flag is specified, output single-line CRUX:
 
 **IMPORTANT**:
 - The `generated` field is REQUIRED and must be updated every time the CRUX file is created or modified. Use the current date and time in `YYYY-MM-DD HH:MM` format (24-hour time).
-- The `sourceChecksum` field is REQUIRED for local file sources. Use the `CRUX-Utils` skill (`--cksum` mode). Store the checksum value only. This enables skip-if-unchanged optimization. OMIT this field for URL sources.
+- The `sourceChecksum` field is REQUIRED for local file sources. Use the `crux-utils` skill (`--cksum` mode). Store the checksum value only. This enables skip-if-unchanged optimization. OMIT this field for URL sources.
 - The `sourceUrl` field is REQUIRED for URL sources. OMIT this field for local file sources.
 - The `cruxLevel` field is REQUIRED. Record the resolved compression level (1-100). Default is 25 when `crux: true` or no level specified.
-- The `beforeTokens` and `afterTokens` fields are REQUIRED. Use the `CRUX-Utils` skill (`--token-count` mode) if available. Fallback: LLM estimation using prose=4 chars/token, code=3.5 chars/token, CRUX symbols=1 token each.
+- The `beforeTokens` and `afterTokens` fields are REQUIRED. Use the `crux-utils` skill (`--token-count` mode) if available. Fallback: LLM estimation using prose=4 chars/token, code=3.5 chars/token, CRUX symbols=1 token each.
 - The `reducedBy` field is REQUIRED. Calculate as `round((1 - afterTokens/beforeTokens) * 100)%`. Example: beforeTokens=1614, afterTokens=388 → reducedBy: 76%.
 - The `confidence` field is REQUIRED and must be populated after a separate validation agent evaluates the CRUX against the source.
 

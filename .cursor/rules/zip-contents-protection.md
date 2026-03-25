@@ -48,8 +48,8 @@ AGENTS.crux.md (extracted from AGENTS.md)
 .cursor/hooks/crux-detect-changes.sh
 .cursor/hooks/crux-session-start.sh
 .cursor/rules/_CRUX-RULE.mdc
-.cursor/skills/CRUX-Utils/SKILL.md
-.cursor/skills/CRUX-Utils/scripts/crux-utils.sh
+.cursor/skills/crux-utils/SKILL.md
+.cursor/skills/crux-utils/scripts/crux-utils.sh
 ```
 
 ## Rationale

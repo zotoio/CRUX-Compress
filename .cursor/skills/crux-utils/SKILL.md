@@ -1,5 +1,5 @@
 ---
-name: CRUX-Utils
+name: crux-utils
 description: Multi-purpose utility for CRUX compression workflows. Provides token estimation and checksum calculation. Use when estimating tokens for compression, comparing file sizes, or getting checksums for sourceChecksum tracking.
 ---
 
@@ -11,13 +11,13 @@ Multi-purpose utility for CRUX compression workflows. Provides deterministic too
 
 ```bash
 # Token count estimation
-bash .cursor/skills/CRUX-Utils/scripts/crux-utils.sh --token-count <file>
+bash .cursor/skills/crux-utils/scripts/crux-utils.sh --token-count <file>
 
 # Compare source vs CRUX (ratio mode)
-bash .cursor/skills/CRUX-Utils/scripts/crux-utils.sh --token-count --ratio <source> <crux>
+bash .cursor/skills/crux-utils/scripts/crux-utils.sh --token-count --ratio <source> <crux>
 
 # Get checksum for sourceChecksum frontmatter
-bash .cursor/skills/CRUX-Utils/scripts/crux-utils.sh --cksum <file>
+bash .cursor/skills/crux-utils/scripts/crux-utils.sh --cksum <file>
 ```
 
 ## Modes

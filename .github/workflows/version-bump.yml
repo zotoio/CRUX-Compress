@@ -39,7 +39,7 @@ env:
     .cursor/hooks/crux-detect-changes.sh
     .cursor/hooks/crux-session-start.sh
     .cursor/rules/_CRUX-RULE.mdc
-    .cursor/skills/CRUX-Utils/
+    .cursor/skills/crux-utils/
 
 jobs:
   check-release-files:

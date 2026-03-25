@@ -113,7 +113,7 @@ This prevents resource exhaustion and ensures reliable processing.
 
 Each `.crux.md` file includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file. Before processing:
 
-1. Agent gets current checksum using `CRUX-Utils` skill (`--cksum` mode)
+1. Agent gets current checksum using `crux-utils` skill (`--cksum` mode)
 2. If existing CRUX file's `sourceChecksum` matches, the source is unchanged - **skip update**
 3. If no match (or no existing CRUX file), proceed with compression
 4. After compression, store the new `sourceChecksum` in the output frontmatter
@@ -335,7 +335,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      - Follow CRUX.md specification
      - Do NOT include alwaysApply or other IDE-specific frontmatter in .crux.md
      - Check source checksum vs existing CRUX sourceChecksum - skip if unchanged
-     - Report before/after token counts using `CRUX-Utils` skill (or "skipped - source unchanged")
+     - Report before/after token counts using `crux-utils` skill (or "skipped - source unchanged")
      - If source lacks `crux: true` or `crux: <n>` frontmatter, add `crux: true` first
      - Ensure source uses .md extension (rename from .mdc if needed)
      ```
@@ -657,4 +657,4 @@ Using a **separate agent instance** for validation ensures:
 - `crux-cursor-rule-manager` subagent - The specialist that performs compression
 - `CRUX.md` - The CRUX notation specification
 - `.cursor/rules/_CRUX-RULE.mdc` - Rules for working with CRUX files
-- `CRUX-Utils` skill - Token estimation and checksum utilities
+- `crux-utils` skill - Token estimation and checksum utilities
