@@ -629,6 +629,55 @@
           "size": 6745
         }
       }
+    },
+    "2.8.3": {
+      "date": "2026-03-25",
+      "files": {
+        "CRUX.md": {
+          "checksum": "197b4c3d699d4742c0a2b68c8e32aa25220f29f9a81c9f9383d4a59cae10b44e",
+          "size": 28188
+        },
+        ".crux/crux.json": {
+          "checksum": "6cb4cbd47ab2dd3a1d670ce326ad710a9c46a9bd700278d99a84bcba8234b5d3",
+          "size": 25
+        },
+        "AGENTS.md": {
+          "checksum": "70a15431ab4beebdbf13f0b6ffe564016d8a4797933d3a7db970f1e57ea8eb19",
+          "size": 2414
+        },
+        ".cursor/hooks.json": {
+          "checksum": "af2e4dc50cfeca1f323843acfb4cb036ef0f1b8f624e46042aba9adf628fb9bd",
+          "size": 586
+        },
+        ".cursor/agents/crux-cursor-rule-manager.md": {
+          "checksum": "2476b235580bc3f2cc981c47b5be9618ec6c8291e5315403492217e9880fcccc",
+          "size": 18278
+        },
+        ".cursor/commands/crux-compress.md": {
+          "checksum": "d022b9e9012fc8429b8cc43ce450de2bf04aa30158e74fdb689a5c0e971dd74d",
+          "size": 31181
+        },
+        ".cursor/hooks/crux-detect-changes.sh": {
+          "checksum": "2308cee60bd021011b6955fa7f9b7f9798e91d1c3a6b139612af90d08314388d",
+          "size": 3463
+        },
+        ".cursor/hooks/crux-session-start.sh": {
+          "checksum": "f673592017063a621410ad6e78fc293211a0c468cb098b07b27a602b66c54925",
+          "size": 1736
+        },
+        ".cursor/rules/_CRUX-RULE.mdc": {
+          "checksum": "e50424945f9ef6d01b33619d9d44e3870a90ff9d6cfcbf99ec0fcb287875aa0b",
+          "size": 1687
+        },
+        ".cursor/skills/crux-utils/SKILL.md": {
+          "checksum": "249914a42f1b7cc76fcb696d6b782d059ad818cf749afdc9f440e0044e8fd59c",
+          "size": 2776
+        },
+        ".cursor/skills/crux-utils/scripts/crux-utils.sh": {
+          "checksum": "edf45d5ac18cd6a9611e8a1e482113145078609a473bc93d93af59f059df92f3",
+          "size": 6745
+        }
+      }
     }
   },
   "allFiles": {
@@ -645,7 +694,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".crux/crux.json": [
       "2.2.0",
@@ -660,7 +710,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     "AGENTS.md": [
       "2.2.0",
@@ -675,7 +726,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/hooks.json": [
       "2.2.0",
@@ -690,7 +742,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/agents/crux-cursor-rule-manager.md": [
       "2.2.0",
@@ -705,7 +758,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/commands/crux-compress.md": [
       "2.2.0",
@@ -720,7 +774,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/hooks/detect-crux-changes.sh": [
       "2.2.0",
@@ -739,7 +794,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/skills/CRUX-Utils/SKILL.md": [
       "2.2.0",
@@ -780,7 +836,8 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/hooks/crux-session-start.sh": [
       "2.3.0",
@@ -793,13 +850,16 @@
       "2.6.0",
       "2.7.0",
       "2.7.1",
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/skills/crux-utils/SKILL.md": [
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ],
     ".cursor/skills/crux-utils/scripts/crux-utils.sh": [
-      "2.8.1"
+      "2.8.1",
+      "2.8.3"
     ]
   }
 }
