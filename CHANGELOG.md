@@ -5,6 +5,12 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.8.3](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.8.3) - 2026-03-25
+
+- chore: update release manifest for v2.8.3 [skip ci] (dc1f886)
+- fix: restore generated CRUX file protections (3662ac3)
+- docs: update CHANGELOG.md for v2.8.1 [skip ci] (7c40e1b)
+
 ## [v2.8.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.8.1) - 2026-03-25
 
 - chore: update release manifest for v2.8.1 [skip ci] (c588c79)
