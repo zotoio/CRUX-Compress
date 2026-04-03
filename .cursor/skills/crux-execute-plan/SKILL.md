@@ -100,7 +100,7 @@ After adversarial verification:
 After all phases complete and all subtasks have been adversarially verified:
 
 1. **Confirm all subtasks are `Done`**: Every row in the manifest must have status `Done`. If any are `Partial` or `Failed`, report and ask the user before proceeding
-2. **Run tests**: Execute `./scripts/test.sh` via a `shell` subagent
+2. **Run tests**: Execute `python3 scripts/test.py` via a `shell` subagent
 3. **Check linter errors**: Run ReadLints on all files modified during execution
 4. **Integrity audit**: Spawn `integrity-expert` to audit changed files (shell quality, CRUX sync, config consistency)
 5. **Documentation sync**: Spawn `docs-sync-agent` if any trigger files (agents, skills, commands, hooks, scripts) were modified
@@ -214,7 +214,7 @@ After user approval:
 ### Testing During Execution
 
 - Individual subtasks should only run targeted tests on files they modified
-- The global test suite (`./scripts/test.sh`) runs only during the final verification phase
+- The global test suite (`python3 scripts/test.py`) runs only during the final verification phase
 - This prevents test failures from parallel file modifications
 
 ## Resuming Execution

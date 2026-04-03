@@ -83,9 +83,9 @@ tests/fixtures/                     # Shared test fixture files
 | Test File | Script Under Test | Coverage |
 |-----------|------------------|----------|
 | `test_install.py` | `install.py` | CLI flags, version comparison, hooks merge, upsert |
-| `test_crux_utils.py` | `crux-utils.sh` | Token counting, checksums, compression ratio |
+| `test_crux_utils.py` | `crux-utils.py` | Token counting, checksums, compression ratio |
 | `test_detect_hook.py` | `crux-detect-changes.py` | File filtering, queue management |
-| `test_create_zip.py` | `create-crux-zip.sh` | Zip contents, version matching, structure |
+| `test_create_zip.py` | `create-crux-zip.py` | Zip contents, version matching, structure |
 | `test_a_memory_crud.py` | Memory skills | Memory create, read, update, delete |
 | `test_b_dream_workflow.py` | Dream extraction | Post-plan memory extraction workflow |
 | `test_c_rem_sleep.py` | REM sleep | Promotion, demotion, archival |
@@ -96,8 +96,8 @@ tests/fixtures/                     # Shared test fixture files
 ### Running Tests
 
 ```bash
-# Run all tests (shellcheck + pytest)
-./scripts/test.sh
+# Run all tests (bats + pytest)
+python3 scripts/test.py
 
 # Run all pytest tests
 pytest evals/ -v

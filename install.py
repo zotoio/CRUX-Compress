@@ -189,7 +189,7 @@ def get_checksum(filepath: str) -> str:
 def check_not_in_crux_repo() -> None:
     if (
         Path("CRUX.md").is_file()
-        and Path("scripts/create-crux-zip.sh").is_file()
+        and Path("scripts/create-crux-zip.py").is_file()
         and Path("scripts").is_dir()
     ):
         try:
@@ -230,7 +230,7 @@ def create_backup_zip() -> str:
         ".cursor/commands/crux-compress.md",
         ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
         ".cursor/rules/_CRUX-RULE.mdc",
-        ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.sh",
+        ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.py",
     ]
 
     files_to_backup: list[str] = []
@@ -349,7 +349,7 @@ RELEASE_FILES = [
     ".cursor/commands/crux-compress.md",
     ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
     ".cursor/rules/_CRUX-RULE.mdc",
-    ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.sh",
+    ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.py",
 ]
 
 
@@ -477,7 +477,7 @@ def install_from_staging(staging_dir: Path) -> None:
     if Path("AGENTS.crux.md").is_file():
         upsert_agents_crux_block("AGENTS.crux.md")
 
-    for script in [".cursor/skills/crux-utils/scripts/crux-utils.sh"]:
+    for script in [".cursor/skills/crux-utils/scripts/crux-utils.py"]:
         p = Path(script)
         if p.is_file():
             p.chmod(p.stat().st_mode | 0o111)

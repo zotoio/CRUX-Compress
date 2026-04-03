@@ -793,8 +793,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
 | Utility Skill       | `.cursor/skills/crux-utils/`                 | Token estimation, checksums    |
 | Install Script      | `install.py`                                 | Curl-pipe installer (Python)   |
-| Zip Builder         | `scripts/create-crux-zip.sh`                 | Build distribution zip         |
-| Shellcheck          | `scripts/shellcheck.sh`                      | Lint all shell scripts         |
+| Zip Builder         | `scripts/create-crux-zip.py`                 | Build distribution zip         |
 | Tests               | `evals/*.py`                                 | Pytest test suite              |
 | CI Workflows        | `.github/workflows/`                         | Automated testing and releases |
 | Dev Rules           | `.cursor/rules/*.mdc`                        | Development workflow rules     |
@@ -903,22 +902,17 @@ brew install shellcheck
 # Ubuntu/Debian
 sudo apt install shellcheck
 
-# Run shellcheck on all scripts
-./scripts/shellcheck.sh
-
-# Show diff suggestions for fixes
-./scripts/shellcheck.sh --fix
+# Run all tests
+python3 scripts/test.py
 ```
-
-The script checks remaining shell files including `scripts/create-crux-zip.sh` and utility scripts.
 
 ### Test Coverage
 
 
 | Script                       | Test File               | Coverage                                          |
 | ---------------------------- | ----------------------- | ------------------------------------------------- |
-| `crux-utils.sh`              | `test_crux_utils.py`    | Token counting, checksums, ratios, error handling |
-| `scripts/create-crux-zip.sh` | `test_create_zip.py`    | Zip contents, version embedding, structure        |
+| `crux-utils.py`              | `test_crux_utils.py`    | Token counting, checksums, ratios, error handling |
+| `scripts/create-crux-zip.py` | `test_create_zip.py`    | Zip contents, version embedding, structure        |
 | `crux-detect-changes.py`     | `test_detect_hook.py`   | Frontmatter detection, queue management           |
 | `install.py`                 | `test_install.py`       | CLI flags, version comparison, hooks merge, upsert |
 
@@ -935,7 +929,7 @@ pip install -r evals/requirements.txt
 pytest evals/ -v
 ```
 
-The `scripts/test.sh` script runs shellcheck and pytest in sequence.
+The `scripts/test.py` script runs bats and pytest in sequence.
 
 ### LLM Feature Testing
 
@@ -987,7 +981,7 @@ Version bumping follows conventional commits:
 2. `version-bump.yml` analyzes commits and updates `.crux/crux.json`
 3. `release.yml` detects version change and:
   - Generates checksums and updates `.crux/crux-release-files.json` manifest
-  - Builds versioned zip via `scripts/create-crux-zip.sh`
+  - Builds versioned zip via `scripts/create-crux-zip.py`
   - Creates GitHub Release with tag `vX.X.X`
   - Attaches zip as release artifact
   - Generates release notes from commits

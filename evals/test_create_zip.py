@@ -1,4 +1,4 @@
-"""Tests for create-crux-zip.sh.
+"""Tests for create-crux-zip.py.
 
 Validates that the distribution zip is created correctly with all required
 files, correct versioning, and expected structure.
@@ -8,16 +8,17 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CREATE_ZIP = PROJECT_ROOT / "scripts" / "create-crux-zip.sh"
+CREATE_ZIP = PROJECT_ROOT / "scripts" / "create-crux-zip.py"
 
 
 def _run_zip(output_dir: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [str(CREATE_ZIP), str(output_dir)],
+        [sys.executable, str(CREATE_ZIP), str(output_dir)],
         capture_output=True, text=True, cwd=str(PROJECT_ROOT),
     )
 
@@ -89,7 +90,7 @@ class TestZipContents:
     def test_contains_crux_utils_skill(self, tmp_path: Path):
         names = self._get_names(tmp_path)
         assert any("crux-utils/SKILL.md" in n for n in names)
-        assert any("crux-utils.sh" in n for n in names)
+        assert any("crux-utils.py" in n for n in names)
 
 
 class TestZipIntegrity:

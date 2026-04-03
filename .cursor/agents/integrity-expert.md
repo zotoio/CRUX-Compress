@@ -34,7 +34,7 @@ Proactively identify and report issues affecting codebase integrity, including c
 ### 1. Shell Script Quality
 
 Check all `.sh` files for:
-- ShellCheck compliance (run `./scripts/shellcheck.sh` if available)
+- ShellCheck compliance (if shell scripts exist)
 - Proper error handling (`set -e`, `set -o pipefail`)
 - Quoting of variables
 - Safe path handling
@@ -51,7 +51,7 @@ Check all `.sh` files for:
 ### 2. Test Coverage & Quality
 
 Check test infrastructure:
-- Run `./scripts/test.sh` to verify all tests pass
+- Run `python3 scripts/test.py` to verify all tests pass
 - Review test structure in `tests/*.bats`
 - Identify untested functionality
 - Check test helper usage (`tests/helpers.bash`)
@@ -95,7 +95,7 @@ Check `.github/workflows/*.yml`:
 - Verify referenced scripts/files exist
 - Check for hardcoded secrets or credentials
 - Validate job dependencies
-- Ensure release paths match `scripts/create-crux-zip.sh`
+- Ensure release paths match `scripts/create-crux-zip.py`
 
 **Report format:**
 ```
@@ -194,8 +194,7 @@ For rapid checks, use these:
 
 | Check | Command |
 |-------|---------|
-| Shell lint | `./scripts/shellcheck.sh` |
-| Run tests | `./scripts/test.sh` |
+| Run tests | `python3 scripts/test.py` |
 | CRUX checksums | Use `crux-utils` skill with `--cksum` mode |
 
 ## What NOT to Do

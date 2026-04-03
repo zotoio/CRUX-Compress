@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq bc
+          sudo apt-get install -y jq
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,8 +49,7 @@ jobs:
 
       - name: Validate zip creation
         run: |
-          chmod +x scripts/create-crux-zip.sh
-          ./scripts/create-crux-zip.sh /tmp
+          python3 scripts/create-crux-zip.py /tmp
           
           # Verify zip was created
           ZIP_FILE=$(ls /tmp/CRUX-Compress-v*.zip 2>/dev/null || echo "")
@@ -73,7 +72,7 @@ jobs:
             ".cursor/hooks/crux-session-start.py"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/crux-utils/SKILL.md"
-            ".cursor/skills/crux-utils/scripts/crux-utils.sh"
+            ".cursor/skills/crux-utils/scripts/crux-utils.py"
           )
           
           for file in "${REQUIRED_FILES[@]}"; do

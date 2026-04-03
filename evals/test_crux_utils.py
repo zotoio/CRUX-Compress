@@ -1,4 +1,4 @@
-"""Tests for the crux-utils.sh shell script.
+"""Tests for the crux-utils.py script.
 
 Validates token counting, checksum calculation, and CLI behavior
 of the CRUX utility script.
@@ -7,10 +7,11 @@ of the CRUX utility script.
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CRUX_UTILS = PROJECT_ROOT / ".cursor" / "skills" / "crux-utils" / "scripts" / "crux-utils.sh"
+CRUX_UTILS = PROJECT_ROOT / ".cursor" / "skills" / "crux-utils" / "scripts" / "crux-utils.py"
 
 SAMPLE_MD = """\
 ---
@@ -75,7 +76,7 @@ R.style{
 
 def _run(args: list[str], cwd: str | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [str(CRUX_UTILS)] + args,
+        [sys.executable, str(CRUX_UTILS)] + args,
         capture_output=True, text=True,
         cwd=cwd or str(PROJECT_ROOT),
     )

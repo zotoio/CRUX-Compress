@@ -111,7 +111,7 @@ all subtasks in prior phases are complete.
 
 ## Definition of Done
 - [ ] All subtasks completed
-- [ ] All tests passing (`./scripts/test.sh`)
+- [ ] All tests passing (`python3 scripts/test.py`)
 - [ ] No linter errors in modified files
 - [ ] Documentation updated (README.md, CONTRIBUTORS.md, AGENTS.md as needed)
 - [ ] CRUX files updated for any modified source rules
@@ -237,7 +237,7 @@ Each subtask file contains:
 3. **Manage dependencies**: Only spawn dependent tasks after their prerequisites complete
 4. **Capture results**: Update the index file with execution notes from each agent
 5. **Parallel limit**: Spawn at most 4 subagents simultaneously to prevent resource exhaustion
-6. **No global tests during parallel work**: Subtasks should only run targeted tests; defer `./scripts/test.sh` to final verification
+6. **No global tests during parallel work**: Subtasks should only run targeted tests; defer `python3 scripts/test.py` to final verification
 
 ## Critical Rules
 
@@ -254,7 +254,7 @@ Each subtask file contains:
 - **UPDATE subtask file checklists** — executing agents tick off Deliverables and Definition of Done items as each is completed; adversarial verifiers reset and independently re-tick only confirmed items
 - **VERIFY completion** of each subtask before marking done
 - **STOP for user review** before final documentation and cleanup
-- **RUN `./scripts/test.sh`** only in the final verification phase, after all subtasks complete
+- **RUN `python3 scripts/test.py`** only in the final verification phase, after all subtasks complete
 - **CHECK linter errors** via ReadLints on modified files after each subtask
 
 ### Plans Are Not Knowledge

@@ -43,7 +43,7 @@ Pass `$ARGUMENTS` to the subagent as the plan path (or `--resume` flag).
    - Flags anything missing or incorrect
    - Returns verdict: Verified / Partial / Failed
 5. **Final Verification**: After all subtasks are verified:
-   - Runs the full test suite (`./scripts/test.sh`)
+   - Runs the full test suite (`python3 scripts/test.py`)
    - Checks linter errors on all modified files
    - Spawns `integrity-expert` for overall code quality audit
    - Spawns `docs-sync-agent` for documentation updates if trigger files changed

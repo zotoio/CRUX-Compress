@@ -51,7 +51,7 @@ jobs:
           DATE=$(date +%Y-%m-%d)
           MANIFEST=".crux/crux-release-files.json"
           
-          # Files included in release (must match create-crux-zip.sh)
+          # Files included in release (must match create-crux-zip.py)
           RELEASE_FILES=(
             "CRUX.md"
             ".crux/crux.json"
@@ -63,7 +63,7 @@ jobs:
             ".cursor/hooks/crux-session-start.py"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/crux-utils/SKILL.md"
-            ".cursor/skills/crux-utils/scripts/crux-utils.sh"
+            ".cursor/skills/crux-utils/scripts/crux-utils.py"
           )
           
           echo "Generating checksums for release v${VERSION}..."
@@ -131,8 +131,7 @@ jobs:
       - name: Build distribution zip
         if: steps.tag_check.outputs.exists == 'false'
         run: |
-          chmod +x scripts/create-crux-zip.sh
-          ./scripts/create-crux-zip.sh .
+          python3 scripts/create-crux-zip.py .
           ls -la CRUX-Compress-*.zip
 
       - name: Generate release notes and changelog
