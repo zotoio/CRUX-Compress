@@ -22,12 +22,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq bc
 
-      - name: Setup BATS
-        uses: bats-core/bats-action@2.0.0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Run BATS tests
-        run: |
-          bats tests/*.bats --formatter tap
+      - name: Install bats
+        run: npm install -g bats
+
+      - name: Run bats tests
+        run: bats tests/*.bats
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python test dependencies
+        run: pip install -r evals/requirements.txt
+
+      - name: Run pytest (evals)
+        run: pytest evals/ -v --tb=short
+
+      - name: Run pytest (plugin)
+        run: pytest plugins/zoto-spec-system/tests/ -v --tb=short
 
       - name: Validate zip creation
         run: |
@@ -51,8 +69,8 @@ jobs:
             ".cursor/hooks.json"
             ".cursor/agents/crux-cursor-rule-manager.md"
             ".cursor/commands/crux-compress.md"
-            ".cursor/hooks/crux-detect-changes.sh"
-            ".cursor/hooks/crux-session-start.sh"
+            ".cursor/hooks/crux-detect-changes.py"
+            ".cursor/hooks/crux-session-start.py"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/crux-utils/SKILL.md"
             ".cursor/skills/crux-utils/scripts/crux-utils.sh"
@@ -70,21 +88,20 @@ jobs:
 
       - name: Validate install script syntax
         run: |
-          # Check for syntax errors
           bash -n install.sh
           echo "Install script syntax OK"
 
       - name: Test install script help
-        run: |
-          chmod +x install.sh
-          ./install.sh --help
+        run: bash install.sh --help
 
       - name: Summary
         run: |
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "All tests passed:" >> $GITHUB_STEP_SUMMARY
-          echo "- BATS test suite" >> $GITHUB_STEP_SUMMARY
+          echo "- bats tests (install.sh, scripts)" >> $GITHUB_STEP_SUMMARY
+          echo "- pytest suite (evals/)" >> $GITHUB_STEP_SUMMARY
+          echo "- pytest plugin tests (plugins/zoto-spec-system/)" >> $GITHUB_STEP_SUMMARY
           echo "- Zip creation validation" >> $GITHUB_STEP_SUMMARY
           echo "- Install script syntax check" >> $GITHUB_STEP_SUMMARY
 
@@ -100,6 +117,5 @@ jobs:
         with:
           scandir: '.'
           ignore_paths: >-
-            tests/bats
             web
           severity: warning

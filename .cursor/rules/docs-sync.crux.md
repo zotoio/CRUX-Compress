@@ -1,12 +1,11 @@
 ---
-generated: 2026-03-10 14:30
+generated: 2026-04-04 12:00
 sourceChecksum: 347482193
 cruxLevel: 25
 beforeTokens: 468
-afterTokens: 314
-reducedBy: 33%
-confidence: 92%
-crux: true
+afterTokens: 320
+reducedBy: 32%
+confidence: 88%
 ---
 
 > [!IMPORTANT]
@@ -52,5 +51,6 @@ P.skip{
  temp|gen files
  ¬spec features→doc existing only
 }
+Ω{concise|actionable}
 ⟧
 ```

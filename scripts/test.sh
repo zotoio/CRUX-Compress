@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run all tests (shellcheck + bats + optional crux-test)
+# Run all tests (shellcheck + bats + pytest + optional crux-test)
 # Usage: ./scripts/test.sh [--crux-test]
 #
 # Options:
@@ -61,6 +61,17 @@ if [[ "$RUN_CRUX_TEST" == "true" ]]; then
     else
         cursor-agent --model opus-4.5-thinking --print --output-format stream-json --workspace "$PROJECT_ROOT" "/crux-test"
     fi
+fi
+
+echo ""
+echo "=== Running pytest ==="
+echo ""
+
+if ! command -v pytest &> /dev/null; then
+    echo -e "${YELLOW}Warning: pytest not found, skipping tests${NC}"
+    echo -e "${YELLOW}Install with: pip install -r evals/requirements.txt${NC}"
+else
+    pytest evals/ -v
 fi
 
 echo ""

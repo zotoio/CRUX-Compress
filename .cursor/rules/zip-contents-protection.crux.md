@@ -36,7 +36,7 @@ P.only{Δ zip when user says:
 M.zip{
  CRUX.md;.crux/crux.json;AGENTS.crux.md←AGENTS.md;
  .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
- commands/crux-compress.md,hooks/[crux-detect-changes.sh,crux-session-start.sh],
+ commands/crux-compress.md,hooks/[crux-detect-changes.py,crux-session-start.py],
  rules/_CRUX-RULE.mdc,skills/crux-utils/[SKILL.md,scripts/crux-utils.sh]]}
 
 Ω{dist=minimal;+files→[↑size,?conflicts,↑updates,↑maint]}

@@ -1,0 +1,47 @@
+---
+generated: 2026-04-04 00:00
+sourceChecksum: 1709116858
+cruxLevel: 25
+beforeTokens: 420
+afterTokens: 185
+reducedBy: 56%
+confidence: 90%
+alwaysApply: true
+crux: true
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# CRUX Memories Integration Rule
+
+```crux
+⟦CRUX:crux-memories-integration.md
+Ρ{CRUX Memories agent integration}
+Κ{cfg=.crux/crux-memories.json; idx=.crux/memory-index.yml}
+
+Φ.enabled{enableMemories="true"→
+ discover: read idx→load full only likely matches(title|desc|tags)
+ MCP configured→semantic search ≻ idx scan
+ output: annotate [memory:{title}] when influenced
+ refs: increment via crux-skill-memory-reference-tracker; ¬direct file writes
+ post-plan→suggest /crux-dream
+}
+
+Φ.disabled{enableMemories="false"→skip all memory ops silently}
+
+R.general{
+ ¬direct read|write memory files→use CRUX memory skills
+ scope: base+own agent-scoped only
+ repo-local: ¬touch other repo memories
+ dir: memories/ (cfg: cruxMemories.storage.memoriesDir)
+}
+
+R.mcp{
+ .cursor/mcp.json→{mcpServers:{crux-memories:{
+  command:"python",
+  args:["-m","crux_mcp_server","-t","stdio","--config",".crux/crux-memories.json"]}}}
+ MCP avail→semantic search ≻ linear idx scan
+}
+⟧
+```

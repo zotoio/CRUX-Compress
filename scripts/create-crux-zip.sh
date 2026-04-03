@@ -71,8 +71,8 @@ cp .cursor/agents/crux-cursor-rule-manager.md "$STAGING_DIR/.cursor/agents/"
 cp .cursor/commands/crux-compress.md "$STAGING_DIR/.cursor/commands/"
 
 # Copy hooks
-cp .cursor/hooks/crux-detect-changes.sh "$STAGING_DIR/.cursor/hooks/"
-cp .cursor/hooks/crux-session-start.sh "$STAGING_DIR/.cursor/hooks/"
+cp .cursor/hooks/crux-detect-changes.py "$STAGING_DIR/.cursor/hooks/"
+cp .cursor/hooks/crux-session-start.py "$STAGING_DIR/.cursor/hooks/"
 
 # Copy always-applied rule
 cp .cursor/rules/_CRUX-RULE.mdc "$STAGING_DIR/.cursor/rules/"

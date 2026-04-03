@@ -1,0 +1,4 @@
+fastmcp>=2.0
+pyyaml>=6.0
+watchdog>=4.0
+# Optional: sentence-transformers>=2.0  # for semantic search, falls back to TF-IDF without it

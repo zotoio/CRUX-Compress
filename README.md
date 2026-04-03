@@ -23,9 +23,14 @@
   - [2. Agent Awareness (`AGENTS.md`)](#2-agent-awareness-agentsmd)
   - [3. `crux-cursor-rule-manager` - The Subagent](#3-crux-cursor-rule-manager---the-subagent)
   - [4. `/crux-compress` - The Command](#4-crux-compress---the-command)
-  - [5. `crux-session-start.sh` - The Hook](#5-crux-session-startsh---the-hook)
-  - [6. `crux-detect-changes.sh` - The Hook](#6-crux-detect-changessh---the-hook)
+  - [5. `crux-session-start.py` - The Hook](#5-crux-session-startsh---the-hook)
+  - [6. `crux-detect-changes.py` - The Hook](#6-crux-detect-changessh---the-hook)
   - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill)
+- [Memories](#memories)
+  - [Enabling Memories](#enabling-memories)
+  - [Memory Commands](#memory-commands)
+  - [MCP Server (Optional)](#mcp-server-optional)
+  - [Python Dependencies](#python-dependencies)
 
 
 ## The Problem
@@ -224,18 +229,18 @@ The name also serves as a backronym for "crux" — the decisive or most importan
 Install CRUX Compress into your project with a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 -
 ```
 
 If GitHub is blocked in your environment, use the jsDelivr CDN mirror:
 
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/zotoio/CRUX-Compress@main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/zotoio/CRUX-Compress@main/install.py | python3 -
 ```
 
 The installer automatically falls back to jsDelivr for version checks and file downloads when GitHub is unreachable.
 
-> **Tip:** You can also copy `install.sh` locally and run it directly with `bash install.sh` -- it works the same way.
+> **Tip:** You can also copy `install.py` locally and run it directly with `python3 install.py` -- it works the same way.
 
 **Prerequisites**: `curl` and `unzip` must be installed on your system.
 
@@ -243,13 +248,13 @@ The installer automatically falls back to jsDelivr for version checks and file d
 
 ```bash
 # With backup of existing files
-curl -fsSL .../install.sh | bash -s -- --backup
+curl -fsSL .../install.py | python3 - --backup
 
 # Verbose output
-curl -fsSL .../install.sh | bash -s -- --verbose
+curl -fsSL .../install.py | python3 - --verbose
 
 # Show help
-curl -fsSL .../install.sh | bash -s -- --help
+curl -fsSL .../install.py | python3 - --help
 ```
 
 ### What Gets Installed
@@ -264,8 +269,8 @@ The installer creates/updates these files in your project:
 | `.crux/crux.json`                            | Installed CRUX version   |
 | `.crux/crux-release-files.json`              | Release manifest         |
 | `.cursor/hooks.json`                         | Hook configuration       |
-| `.cursor/hooks/crux-detect-changes.sh`       | File change detection    |
-| `.cursor/hooks/crux-session-start.sh`        | Session start hook       |
+| `.cursor/hooks/crux-detect-changes.py`       | File change detection    |
+| `.cursor/hooks/crux-session-start.py`        | Session start hook       |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
 | `.cursor/commands/crux-compress.md`          | Compression command      |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule      |
@@ -296,7 +301,7 @@ flowchart TB
         RULE["_CRUX-RULE.mdc<br/>(Always-Applied Rule)<br/>.cursor/rules/"]
         MANAGER["crux-cursor-rule-manager.md<br/>(Subagent - ΣCRUX)<br/>.cursor/agents/"]
         COMMAND["crux-compress.md<br/>(Cursor Command)<br/>.cursor/commands/"]
-        HOOK["crux-detect-changes.sh<br/>(File Edit Hook)<br/>.cursor/hooks/"]
+        HOOK["crux-detect-changes.py<br/>(File Edit Hook)<br/>.cursor/hooks/"]
         
         AGENTS -->|"References"| CRUX
         RULE -->|"Points to spec"| CRUX
@@ -493,7 +498,7 @@ Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
 | Compressed webpage (URL)               | `.crux.md`  | `.crux/out/page.crux.md` |
 
 
-### 6. `crux-detect-changes.sh` - The Hook (`.cursor/hooks/`)
+### 6. `crux-detect-changes.py` - The Hook (`.cursor/hooks/`)
 
 **Purpose**: A Cursor hook that automatically detects when source files with `crux: true` are modified and queues them for compression.
 
@@ -512,13 +517,13 @@ Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
   "hooks": {
     "sessionStart": [
       {
-        "command": "bash .cursor/hooks/crux-session-start.sh",
+        "command": "python3 .cursor/hooks/crux-session-start.py",
         "description": "Display pending CRUX compressions at session start"
       }
     ],
     "afterFileEdit": [
       {
-        "command": "bash .cursor/hooks/crux-detect-changes.sh",
+        "command": "python3 .cursor/hooks/crux-detect-changes.py",
         "description": "Queue modified source files for CRUX compression"
       }
     ]
@@ -566,6 +571,81 @@ Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
 
 See `.cursor/skills/crux-utils/SKILL.md` for detailed usage.
 
+## Memories
+
+CRUX Memories is an optional learning system that lets agents extract, store, and recall knowledge across sessions. Memories persist as structured markdown files and are automatically surfaced to agents based on relevance.
+
+The memory lifecycle has three phases:
+
+- **Dream** — After completing a plan, extract learnings, red flags, goals, and ideas into memory files
+- **REM Sleep** — Periodically rebalance the memory corpus: promote high-value memories, demote stale ones, consolidate duplicates, archive unused entries
+- **MindReader** — Query and display memories in human-readable form (read-only)
+
+### Enabling Memories
+
+Memories are disabled by default. To enable:
+
+1. Edit `.crux/crux-memories.json` and set `enableMemories` to `"true"`:
+
+```json
+{
+  "flags": [
+    { "enableMemories": "true" }
+  ]
+}
+```
+
+2. Memories are stored in the `memories/` directory, organized by type (`core/`, `learning/`, `redflag/`, `goal/`, `idea/`)
+3. Agent-scoped memories live under `memories/agents/{agent-id}/`
+
+### Memory Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/crux-dream <plan-name>` | Extract memories from a completed plan |
+| `/crux-dream --rem` | Run REM sleep (rebalance all memories) |
+| `/crux-dream --rem --yolo` | REM sleep with auto-apply for non-conflict changes |
+| `/crux-mindreader` | Show contextually relevant memories |
+| `/crux-mindreader "query"` | Search memories by keyword |
+| `/crux-mindreader <plan-name>` | Show memories from a specific plan |
+
+### MCP Server (Optional)
+
+The CRUX MCP server provides semantic search over the memory corpus via the Model Context Protocol. Agents with MCP access can search memories more effectively than linear index scanning.
+
+To configure the MCP server, add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "crux-memories": {
+      "command": "python",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio", "--config", ".crux/crux-memories.json"]
+    }
+  }
+}
+```
+
+The server can also run in HTTP mode for external integrations:
+
+```bash
+python -m crux_mcp_server -t http --port 8742
+```
+
+See `crux_mcp_server/README.md` for full options and tool documentation.
+
+### Python Dependencies
+
+The memory system and MCP server require Python >= 3.10. Install dependencies per component:
+
+```bash
+# MCP server
+pip install -r crux_mcp_server/requirements.txt
+
+# Eval tests
+pip install -r evals/requirements.txt
+```
+
 ## Installation in Another Project
 To use CRUX in your project, see [Quick Install](#quick-install).
 
@@ -577,8 +657,8 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.crux/crux.json`                            | Installed CRUX version                                                        |
 | `.crux/crux-release-files.json`              | Release manifest for backup/verification                                      |
 | `.cursor/hooks.json`                         | Hook configuration                                                            |
-| `.cursor/hooks/crux-detect-changes.sh`       | File change detection hook                                                    |
-| `.cursor/hooks/crux-session-start.sh`        | Session start hook                                                            |
+| `.cursor/hooks/crux-detect-changes.py`       | File change detection hook                                                    |
+| `.cursor/hooks/crux-session-start.py`        | Session start hook                                                            |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
@@ -708,16 +788,26 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Subagent            | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor           |
 | Compress Command    | `.cursor/commands/crux-compress.md`          | Compression interface          |
 | Test Command        | `.cursor/commands/crux-test.md`              | LLM feature testing            |
-| Hook                | `.cursor/hooks/crux-detect-changes.sh`       | Auto-detect file changes       |
-| Session Hook        | `.cursor/hooks/crux-session-start.sh`        | Show pending compressions      |
+| Hook                | `.cursor/hooks/crux-detect-changes.py`       | Auto-detect file changes       |
+| Session Hook        | `.cursor/hooks/crux-session-start.py`        | Show pending compressions      |
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
 | Utility Skill       | `.cursor/skills/crux-utils/`                 | Token estimation, checksums    |
-| Install Script      | `install.sh`                                 | Curl-pipe-bash installer       |
+| Install Script      | `install.py`                                 | Curl-pipe installer (Python)   |
 | Zip Builder         | `scripts/create-crux-zip.sh`                 | Build distribution zip         |
 | Shellcheck          | `scripts/shellcheck.sh`                      | Lint all shell scripts         |
-| Tests               | `tests/*.bats`                               | BATS test suite                |
+| Tests               | `evals/*.py`                                 | Pytest test suite              |
 | CI Workflows        | `.github/workflows/`                         | Automated testing and releases |
 | Dev Rules           | `.cursor/rules/*.mdc`                        | Development workflow rules     |
+| Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
+| Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
+| Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
+| Planner Agent       | `.cursor/agents/crux-planner.md`             | Multi-step planning agent      |
+| Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
+| MindReader Command  | `.cursor/commands/crux-mindreader.md`        | Memory query command           |
+| MCP Server          | `crux_mcp_server/`                           | Semantic memory search server  |
+| Memory Skills       | `.cursor/skills/crux-skill-memory-*/`        | Memory operation skills        |
+| Memory Storage      | `memories/`                                  | Memory file storage            |
+| Eval Tests          | `evals/`                                     | Python-based eval test suite   |
 
 
 ## Quick Reference
@@ -785,24 +875,20 @@ CRUX Compress includes comprehensive test coverage for all scripts.
 
 ### Running Tests Locally
 
-Tests use [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System):
+Tests use [pytest](https://pytest.org/):
 
 ```bash
-# Install BATS (if not already installed)
-# macOS
-brew install bats-core
-
-# Ubuntu/Debian
-sudo apt-get install bats
+# Install test dependencies
+pip install -r evals/requirements.txt
 
 # Run all tests
-bats tests/*.bats
+pytest evals/ -v
 
 # Run specific test file
-bats tests/test_crux_utils.bats
+pytest evals/test_crux_utils.py -v
 
-# Verbose output
-bats tests/*.bats --verbose-run
+# Run with short output
+pytest evals/ --tb=short
 ```
 
 ### Running Shellcheck Locally
@@ -824,18 +910,32 @@ sudo apt install shellcheck
 ./scripts/shellcheck.sh --fix
 ```
 
-The script checks all shell files including `install.sh`, `scripts/create-crux-zip.sh`, hook scripts, utility scripts, and test helpers.
+The script checks remaining shell files including `scripts/create-crux-zip.sh` and utility scripts.
 
 ### Test Coverage
 
 
 | Script                       | Test File               | Coverage                                          |
 | ---------------------------- | ----------------------- | ------------------------------------------------- |
-| `crux-utils.sh`              | `test_crux_utils.bats`  | Token counting, checksums, ratios, error handling |
-| `scripts/create-crux-zip.sh` | `test_create_zip.bats`  | Zip contents, version embedding, structure        |
-| `crux-detect-changes.sh`     | `test_detect_hook.bats` | Frontmatter detection, queue management           |
-| `install.sh`                 | `test_install.bats`     | Syntax validation, options, functions             |
+| `crux-utils.sh`              | `test_crux_utils.py`    | Token counting, checksums, ratios, error handling |
+| `scripts/create-crux-zip.sh` | `test_create_zip.py`    | Zip contents, version embedding, structure        |
+| `crux-detect-changes.py`     | `test_detect_hook.py`   | Frontmatter detection, queue management           |
+| `install.py`                 | `test_install.py`       | CLI flags, version comparison, hooks merge, upsert |
 
+
+### Python Eval Tests
+
+The `evals/` directory contains pytest-based integration tests for the memory system:
+
+```bash
+# Install dependencies
+pip install -r evals/requirements.txt
+
+# Run eval tests
+pytest evals/ -v
+```
+
+The `scripts/test.sh` script runs shellcheck and pytest in sequence.
 
 ### LLM Feature Testing
 
@@ -863,7 +963,7 @@ CRUX Compress uses GitHub Actions for automated testing and releases.
 
 | Workflow           | Trigger        | Purpose                                          |
 | ------------------ | -------------- | ------------------------------------------------ |
-| `test.yml`         | PR, Push       | Runs BATS tests, validates zip, checks scripts   |
+| `test.yml`         | PR, Push       | Runs pytest, validates zip, checks scripts        |
 | `version-bump.yml` | Push to main   | Auto-bumps version based on conventional commits |
 | `release.yml`      | Version change | Creates GitHub Release with zip artifact         |
 
@@ -897,7 +997,7 @@ Version bumping follows conventional commits:
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Make changes and add tests
-4. Run tests: `bats tests/*.bats`
+4. Run tests: `pytest evals/ -v`
 5. Commit with conventional message: `git commit -m "feat: add my feature"`
 6. Push and create PR
 

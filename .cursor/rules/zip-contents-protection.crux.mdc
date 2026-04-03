@@ -1,6 +1,6 @@
 ---
 generated: 2026-03-10 14:00
-sourceChecksum: 506935896
+sourceChecksum: 3147571340
 cruxLevel: 25
 beforeTokens: 525
 afterTokens: 318
@@ -37,7 +37,7 @@ P.only{Δ zip when user says:
 M.zip{
  CRUX.md;.crux/crux.json;AGENTS.crux.md←AGENTS.md;
  .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
- commands/crux-compress.md,hooks/[crux-detect-changes.sh,crux-session-start.sh],
+ commands/crux-compress.md,hooks/[crux-detect-changes.py,crux-session-start.py],
  rules/_CRUX-RULE.mdc,skills/crux-utils/[SKILL.md,scripts/crux-utils.sh]]}
 
 Ω{dist=minimal;+files→[↑size,?conflicts,↑updates,↑maint]}

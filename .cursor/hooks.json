@@ -1,17 +1,17 @@
 {
   "$schema": "https://cursor.sh/hooks-schema.json",
   "version": 1,
-  "description": "CRUX compression hooks - detects source file changes and queues for compression",
+  "description": "CRUX hooks - compression queue, memory nudges, and source change detection",
   "hooks": {
     "sessionStart": [
       {
-        "command": "bash .cursor/hooks/crux-session-start.sh",
-        "description": "CRUX: Display pending CRUX compressions at session start"
+        "command": "python3 .cursor/hooks/crux-session-start.py",
+        "description": "CRUX: Display pending compressions and memory nudges at session start"
       }
     ],
     "afterFileEdit": [
       {
-        "command": "bash .cursor/hooks/crux-detect-changes.sh",
+        "command": "python3 .cursor/hooks/crux-detect-changes.py",
         "description": "CRUX: Queue modified source files (with crux: true) for CRUX compression"
       }
     ]
