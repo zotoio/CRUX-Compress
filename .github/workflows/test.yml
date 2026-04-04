@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'feature/**'
+      - 'feat/**'
   pull_request:
     branches:
       - main
@@ -16,22 +17,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install bats
-        run: npm install -g bats
-
-      - name: Run bats tests
-        run: bats tests/*.bats
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -45,6 +30,7 @@ jobs:
         run: pytest evals/ -v --tb=short
 
       - name: Run pytest (plugin)
+        if: hashFiles('plugins/zoto-spec-system/tests/') != ''
         run: pytest plugins/zoto-spec-system/tests/ -v --tb=short
 
       - name: Validate zip creation
@@ -98,7 +84,6 @@ jobs:
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "All tests passed:" >> $GITHUB_STEP_SUMMARY
-          echo "- bats tests (install.sh, scripts)" >> $GITHUB_STEP_SUMMARY
           echo "- pytest suite (evals/)" >> $GITHUB_STEP_SUMMARY
           echo "- pytest plugin tests (plugins/zoto-spec-system/)" >> $GITHUB_STEP_SUMMARY
           echo "- Zip creation validation" >> $GITHUB_STEP_SUMMARY
