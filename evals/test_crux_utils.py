@@ -76,9 +76,10 @@ R.style{
 
 def _run(args: list[str], cwd: str | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, str(CRUX_UTILS)] + args,
+        [sys.executable, str(CRUX_UTILS), *args],
         capture_output=True, text=True,
         cwd=cwd or str(PROJECT_ROOT),
+        check=False,
     )
 
 
@@ -174,3 +175,40 @@ class TestChecksum:
         result = _run(["--cksum", str(tmp_path / "nonexistent.md")])
         assert result.returncode == 1
         assert "File not found" in result.stdout or "File not found" in result.stderr
+
+    def test_handles_cksum_failure_without_crashing(self, monkeypatch, tmp_path: Path):
+        sample = tmp_path / "sample.md"
+        sample.write_text(SAMPLE_MD, encoding="utf-8")
+
+        def fake_run(*_args, **_kwargs):
+            return subprocess.CompletedProcess(
+                args=["cksum", str(sample)],
+                returncode=1,
+                stdout="",
+                stderr="cksum unavailable",
+            )
+
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("crux_utils", str(CRUX_UTILS))
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+
+        monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+        from io import StringIO
+
+        stdout = StringIO()
+        stderr = StringIO()
+        old_stdout, old_stderr = sys.stdout, sys.stderr
+        try:
+            sys.stdout = stdout
+            sys.stderr = stderr
+            module._run_cksum(str(sample))
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+
+        assert 'FRONTMATTER:       ""' in stdout.getvalue()
+        assert "Warning: cksum failed" in stderr.getvalue()

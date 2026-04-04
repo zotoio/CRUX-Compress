@@ -118,7 +118,15 @@ def _run_cksum(filepath: str) -> None:
     result = subprocess.run(
         ["cksum", filepath], capture_output=True, text=True, check=False,
     )
-    checksum = result.stdout.split()[0]
+    if result.returncode != 0 or not result.stdout.strip():
+        stderr = result.stderr.strip() or "no stderr output"
+        checksum = ""
+        print(
+            f"Warning: cksum failed for {filepath}: {stderr}",
+            file=sys.stderr,
+        )
+    else:
+        checksum = result.stdout.split()[0]
 
     print(f"=== Checksum: {p.name} ===")
     print(f"Checksum:          {checksum}")

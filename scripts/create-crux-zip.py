@@ -64,6 +64,10 @@ def main() -> None:
             if idx == -1:
                 print("ERROR: Could not extract CRUX block from AGENTS.md")
                 sys.exit(1)
+            print(
+                "WARNING: AGENTS.md is missing a closing </CRUX> tag; "
+                "falling back to extracting the CRUX block from <CRUX to EOF",
+            )
             crux_block = agents_text[idx:].rstrip()
         zf.writestr("AGENTS.crux.md", crux_block + "\n")
 

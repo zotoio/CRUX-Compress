@@ -21,15 +21,11 @@ def _parse_frontmatter(path: Path) -> dict:
     return yaml.safe_load(parts[1])
 
 
-def _config_transitions(tmp_path: Path) -> dict:
-    return _make_config(tmp_path)
-
-
 class TestPromotionThreshold:
     """When strength reaches promoteAt, the memory should be flagged for promotion."""
 
     def test_idea_at_threshold_recommends_promotion(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         transitions = cfg["cruxMemories"]["typeTransitions"]
 
         mem_dir = tmp_path / "memories"
@@ -41,7 +37,7 @@ class TestPromotionThreshold:
         assert transitions["idea"]["promoteTo"] == "learning"
 
     def test_learning_at_threshold_recommends_promotion(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         transitions = cfg["cruxMemories"]["typeTransitions"]
 
         mem_dir = tmp_path / "memories"
@@ -53,12 +49,12 @@ class TestPromotionThreshold:
         assert transitions["learning"]["promoteTo"] == "core"
 
     def test_core_has_no_promotion(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         transitions = cfg["cruxMemories"]["typeTransitions"]
         assert transitions["core"]["promoteAt"] is None
 
     def test_goal_has_no_promotion(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         transitions = cfg["cruxMemories"]["typeTransitions"]
         assert transitions["goal"]["promoteAt"] is None
 
@@ -67,7 +63,7 @@ class TestPromotionFileMove:
     """After promotion, the file moves to the new type directory with updated frontmatter."""
 
     def test_promoted_file_in_new_directory(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         promote_to = cfg["cruxMemories"]["typeTransitions"]["idea"]["promoteTo"]
 
         mem_dir = tmp_path / "memories"
@@ -94,7 +90,7 @@ class TestPromotionFileMove:
         assert new_fm["promoted_from"] == "idea"
 
     def test_promoted_frontmatter_updated(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         mem_dir = tmp_path / "memories"
         for t in MEMORY_TYPES:
             (mem_dir / t).mkdir(parents=True, exist_ok=True)
@@ -120,7 +116,7 @@ class TestDemotionAfterInactivity:
     """Memories unreferenced for demoteAfterDaysUnreferenced days are demoted."""
 
     def test_stale_memory_triggers_demotion(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         demote_days = cfg["cruxMemories"]["demoteAfterDaysUnreferenced"]
 
         mem_dir = tmp_path / "memories"
@@ -149,7 +145,7 @@ class TestDemotionAfterInactivity:
         )
 
     def test_recent_memory_not_demoted(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         demote_days = cfg["cruxMemories"]["demoteAfterDaysUnreferenced"]
 
         mem_dir = tmp_path / "memories"
@@ -180,7 +176,7 @@ class TestArchivalAfterInactivity:
     """Memories unreferenced for archiveAfterDaysUnreferenced days are archived."""
 
     def test_very_stale_memory_triggers_archival(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         archive_days = cfg["cruxMemories"]["archiveAfterDaysUnreferenced"]
 
         mem_dir = tmp_path / "memories"
@@ -221,5 +217,5 @@ class TestArchivalAfterInactivity:
         assert _parse_frontmatter(archived_path)["type"] == "archived"
 
     def test_demotion_threshold_less_than_archival(self, tmp_path: Path):
-        cfg = _config_transitions(tmp_path)
+        cfg = _make_config(tmp_path)
         assert cfg["cruxMemories"]["demoteAfterDaysUnreferenced"] < cfg["cruxMemories"]["archiveAfterDaysUnreferenced"]
