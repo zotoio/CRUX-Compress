@@ -1,7 +1,7 @@
 # Plan: CRUX Memories System
 
 ## Status
-In Progress
+Ready for Review
 
 ## Overview
 
