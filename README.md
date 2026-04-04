@@ -929,7 +929,9 @@ pip install -r evals/requirements.txt
 pytest evals/ -v
 ```
 
-The `scripts/test.py` script runs bats and pytest in sequence.
+The `scripts/test.py` wrapper runs available automated test suites in sequence and
+prints a warning instead of a false success when required tools such as `pytest`
+are not installed.
 
 ### LLM Feature Testing
 

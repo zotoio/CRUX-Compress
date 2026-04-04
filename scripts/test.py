@@ -24,6 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 def main() -> int:
     run_crux_test = False
+    tests_run = False
 
     for arg in sys.argv[1:]:
         if arg == "--crux-test":
@@ -40,25 +41,31 @@ def main() -> int:
             return 1
 
     bats_files = sorted(PROJECT_ROOT.glob("tests/*.bats"))
-    if bats_files:
+    bats = shutil.which("bats")
+    if bats_files and bats:
         print("=== Running bats tests ===")
         print()
         result = subprocess.run(
-            ["bats"] + [str(f) for f in bats_files],
+            [bats, *[str(f) for f in bats_files]],
             cwd=PROJECT_ROOT,
+            check=False,
         )
         if result.returncode != 0:
             return result.returncode
+        tests_run = True
+    elif bats_files:
+        print(f"{YELLOW}Warning: bats not found, skipping bats tests{NC}")
 
     if run_crux_test:
         print()
         print("=== Running /crux-test via cursor-agent ===")
         print()
 
-        if shutil.which("cursor-agent"):
+        cursor_agent = shutil.which("cursor-agent")
+        if cursor_agent:
             result = subprocess.run(
                 [
-                    "cursor-agent",
+                    cursor_agent,
                     "--model", "opus-4.5-thinking",
                     "--print",
                     "--output-format", "stream-json",
@@ -66,6 +73,7 @@ def main() -> int:
                     "/crux-test",
                 ],
                 cwd=PROJECT_ROOT,
+                check=False,
             )
             if result.returncode != 0:
                 return result.returncode
@@ -76,19 +84,25 @@ def main() -> int:
     print("=== Running pytest ===")
     print()
 
-    if shutil.which("pytest"):
+    pytest_bin = shutil.which("pytest")
+    if pytest_bin:
         result = subprocess.run(
-            ["pytest", "evals/", "-v"],
+            [pytest_bin, "evals/", "-v"],
             cwd=PROJECT_ROOT,
+            check=False,
         )
         if result.returncode != 0:
             return result.returncode
+        tests_run = True
     else:
         print(f"{YELLOW}Warning: pytest not found, skipping tests{NC}")
         print(f"{YELLOW}Install with: pip install -r evals/requirements.txt{NC}")
 
     print()
-    print(f"{GREEN}\u2713 All tests passed{NC}")
+    if tests_run:
+        print(f"{GREEN}\u2713 All tests passed{NC}")
+    else:
+        print(f"{YELLOW}\u2713 No automated tests were run{NC}")
     return 0
 
 

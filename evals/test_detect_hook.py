@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -16,10 +17,11 @@ HOOK_SCRIPT = PROJECT_ROOT / ".cursor" / "hooks" / "crux-detect-changes.py"
 
 def _run_hook(cwd: Path, file_path: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["python3", str(HOOK_SCRIPT)],
+        [sys.executable, str(HOOK_SCRIPT)],
         capture_output=True, text=True,
         input=json.dumps({"file_path": file_path}),
         cwd=str(cwd),
+        check=False,
     )
 
 

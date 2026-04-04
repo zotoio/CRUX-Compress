@@ -12,6 +12,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+import pytest
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CREATE_ZIP = PROJECT_ROOT / "scripts" / "create-crux-zip.py"
 
@@ -20,6 +22,7 @@ def _run_zip(output_dir: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(CREATE_ZIP), str(output_dir)],
         capture_output=True, text=True, cwd=str(PROJECT_ROOT),
+        check=False,
     )
 
 
@@ -48,49 +51,42 @@ class TestZipCreation:
 
 
 class TestZipContents:
-    def _get_names(self, tmp_path: Path) -> list[str]:
+    @pytest.fixture(scope="class")
+    def zip_names(self, tmp_path_factory: pytest.TempPathFactory) -> list[str]:
+        tmp_path = tmp_path_factory.mktemp("zip")
         result = _run_zip(tmp_path)
         assert result.returncode == 0
         zp = _get_zip_path(tmp_path)
         with zipfile.ZipFile(zp) as zf:
             return zf.namelist()
 
-    def test_contains_crux_md(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("CRUX.md" in n for n in names)
+    def test_contains_crux_md(self, zip_names: list[str]):
+        assert any("CRUX.md" in n for n in zip_names)
 
-    def test_contains_agents_crux_md(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("AGENTS.crux.md" in n for n in names)
+    def test_contains_agents_crux_md(self, zip_names: list[str]):
+        assert any("AGENTS.crux.md" in n for n in zip_names)
 
-    def test_contains_crux_json(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any(".crux/crux.json" in n for n in names)
+    def test_contains_crux_json(self, zip_names: list[str]):
+        assert any(".crux/crux.json" in n for n in zip_names)
 
-    def test_contains_hooks_json(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any(".cursor/hooks.json" in n for n in names)
+    def test_contains_hooks_json(self, zip_names: list[str]):
+        assert any(".cursor/hooks.json" in n for n in zip_names)
 
-    def test_contains_rule_manager(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("crux-cursor-rule-manager.md" in n for n in names)
+    def test_contains_rule_manager(self, zip_names: list[str]):
+        assert any("crux-cursor-rule-manager.md" in n for n in zip_names)
 
-    def test_contains_crux_compress_command(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("crux-compress.md" in n for n in names)
+    def test_contains_crux_compress_command(self, zip_names: list[str]):
+        assert any("crux-compress.md" in n for n in zip_names)
 
-    def test_contains_detect_changes_hook(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("crux-detect-changes.py" in n for n in names)
+    def test_contains_detect_changes_hook(self, zip_names: list[str]):
+        assert any("crux-detect-changes.py" in n for n in zip_names)
 
-    def test_contains_crux_rule(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("_CRUX-RULE.mdc" in n for n in names)
+    def test_contains_crux_rule(self, zip_names: list[str]):
+        assert any("_CRUX-RULE.mdc" in n for n in zip_names)
 
-    def test_contains_crux_utils_skill(self, tmp_path: Path):
-        names = self._get_names(tmp_path)
-        assert any("crux-utils/SKILL.md" in n for n in names)
-        assert any("crux-utils.py" in n for n in names)
+    def test_contains_crux_utils_skill(self, zip_names: list[str]):
+        assert any("crux-utils/SKILL.md" in n for n in zip_names)
+        assert any("crux-utils.py" in n for n in zip_names)
 
 
 class TestZipIntegrity:

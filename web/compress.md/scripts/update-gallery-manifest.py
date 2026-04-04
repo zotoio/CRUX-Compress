@@ -27,8 +27,7 @@ def _extract_frontmatter_value(filepath: Path, key: str) -> str:
     for line in match.group(1).splitlines():
         m = re.match(rf"^{re.escape(key)}:\s*(.*)", line)
         if m:
-            val = m.group(1).strip().strip("'\"").replace("~", "")
-            return val
+            return m.group(1).strip().strip("'\"").replace("~", "")
     return ""
 
 

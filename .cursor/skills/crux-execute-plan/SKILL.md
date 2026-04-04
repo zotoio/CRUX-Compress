@@ -28,7 +28,7 @@ Use this skill when a plan exists in `plans/` with status `Ready for Review` (or
 
 Present the manifest as the execution summary and wait for user approval:
 
-```
+```text
 ## Execution Summary
 
 - **Plan**: [feature name]
@@ -169,7 +169,7 @@ Write a persistent execution report to the plan directory as `execution-report-[
 
 Present the execution report to the user for approval:
 
-```
+```text
 Execution report written to: plans/[directory]/execution-report-[feature-name]-[yyyymmdd].md
 
 All [N] subtasks verified. Tests: PASS. Linter: CLEAN.
@@ -201,8 +201,12 @@ After user approval:
 
 ### Error Handling
 
-- If a subtask fails, update its status in the index and report to the user
-- Ask the user how to proceed: retry, skip, or abort the plan
+- If a subtask fails, immediately stop scheduling new subtasks in the current batch, update the failed subtask status in the index, and report the failure to the user
+- **Abort**: cancel every still-running subtask in that batch, mark each cancelled subtask as `Aborted` in the index, and do not start another batch
+- **Skip**: allow already-running subtasks in the current batch to finish, mark the failed subtask as `Skipped`, then update the index for every finished subtask together before prompting for the next step
+- **Retry**: cancel every still-running subtask in the current batch, mark those cancelled subtasks as `Pending`, and requeue the failed subtask plus any cancelled subtasks for a fresh batch attempt
+- All subtask status updates for a batch must be applied atomically in the index so resume logic never sees partially updated batch state
+- After applying the selected batch policy, ask the user how to proceed if further confirmation is needed
 - Never silently skip a failed subtask
 
 ### Progress Updates

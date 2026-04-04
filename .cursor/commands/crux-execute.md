@@ -6,7 +6,7 @@ Execute an engineering plan with guided subagent coordination, progress tracking
 
 ## Usage
 
-```
+```text
 /crux-execute                                          - Execute the most recent plan in plans/
 /crux-execute plans/20260403-memory-system              - Execute a specific plan by directory
 /crux-execute plans/20260403-memory-system/plan-memory-system-20260403.md  - Execute by index file path
@@ -58,7 +58,7 @@ Pass `$ARGUMENTS` to the subagent as the plan path (or `--resume` flag).
 | **Manifest-driven dispatch** | The subagent for each subtask comes from the manifest's Subagent column — never overridden |
 | **Adversarial verification** | Every subtask is verified by a fresh `integrity-expert` that did not execute the work |
 | **Dependency enforcement** | Never starts a subtask before its dependencies are complete |
-| **Failure handling** | If a subtask fails or verification returns Failed, stops and asks user: retry, skip, or abort |
+| **Failure handling** | On subtask failure, stops scheduling new work in the batch and applies a deterministic retry/skip/abort policy before updating the index |
 | **Parallel limit** | Maximum 4 concurrent subagents per batch |
 | **No global tests mid-execution** | Individual subtasks run only targeted tests; full suite deferred to final verification |
 | **Progress persistence** | Plan index manifest is updated after each subtask — supports `--resume` on interruption |
@@ -69,7 +69,7 @@ Pass `$ARGUMENTS` to the subagent as the plan path (or `--resume` flag).
 
 The report is written to the plan directory alongside the index and subtask files:
 
-```
+```text
 plans/20260403-memory-system/
 ├── plan-memory-system-20260403.md
 ├── subtask-01-memory-system-foundation-20260403.md
