@@ -165,7 +165,7 @@ jobs:
             echo "## Installation"
             echo ""
             echo '```bash'
-            echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash"
+            echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.py | python3 -"
             echo '```'
             echo ""
             echo "Or download the zip manually and extract to your project root."
@@ -269,7 +269,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install Command**:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash" >> $GITHUB_STEP_SUMMARY
+          echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.py | python3 -" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Skip message

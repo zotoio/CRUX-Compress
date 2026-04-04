@@ -43,7 +43,7 @@ Add and update test coverage for both workstreams: (1) memory integration points
    - Test `--target 0` or `--target 101` is rejected
    - Test `--ratio` without `--target` works as before
 
-2. **`evals/test_plugin_registry.py`** (new file) — plugin registry validation:
+2. **`evals/test_n_plugin_registry.py`** (new file, following lettered sequence `a..m` → `n`) — plugin registry validation:
    - Registry is valid JSON
    - All plugins have required fields (`description`, `hooks`, `failClosed`)
    - `enabledByDefault` field is boolean when present

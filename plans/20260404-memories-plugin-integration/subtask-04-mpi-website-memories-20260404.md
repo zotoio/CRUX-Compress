@@ -17,6 +17,7 @@ Add a CRUX Memories feature section to the website landing page (`web/compress.m
 - [ ] Visual style consistent with existing feature cards (rules, images, code, URLs)
 - [ ] Link to README memories section for detailed documentation
 - [ ] Note that memories are disabled by default and require explicit enablement
+- [ ] Update quickstart install command from `install.sh | bash` to `install.py | python3 -` (lines ~406 and ~414 reference stale `install.sh`)
 
 ## Definition of Done
 - [ ] Website HTML is well-formed (no unclosed tags)
@@ -35,8 +36,7 @@ Add a CRUX Memories feature section to the website landing page (`web/compress.m
 - Gallery sections for each compression type
 
 ### Where to Add Memories Section
-- After the existing compression type cards (rules/images/code/URLs)
-- OR as a new section before the quickstart
+- Place after the URL compression section and before the Notation section. Memories is a capability (not a compression type), so it should be visually distinct from the compression cards while still appearing in the feature showcase area.
 - Style should match existing cards but clearly indicate this is a different capability (not a compression type)
 
 ### Content Guidance
@@ -47,7 +47,6 @@ The memories section should convey:
 4. **Integration**: Works with existing CRUX workflows; memories inform future agent sessions
 
 ### What NOT to Change
-- Do not modify the install command on the website (that's a separate concern)
 - Do not add implementation details or configuration specifics
 - Keep it concise — the README has full documentation
 

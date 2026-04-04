@@ -9,17 +9,18 @@
 
 ## Objective
 
-Fix `.github/workflows/test.yml` to align with the actual repository state. The workflow currently references files and patterns that don't exist, causing broken or misleading CI steps.
+Review, validate, and commit existing uncommitted workflow fixes across `test.yml`, `release.yml`, and `version-bump.yml`. Most `install.sh` removal work is already done in the working tree — this subtask ensures the changes are correct and complete, then commits them.
 
 ## Deliverables Checklist
-- [ ] `test.yml`: Replace `bash -n install.sh` and `bash install.sh --help` with `python3 -c "import ast; ast.parse(open('install.py').read())"` and `python3 install.py --help`
-- [ ] `test.yml`: Remove or conditionalize `bats tests/*.bats` step (no `.bats` files exist)
-- [ ] `test.yml`: Conditionalize `pytest plugins/zoto-spec-system/tests/` step (only run if directory exists)
-- [ ] `version-bump.yml`: Update `RELEASE_PATHS` to reference `install.py` instead of `install.sh` (if applicable)
+- [ ] Review uncommitted diff in `test.yml` (removes `install.sh` validation steps and summary line) — verify correctness, commit
+- [ ] Review uncommitted diff in `release.yml` (changes `install.sh` → `install.py` in install commands) — verify correctness, commit
+- [ ] Review uncommitted diff in `version-bump.yml` (removes `install.sh` from `RELEASE_PATHS`) — verify correctness, commit
 - [ ] Verify `pytest evals/` step covers memory eval tests correctly
+- [ ] Scan all workflow files for any remaining `install.sh` references and fix if found
 
 ## Definition of Done
-- [ ] `test.yml` references only files that exist in the repository
+- [ ] All uncommitted workflow diffs are reviewed and committed
+- [ ] No workflow file references `install.sh`
 - [ ] No CI steps will fail due to missing files
 - [ ] Memory eval tests (`evals/test_a_*.py` through `evals/test_m_*.py`) are covered by `pytest evals/`
 - [ ] No YAML syntax errors in workflow files
@@ -27,25 +28,24 @@ Fix `.github/workflows/test.yml` to align with the actual repository state. The 
 
 ## Implementation Notes
 
-### Current Issues in `test.yml`
-1. **`bash -n install.sh`** — `install.sh` does not exist; the installer is `install.py`
-2. **`bash install.sh --help`** — same; should be `python3 install.py --help`
-3. **`bats tests/*.bats`** — no `.bats` files exist in `tests/`; this step will error
-4. **`pytest plugins/zoto-spec-system/tests/`** — `plugins/` directory may not exist on all branches
+### Working Tree State (as of plan creation)
+The following uncommitted diffs already exist and need review/commit:
 
-### Fixes
-1. Replace bash syntax check with Python AST parse
-2. Replace bash help with Python help
-3. Either remove bats step entirely or gate it: `if ls tests/*.bats 1>/dev/null 2>&1; then bats tests/*.bats; fi`
-4. Gate plugin tests: `if [ -d "plugins/zoto-spec-system/tests" ]; then pytest plugins/zoto-spec-system/tests/ -v; fi`
+1. **`test.yml`**: Removes `bash -n install.sh` and `bash install.sh --help` validation steps, removes summary line referencing install script check
+2. **`release.yml`**: Changes two `install.sh` references to `install.py | python3 -` in the installation command output
+3. **`version-bump.yml`**: Removes `install.sh` from `RELEASE_PATHS` list
 
-### Files to Read Before Editing
-- `.github/workflows/test.yml` — full workflow
-- `.github/workflows/version-bump.yml` — check RELEASE_PATHS for install.sh
+The committed `test.yml` already uses `hashFiles` to conditionalize the plugin test step — no `bats` references exist in the committed version.
+
+### Files to Read Before Committing
+- `.github/workflows/test.yml` — review full diff
+- `.github/workflows/release.yml` — review full diff
+- `.github/workflows/version-bump.yml` — review full diff
+- `.github/workflows/deploy-pages.yml` — scan for any `install.sh` references
 
 ### What NOT to Change
 - Do not modify the `pytest evals/` step — it already covers memory tests
-- Do not modify `release.yml` or `deploy-pages.yml` unless they reference `install.sh`
+- Do not modify `deploy-pages.yml` unless it references `install.sh`
 
 ## Testing Strategy
 **IMPORTANT**: Do NOT trigger global test suites during parallel execution. Instead:

@@ -71,14 +71,6 @@ jobs:
           
           echo "All required files present in zip"
 
-      - name: Validate install script syntax
-        run: |
-          bash -n install.sh
-          echo "Install script syntax OK"
-
-      - name: Test install script help
-        run: bash install.sh --help
-
       - name: Summary
         run: |
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
@@ -87,7 +79,6 @@ jobs:
           echo "- pytest suite (evals/)" >> $GITHUB_STEP_SUMMARY
           echo "- pytest plugin tests (plugins/zoto-spec-system/)" >> $GITHUB_STEP_SUMMARY
           echo "- Zip creation validation" >> $GITHUB_STEP_SUMMARY
-          echo "- Install script syntax check" >> $GITHUB_STEP_SUMMARY
 
   shellcheck:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 # Plan: Memories & Plugin Integration
 
 ## Status
-Draft
+Ready for Review
 
 ## Overview
 
@@ -18,8 +18,10 @@ Two workstreams to bring CRUX-Compress to full feature integration maturity:
 | Area | Current State | Gap |
 |------|--------------|-----|
 | **Installer (`install.py`)** | No memory-related files in `RELEASE_FILES` | Config, skills, commands, agent not installable |
-| **CI/CD (`test.yml`)** | References `install.sh` (doesn't exist), `bats tests/*.bats` (no bats files), `pytest plugins/zoto-spec-system/tests/` (may not exist) | Broken/misleading CI steps |
-| **Website (`index.html`)** | No CRUX Memories section; only `M{...}` notation mention | Missing feature visibility |
+| **CI/CD (`test.yml`)** | Uncommitted diffs remove `install.sh` validation steps; `pytest plugins/...` conditionalized with `hashFiles` | Uncommitted changes need review and commit; `scripts/test.py` still conditionally runs bats (harmless but vestigial) |
+| **CI/CD (`release.yml`)** | Uncommitted diffs update `install.sh` → `install.py` references | Uncommitted changes need review and commit |
+| **CI/CD (`version-bump.yml`)** | Uncommitted diff removes `install.sh` from `RELEASE_PATHS` | Uncommitted changes need review and commit |
+| **Website (`index.html`)** | No CRUX Memories section; only `M{...}` notation mention; quickstart references `install.sh` | Missing feature visibility; stale install command |
 | **hooks.json** | `crux-post-dream.py` exists but not registered | By design (invoked programmatically), but needs documentation clarity |
 | **`.cursor/mcp.json`** | Not committed to repo | MCP semantic search documented but not wired as default |
 | **Memory corpus** | Empty `memories/`, empty index | Correct for disabled-by-default |
@@ -51,8 +53,8 @@ Two workstreams to bring CRUX-Compress to full feature integration maturity:
 5. **CRUX.md**: Do NOT modify. The spec's `target_ratio ≤ level/100` quality gate is implementation-agnostic — whether checked by core or plugin doesn't affect the spec.
    - Rationale: CRUX.md is read-only per foundational rules.
 
-6. **CI/CD fixes**: Update `test.yml` to reference `install.py` (not `install.sh`), remove bats references, conditionally run plugin tests.
-   - Rationale: Align CI with actual repository state.
+6. **CI/CD fixes**: Review and commit existing uncommitted workflow diffs (`test.yml`, `release.yml`, `version-bump.yml`) that already remove `install.sh` references; verify no remaining stale references across all workflow files.
+   - Rationale: Align CI with actual repository state. Most fixes are already applied in the working tree — avoid duplicating work.
 
 7. **Website memories section**: Add a feature card similar to existing compression types. Brief, note opt-in nature, link to README.
    - Rationale: Feature discoverability without overloading the landing page.
@@ -138,6 +140,13 @@ graph TD
 |----|----------|-------------|
 | 10 | integrity-expert | Full integrity audit: CRUX sync, test pass, lint clean, backward compat verification |
 
+## Rollback Plan
+
+All changes are on the `feat/memories` branch. To revert:
+1. Identify the pre-execution commit: `git log --oneline feat/memories | head -20`
+2. Reset: `git reset --hard <pre-execution-commit>`
+3. If the plugin architecture proves unworkable during implementation, checkpoint after subtask 01 (design) before proceeding to subtask 06 (implementation). If 06 fails, revert to the post-01 checkpoint and re-plan the plugin approach.
+
 ## Definition of Done
 - [ ] All 10 subtasks completed
 - [ ] All tests passing (`python3 scripts/test.py`)
@@ -147,7 +156,7 @@ graph TD
 - [ ] Existing `/crux-compress` commands produce identical output (backward compat)
 - [ ] `compression-level` plugin is registered and enabled by default
 - [ ] `crux-utils.py --ratio` accepts `--target` parameter
-- [ ] Website includes memories section
+- [ ] Website includes memories section and updated install command (`install.py`)
 - [ ] CI/CD workflow runs cleanly against actual repo state
 - [ ] Installer can optionally set up memory system components
 

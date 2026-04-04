@@ -12,7 +12,7 @@
 Clarify the hook invocation model for memory-related hooks, ensure MCP documentation is accurate, and close out the Definition of Done from the previous memories plan (`plans/20260403-crux-memories/`).
 
 ## Deliverables Checklist
-- [ ] `crux-post-dream.py` header comment updated to explicitly state it is invoked programmatically by the `/crux-dream` workflow, NOT registered as a Cursor event hook
+- [ ] Verify `crux-post-dream.py` header comment correctly documents its programmatic invocation model (invoked by `/crux-dream` workflow, NOT a Cursor event hook); update only if documentation is missing or inaccurate
 - [ ] Verify `.cursor/hooks.json` correctly lists only event-driven hooks (do NOT add `crux-post-dream.py`)
 - [ ] Verify the integration rule (`.cursor/rules/crux-memories-integration.md`) MCP configuration example is accurate and matches the actual `crux_mcp_server/` package
 - [ ] Update `plans/20260403-crux-memories/plan-crux-memories-20260403.md` — check the DoD items and tick those that are genuinely complete
