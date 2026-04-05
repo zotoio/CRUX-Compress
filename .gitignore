@@ -59,9 +59,5 @@ out/
 .xfiResults/
 *.zip
 
-# CRUX Memories - generated files
-.crux/memory-index.yml
-.crux/reference-tracking/
-
 # Archive directory
 .ai-ignored/

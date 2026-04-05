@@ -60,11 +60,13 @@ Extract memories from a completed unit of work.
 
 8. **Create Memories**: For accepted candidates, delegate to `crux-skill-memory-crud` Create operation. Pass type, title, description, tags, source slug, and scope.
 
-9. **Write Dream Summary**: Write a summary to the work item directory following the `summaryPattern` from config (default `dream-{slug}-{yyyymmdd}.md`). Include: candidates extracted, accepted, rejected, conflicts resolved, and memories created.
+9. **Resolved Bug Review**: Use `crux-skill-memory-extract` step 9 to identify existing `redflag` memories whose bugs appear to have been fixed by this work item. Cross-reference redflag descriptions against the code diff and subtask outcomes. Present any "likely resolved" or "possibly resolved" redflags to the user and ask if they'd like to forget (delete) each one. For confirmed deletions, delegate to `crux-skill-memory-crud` Delete operation. In `--yolo` mode, auto-forget "likely" resolved redflags but still prompt for "possibly" resolved ones.
 
-10. **Rebuild Index**: Invoke `crux-skill-memory-index` to refresh `.crux/memory-index.yml`.
+10. **Write Dream Summary**: Write a summary to the work item directory following the `summaryPattern` from config (default `dream-{slug}-{yyyymmdd}.md`). Include: candidates extracted, accepted, rejected, conflicts resolved, memories created, and resolved bugs forgotten.
 
-11. **Offer Archival**: Ask the user whether to move the completed work item directory to `archiveDir` (default `.ai-ignored/executed`).
+11. **Rebuild Index**: Invoke `crux-skill-memory-index` to refresh `.crux/memory-index.yml`.
+
+12. **Offer Archival**: Ask the user whether to move the completed work item directory to `archiveDir` (default `.ai-ignored/executed`).
 
 ### REM Sleep Mode — `/crux-dream --rem`
 

@@ -197,6 +197,53 @@ Order candidates by estimated value and present the top N.
 3. Take the top `maxCandidateFacts` candidates (default `5`)
 4. If more candidates remain beyond the limit, note how many were excluded and offer to show them
 
+### 9. Resolved Bug Detection
+
+Identify existing `redflag` memories whose bugs or anti-patterns appear to have been fixed by the completed work.
+
+**Steps**:
+
+1. From the existing memories loaded in step 4, filter to those with `type: redflag`
+2. For each redflag memory, compare its described bug/anti-pattern against:
+   - **Code changes**: Does the diff show changes that directly address the issue described in the redflag? (e.g. the anti-pattern was refactored away, the bug-causing code was rewritten)
+   - **Subtask outcomes**: Did any subtask explicitly mention fixing, resolving, or addressing this specific issue?
+   - **Pattern removal**: Was the problematic pattern described by the redflag removed or replaced with the recommended approach?
+3. Classify each redflag into one of:
+   - **Likely resolved**: Strong evidence — the diff contains changes that directly fix the described bug or remove the anti-pattern, or a subtask explicitly states the issue was resolved
+   - **Possibly resolved**: Partial evidence — related code was changed but it is not conclusive whether the specific issue was fully addressed
+   - **Still active**: No evidence of resolution — skip, do not present to the user
+4. Only present redflags classified as "likely resolved" or "possibly resolved"
+5. For each, prepare a resolution report (see Resolved Bug Format below)
+
+**Heuristics for matching redflags to changes**:
+
+- Compare the redflag's tags against changed file paths and content (e.g. a redflag tagged `[testing, fixtures]` matching changes in test files)
+- Check if the redflag's "Solution" or "Prevention" section describes an approach that now appears in the codebase
+- Check if the specific file, function, or pattern named in the redflag body was modified
+- When in doubt, classify as "possibly resolved" rather than "likely resolved" — the user makes the final call
+
+## Resolved Bug Format
+
+Each potentially-resolved redflag is presented with these fields:
+
+```yaml
+memory_path: "memories/redflag/example-bug.memory.md"
+title: "Example bug title from the memory"
+confidence: "likely"          # or "possibly"
+evidence: "The diff shows refactoring of X to use the recommended approach described in this memory's Solution section."
+recommendation: "forget"      # always "forget" — user decides
+```
+
+**Field descriptions**:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `memory_path` | Yes | Path to the existing redflag memory file |
+| `title` | Yes | Title from the redflag memory's frontmatter |
+| `confidence` | Yes | `"likely"` or `"possibly"` — how strong the evidence is that the bug was fixed |
+| `evidence` | Yes | Specific evidence from the diff, subtask outcomes, or code changes that suggests the bug was resolved |
+| `recommendation` | Yes | Always `"forget"` — resolved bugs should be deleted, but the user confirms |
+
 ## Candidate Fact Format
 
 Each candidate is presented with these fields:
@@ -231,7 +278,7 @@ source: "20260401-component-library"  # work item identifier
 
 ## Presentation to User
 
-After ranking, present candidates to the user for review:
+After ranking, present candidates to the user for review. If resolved bugs were detected (step 9), present them in a separate section after the new candidates:
 
 ```
 Analysing {unitOfWork} "{work-item-id}"...
@@ -256,7 +303,27 @@ Top {N} candidate facts:
 Accept all? Or review individually? [all/individual/skip]
 ```
 
-In `--yolo` mode, auto-accept all candidates except those with conflicts (conflicts always require user input).
+If resolved bugs were detected:
+
+```
+🐛 Resolved bugs detected — {count} redflag memories may no longer be needed:
+
+  1. [{confidence}] {title}
+     File: {memory_path}
+     Evidence: {evidence}
+
+  2. [{confidence}] {title}
+     ...
+
+Forget all resolved bugs? Or review individually? [all/individual/skip]
+```
+
+Each resolved bug the user confirms is deleted via `crux-skill-memory-crud` Delete operation (memory file and its reference tracker are both removed).
+
+In `--yolo` mode:
+- Auto-accept all new candidates except those with conflicts (conflicts always require user input)
+- Auto-forget redflags classified as "likely" resolved
+- Present "possibly" resolved redflags for user confirmation (insufficient confidence for auto-deletion)
 
 ## Integration
 
@@ -268,6 +335,8 @@ In `--yolo` mode, auto-accept all candidates except those with conflicts (confli
 | Memory index | `.crux/memory-index.yml` | Quick lookup of existing memories for comparison |
 
 After the user accepts candidates (all or individually), delegate to `crux-skill-memory-crud` for actual file creation. Pass the candidate's `type`, `title`, `description`, `tags`, `source`, and scope (agent-id if agent-scoped) directly to the CRUD skill's Create operation.
+
+After the user confirms resolved bugs for deletion, delegate to `crux-skill-memory-crud` Delete operation. The memory file and its reference tracker are both removed.
 
 ## Config Reference
 
@@ -301,7 +370,8 @@ All config values come from `.crux/crux-memories.json`:
 ## What This Skill Does NOT Do
 
 - Does not create memory files — delegates to `crux-skill-memory-crud` after user approval
-- Does not modify existing memories — only proposes new candidates or flags conflicts for user resolution
+- Does not delete memory files — proposes resolved bugs for user confirmation, delegates deletion to `crux-skill-memory-crud`
+- Does not modify existing memories — only proposes new candidates, flags conflicts, or identifies resolved bugs for user resolution
 - Does not handle REM sleep workflows (consolidation, promotion, demotion) — that is `crux-skill-memory-rebalance`
 - Does not compress memories — that is `crux-skill-memory-compress`
 - Does not build the memory index — that is `crux-skill-memory-index`
