@@ -31,8 +31,8 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 **Prerequisites**:
 - General prerequisites above
-- At least one completed plan directory exists under `plans/` with a valid `_execution-state.yml` file whose `status` is `complete`
-- At least one plan directory exists that has NOT been dreamed yet (no `dream-*.md` summary file present)
+- At least one completed spec directory exists under `specs/` with a valid `_execution-state.yml` file whose `status` is `complete`
+- At least one spec directory exists that has NOT been dreamed yet (no `dream-*.md` summary file present)
 
 **Steps**:
 
@@ -45,29 +45,29 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
 | 2 | The agent spawns a `crux-cursor-memory-manager` subagent | A subagent is invoked (visible in chat or agent logs) |
-| 3 | The agent lists unprocessed plan directories found under `plans/` | Output contains a numbered list of plan directory names that have NOT been dreamed |
-| 3 | The agent asks which plan to process | A prompt or question asking the user to select a plan appears |
-| 3 | Already-dreamed plans (those with a `dream-*.md` file) are NOT listed | Only plans without a dream summary appear in the list |
+| 3 | The agent lists unprocessed spec directories found under `specs/` | Output contains a numbered list of spec directory names that have NOT been dreamed |
+| 3 | The agent asks which spec to process | A prompt or question asking the user to select a spec appears |
+| 3 | Already-dreamed specs (those with a `dream-*.md` file) are NOT listed | Only specs without a dream summary appear in the list |
 
-**Pass/Fail**: PASS if all expected outcomes are met. FAIL if the agent crashes, lists no plans when unprocessed ones exist, or lists already-dreamed plans.
+**Pass/Fail**: PASS if all expected outcomes are met. FAIL if the agent crashes, lists no specs when unprocessed ones exist, or lists already-dreamed specs.
 
 ---
 
-### B2. Dream with Plan Name — Full Flow
+### B2. Dream with Spec Name — Full Flow
 
 **Category**: B — Dream Workflow (Interactive)
 
 **Prerequisites**:
 - General prerequisites above
-- A completed plan exists at `plans/<plan-name>/` (e.g. `plans/20260403-crux-memories/`)
-- The plan has `_execution-state.yml` with `status: complete`
-- The plan has at least two subtask files with execution notes
+- A completed spec exists at `specs/<spec-name>/` (e.g. `specs/20260403-crux-memories/`)
+- The spec has `_execution-state.yml` with `status: complete`
+- The spec has at least two subtask files with execution notes
 - Some existing memories exist in `memories/` (to test comparison and conflict detection)
 
 **Steps**:
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
-2. Type `/crux-dream <plan-name>` (e.g. `/crux-dream 20260403-crux-memories`) and send
+2. Type `/crux-dream <spec-name>` (e.g. `/crux-dream 20260403-crux-memories`) and send
 3. Observe the **execution verification** step
 4. Observe the **diff analysis** step
 5. Observe the **candidate fact presentation**
@@ -80,14 +80,14 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
-| 3 | Agent verifies plan execution by checking `_execution-state.yml` | Output confirms execution status (e.g. "✅ Execution verified: X/Y subtasks complete") |
-| 4 | Agent reports the number of repository changes since plan start | Output includes a change count and states whether it is within the `maxUnrelatedChanges` threshold (default 50) |
+| 3 | Agent verifies spec execution by checking `_execution-state.yml` | Output confirms execution status (e.g. "✅ Execution verified: X/Y subtasks complete") |
+| 4 | Agent reports the number of repository changes since spec start | Output includes a change count and states whether it is within the `maxUnrelatedChanges` threshold (default 50) |
 | 5 | Agent presents ranked candidate facts (up to `maxCandidateFacts`, default 5) | Each candidate shows: a rank number, a type label (`[learning]`, `[redflag]`, `[idea]`, `[goal]`, `[core]`), and a descriptive title/body |
 | 5 | Candidates are ranked by type priority, measurability, recurrence, actionability, and novelty | Higher-priority types appear first; duplicates of existing memories are excluded |
 | 6 | Agent asks for acceptance (`all`, `individual`, or `skip`) | A clear prompt with options appears |
-| 7 | Accepted memories are created as `*.memory.md` files in the correct type subdirectory under `memories/` | Files exist at `memories/<type>/<slug>.memory.md` with valid frontmatter (title, description, type, strength=1, created, modified, source=`<plan-name>`, tags) |
-| 8 | A dream summary file is written to the plan directory | File exists at `plans/<plan-name>/dream-<slug>-<yyyymmdd>.md` and contains: candidates extracted, accepted, rejected, and memories created |
-| 9 | Agent offers to archive the plan directory | Three options are presented: move to `.ai-ignored/executed/`, leave in place, or delete |
+| 7 | Accepted memories are created as `*.memory.md` files in the correct type subdirectory under `memories/` | Files exist at `memories/<type>/<slug>.memory.md` with valid frontmatter (title, description, type, strength=1, created, modified, source=`<spec-name>`, tags) |
+| 8 | A dream summary file is written to the spec directory | File exists at `specs/<spec-name>/dream-<slug>-<yyyymmdd>.md` and contains: candidates extracted, accepted, rejected, and memories created |
+| 9 | Agent offers to archive the spec directory | Three options are presented: move to `.ai-ignored/executed/`, leave in place, or delete |
 
 **Pass/Fail**: PASS if all steps produce the expected outcomes in order. FAIL if any step is skipped, produces incorrect output, or the agent deviates from the workflow.
 
@@ -99,8 +99,8 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 **Prerequisites**:
 - General prerequisites above
-- A completed plan exists that would produce a candidate fact about a specific topic (e.g. "prefer X approach for caching")
-- A memory already exists in `memories/` that **contradicts** what the plan's candidate would say (e.g. an existing `core` or `learning` memory stating "avoid X approach for caching, use Y instead")
+- A completed spec exists that would produce a candidate fact about a specific topic (e.g. "prefer X approach for caching")
+- A memory already exists in `memories/` that **contradicts** what the spec's candidate would say (e.g. an existing `core` or `learning` memory stating "avoid X approach for caching, use Y instead")
 - If no natural conflict exists, manually create one:
   1. Create a memory file at `memories/learning/test-conflict-memory.memory.md`:
      ```yaml
@@ -118,12 +118,12 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
      Write-through caching is the only safe approach for user session data.
      Read-through or cache-aside patterns cause stale reads under concurrent writes.
      ```
-  2. Ensure the plan under test would extract a candidate fact recommending the opposite pattern (e.g. "cache-aside is preferred for session data")
+  2. Ensure the spec under test would extract a candidate fact recommending the opposite pattern (e.g. "cache-aside is preferred for session data")
 
 **Steps**:
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
-2. Type `/crux-dream <plan-name>` and send
+2. Type `/crux-dream <spec-name>` and send
 3. Wait for the candidate fact presentation step
 4. Observe how the agent handles the conflicting candidate
 
@@ -301,32 +301,32 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
-### J3. MindReader — Plan Name(s) (Source Filtering)
+### J3. MindReader — Spec Name(s) (Source Filtering)
 
 **Category**: J — MindReader
 
 **Prerequisites**:
 - General prerequisites above
-- At least 2-3 memories exist with the `source` field set to a specific plan slug (e.g. `source: "20260403-crux-memories"`)
+- At least 2-3 memories exist with the `source` field set to a specific spec slug (e.g. `source: "20260403-crux-memories"`)
 - At least 1 memory exists with a different `source` to verify filtering
 
 **Steps**:
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
-2. Type `/crux-mindreader <plan-name>` (e.g. `/crux-mindreader 20260403-crux-memories`) and send
+2. Type `/crux-mindreader <spec-name>` (e.g. `/crux-mindreader 20260403-crux-memories`) and send
 3. Observe the output
 
 **Expected Outcomes**:
 
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
-| 3 | Only memories whose `source` matches the given plan slug are displayed | All displayed memories have `source: "<plan-name>"` in their frontmatter |
+| 3 | Only memories whose `source` matches the given spec slug are displayed | All displayed memories have `source: "<spec-name>"` in their frontmatter |
 | 3 | Memories from other sources are NOT displayed | No memory with a different `source` value appears |
 | 3 | Results are grouped by type | Memories are organized under type headings (e.g. "Core", "Learning", "Idea") |
 | 3 | Each memory shows full metadata and body content | Title, type, strength, references, tags, created/modified dates, and body are all displayed |
 | 3 | Compressed memories are decompressed for display | If any matching memory is a `.memory.crux.md` file, its body is shown in readable natural language |
 
-**Pass/Fail**: PASS if only memories from the specified plan are shown, grouped by type. FAIL if unrelated memories appear or filtering is incorrect.
+**Pass/Fail**: PASS if only memories from the specified spec are shown, grouped by type. FAIL if unrelated memories appear or filtering is incorrect.
 
 ---
 
@@ -378,13 +378,13 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
   - `.cursor/hooks/crux-session-start.py`
   - `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py`
 - `enableMemories` is set to `"true"` in the config
-- At least one completed plan exists for dream testing
+- At least one completed spec exists for dream testing
 - At least 3-5 memories exist for REM and MindReader testing
 
 **Steps**:
 
-1. **Session hook**: Start a new Cursor chat session. If the number of plan directories under `plans/` exceeds the `sessionStartNudge.threshold` (default 20), verify the nudge message appears
-2. **Dream**: Type `/crux-dream <plan-name>` and run through the full dream flow (see scenario B2 for detailed steps)
+1. **Session hook**: Start a new Cursor chat session. If the number of spec directories under `specs/` exceeds the `sessionStartNudge.threshold` (default 20), verify the nudge message appears
+2. **Dream**: Type `/crux-dream <spec-name>` and run through the full dream flow (see scenario B2 for detailed steps)
 3. **Post-dream rebuild**: After dream completes, verify the post-dream script runs (`.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` — rebuilds the memory index)
 4. **REM sleep**: Type `/crux-dream --rem` and observe the REM analysis (see scenario C1)
 5. **MindReader (no args)**: Type `/crux-mindreader` and verify contextual memories are shown (see scenario J1)
@@ -395,7 +395,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
-| 1 | Session hook detects `enableMemories=true` and checks plan count | If threshold exceeded: nudge message appears. If not: session starts normally |
+| 1 | Session hook detects `enableMemories=true` and checks spec count | If threshold exceeded: nudge message appears. If not: session starts normally |
 | 2 | Full dream flow works as documented | All B2 criteria are met |
 | 3 | `.crux/memory-index.yml` is rebuilt after dream | Index file timestamp is updated; new memories from dream appear in the index |
 | 4 | REM sleep analysis runs and presents recommendations | All C1 criteria are met |
@@ -425,10 +425,10 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 3. **Verify `CLAUDE.md` rule content**: The `CLAUDE.md` file (or `.claude/memories-rule.md`) should contain the agent rule text described in the spec:
    - Instructs agents to read `.crux/memory-index.yml` when `enableMemories` is true
    - Instructs agents to annotate output with `[memory:{title}]`
-   - Instructs agents to suggest `/crux-dream` after plan execution
+   - Instructs agents to suggest `/crux-dream` after spec execution
 4. **Verify command definitions**: The dream command definition should:
    - Reference `.crux/crux-memories.json` for config
-   - Accept `$ARGUMENTS` for plan name or `--rem`/`--yolo` flags
+   - Accept `$ARGUMENTS` for spec name or `--rem`/`--yolo` flags
    - Describe the dream workflow steps
 5. **Verify session hook**: `.claude/hooks/session-start.sh` should:
    - Read config from `.crux/crux-memories.json`
@@ -522,13 +522,13 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 | Command | Description |
 |---------|-------------|
-| `/crux-dream` | List unprocessed plans, select one to dream |
-| `/crux-dream <plan-name>` | Extract memories from a specific completed plan |
+| `/crux-dream` | List unprocessed specs, select one to dream |
+| `/crux-dream <spec-name>` | Extract memories from a specific completed spec |
 | `/crux-dream --rem` | Run REM sleep — rebalance all memories interactively |
 | `/crux-dream --rem --yolo` | Run REM sleep — auto-apply non-conflict changes |
 | `/crux-mindreader` | Show contextually relevant memories |
 | `/crux-mindreader "query"` | Search memories by keyword |
-| `/crux-mindreader <plan-name>` | Show memories from a specific plan |
+| `/crux-mindreader <spec-name>` | Show memories from a specific spec |
 | `/crux-mindreader <file-path>` | Display a specific memory file |
 
 ### Key Files
@@ -555,4 +555,4 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `demoteAfterDaysUnreferenced` | 90 | Days before unreferenced memory is demoted |
 | `archiveAfterDaysUnreferenced` | 180 | Days before unreferenced memory is archived |
 | `promotionToRuleThreshold` | 30 | References before suggesting rule promotion |
-| `sessionStartNudge.threshold` | 20 | Plan count before nudge message appears |
+| `sessionStartNudge.threshold` | 20 | Spec count before nudge message appears |

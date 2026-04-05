@@ -1,6 +1,6 @@
 ---
-generated: 2026-04-04 00:00
-sourceChecksum: 1709116858
+generated: 2026-04-05 00:00
+sourceChecksum: 3755605339
 cruxLevel: 25
 beforeTokens: 420
 afterTokens: 185
@@ -25,7 +25,7 @@ crux: true
  MCP configured→semantic search ≻ idx scan
  output: annotate [memory:{title}] when influenced
  refs: increment via crux-skill-memory-reference-tracker; ¬direct file writes
- post-plan→suggest /crux-dream
+ post-spec→suggest /crux-dream
 }
 
 Φ.disabled{enableMemories="false"→skip all memory ops silently}

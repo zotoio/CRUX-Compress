@@ -169,7 +169,7 @@ def write_memory(
     strength: int = 1,
     created: str | None = None,
     modified: str | None = None,
-    source: str = "test-plan",
+    source: str = "test-spec",
     tags: list[str] | None = None,
     body: str = "",
     agent_id: str | None = None,

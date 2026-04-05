@@ -20,7 +20,7 @@ Before any operation:
 
 1. **Read config**: Load `.crux/crux-memories.json` and extract:
    - `flags.enableMemories` — must be `"true"` or abort with message
-   - `cruxMemories.unitOfWork` — the type of work item (e.g. `spec`, `plan`, `task`)
+   - `cruxMemories.unitOfWork` — the type of work item (e.g. `spec`, `task`)
    - `cruxMemories.dream.maxCandidateFacts` — max candidates to present (default `5`)
    - `cruxMemories.dream.maxUnrelatedChanges` — threshold for aborting on noisy diffs (default `50`)
    - `cruxMemories.dream.stateFile` — execution state filename (default `_execution-state.yml`)
@@ -72,7 +72,7 @@ Read all available execution artifacts and identify candidate facts.
 
 | Artifact | What to look for |
 |----------|-----------------|
-| Plan/spec document | Goals, requirements, constraints, architectural decisions |
+| Spec document | Goals, requirements, constraints, architectural decisions |
 | Subtask files | Individual task outcomes, blockers encountered, workarounds applied |
 | Execution state file | Completion status per subtask, timing, error counts |
 | Dream summaries (prior) | Previously extracted memories from this or related work items — avoid duplicating |
@@ -345,7 +345,7 @@ All config values come from `.crux/crux-memories.json`:
 | Key | Type | Default | Purpose |
 |-----|------|---------|---------|
 | `flags.enableMemories` | string | `"false"` | Feature gate — must be `"true"` to operate |
-| `cruxMemories.unitOfWork` | string | `"spec"` | Type of work item to look for (e.g. `spec`, `plan`, `task`) |
+| `cruxMemories.unitOfWork` | string | `"spec"` | Type of work item to look for (e.g. `spec`, `task`) |
 | `cruxMemories.dream.maxCandidateFacts` | integer | `5` | Maximum number of candidates to present |
 | `cruxMemories.dream.maxUnrelatedChanges` | integer | `50` | Changed file count threshold before warning |
 | `cruxMemories.dream.stateFile` | string | `"_execution-state.yml"` | Execution state filename within work item directory |

@@ -45,7 +45,7 @@ Every memory file must have YAML frontmatter with these fields:
 | `strength` | integer | Starts at `1` for new memories; incremented on reinforcement |
 | `created` | date | ISO date (`YYYY-MM-DD`); set once at creation, never modified |
 | `modified` | date | ISO date (`YYYY-MM-DD`); updated on every write |
-| `source` | string | Slug of the originating plan or session (e.g. `20260403-component-library`) |
+| `source` | string | Slug of the originating spec or session (e.g. `20260403-component-library`) |
 | `tags` | list | Array of lowercase tag strings for categorization |
 
 ### Optional Fields

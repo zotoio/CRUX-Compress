@@ -28,7 +28,7 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 
 ### Dream Nudge
 
-- After plan execution completes, suggest running `/crux-dream` to extract learnings
+- After spec execution completes, suggest running `/crux-dream` to extract learnings
 
 ## When Memories Are Disabled (`enableMemories: "false"`)
 

@@ -192,7 +192,7 @@ recent_references:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `{unitOfWork}` or `conversation_id` | string | Yes | Source identifier — key name matches config `unitOfWork` (e.g. `spec`, `plan`) or `conversation_id` for standalone sessions |
+| `{unitOfWork}` or `conversation_id` | string | Yes | Source identifier — key name matches config `unitOfWork` (e.g. `spec`) or `conversation_id` for standalone sessions |
 | `count` | integer | Yes | Number of references from this source |
 | `last` | date | Yes | Date of most recent reference from this source |
 | `context` | string | No | Brief description of how the memory was used |

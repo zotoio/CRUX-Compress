@@ -69,10 +69,12 @@ evals/                              # All tests (pytest)
 ├── test_k_session_hook.py          # Session start hook
 ├── test_l_mcp_server.py            # MCP server tools
 ├── test_m_config_validation.py     # Config validation
+├── test_n_plugin_registry.py       # Plugin registry validation
 ├── test_create_zip.py              # Distribution zip creation
 ├── test_crux_utils.py              # CRUX utility script
 ├── test_detect_hook.py             # File change detection hook
 ├── test_install.py                 # Installer script
+├── test_test_runner.py             # Test runner script
 ├── requirements.txt                # pytest, pyyaml
 └── USER_EVAL_CHECKLISTS.md         # Manual eval checklists
 
@@ -88,11 +90,17 @@ tests/fixtures/                     # Shared test fixture files
 | `test_detect_hook.py` | `crux-detect-changes.py` | File filtering, queue management |
 | `test_create_zip.py` | `create-crux-zip.py` | Zip contents, version matching, structure |
 | `test_a_memory_crud.py` | Memory skills | Memory create, read, update, delete |
-| `test_b_dream_workflow.py` | Dream extraction | Post-plan memory extraction workflow |
+| `test_b_dream_workflow.py` | Dream extraction | Post-spec memory extraction workflow |
 | `test_c_rem_sleep.py` | REM sleep | Promotion, demotion, archival |
 | `test_d_reference_tracking.py` | Reference tracker | Usage tracking and strength sync |
 | `test_e_memory_index.py` | Memory index | Index building and prioritisation |
+| `test_f_type_transitions.py` | Type transitions | Type transition logic and promotion thresholds |
+| `test_g_compression.py` | Memory compression | CRUX compression of memory bodies |
+| `test_h_agent_scoping.py` | Agent scoping | Agent memory isolation and scope rules |
+| `test_i_scope_ranking.py` | Scope ranking | Scope priority ranking logic |
 | `test_k_session_hook.py` | Session hook | Memory nudge on session start |
+| `test_l_mcp_server.py` | MCP server | MCP server tool validation |
+| `test_m_config_validation.py` | Config validation | Memory configuration validation |
 | `test_n_plugin_registry.py` | Plugin registry | Schema validation, `enabledByDefault` semantics |
 
 ### Running Tests

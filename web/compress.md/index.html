@@ -62,6 +62,7 @@
       <div class="site-nav-links">
         <a href="#rules-compression" class="site-nav-link">Demos</a>
         <a href="#notation" class="site-nav-link">Notation</a>
+        <a href="#memories" class="site-nav-link">Memories</a>
         <a href="#quickstart" class="site-nav-link">Quickstart</a>
       </div>
     </div>
@@ -211,37 +212,203 @@
       <h2 class="section-title">CRUX Memories</h2>
       <p class="section-intro">Agents that learn. CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions.</p>
 
+      <!-- Lifecycle Flow -->
+      <div class="memories-lifecycle">
+        <div class="memories-lifecycle-step">
+          <div class="memories-lifecycle-icon">1</div>
+          <div class="memories-lifecycle-label">Work</div>
+          <div class="memories-lifecycle-desc">Complete a spec</div>
+        </div>
+        <div class="memories-lifecycle-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="memories-lifecycle-step">
+          <div class="memories-lifecycle-icon">2</div>
+          <div class="memories-lifecycle-label">Dream</div>
+          <div class="memories-lifecycle-desc">Extract learnings into memories</div>
+        </div>
+        <div class="memories-lifecycle-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="memories-lifecycle-step">
+          <div class="memories-lifecycle-icon">3</div>
+          <div class="memories-lifecycle-label">REM Sleep</div>
+          <div class="memories-lifecycle-desc">Rebalance, promote, consolidate</div>
+        </div>
+        <div class="memories-lifecycle-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="memories-lifecycle-step">
+          <div class="memories-lifecycle-icon">4</div>
+          <div class="memories-lifecycle-label">MindReader</div>
+          <div class="memories-lifecycle-desc">Query and surface memories</div>
+        </div>
+      </div>
+
+      <!-- Three Modes (expanded) -->
       <div class="memories-modes">
         <div class="memories-mode">
           <div class="memories-mode-icon">D</div>
           <div class="memories-mode-text">
             <strong>Dream</strong>
-            <span>After a plan completes, the agent extracts learnings &mdash; patterns, red flags, ideas &mdash; and stores them as reusable memories</span>
+            <span>After a spec completes, the agent analyses all artifacts &mdash; diffs, execution reports, work logs &mdash; and extracts ranked candidate facts: learnings, red flags, ideas, goals, and core patterns. You review and approve which become memories.</span>
           </div>
         </div>
         <div class="memories-mode">
           <div class="memories-mode-icon">R</div>
           <div class="memories-mode-text">
             <strong>REM Sleep</strong>
-            <span>Periodic rebalancing consolidates memories, promotes strong ones, archives weak ones, and resolves conflicts</span>
+            <span>Periodic rebalancing scans all memories and trackers: promotes high-value memories, demotes stale ones, archives unused entries, consolidates near-duplicates, detects conflicts, and optionally CRUX-compresses memory bodies.</span>
           </div>
         </div>
         <div class="memories-mode">
           <div class="memories-mode-icon">M</div>
           <div class="memories-mode-text">
             <strong>MindReader</strong>
-            <span>Query stored memories on demand &mdash; search by topic, type, or relevance to inform current work</span>
+            <span>Query stored memories on demand &mdash; search by keyword, type, spec source, or let the agent surface contextually relevant memories. Compressed memories are decompressed for display without modifying files.</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Memory Types -->
+      <h3 class="memories-subsection-title">Memory Types</h3>
+      <p class="memories-subsection-intro">Memories are classified into five types, each representing a different category of knowledge. Memories can be promoted between types based on usage.</p>
+      <div class="memories-types">
+        <div class="memories-type">
+          <div class="memories-type-icon memories-type-icon--core">C</div>
+          <div class="memories-type-text">
+            <strong>Core</strong>
+            <span>Proven, high-value knowledge &mdash; the most important and well-referenced facts</span>
+          </div>
+        </div>
+        <div class="memories-type">
+          <div class="memories-type-icon memories-type-icon--redflag">!</div>
+          <div class="memories-type-text">
+            <strong>Red Flag</strong>
+            <span>Pitfalls, anti-patterns, and things to avoid &mdash; promoted to core at 10 refs</span>
+          </div>
+        </div>
+        <div class="memories-type">
+          <div class="memories-type-icon memories-type-icon--goal">G</div>
+          <div class="memories-type-text">
+            <strong>Goal</strong>
+            <span>Aspirational targets and objectives for the project</span>
+          </div>
+        </div>
+        <div class="memories-type">
+          <div class="memories-type-icon memories-type-icon--learning">L</div>
+          <div class="memories-type-text">
+            <strong>Learning</strong>
+            <span>Patterns and insights from completed work &mdash; promoted to core at 15 refs</span>
+          </div>
+        </div>
+        <div class="memories-type">
+          <div class="memories-type-icon memories-type-icon--idea">I</div>
+          <div class="memories-type-text">
+            <strong>Idea</strong>
+            <span>Speculative thoughts for future consideration &mdash; promoted to learning at 5 refs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promotion Pathway -->
+      <div class="memories-promotion">
+        <span class="memories-promotion-step">idea</span>
+        <span class="memories-promotion-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span class="memories-promotion-label">5 refs</span>
+        </span>
+        <span class="memories-promotion-step">learning</span>
+        <span class="memories-promotion-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span class="memories-promotion-label">15 refs</span>
+        </span>
+        <span class="memories-promotion-step memories-promotion-step--core">core</span>
+        <span class="memories-promotion-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span class="memories-promotion-label">30 refs</span>
+        </span>
+        <span class="memories-promotion-step memories-promotion-step--rule">cursor rule</span>
+      </div>
+
+      <!-- Commands -->
+      <h3 class="memories-subsection-title">Commands</h3>
+      <div class="memories-commands">
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-dream</code>
+            <span class="memories-command-desc">Extract &amp; rebalance</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-dream &lt;spec-name&gt;</code><span>Extract memories from completed work</span></div>
+            <div class="memories-command-line"><code>/crux-dream --rem</code><span>Run REM sleep rebalancing</span></div>
+            <div class="memories-command-line"><code>/crux-dream --rem --yolo</code><span>Auto-apply non-conflict changes</span></div>
+          </div>
+        </div>
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-mindreader</code>
+            <span class="memories-command-desc">Query &amp; display</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-mindreader</code><span>Show contextually relevant memories</span></div>
+            <div class="memories-command-line"><code>/crux-mindreader "query"</code><span>Search by keyword</span></div>
+            <div class="memories-command-line"><code>/crux-mindreader &lt;spec-name&gt;</code><span>Show memories from a specific spec</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <h3 class="memories-subsection-title">Powered by 6 Skills</h3>
+      <p class="memories-subsection-intro">The memory system is modular &mdash; each operation is handled by a dedicated skill, orchestrated by the memory manager agent.</p>
+      <div class="memories-skills">
+        <div class="memories-skill"><code>memory-crud</code><span>Create, read, update, delete</span></div>
+        <div class="memories-skill"><code>memory-extract</code><span>Analyse work, propose candidates</span></div>
+        <div class="memories-skill"><code>memory-rebalance</code><span>Promote, demote, consolidate</span></div>
+        <div class="memories-skill"><code>memory-compress</code><span>CRUX-compress memory bodies</span></div>
+        <div class="memories-skill"><code>memory-index</code><span>Build prioritised index</span></div>
+        <div class="memories-skill"><code>memory-reference-tracker</code><span>Track usage, sync strength</span></div>
+      </div>
+
+      <!-- Features row -->
+      <h3 class="memories-subsection-title">Key Features</h3>
+      <div class="memories-features">
+        <div class="memories-feature">
+          <strong>Reference Tracking</strong>
+          <span>Every time an agent uses a memory, its reference count increments. High-count memories get promoted automatically.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>CRUX Compression</strong>
+          <span>Memory bodies are CRUX-compressed to save context tokens, with original sources archived for rollback.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Agent Scoping</strong>
+          <span>Memories can be scoped to specific agents under <code>memories/agents/{id}/</code>, keeping context isolated.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Conflict Detection</strong>
+          <span>REM sleep detects contradictions between memories and presents them for manual resolution.</span>
+        </div>
+      </div>
+
+      <!-- Install -->
+      <div class="memories-install">
+        <h3 class="memories-subsection-title">Get Started</h3>
+        <div class="code-block code-block--install memories-install-block">
+          <div class="code-block-header">
+            <span class="code-block-label">Terminal</span>
+          </div>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-memories</code></pre>
         </div>
       </div>
 
       <div class="memories-optin">
         <span class="memories-optin-badge">Opt-in</span>
-        <span>Memories are disabled by default. Enable via <code>.crux/crux-memories.json</code> to start capturing agent learnings.</span>
+        <span>Memories are disabled by default. The <code>--with-memories</code> flag scaffolds all memory components. Enable via <code>.crux/crux-memories.json</code> to start capturing agent learnings.</span>
       </div>
 
       <a href="https://github.com/zotoio/CRUX-Compress/blob/main/README.md#memories" class="spec-link" target="_blank" rel="noopener">
-        Learn more in the README &rarr;
+        Full documentation in the README &rarr;
       </a>
     </div>
   </section>

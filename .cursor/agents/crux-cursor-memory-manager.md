@@ -48,7 +48,7 @@ Extract memories from a completed unit of work.
 
 2. **Diff Analysis**: Assess the scope of repository changes since the work item started. If changed file count exceeds `maxUnrelatedChanges` (default `50`), warn the user and present options (proceed, adjust threshold, abort).
 
-3. **Analyse Artifacts**: Read all execution artifacts (plan docs, subtask files, execution reports, work logs, code diffs). Use `crux-skill-memory-extract` to identify candidate facts — learnings, red flags, goals, ideas, and core patterns.
+3. **Analyse Artifacts**: Read all execution artifacts (spec docs, subtask files, execution reports, work logs, code diffs). Use `crux-skill-memory-extract` to identify candidate facts — learnings, red flags, goals, ideas, and core patterns.
 
 4. **Compare with Existing Memories**: Load existing memories from `memoriesDir` and `agentMemoriesDir`. Filter candidates for novelty: discard exact duplicates, flag near-duplicates for merge consideration, annotate related-but-distinct candidates.
 

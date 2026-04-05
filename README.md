@@ -29,6 +29,8 @@
 - [Memories](#memories)
   - [Enabling Memories](#enabling-memories)
   - [Memory Commands](#memory-commands)
+  - [Memory Skills](#memory-skills)
+  - [Type Transitions and Reference Tracking](#type-transitions-and-reference-tracking)
   - [MCP Server (Optional)](#mcp-server-optional)
   - [Python Dependencies](#python-dependencies)
 
@@ -606,15 +608,19 @@ CRUX Memories is an optional learning system that lets agents extract, store, an
 
 The memory lifecycle has three phases:
 
-- **Dream** — After completing a plan, extract learnings, red flags, goals, and ideas into memory files
+- **Dream** — After completing a spec, extract learnings, red flags, goals, and ideas into memory files
 - **REM Sleep** — Periodically rebalance the memory corpus: promote high-value memories, demote stale ones, consolidate duplicates, archive unused entries
 - **MindReader** — Query and display memories in human-readable form (read-only)
 
 ### Enabling Memories
 
-Memories are disabled by default. To enable:
+Memories are disabled by default. To scaffold the memory system during install:
 
-1. Edit `.crux/crux-memories.json` and set `enableMemories` to `"true"`:
+```bash
+curl -fsSL .../install.py | python3 - --with-memories
+```
+
+Or enable manually by editing `.crux/crux-memories.json` and setting `enableMemories` to `"true"`:
 
 ```json
 {
@@ -624,19 +630,53 @@ Memories are disabled by default. To enable:
 }
 ```
 
-2. Memories are stored in the `memories/` directory, organized by type (`core/`, `learning/`, `redflag/`, `goal/`, `idea/`)
-3. Agent-scoped memories live under `memories/agents/{agent-id}/`
+Memories are stored in the `memories/` directory, organized by type:
+
+| Type | Directory | Purpose |
+|------|-----------|---------|
+| Core | `memories/core/` | Proven, high-value knowledge |
+| Red Flag | `memories/redflag/` | Pitfalls, anti-patterns, things to avoid |
+| Goal | `memories/goal/` | Aspirational targets and objectives |
+| Learning | `memories/learning/` | Patterns and insights from completed work |
+| Idea | `memories/idea/` | Speculative thoughts for future consideration |
+
+Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated per agent.
 
 ### Memory Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/crux-dream <plan-name>` | Extract memories from a completed plan |
+| `/crux-dream <spec-name>` | Extract memories from a completed spec |
 | `/crux-dream --rem` | Run REM sleep (rebalance all memories) |
 | `/crux-dream --rem --yolo` | REM sleep with auto-apply for non-conflict changes |
 | `/crux-mindreader` | Show contextually relevant memories |
 | `/crux-mindreader "query"` | Search memories by keyword |
-| `/crux-mindreader <plan-name>` | Show memories from a specific plan |
+| `/crux-mindreader <spec-name>` | Show memories from a specific spec |
+
+### Memory Skills
+
+Six specialized skills power the memory system:
+
+| Skill | Purpose |
+|-------|---------|
+| `crux-skill-memory-crud` | Create, read, update, delete memory files with frontmatter management |
+| `crux-skill-memory-extract` | Analyse completed work and propose ranked candidate facts |
+| `crux-skill-memory-rebalance` | Consolidate, promote, demote, and archive memories during REM sleep |
+| `crux-skill-memory-compress` | CRUX-compress memory file bodies with adaptive sizing |
+| `crux-skill-memory-index` | Build a prioritised memory index from all memory files |
+| `crux-skill-memory-reference-tracker` | Track memory references in agent output and sync strength counters |
+
+### Type Transitions and Reference Tracking
+
+Memories gain strength through reference tracking — each time an agent uses a memory, its reference count increments. When a memory reaches a promotion threshold, it transitions to a higher type:
+
+- **idea** → **learning** (at 5 references)
+- **learning** → **core** (at 15 references)
+- **redflag** → **core** (at 10 references)
+
+Memories unreferenced for 90 days are demoted; after 180 days they are archived. Memories with very high reference counts (30+) may be promoted to permanent Cursor rules.
+
+Memory bodies can be CRUX-compressed to save storage and context tokens, with the original source archived for rollback.
 
 ### MCP Server (Optional)
 
@@ -946,6 +986,18 @@ python3 scripts/test.py
 | `crux-detect-changes.py`     | `test_detect_hook.py`      | Frontmatter detection, queue management           |
 | `install.py`                 | `test_install.py`          | CLI flags, version comparison, hooks merge, `--with-memories`, upsert |
 | `registry.json`              | `test_n_plugin_registry.py` | Registry schema, `enabledByDefault` semantics, plugin validation |
+| Memory CRUD                  | `test_a_memory_crud.py`    | Memory create, read, update, delete               |
+| Dream extraction             | `test_b_dream_workflow.py` | Post-spec memory extraction workflow               |
+| REM sleep                    | `test_c_rem_sleep.py`      | Promotion, demotion, archival                      |
+| Reference tracking           | `test_d_reference_tracking.py` | Usage tracking and strength sync               |
+| Memory index                 | `test_e_memory_index.py`   | Index building and prioritisation                  |
+| Type transitions             | `test_f_type_transitions.py` | Type transition logic                            |
+| Memory compression           | `test_g_compression.py`    | Memory CRUX compression                           |
+| Agent scoping                | `test_h_agent_scoping.py`  | Agent memory isolation                             |
+| Scope ranking                | `test_i_scope_ranking.py`  | Scope ranking logic                                |
+| Session hook                 | `test_k_session_hook.py`   | Memory nudge on session start                      |
+| MCP server                   | `test_l_mcp_server.py`     | MCP server tools                                   |
+| Config validation            | `test_m_config_validation.py` | Configuration validation                        |
 
 
 ### Python Eval Tests

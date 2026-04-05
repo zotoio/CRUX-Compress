@@ -180,7 +180,7 @@ Cluster memories that cover the same domain or subject area:
 1. **Tag overlap**: Memories sharing ≥50% of their tags are candidates for the same group
 2. **Type affinity**: Memories of the same type are preferred grouping partners — group same-type memories first, only cross-type when the subject overlap is strong
 3. **Title/description similarity**: Memories whose titles or descriptions reference the same concept, pattern, technique, or domain
-4. **Source affinity**: Memories originating from the same `source` (plan/session) that cover facets of the same subject
+4. **Source affinity**: Memories originating from the same `source` (spec/session) that cover facets of the same subject
 5. **Body content**: Overlapping or complementary body content (e.g. two memories about plugin architecture with different specific lessons)
 
 A memory may only belong to one consolidation group. Groups must contain at least 2 memories. Memories with no strong affinity to others remain standalone.
