@@ -396,10 +396,13 @@
         <h3 class="memories-subsection-title">Get Started</h3>
         <div class="code-block code-block--install memories-install-block">
           <div class="code-block-header">
-            <span class="code-block-label">Terminal</span>
+            <span class="code-block-label">Agent Prompt</span>
           </div>
-          <pre><code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-memories</code></pre>
+          <pre><code>Fetch https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md, read it, and follow its instructions to install CRUX Compress with --with-memories</code></pre>
         </div>
+        <p class="memories-install-fallback" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">
+          Or with Python: <code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-memories</code>
+        </p>
       </div>
 
       <div class="memories-optin">
@@ -606,11 +609,28 @@
       
       <div class="install-section">
         <h3>Installation</h3>
-        <p class="prereqs">Prerequisites: <code>curl</code>, <code>python3</code>, <a href="https://cursor.sh" target="_blank" rel="noopener">Cursor IDE</a></p>
+        <p class="prereqs">Prerequisites: <a href="https://cursor.sh" target="_blank" rel="noopener">Cursor IDE</a> (no runtime dependencies for agent install)</p>
         
         <div class="code-block code-block--install">
           <div class="code-block-header">
-            <span class="code-block-label">Terminal</span>
+            <span class="code-block-label">Paste into Cursor chat</span>
+            <button class="copy-button" data-copy="Fetch https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md, read it, and follow its instructions to install CRUX Compress into this project.">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>Fetch https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md, read it, and follow its instructions to install CRUX Compress into this project.</code></pre>
+        </div>
+        <p class="install-tip" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">
+          Can't fetch URLs? Save <a href="https://github.com/zotoio/CRUX-Compress/blob/main/install.crux.md" target="_blank" rel="noopener" style="color: var(--accent-compressed);">install.crux.md</a> to your project and reference it, or paste its contents into chat.
+        </p>
+
+        <div class="code-block code-block--install" style="margin-top: 1rem;">
+          <div class="code-block-header">
+            <span class="code-block-label">Alternative: Terminal (requires python3)</span>
             <button class="copy-button" data-copy="curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 -">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
@@ -628,6 +648,7 @@
         <div class="file-tree">
           <div class="file-tree-item"><code>CRUX.md</code><span>Specification (readonly)</span></div>
           <div class="file-tree-item"><code>AGENTS.md</code><span>Agent awareness notice</span></div>
+          <div class="file-tree-item"><code>install.crux.md</code><span>Installer spec (update reference)</span></div>
           <div class="file-tree-item"><code>.cursor/rules/_CRUX-RULE.mdc</code><span>Always-applied rule</span></div>
           <div class="file-tree-item"><code>.cursor/agents/crux-cursor-rule-manager.md</code><span>Compression agent</span></div>
           <div class="file-tree-item"><code>.cursor/commands/crux-compress.md</code><span>Compression command</span></div>

@@ -17,6 +17,7 @@ from pathlib import Path
 
 DIST_FILES = [
     "CRUX.md",
+    "install.crux.md",
     ".crux/crux.json",
     ".cursor/hooks.json",
     ".cursor/agents/crux-cursor-rule-manager.md",

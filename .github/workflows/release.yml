@@ -54,6 +54,7 @@ jobs:
           # Files included in release (must match create-crux-zip.py)
           RELEASE_FILES=(
             "CRUX.md"
+            "install.crux.md"
             ".crux/crux.json"
             "AGENTS.md"
             ".cursor/hooks.json"

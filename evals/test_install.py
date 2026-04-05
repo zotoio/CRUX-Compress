@@ -525,3 +525,254 @@ class TestWithoutMemories:
         assert not (tmp_path / ".crux" / "crux-memories.json").exists()
         assert not (tmp_path / "memories").exists()
         assert not (tmp_path / ".crux" / "reference-tracking").exists()
+
+
+# ── Deprecated file cleanup ──
+
+
+class TestCleanupDeprecatedFiles:
+    def test_removes_old_bash_hook(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor" / "hooks"
+        hooks_dir.mkdir(parents=True)
+        old_hook = hooks_dir / "detect-crux-changes.sh"
+        old_hook.write_text("#!/bin/bash\necho old")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not old_hook.exists()
+
+    def test_removes_old_skill_directory(self, tmp_path: Path):
+        mod = _load_install()
+        old_skill = tmp_path / ".cursor" / "skills" / "CRUX-Utils" / "scripts"
+        old_skill.mkdir(parents=True)
+        (old_skill / "crux-utils.sh").write_text("#!/bin/bash")
+        (old_skill.parent / "SKILL.md").write_text("# Old skill")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not (old_skill / "crux-utils.sh").exists()
+        assert not (old_skill.parent / "SKILL.md").exists()
+        assert not old_skill.exists(), "Empty scripts/ dir should be removed"
+        assert not old_skill.parent.exists(), "Empty CRUX-Utils/ dir should be removed"
+
+    def test_removes_old_update_sh(self, tmp_path: Path):
+        mod = _load_install()
+        crux_dir = tmp_path / ".crux"
+        crux_dir.mkdir(parents=True)
+        (crux_dir / "update.sh").write_text("#!/bin/bash")
+        (crux_dir / "crux.json").write_text('{"version":"2.0.0"}')
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not (crux_dir / "update.sh").exists()
+        assert (crux_dir / "crux.json").exists(), "Non-deprecated files should be preserved"
+
+    def test_noop_when_no_deprecated_files(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+        finally:
+            os.chdir(orig_cwd)
+
+    def test_preserves_nonempty_parent_dirs(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor" / "hooks"
+        hooks_dir.mkdir(parents=True)
+        (hooks_dir / "detect-crux-changes.sh").write_text("old")
+        (hooks_dir / "crux-detect-changes.py").write_text("new")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not (hooks_dir / "detect-crux-changes.sh").exists()
+        assert hooks_dir.exists(), "Dir with remaining files should not be removed"
+        assert (hooks_dir / "crux-detect-changes.py").exists()
+
+
+class TestCleanupDeprecatedHooks:
+    def test_removes_old_bash_hook_commands(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor"
+        hooks_dir.mkdir(parents=True)
+        hooks_json = hooks_dir / "hooks.json"
+        hooks_json.write_text(json.dumps({
+            "hooks": {
+                "afterFileEdit": [
+                    {"command": "bash .cursor/hooks/detect-crux-changes.sh"},
+                    {"command": "python3 .cursor/hooks/crux-detect-changes.py"},
+                ]
+            }
+        }))
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+        data = json.loads(hooks_json.read_text())
+        commands = [h["command"] for h in data["hooks"]["afterFileEdit"]]
+        assert "bash .cursor/hooks/detect-crux-changes.sh" not in commands
+        assert "python3 .cursor/hooks/crux-detect-changes.py" in commands
+
+    def test_removes_bare_sh_hook_command(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor"
+        hooks_dir.mkdir(parents=True)
+        hooks_json = hooks_dir / "hooks.json"
+        hooks_json.write_text(json.dumps({
+            "hooks": {
+                "afterFileEdit": [
+                    {"command": ".cursor/hooks/detect-crux-changes.sh"},
+                    {"command": "python3 .cursor/hooks/crux-detect-changes.py"},
+                ]
+            }
+        }))
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+        data = json.loads(hooks_json.read_text())
+        commands = [h["command"] for h in data["hooks"]["afterFileEdit"]]
+        assert ".cursor/hooks/detect-crux-changes.sh" not in commands
+        assert len(commands) == 1
+
+    def test_deletes_empty_lifecycle_after_cleanup(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor"
+        hooks_dir.mkdir(parents=True)
+        hooks_json = hooks_dir / "hooks.json"
+        hooks_json.write_text(json.dumps({
+            "hooks": {
+                "afterFileEdit": [
+                    {"command": "bash .cursor/hooks/detect-crux-changes.sh"},
+                ],
+                "sessionStart": [
+                    {"command": "python3 .cursor/hooks/crux-session-start.py"},
+                ]
+            }
+        }))
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+        data = json.loads(hooks_json.read_text())
+        assert "afterFileEdit" not in data["hooks"], "Empty lifecycle should be removed"
+        assert "sessionStart" in data["hooks"]
+
+    def test_noop_when_no_deprecated_hooks(self, tmp_path: Path):
+        mod = _load_install()
+        hooks_dir = tmp_path / ".cursor"
+        hooks_dir.mkdir(parents=True)
+        hooks_json = hooks_dir / "hooks.json"
+        original = json.dumps({
+            "hooks": {
+                "sessionStart": [
+                    {"command": "python3 .cursor/hooks/crux-session-start.py"},
+                ]
+            }
+        })
+        hooks_json.write_text(original)
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+        data = json.loads(hooks_json.read_text())
+        assert len(data["hooks"]["sessionStart"]) == 1
+
+    def test_noop_when_no_hooks_json(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+
+class TestCleanupIntegration:
+    """Test that deprecated files + hooks cleanup work together for upgrade scenarios."""
+
+    def test_v2_2_to_latest_upgrade(self, tmp_path: Path):
+        """Simulate upgrading from v2.2.x with old bash hooks."""
+        mod = _load_install()
+
+        hooks_dir = tmp_path / ".cursor" / "hooks"
+        hooks_dir.mkdir(parents=True)
+        (hooks_dir / "detect-crux-changes.sh").write_text("#!/bin/bash\nold hook")
+
+        old_skill = tmp_path / ".cursor" / "skills" / "CRUX-Utils" / "scripts"
+        old_skill.mkdir(parents=True)
+        (old_skill / "crux-utils.sh").write_text("#!/bin/bash")
+        (old_skill.parent / "SKILL.md").write_text("# Old")
+
+        crux_dir = tmp_path / ".crux"
+        crux_dir.mkdir(parents=True)
+        (crux_dir / "update.sh").write_text("#!/bin/bash\nold updater")
+
+        hooks_json = tmp_path / ".cursor" / "hooks.json"
+        hooks_json.write_text(json.dumps({
+            "hooks": {
+                "afterFileEdit": [
+                    {"command": "bash .cursor/hooks/detect-crux-changes.sh"},
+                    {"command": "python3 .cursor/hooks/crux-detect-changes.py"},
+                ],
+                "sessionStart": [
+                    {"command": "python3 .cursor/hooks/crux-session-start.py"},
+                ]
+            }
+        }))
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.cleanup_deprecated_files()
+            mod.cleanup_deprecated_hooks()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not (hooks_dir / "detect-crux-changes.sh").exists()
+        assert not (old_skill / "crux-utils.sh").exists()
+        assert not old_skill.parent.exists()
+        assert not (crux_dir / "update.sh").exists()
+
+        data = json.loads(hooks_json.read_text())
+        commands = [h["command"] for h in data["hooks"]["afterFileEdit"]]
+        assert "bash .cursor/hooks/detect-crux-changes.sh" not in commands
+        assert "python3 .cursor/hooks/crux-detect-changes.py" in commands
+        assert len(data["hooks"]["sessionStart"]) == 1

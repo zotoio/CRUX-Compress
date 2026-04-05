@@ -226,7 +226,8 @@ def create_backup_zip() -> str:
     log("Creating backup...")
 
     standard_files = [
-        "CRUX.md", "AGENTS.md", ".crux/crux.json", ".crux/crux-release-files.json",
+        "CRUX.md", "AGENTS.md", "install.crux.md",
+        ".crux/crux.json", ".crux/crux-release-files.json",
         ".cursor/hooks.json", ".cursor/agents/crux-cursor-rule-manager.md",
         ".cursor/commands/crux-compress.md",
         ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
@@ -341,11 +342,89 @@ def upsert_agents_crux_block(crux_block_file: str) -> None:
     log_verbose("Removed AGENTS.crux.md")
 
 
+# ── Deprecated file cleanup ──
+
+DEPRECATED_FILES = [
+    ".cursor/hooks/detect-crux-changes.sh",
+    ".cursor/skills/CRUX-Utils/SKILL.md",
+    ".cursor/skills/CRUX-Utils/scripts/crux-utils.sh",
+    ".crux/update.sh",
+]
+
+DEPRECATED_HOOK_COMMANDS = {
+    "bash .cursor/hooks/detect-crux-changes.sh",
+    ".cursor/hooks/detect-crux-changes.sh",
+    "sh .cursor/hooks/detect-crux-changes.sh",
+}
+
+
+def cleanup_deprecated_files() -> None:
+    """Remove files from older CRUX versions that have been renamed or replaced."""
+    removed = 0
+    for filepath in DEPRECATED_FILES:
+        p = Path(filepath)
+        if p.is_file():
+            p.unlink()
+            removed += 1
+            log_verbose(f"Removed deprecated: {filepath}")
+
+    for filepath in DEPRECATED_FILES:
+        parent = Path(filepath).parent
+        while parent != Path(".") and parent.is_dir():
+            try:
+                parent.rmdir()
+                log_verbose(f"Removed empty directory: {parent}")
+                parent = parent.parent
+            except OSError:
+                break
+
+    if removed:
+        log_success(f"Cleaned up {removed} deprecated file(s) from previous versions")
+
+
+def cleanup_deprecated_hooks() -> None:
+    """Remove stale CRUX hook commands from hooks.json."""
+    hooks_path = Path(".cursor/hooks.json")
+    if not hooks_path.is_file():
+        return
+
+    try:
+        data = json.loads(hooks_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return
+
+    hooks = data.get("hooks", {})
+    if not hooks:
+        return
+
+    changed = False
+    for lifecycle in list(hooks.keys()):
+        arr = hooks.get(lifecycle)
+        if not isinstance(arr, list):
+            continue
+        original_len = len(arr)
+        arr[:] = [
+            h for h in arr
+            if not (isinstance(h, dict) and h.get("command") in DEPRECATED_HOOK_COMMANDS)
+        ]
+        if len(arr) < original_len:
+            changed = True
+            removed = original_len - len(arr)
+            log_verbose(f"Removed {removed} deprecated hook(s) from {lifecycle}")
+        if not arr:
+            del hooks[lifecycle]
+
+    if changed:
+        data["hooks"] = hooks
+        hooks_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+        log_success("Cleaned up deprecated hooks from .cursor/hooks.json")
+
+
 # ── Download ──
 
 
 RELEASE_FILES = [
-    "CRUX.md", ".crux/crux.json", ".crux/crux-release-files.json",
+    "CRUX.md", "install.crux.md", ".crux/crux.json", ".crux/crux-release-files.json",
     ".cursor/hooks.json", ".cursor/agents/crux-cursor-rule-manager.md",
     ".cursor/commands/crux-compress.md",
     ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
@@ -495,9 +574,16 @@ def download_update_script() -> None:
             update_path.write_bytes(data)
             update_path.chmod(update_path.stat().st_mode | 0o111)
             log_verbose(f"Update script saved to {update_path}")
-            return
+            break
+    else:
+        log_warn("Could not download update script")
 
-    log_warn("Could not download update script")
+    for url in [f"{RAW_BASE}/install.crux.md", f"{JSDELIVR_CDN}@main/install.crux.md"]:
+        data = http_get(url)
+        if data:
+            Path("install.crux.md").write_bytes(data)
+            log_verbose("Installer reference saved to install.crux.md")
+            break
 
 
 DEFAULT_MEMORIES_CONFIG = {
@@ -642,7 +728,7 @@ def show_completion_report(version: str, backup_zip: str, with_memories: bool = 
         print("         .cursor/hooks/crux-detect-changes.py \\")
         print("         .cursor/hooks/crux-session-start.py \\")
         print("         .cursor/rules/_CRUX-RULE.mdc \\")
-        print("         .cursor/skills/crux-utils CRUX.md")
+        print("         .cursor/skills/crux-utils CRUX.md install.crux.md")
         print()
         print(f"  {CYAN}# Restore from backup{NC}")
         print(f"  unzip -o '{backup_zip}'")
@@ -774,6 +860,8 @@ def main() -> None:
 
     install_from_staging(staging_dir)
     shutil.rmtree(staging_dir.parent, ignore_errors=True)
+    cleanup_deprecated_files()
+    cleanup_deprecated_hooks()
     download_update_script()
 
     if with_memories:

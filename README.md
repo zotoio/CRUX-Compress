@@ -228,7 +228,19 @@ The name also serves as a backronym for "crux" — the decisive or most importan
 
 ## Quick Install
 
-Install CRUX Compress into your project with a single command:
+### Recommended: Agent-Driven Install
+
+The easiest way to install CRUX is to let your AI agent do it. In Cursor, paste this into chat:
+
+> Fetch `https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md`, read it, and follow its instructions to install CRUX Compress into this project.
+
+The agent will decompress the CRUX installer spec and execute the installation — no `python3` or `curl` required on your system. The spec includes language fallback logic so the agent can implement the installer in whatever runtime is available.
+
+> **Tip:** If your agent can't fetch URLs, save [`install.crux.md`](https://github.com/zotoio/CRUX-Compress/blob/main/install.crux.md) to your project and reference it, or paste its contents directly into chat.
+
+### Alternative: One-Line Script Install
+
+If you prefer a traditional install, run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 -
@@ -244,7 +256,7 @@ The installer automatically falls back to jsDelivr for version checks and file d
 
 > **Tip:** You can also copy `install.py` locally and run it directly with `python3 install.py` -- it works the same way.
 
-**Prerequisites**: `curl` and `unzip` must be installed on your system.
+**Prerequisites** (script install only): `curl` and `python3`.
 
 ### Install Options
 
@@ -271,6 +283,7 @@ The installer creates/updates these files in your project:
 | -------------------------------------------- | ------------------------ |
 | `CRUX.md`                                    | Specification (READONLY) |
 | `AGENTS.md`                                  | Agent awareness notice   |
+| `install.crux.md`                            | Installer spec (update reference) |
 | `.crux/crux.json`                            | Installed CRUX version   |
 | `.crux/crux-release-files.json`              | Release manifest         |
 | `.cursor/hooks.json`                         | Hook configuration       |
@@ -284,15 +297,19 @@ The installer creates/updates these files in your project:
 
 ### Upgrading
 
-The install script is re-runnable. It detects existing installations and shows version comparison before upgrading:
+Ask your agent to read `install.crux.md` in your project root and follow the `Γ.bootstrap_upgrade` instructions. It will detect the installed version, download the latest release, clean up deprecated files from older versions, and update everything.
 
-```
-Current version: v1.0.0
-Latest version:  v1.1.0
-Upgrading from v1.0.0 to v1.1.0...
+Alternatively, use the script directly:
+
+```bash
+# If update.py exists (installed by previous CRUX versions)
+python3 .crux/update.py --backup
+
+# Or re-run the installer from source
+curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --backup
 ```
 
-Use `--backup` to preserve your existing files before overwriting.
+The upgrade process automatically removes stale files from older versions (e.g., renamed hooks and skills) and cleans deprecated commands from `hooks.json`.
 
 ## System Architecture
 
