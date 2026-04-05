@@ -18,15 +18,17 @@
       "indexFile": ".crux/memory-index.yml"
     },
 
-    "maxMemorySize": 2048,
+    "sizeUnit": "lines",
+    "compressionMinLines": 500,
+    "maxMemorySize": 1000,
     "compressionTarget": 33,
-    "unitOfWork": "plan",
+    "unitOfWork": "spec",
 
     "dream": {
       "maxCandidateFacts": 5,
       "maxUnrelatedChanges": 50,
       "stateFile": "_execution-state.yml",
-      "workDir": "plans",
+      "workDir": "specs",
       "summaryPattern": "dream-{slug}-{yyyymmdd}.md"
     },
 

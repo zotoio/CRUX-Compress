@@ -21,7 +21,8 @@ def _make_config(
     archive_dir: str = ".ai-ignored/executed",
     index_file: str = ".crux/memory-index.yml",
     tracking_dir: str = ".crux/reference-tracking",
-    max_memory_size: int = 2048,
+    compression_min_lines: int = 500,
+    max_memory_size: int = 1000,
     max_candidate_facts: int = 5,
     max_references_stored: int = 10,
     demote_days: int = 90,
@@ -44,14 +45,16 @@ def _make_config(
                 "compressionSourceArchive": ".ai-ignored/memories/sources",
                 "indexFile": index_file,
             },
+            "sizeUnit": "lines",
+            "compressionMinLines": compression_min_lines,
             "maxMemorySize": max_memory_size,
             "compressionTarget": 33,
-            "unitOfWork": "plan",
+            "unitOfWork": "spec",
             "dream": {
                 "maxCandidateFacts": max_candidate_facts,
                 "maxUnrelatedChanges": 50,
                 "stateFile": "_execution-state.yml",
-                "workDir": "plans",
+                "workDir": "specs",
                 "summaryPattern": "dream-{slug}-{yyyymmdd}.md",
             },
             "typePriority": MEMORY_TYPES,
@@ -145,8 +148,8 @@ def sample_tracker_file(tmp_path: Path) -> Path:
         "last_referenced": today,
         "strength": 1,
         "recent_references": [
-            {"plan": "20260403-crux-memories", "count": 2, "last": today},
-            {"plan": "20260402-other-plan", "count": 1, "last": today},
+            {"spec": "20260403-crux-memories", "count": 2, "last": today},
+            {"spec": "20260402-other-spec", "count": 1, "last": today},
         ],
     }
     tracker_path = tracking_dir / "validate-checksums.refs.yml"
@@ -226,7 +229,7 @@ def write_tracker(
         "last_referenced": last_referenced,
         "strength": strength,
         "recent_references": recent_references
-        or [{"plan": "test-plan", "count": references, "last": last_referenced}],
+        or [{"spec": "test-spec", "count": references, "last": last_referenced}],
     }
     tracking_dir.mkdir(parents=True, exist_ok=True)
     path = tracking_dir / f"{slug}.refs.yml"

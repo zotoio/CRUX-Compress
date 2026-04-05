@@ -1,6 +1,6 @@
 ---
 name: crux-skill-memory-compress
-description: CRUX-compress memory files with adaptive sizing and source archival. Handles compress, decompress, migration of existing memories, and maxMemorySize enforcement. Use when compressing or decompressing memory files, or migrating uncompressed memories after enabling compression.
+description: CRUX-compress memory files with adaptive sizing and source archival. Handles compress, decompress, migration of existing memories, and maxMemorySize enforcement (in lines). Use when compressing or decompressing memory files, or migrating uncompressed memories after enabling compression.
 ---
 
 # CRUX Memory Compress
@@ -14,7 +14,9 @@ Before any operation:
 1. **Read config**: Load `.crux/crux-memories.json` and extract:
    - `flags.enableMemoryCompression` — must be `"true"` or abort with message
    - `cruxMemories.compressionTarget` — target percentage (default `33`)
-   - `cruxMemories.maxMemorySize` — hard cap in bytes (default `2048`)
+   - `cruxMemories.sizeUnit` — unit for size thresholds: `"lines"` or `"bytes"` (default `"lines"`)
+   - `cruxMemories.compressionMinLines` — minimum file size in lines before compression is considered (default `500`)
+   - `cruxMemories.maxMemorySize` — hard cap in configured sizeUnit (default `1000` lines)
    - `cruxMemories.storage.compressionSourceArchive` — archive path (default `.ai-ignored/memories/sources`)
    - `cruxMemories.storage.memoriesDir` — where memories live (default `memories`)
 2. **Load CRUX spec**: Read `CRUX.md` from project root for encoding symbols and compression rules
@@ -31,15 +33,16 @@ Compress a single memory file's body using CRUX notation.
 **Steps**:
 
 1. Read the memory file and separate frontmatter from body
-2. **Frontmatter is NEVER compressed** — preserve it exactly as-is (title, description, type, tags, strength, scope, etc.)
-3. Estimate body token count using `crux-utils` skill (`--token-count`) if available, otherwise LLM estimation (prose: 4 chars/token, code: 3.5 chars/token, CRUX symbols: 1 token each)
+2. **Check `compressionMinLines`** — count the total lines in the file. If below `compressionMinLines` (default `500`), skip compression and return the file unchanged. Files below this threshold are too small to benefit from CRUX compression.
+3. **Frontmatter is NEVER compressed** — preserve it exactly as-is (title, description, type, tags, strength, scope, etc.)
+4. Estimate body token count using `crux-utils` skill (`--token-count`) if available, otherwise LLM estimation (prose: 4 chars/token, code: 3.5 chars/token, CRUX symbols: 1 token each)
 4. Apply CRUX compression to the body only, targeting `compressionTarget`% of original body size
-5. Measure compressed body size in bytes
-6. **Adaptive sizing** — if compressed output exceeds `maxMemorySize` bytes:
+5. Measure compressed body size in the configured `sizeUnit` (default: lines)
+6. **Adaptive sizing** — determine the applicable size cap: use `maxConsolidatedSize` if the file has `consolidation_topic` in its frontmatter, otherwise `maxMemorySize`. If compressed output exceeds the cap (measured in `sizeUnit`):
    - Increase compression aggressiveness (reduce target by 10 percentage points)
    - Re-compress and re-measure
-   - Repeat until under `maxMemorySize` or target reaches 5%
-   - If still over `maxMemorySize` at maximum compression, flag for manual review and do NOT write the file
+   - Repeat until under the cap or target reaches 5%
+   - If still over the cap at maximum compression, flag for manual review and do NOT write the file
 7. Archive the original (see [Source Archival](#3-source-archival))
 8. Write compressed output as `{slug}.memory.crux.md` in the same directory
 9. Delete the original `.memory.md` from the working directory (it has been archived in step 7)
@@ -73,7 +76,7 @@ sourceArchive: .ai-ignored/memories/sources/20260404/react-memo-list-rendering.m
 ⟧
 ```
 
-**Key difference from rule compression**: Memory compression has a `maxMemorySize` hard cap that may require compressing beyond the `compressionTarget` ratio. Rule compression only targets a percentage — memory compression targets a percentage AND an absolute byte limit.
+**Key difference from rule compression**: Memory compression has a `maxMemorySize` hard cap (in lines by default) that may require compressing beyond the `compressionTarget` ratio. Rule compression only targets a percentage — memory compression targets a percentage AND an absolute size limit.
 
 ### 2. Decompress
 
@@ -126,14 +129,14 @@ When compression is enabled on a repo with existing uncompressed memories, detec
 
    | File | Current Size | Est. Compressed | Fits maxMemorySize |
    |------|-------------|-----------------|-------------------|
-   | core/react-memo.memory.md | 3.2 KB | ~1.1 KB | Yes |
-   | learning/stale-closure.memory.md | 1.8 KB | ~0.6 KB | Yes |
-   | idea/visual-regression.memory.md | 4.5 KB | ~1.5 KB | Yes |
+   | core/react-memo.memory.md | 85 lines | ~28 lines | Yes |
+   | learning/stale-closure.memory.md | 45 lines | ~15 lines | Yes |
+   | idea/visual-regression.memory.md | 120 lines | ~40 lines | Yes |
 
    Compress all? [all/select/skip]
    ```
-4. On confirmation, compress each file using the [Compress](#1-compress) operation
-5. Report results: how many compressed, any that exceeded `maxMemorySize` and were flagged
+4. On confirmation, compress each file using the [Compress](#1-compress) operation (files below `compressionMinLines` are automatically skipped)
+5. Report results: how many compressed, how many skipped (below minimum), any that exceeded `maxMemorySize` and were flagged
 
 ## CRUX Compression Patterns for Memories
 
@@ -164,7 +167,10 @@ All config values come from `.crux/crux-memories.json`:
 |-----|------|---------|---------|
 | `flags.enableMemoryCompression` | string | `"false"` | Feature gate — must be `"true"` to operate |
 | `cruxMemories.compressionTarget` | number | `33` | Target compressed size as % of original |
-| `cruxMemories.maxMemorySize` | number | `2048` | Hard cap on compressed output in bytes |
+| `cruxMemories.sizeUnit` | string | `"lines"` | Unit for size thresholds — `"lines"` or `"bytes"` |
+| `cruxMemories.compressionMinLines` | number | `500` | Minimum file size in lines before compression is considered; files below this are left uncompressed |
+| `cruxMemories.maxMemorySize` | number | `1000` | Hard cap on compressed output in lines (default) for standalone memories |
+| `cruxMemories.maxConsolidatedSize` | number | `2000` | Hard cap on compressed output in lines (default) for consolidated memories; used instead of `maxMemorySize` when the file has `consolidation_topic` frontmatter |
 | `cruxMemories.storage.compressionSourceArchive` | string | `.ai-ignored/memories/sources` | Base path for archived originals |
 
 ## Error Handling
@@ -173,7 +179,7 @@ All config values come from `.crux/crux-memories.json`:
 |-----------|--------|
 | `enableMemoryCompression` is not `"true"` | Abort, inform caller compression is disabled |
 | File is not a `.memory.md` or `.memory.crux.md` | Reject with descriptive error |
-| Compressed output exceeds `maxMemorySize` at max compression | Flag for manual review, do not write output |
+| Compressed output exceeds `maxMemorySize` (in configured `sizeUnit`) at max compression | Flag for manual review, do not write output |
 | Source archive directory cannot be created | Abort compression, report filesystem error |
 | Decompressed file would overwrite existing `.memory.md` | Prompt before overwriting |
 | Config file missing or malformed | Report error with path and expected structure |

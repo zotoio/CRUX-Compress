@@ -61,6 +61,7 @@ Each entry has:
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `id` | string | 7-char hex hash from frontmatter (omitted if memory predates the `id` field) |
 | `slug` | string | Memory slug derived from filename |
 | `title` | string | Title from frontmatter |
 | `description` | string | Description from frontmatter |
@@ -77,7 +78,8 @@ Each entry has:
 # Last rebuilt: 2026-04-03T14:22:00Z
 
 memories:
-  - slug: react-memo-list-rendering
+  - id: "b3f1a2c"
+    slug: react-memo-list-rendering
     title: "React.memo on list item components prevents full re-render"
     description: "Wrapping list item components in React.memo..."
     type: "core"
@@ -85,7 +87,8 @@ memories:
     references: 12
     tags: [react, performance, rendering]
     file: memories/core/react-memo-list-rendering.memory.crux.md
-  - slug: validate-checksums-before-overwrite
+  - id: "a1b2c3d"
+    slug: validate-checksums-before-overwrite
     title: "Always validate CRUX checksums before overwriting"
     description: "Source files can drift from their CRUX output..."
     type: "learning"

@@ -9,7 +9,7 @@ Decompress, query, and display CRUX memories in human-readable form.
 ```
 /crux-mindreader                                    - Show contextually relevant memories
 /crux-mindreader "search query"                     - Search memories by keyword
-/crux-mindreader 20260403-crux-memories              - Show memories from a specific plan
+/crux-mindreader 20260403-crux-memories              - Show memories from a specific spec
 /crux-mindreader memories/core/some-memory.memory.md - Display a specific memory file
 ```
 
@@ -21,7 +21,7 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in M
 
 - **No arguments**: The manager loads the memory index (`.crux/memory-index.yml`) and surfaces memories most likely to be relevant to the current conversation context. For each memory, it shows title, type, strength, reference count, and a brief rationale for why it was surfaced.
 - **Quoted text** (e.g. `"performance optimization"`): The manager searches existing memories by title, description, tags, and body content. Results are ranked by relevance with decompressed body content shown for compressed memories. Pass `$ARGUMENTS` to the subagent as the search query.
-- **Plan name(s)** (e.g. `20260403-crux-memories`): The manager finds all memories whose `source` field matches the given plan slug(s). Results are grouped by type. Pass `$ARGUMENTS` to the subagent as the plan name(s).
+- **Spec name(s)** (e.g. `20260403-crux-memories`): The manager finds all memories whose `source` field matches the given spec slug(s). Results are grouped by type. Pass `$ARGUMENTS` to the subagent as the spec name(s).
 - **File path(s)** (e.g. `memories/learning/foo.memory.md`): The manager reads the specified memory file(s) directly. Compressed files (`.memory.crux.md`) are decompressed for display. Full frontmatter and body are shown. Pass `$ARGUMENTS` to the subagent as the file path(s).
 
 ### What Happens
@@ -30,23 +30,50 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in M
 2. Based on the invocation mode, it either:
    - Loads the memory index and selects relevant entries
    - Searches memory files for keyword matches
-   - Filters memories by source plan slug
+   - Filters memories by source spec slug
    - Reads specific memory files directly
 3. For compressed memories (`.memory.crux.md`), decompresses the CRUX body to terse natural language for display — without modifying the file on disk
 4. Presents results with frontmatter metadata and readable body content
 
 ### Display Format
 
-Each displayed memory includes:
+Render memories as a markdown table grouped by type. Each row shows the memory's short hash `id` for easy reference.
 
+**Table format** (one table per type group):
+
+```markdown
+### {Type} Memories
+
+| ID | Title | Str | Refs | Source | Tags |
+|----|-------|-----|------|--------|------|
+| `{id}` | {title} | {strength} | {references} | {source} | {tags as comma-separated} |
 ```
-─── [{type}] {title} ───
-Strength: {strength} | References: {references} | Source: {source}
-Tags: {tags}
-Created: {created} | Modified: {modified}
+
+After the table(s), show a **Details** section with each memory's body content (decompressed if needed), prefixed by its hash:
+
+```markdown
+#### `{id}` — {title}
 
 {body content — decompressed if needed}
 ```
+
+### Post-Display: Next Steps Menu
+
+After displaying the MindReader results, use the `AskQuestion` tool with a single multi-select question offering these actions:
+
+| Option | Label | What it does |
+|--------|-------|-------------|
+| `delete` | Delete memories | Let the user pick which memories to remove from the corpus |
+| `consolidate` | Consolidate memories | Automatically find optimal combinations, merge near-duplicates, and compress the result |
+| `promote` | Promote (boost) memories | Increase strength of selected memories |
+| `skip` | No thanks | Do nothing — end the interaction |
+
+If the user selects one or more actions, execute them in order:
+
+1. **Delete**: Present a follow-up `AskQuestion` listing each memory by its `id` and title as a multi-select. Delete selected memories using `crux-skill-memory-crud` Delete, then rebuild the index via `crux-skill-memory-index`.
+2. **Consolidate**: Spawn a `crux-cursor-memory-manager` subagent in REM Sleep mode scoped to the displayed memories. The subagent identifies near-duplicates, merges them, and compresses if `enableMemoryCompression` is active. Present the consolidation report to the user.
+3. **Promote**: Present a follow-up `AskQuestion` listing each memory by its `id` and title as a multi-select. For selected memories, increment strength by 1 via `crux-skill-memory-crud` Update, then rebuild the index.
+4. **Skip**: End the interaction with no further action.
 
 ## Related
 

@@ -34,6 +34,7 @@ class TestCompressedFileProduction:
     def test_compressed_file_within_size_limit(self, tmp_path: Path):
         cfg = _make_config(tmp_path)
         max_size = cfg["cruxMemories"]["maxMemorySize"]
+        size_unit = cfg["cruxMemories"].get("sizeUnit", "lines")
 
         mem_dir = tmp_path / "memories"
         body = "A" * 500
@@ -42,10 +43,16 @@ class TestCompressedFileProduction:
             compressed=True, body=body,
         )
 
-        file_size = path.stat().st_size
-        assert file_size <= max_size, (
-            f"Compressed file {file_size} bytes exceeds maxMemorySize {max_size}"
-        )
+        if size_unit == "lines":
+            file_size = len(path.read_text().splitlines())
+            assert file_size <= max_size, (
+                f"Compressed file {file_size} lines exceeds maxMemorySize {max_size}"
+            )
+        else:
+            file_size = path.stat().st_size
+            assert file_size <= max_size, (
+                f"Compressed file {file_size} bytes exceeds maxMemorySize {max_size}"
+            )
 
     def test_config_compression_flag(self, tmp_path: Path):
         cfg = _make_config(tmp_path)

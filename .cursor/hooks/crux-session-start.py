@@ -64,7 +64,7 @@ def _read_memory_nudge() -> str | None:
         return None
 
     nudge_cfg = cfg.get("cruxMemories", {}).get("hooks", {}).get("sessionStartNudge", {})
-    watch_dir = Path(nudge_cfg.get("watchDir", "plans"))
+    watch_dir = Path(nudge_cfg.get("watchDir", "specs"))
     threshold = int(nudge_cfg.get("threshold", 20))
     nudge_message = nudge_cfg.get("message", "")
 

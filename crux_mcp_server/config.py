@@ -33,7 +33,7 @@ class MemoriesConfig:
     enabled: bool = False
     compression: bool = False
     storage: StorageConfig = field(default_factory=StorageConfig)
-    max_memory_size: int = 2048
+    max_memory_size: int = 1000
     type_priority: list[str] = field(
         default_factory=lambda: list(_DEFAULT_TYPE_PRIORITY)
     )
@@ -90,7 +90,7 @@ def load_config(config_path: Path | None = None, project_root: Path | None = Non
         enabled=_resolve_flag(flags, "enableMemories"),
         compression=_resolve_flag(flags, "enableMemoryCompression"),
         storage=storage,
-        max_memory_size=cm.get("maxMemorySize", 2048),
+        max_memory_size=cm.get("maxMemorySize", 1000),
         type_priority=cm.get("typePriority", list(_DEFAULT_TYPE_PRIORITY)),
         reference_tracking=ref_tracking,
         scope_ranking=cm.get("scopeRanking", ["base", "agents", "shared"]),

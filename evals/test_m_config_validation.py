@@ -72,7 +72,7 @@ class TestUnitOfWorkInterpolation:
 
     def test_unit_of_work_configured(self, tmp_path: Path):
         cfg = _make_config(tmp_path)
-        assert cfg["cruxMemories"]["unitOfWork"] == "plan"
+        assert cfg["cruxMemories"]["unitOfWork"] == "spec"
 
     def test_nudge_message_template_exists(self, tmp_path: Path):
         real_config = Path(__file__).resolve().parent.parent / ".crux" / "crux-memories.json"
@@ -89,8 +89,8 @@ class TestUnitOfWorkInterpolation:
         cfg = _make_config(tmp_path)
         unit = cfg["cruxMemories"]["unitOfWork"]
         work_dir = cfg["cruxMemories"]["dream"]["workDir"]
-        assert unit == "plan"
-        assert work_dir == "plans"
+        assert unit == "spec"
+        assert work_dir == "specs"
 
 
 class TestPlatformPaths:

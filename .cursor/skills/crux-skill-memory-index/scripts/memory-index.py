@@ -160,7 +160,11 @@ def build_index(cfg: dict, project_root: Path) -> list[dict]:
         except ValueError:
             rel_path = mf
 
-        entries.append(
+        entry: dict = {}
+        mem_id = fm.get("id")
+        if mem_id:
+            entry["id"] = str(mem_id)
+        entry.update(
             {
                 "slug": slug,
                 "title": str(title),
@@ -173,6 +177,8 @@ def build_index(cfg: dict, project_root: Path) -> list[dict]:
                 "_type_rank": type_rank.get(mem_type, len(type_priority)),
             }
         )
+
+        entries.append(entry)
 
     entries.sort(key=lambda e: (e["_type_rank"], -e["strength"], -e["references"]))
 

@@ -20,7 +20,7 @@ All settings live in `.crux/crux-memories.json` under `cruxMemories.referenceTra
 | `promotionToRuleThreshold` | integer | `30` | Total reference count that flags a memory for promotion to a permanent rule |
 | `maxReferencesStored` | integer | `10` | Maximum entries in `recent_references` (oldest evicted when cap exceeded) |
 
-Additionally, `cruxMemories.unitOfWork` (e.g. `plan`) determines the key name used in `recent_references` source entries.
+Additionally, `cruxMemories.unitOfWork` (e.g. `spec`) determines the key name used in `recent_references` source entries.
 
 ## Operations
 
@@ -66,7 +66,7 @@ Tracker files are created on first reference. Unreferenced memories have no trac
 
 1. Read the memory file's frontmatter to get the current `strength` value.
 2. Determine the source identifier:
-   - If operating within a unit of work (e.g. a plan), use `{unitOfWork}: "{id}"` (e.g. `plan: "20260403-crux-memories"`).
+   - If operating within a unit of work (e.g. a spec), use `{unitOfWork}: "{id}"` (e.g. `spec: "20260403-crux-memories"`).
    - If in a standalone conversation, use `conversation_id: "{id}"`.
 3. Write the new `.refs.yml` file:
 
@@ -91,7 +91,7 @@ The `recent_references` list is a **capped, sorted** list of the top referrers f
 **Update logic**:
 
 1. Determine the current source:
-   - Within a unit of work → key is the configured `unitOfWork` value (e.g. `plan`), value is the work ID.
+   - Within a unit of work → key is the configured `unitOfWork` value (e.g. `spec`), value is the work ID.
    - Standalone conversation → key is `conversation_id`, value is the conversation ID.
 2. Search `recent_references` for an existing entry matching the source.
    - **If found**: increment its `count`, update its `last` date. If context is available and the entry lacks one, add it.
@@ -102,7 +102,7 @@ The `recent_references` list is a **capped, sorted** list of the top referrers f
 **Entry format**:
 
 ```yaml
-- plan: "20260403-component-library"    # key matches unitOfWork config
+- spec: "20260403-component-library"    # key matches unitOfWork config
   count: 5
   last: 2026-04-03
   context: "Applied memoization pattern to data grid component"
@@ -168,10 +168,10 @@ references: 12
 last_referenced: 2026-04-03
 strength: 3
 recent_references:
-  - plan: "20260403-component-library"
+  - spec: "20260403-component-library"
     count: 5
     last: 2026-04-03
-  - plan: "20260401-dashboard-performance"
+  - spec: "20260401-dashboard-performance"
     count: 4
     last: 2026-04-01
   - conversation_id: "a3f7b2c"
@@ -192,7 +192,7 @@ recent_references:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `{unitOfWork}` or `conversation_id` | string | Yes | Source identifier — key name matches config `unitOfWork` (e.g. `plan`, `spec`) or `conversation_id` for standalone sessions |
+| `{unitOfWork}` or `conversation_id` | string | Yes | Source identifier — key name matches config `unitOfWork` (e.g. `spec`, `plan`) or `conversation_id` for standalone sessions |
 | `count` | integer | Yes | Number of references from this source |
 | `last` | date | Yes | Date of most recent reference from this source |
 | `context` | string | No | Brief description of how the memory was used |

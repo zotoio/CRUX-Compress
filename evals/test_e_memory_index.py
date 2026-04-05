@@ -40,8 +40,10 @@ def _make_config(tmp_path: Path, memories_dir: str = "memories") -> Path:
                 "archiveDir": ".ai-ignored/executed",
                 "indexFile": ".crux/memory-index.yml",
             },
-            "maxMemorySize": 2048,
-            "unitOfWork": "plan",
+            "sizeUnit": "lines",
+            "compressionMinLines": 500,
+            "maxMemorySize": 1000,
+            "unitOfWork": "spec",
             "typePriority": ["core", "redflag", "goal", "learning", "idea", "archived"],
             "referenceTracking": {
                 "enabled": True,

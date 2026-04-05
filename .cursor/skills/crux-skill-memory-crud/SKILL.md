@@ -24,7 +24,9 @@ All configuration lives in `.crux/crux-memories.json` under the `cruxMemories` k
 |---------|---------|---------|
 | `storage.memoriesDir` | `memories` | Root directory for base memories |
 | `storage.agentMemoriesDir` | `memories/agents` | Root directory for agent-scoped memories |
-| `maxMemorySize` | 2048 | Maximum memory file size in bytes |
+| `sizeUnit` | `"lines"` | Unit for size thresholds — `"lines"` or `"bytes"` |
+| `compressionMinLines` | 500 | Minimum file size in lines before compression is considered |
+| `maxMemorySize` | 1000 | Maximum memory file size in lines (default) |
 | `referenceTracking.trackingDir` | `.crux/reference-tracking` | Reference tracker location |
 | `typePriority` | `[core, redflag, goal, learning, idea, archived]` | Valid memory types in priority order |
 
@@ -36,6 +38,7 @@ Every memory file must have YAML frontmatter with these fields:
 
 | Field | Type | Rules |
 |-------|------|-------|
+| `id` | string | 7-character hex hash, generated once at creation from `sha256(title)[:7]`. Immutable — never changes even if the title is edited. Used as the stable short identifier for display and selection. |
 | `title` | string | Descriptive title conveying the key insight |
 | `description` | string | Self-contained summary — enough to act on without reading the body |
 | `type` | enum | One of: `core`, `redflag`, `goal`, `learning`, `idea`, `archived` |
@@ -50,11 +53,15 @@ Every memory file must have YAML frontmatter with these fields:
 | Field | Type | Rules |
 |-------|------|-------|
 | `promoted_from` | string | Previous type before a type transition; set automatically on promotion/demotion |
+| `consolidated_from` | list | List of original memory `id` values when this memory was created by merging multiple memories during REM sleep consolidation. Set once, never modified. |
+| `consolidation_topic` | string | Shared slug identifying the topic across multi-volume consolidated memories (e.g. `plugin-architecture`). All volumes for the same topic share this value. Set during consolidation when splitting is needed. |
+| `consolidation_part` | integer | Volume number within a multi-volume consolidated topic (1-indexed). Only present when `consolidation_topic` is set and the topic spans multiple files. |
 
 ### Example Frontmatter
 
 ```yaml
 ---
+id: "a1b2c3d"
 title: "Always validate CRUX checksums before overwriting"
 description: "Source files can drift from their CRUX output. Always recompute and compare sourceChecksum before regenerating to avoid silent data loss."
 type: "learning"
@@ -99,18 +106,20 @@ Create a new memory file.
 1. Load config from `.crux/crux-memories.json`
 2. Validate `type` is one of the allowed types in `typePriority`
 3. Generate slug from title (lowercase, replace spaces/special chars with hyphens, truncate to reasonable length)
-4. Build frontmatter with all required fields:
+4. Generate `id` by computing `sha256(title)` and taking the first 7 hex characters. If a collision exists with another memory, extend to 8 characters.
+5. Build frontmatter with all required fields:
+   - `id`: the generated hash
    - `strength`: `1`
    - `created`: today's date
    - `modified`: today's date
-5. Compose the full file: frontmatter + body content
-6. Check file size against `maxMemorySize` (default 2048 bytes). If exceeded, warn the user and suggest trimming the body or compressing
-7. Determine target directory:
+6. Compose the full file: frontmatter + body content
+7. Check file size against `maxMemorySize` (default 1000 lines). If exceeded, warn the user and suggest trimming the body or compressing
+8. Determine target directory:
    - If agent-id provided: `memories/agents/{agent-id}/{type}/`
    - Otherwise: `memories/{type}/`
-8. Create parent directories if needed
-9. Write `{slug}.memory.md` to the target directory
-10. Return the file path
+9. Create parent directories if needed
+10. Write `{slug}.memory.md` to the target directory
+11. Return the file path and `id`
 
 ### Read
 
@@ -136,6 +145,7 @@ Modify a memory's frontmatter or body.
 
 1. Read the existing memory (use the Read operation)
 2. Apply field updates to the frontmatter. Enforce these rules:
+   - `id` — **never** modify this field; it is immutable after creation
    - `created` — **never** modify this field; reject any attempt to change it
    - `modified` — always set to today's date
    - `type` — if changed, handle type transition (see below)
@@ -175,8 +185,9 @@ Check a memory file against the required schema.
 
 1. Read the memory file (use the Read operation)
 2. Check all required frontmatter fields are present:
-   - `title`, `description`, `type`, `strength`, `created`, `modified`, `source`, `tags`
+   - `id`, `title`, `description`, `type`, `strength`, `created`, `modified`, `source`, `tags`
 3. Check field types:
+   - `id` must be a 7-character (or 8 on collision) lowercase hex string
    - `type` must be one of: `core`, `redflag`, `goal`, `learning`, `idea`, `archived`
    - `strength` must be a positive integer
    - `created` and `modified` must be valid ISO dates
@@ -188,7 +199,7 @@ Check a memory file against the required schema.
 
 ## What NOT to Do
 
-- Do not modify the `created` date on updates — it is immutable after creation
+- Do not modify `id` or `created` on updates — both are immutable after creation
 - Do not set `strength` to anything other than `1` on new memories
 - Do not write memory files outside the `memories/` directory tree
 - Do not delete reference trackers without also deleting the memory

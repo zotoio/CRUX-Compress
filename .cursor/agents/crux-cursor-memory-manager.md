@@ -38,7 +38,7 @@ Always read the relevant skill file before invoking its operations.
 
 ## Operating Modes
 
-### Dream Mode — `/crux-dream <plan-name>`
+### Dream Mode — `/crux-dream <spec-name>`
 
 Extract memories from a completed unit of work.
 
@@ -80,11 +80,11 @@ Rebalance the entire memory corpus.
 
 3. **Conflict Detection**: Compare memories pairwise for semantic contradictions. Conflicts **always require user input**.
 
-4. **Recommend Changes**: Evaluate promotions (strength meets `promoteAt` threshold), demotions (unreferenced for `demoteAfterDaysUnreferenced` days), archival (unreferenced for `archiveAfterDaysUnreferenced` days), consolidations (near-duplicate memories), strength rebalances, and rule promotion flags.
+4. **Recommend Changes**: Evaluate promotions (strength meets `promoteAt` threshold), demotions (unreferenced for `demoteAfterDaysUnreferenced` days), archival (unreferenced for `archiveAfterDaysUnreferenced` days), consolidations (when `enableMemoryConsolidation` is `"true"` — group related memories by subject/type overlap and merge into single compressed files with shared metadata and keywords), compression of remaining uncompressed memories (when `enableMemoryCompression` is `"true"`), strength rebalances, and rule promotion flags.
 
 5. **Present Report**: Show the full REM sleep analysis report. In interactive mode, wait for user confirmation (all/select/skip). In `--yolo` mode, auto-apply everything except conflicts.
 
-6. **Apply Changes**: Execute confirmed changes via `crux-skill-memory-rebalance` — file moves for promotions/demotions/archival, merges for consolidations, tracker updates for strength rebalances, cleanup for orphaned trackers.
+6. **Apply Changes**: Execute confirmed changes via `crux-skill-memory-rebalance` — file moves for promotions/demotions/archival, consolidated group merges (combined body → compressed `.memory.crux.md` via `crux-skill-memory-compress`), individual compression for remaining uncompressed memories, tracker updates for strength rebalances, cleanup for orphaned trackers.
 
 7. **Write REM Summary**: Write summary to `{archiveDir}/rem-{yyyymmdd}.md` with all changes applied, skipped items, and corpus statistics.
 
@@ -100,7 +100,7 @@ Query and display memories.
 |------------|-----------|
 | `/crux-mindreader` (no args) | Load the memory index, show memories most likely to be relevant to the current context. For each, display title, type, strength, reference count, and a brief rationale for why it was surfaced. |
 | `/crux-mindreader "query text"` | Search existing memories by title, description, tags, and body content. Display matching memories ranked by relevance, with decompressed body content for compressed memories. |
-| `/crux-mindreader plan-name [plan-name...]` | Load memories whose `source` field matches the given plan slug(s). Display all matching memories grouped by type. |
+| `/crux-mindreader spec-name [spec-name...]` | Load memories whose `source` field matches the given spec slug(s). Display all matching memories grouped by type. |
 | `/crux-mindreader path/to/file.memory.md [...]` | Read the specified memory file(s). If compressed (`.memory.crux.md`), decompress and display in human-readable form. Show full frontmatter and body. |
 
 **Decompression display**: When showing compressed memories, use `crux-skill-memory-compress` Decompress logic to expand CRUX notation to terse natural language. Do NOT modify the memory file on disk — MindReader is read-only.
@@ -126,6 +126,7 @@ Agent-scoped memories live under `memories/agents/{agent-id}/{type}/`. These rul
 ### Feature Guards
 - **Always check `flags.enableMemories`** before any operation. If not `"true"`, refuse all memory operations and inform the user that the feature is disabled.
 - **Check `flags.enableMemoryCompression`** before compression operations. Compression is independently gated.
+- **Check `flags.enableMemoryConsolidation`** before consolidation operations. Consolidation is independently gated.
 
 ### Data Integrity
 - **Never modify `created` dates** on existing memories

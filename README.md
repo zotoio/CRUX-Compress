@@ -831,7 +831,6 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
 | Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
-| Planner Agent       | `.cursor/agents/crux-planner.md`             | Multi-step planning agent      |
 | Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
 | MindReader Command  | `.cursor/commands/crux-mindreader.md`        | Memory query command           |
 | MCP Server          | `crux_mcp_server/`                           | Semantic memory search server  |

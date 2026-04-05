@@ -1,6 +1,6 @@
 ---
 name: crux-skill-memory-extract
-description: Analyse execution artifacts from completed units of work, compare with existing memories, detect conflicts, and propose ranked candidate facts for memory creation. Use after a plan (or configured unitOfWork) completes to extract learnings, patterns, red flags, ideas, and goals.
+description: Analyse execution artifacts from completed units of work, compare with existing memories, detect conflicts, and propose ranked candidate facts for memory creation. Use after a spec (or configured unitOfWork) completes to extract learnings, patterns, red flags, ideas, and goals.
 ---
 
 # CRUX Skill: Memory Extract
@@ -10,7 +10,7 @@ Analyses execution artifacts from a completed unit of work, compares candidates 
 ## When to Use
 
 Use this skill when:
-- A unit of work (e.g. plan) has completed execution and you want to extract memories from it
+- A unit of work (e.g. spec) has completed execution and you want to extract memories from it
 - The `/crux-dream` command is invoked for a specific completed work item
 - The `crux-cursor-memory-manager` agent orchestrates a dream workflow
 
@@ -20,11 +20,11 @@ Before any operation:
 
 1. **Read config**: Load `.crux/crux-memories.json` and extract:
    - `flags.enableMemories` — must be `"true"` or abort with message
-   - `cruxMemories.unitOfWork` — the type of work item (e.g. `plan`, `spec`, `task`)
+   - `cruxMemories.unitOfWork` — the type of work item (e.g. `spec`, `plan`, `task`)
    - `cruxMemories.dream.maxCandidateFacts` — max candidates to present (default `5`)
    - `cruxMemories.dream.maxUnrelatedChanges` — threshold for aborting on noisy diffs (default `50`)
    - `cruxMemories.dream.stateFile` — execution state filename (default `_execution-state.yml`)
-   - `cruxMemories.dream.workDir` — directory containing units of work (default `plans`)
+   - `cruxMemories.dream.workDir` — directory containing units of work (default `specs`)
    - `cruxMemories.storage.memoriesDir` — base memory directory (default `memories`)
    - `cruxMemories.storage.agentMemoriesDir` — agent-scoped memory directory (default `memories/agents`)
    - `cruxMemories.typePriority` — valid types in priority order
@@ -36,7 +36,7 @@ Before any operation:
 
 Confirm the unit of work completed successfully before extracting memories.
 
-**Input**: Path to the work item directory (e.g. `plans/20260403-crux-memories/`)
+**Input**: Path to the work item directory (e.g. `specs/20260403-crux-memories/`)
 
 **Steps**:
 
@@ -345,11 +345,11 @@ All config values come from `.crux/crux-memories.json`:
 | Key | Type | Default | Purpose |
 |-----|------|---------|---------|
 | `flags.enableMemories` | string | `"false"` | Feature gate — must be `"true"` to operate |
-| `cruxMemories.unitOfWork` | string | `"plan"` | Type of work item to look for (e.g. `plan`, `spec`, `task`) |
+| `cruxMemories.unitOfWork` | string | `"spec"` | Type of work item to look for (e.g. `spec`, `plan`, `task`) |
 | `cruxMemories.dream.maxCandidateFacts` | integer | `5` | Maximum number of candidates to present |
 | `cruxMemories.dream.maxUnrelatedChanges` | integer | `50` | Changed file count threshold before warning |
 | `cruxMemories.dream.stateFile` | string | `"_execution-state.yml"` | Execution state filename within work item directory |
-| `cruxMemories.dream.workDir` | string | `"plans"` | Directory containing units of work |
+| `cruxMemories.dream.workDir` | string | `"specs"` | Directory containing units of work |
 | `cruxMemories.storage.memoriesDir` | string | `"memories"` | Base memory directory |
 | `cruxMemories.storage.agentMemoriesDir` | string | `"memories/agents"` | Agent-scoped memory directory |
 | `cruxMemories.typePriority` | list | `[core, redflag, goal, learning, idea, archived]` | Valid types in priority order |

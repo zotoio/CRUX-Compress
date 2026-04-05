@@ -167,7 +167,7 @@ promoted_from: "learning"   # if type transition occurred
 | `tags` | No | Searchable tags |
 | `promoted_from` | No | Previous type if a type transition occurred |
 
-A configurable `maxMemorySize` (default: 2048 bytes) limits individual memory file size. When compression is enabled, the compression level is adjusted to fit within this limit — the skill will increase compression aggressiveness until the output fits, or flag the memory as too large if it cannot.
+A configurable `maxMemorySize` (default: 500 lines) limits individual memory file size. The `sizeUnit` setting (default: `"lines"`) determines how this cap is measured. When compression is enabled, the compression level is adjusted to fit within this limit — the skill will increase compression aggressiveness until the output fits, or flag the memory as too large if it cannot.
 
 Reference counts and timestamps are **not** stored in memory frontmatter — they live in per-memory tracker files (see [Reference Tracking Data](#reference-tracking-data-cruxreference-tracking)).
 
@@ -263,7 +263,10 @@ The core memory engine is identical across platforms. Only the wiring layer diff
       "indexFile": ".crux/memory-index.yml"
     },
 
-    "maxMemorySize": 2048,
+    "sizeUnit": "lines",
+    "compressionMinLines": 500,
+    "maxMemorySize": 1000,
+    "maxConsolidatedSize": 2000,
     "compressionTarget": 33,
     "unitOfWork": "spec",
 
@@ -810,7 +813,7 @@ Memory files should be compacted with CRUX. A separate `memoryCompression` featu
 
 ### Adaptive Compression
 
-When compression is enabled, the `crux-skill-memory-compress` skill targets `compressionTarget` (default `33` — aim for 33% of original size) and adjusts compression level to also fit within `maxMemorySize` (default 2048 bytes). The process:
+When compression is enabled, the `crux-skill-memory-compress` skill first checks whether the file meets the `compressionMinLines` threshold (default `500` lines) — files below this are skipped. For qualifying files, it targets `compressionTarget` (default `33` — aim for 33% of original size) and adjusts compression level to also fit within `maxMemorySize` (default 1000 lines). The process:
 
 1. Attempt CRUX compression targeting `compressionTarget` percentage (e.g. 33 = reduce to 33% of original)
 2. If output exceeds `maxMemorySize`, increase compression aggressiveness beyond the target ratio

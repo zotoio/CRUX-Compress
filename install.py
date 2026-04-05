@@ -516,9 +516,11 @@ DEFAULT_MEMORIES_CONFIG = {
             "compressionSourceArchive": ".ai-ignored/memories/sources",
             "indexFile": ".crux/memory-index.yml",
         },
-        "maxMemorySize": 2048,
+        "sizeUnit": "lines",
+        "compressionMinLines": 500,
+        "maxMemorySize": 1000,
         "compressionTarget": 33,
-        "unitOfWork": "plan",
+        "unitOfWork": "spec",
         "commands": {
             "dream": {
                 "file": ".cursor/commands/crux-dream.md",
@@ -534,12 +536,12 @@ DEFAULT_MEMORIES_CONFIG = {
         "hooks": {
             "sessionStartNudge": {
                 "trigger": "sessionStart",
-                "watchDir": "plans",
+                "watchDir": "specs",
                 "threshold": 20,
                 "message": (
                     "Agent: I need a nap to process what we've been working on. "
                     "Run /crux-dream in a fresh thinking agent. "
-                    "I'll wake up fresh and ready for our next plan after that!"
+                    "I'll wake up fresh and ready for our next spec after that!"
                 ),
             },
         },
@@ -547,7 +549,7 @@ DEFAULT_MEMORIES_CONFIG = {
             "maxCandidateFacts": 5,
             "maxUnrelatedChanges": 50,
             "stateFile": "_execution-state.yml",
-            "workDir": "plans",
+            "workDir": "specs",
             "summaryPattern": "dream-{slug}-{yyyymmdd}.md",
         },
         "typePriority": ["core", "redflag", "goal", "learning", "idea", "archived"],
@@ -614,7 +616,7 @@ def setup_memories() -> bool:
     print("To enable memories:")
     print(f"  1. Set {CYAN}enableMemories{NC} to {GREEN}\"true\"{NC} in {config_path}")
     print("  2. Optionally configure MCP server for semantic search")
-    print("  3. Use /crux-dream after completing plans to extract learnings")
+    print("  3. Use /crux-dream after completing specs to extract learnings")
     print()
 
     return True

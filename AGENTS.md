@@ -24,6 +24,5 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 | `crux-cursor-rule-manager` | `.cursor/agents/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
 | `integrity-expert` | `.cursor/agents/integrity-expert.md` | Code quality audits, test coverage, security, CI/CD |
 | `docs-sync-agent` | `.cursor/agents/docs-sync-agent.md` | Documentation synchronization on source changes |
-| `crux-planner` | `.cursor/agents/crux-planner.md` | Planning and coordinating multi-step engineering initiatives |
 | `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, MindReader) |
 

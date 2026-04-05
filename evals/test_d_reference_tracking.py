@@ -63,8 +63,8 @@ class TestMultiSourceTracking:
         today = date.today().isoformat()
 
         recent = [
-            {"plan": "plan-alpha", "count": 3, "last": today},
-            {"plan": "plan-beta", "count": 2, "last": today},
+            {"spec": "spec-alpha", "count": 3, "last": today},
+            {"spec": "spec-beta", "count": 2, "last": today},
         ]
         path = write_tracker(
             tracking_dir,
@@ -77,17 +77,17 @@ class TestMultiSourceTracking:
         assert data["references"] == 5
         assert len(data["recent_references"]) == 2
 
-        sources = [r.get("plan") for r in data["recent_references"]]
-        assert "plan-alpha" in sources
-        assert "plan-beta" in sources
+        sources = [r.get("spec") for r in data["recent_references"]]
+        assert "spec-alpha" in sources
+        assert "spec-beta" in sources
 
     def test_source_counts_correct(self, tmp_path: Path):
         tracking_dir = tmp_path / ".crux" / "reference-tracking"
         today = date.today().isoformat()
 
         recent = [
-            {"plan": "plan-alpha", "count": 7, "last": today},
-            {"plan": "plan-beta", "count": 3, "last": today},
+            {"spec": "spec-alpha", "count": 7, "last": today},
+            {"spec": "spec-beta", "count": 3, "last": today},
         ]
         path = write_tracker(
             tracking_dir,
@@ -110,7 +110,7 @@ class TestMaxReferencesStoredCap:
         today = date.today().isoformat()
 
         recent = [
-            {"plan": f"plan-{i:02d}", "count": 20 - i, "last": today}
+            {"spec": f"spec-{i:02d}", "count": 20 - i, "last": today}
             for i in range(15)
         ]
 
@@ -132,10 +132,10 @@ class TestMaxReferencesStoredCap:
         today = date.today().isoformat()
 
         recent = [
-            {"plan": "high", "count": 100, "last": today},
-            {"plan": "medium", "count": 50, "last": today},
-            {"plan": "low", "count": 10, "last": today},
-            {"plan": "lowest", "count": 1, "last": today},
+            {"spec": "high", "count": 100, "last": today},
+            {"spec": "medium", "count": 50, "last": today},
+            {"spec": "low", "count": 10, "last": today},
+            {"spec": "lowest", "count": 1, "last": today},
         ]
 
         capped = sorted(recent, key=lambda r: -r["count"])[:max_stored]
@@ -148,7 +148,7 @@ class TestMaxReferencesStoredCap:
         )
 
         data = _parse_tracker(path)
-        names = [r["plan"] for r in data["recent_references"]]
+        names = [r["spec"] for r in data["recent_references"]]
         assert "high" in names
         assert "medium" in names
         assert "low" in names

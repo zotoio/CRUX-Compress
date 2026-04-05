@@ -3,12 +3,14 @@
 
   "flags": [
     { "enableMemories": "true" },
-    { "enableMemoryCompression": "true" }
+    { "enableMemoryCompression": "true" },
+    { "enableMemoryConsolidation": "true" }
   ],
 
   "cruxMemories": {
     "enabled": "${flags.enableMemories}",
     "compression": "${flags.enableMemoryCompression}",
+    "consolidation": "${flags.enableMemoryConsolidation}",
 
     "storage": {
       "memoriesDir": "memories",
@@ -18,9 +20,12 @@
       "indexFile": ".crux/memory-index.yml"
     },
 
-    "maxMemorySize": 2048,
+    "sizeUnit": "lines",
+    "compressionMinLines": 500,
+    "maxMemorySize": 1000,
+    "maxConsolidatedSize": 2000,
     "compressionTarget": 33,
-    "unitOfWork": "plan",
+    "unitOfWork": "spec",
 
     "commands": {
       "dream": {
@@ -38,9 +43,9 @@
     "hooks": {
       "sessionStartNudge": {
         "trigger": "sessionStart",
-        "watchDir": "plans",
+        "watchDir": "specs",
         "threshold": 20,
-        "message": "Agent: 🥱 I need a nap to process what we've been working on. Run /crux-dream in a fresh thinking agent. I'll wake up fresh and ready for our next plan after that!"
+        "message": "Agent: 🥱 I need a nap to process what we've been working on. Run /crux-dream in a fresh thinking agent. I'll wake up fresh and ready for our next spec after that!"
       }
     },
 
@@ -48,7 +53,7 @@
       "maxCandidateFacts": 5,
       "maxUnrelatedChanges": 50,
       "stateFile": "_execution-state.yml",
-      "workDir": "plans",
+      "workDir": "specs",
       "summaryPattern": "dream-{slug}-{yyyymmdd}.md"
     },
 

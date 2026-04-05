@@ -266,7 +266,6 @@ The memory system is a development-time feature not included in the distribution
 | `memories/` | Memory file storage (by type: `core/`, `learning/`, `redflag/`, `goal/`, `idea/`) |
 | `memories/agents/` | Agent-scoped memory storage |
 | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent definition |
-| `.cursor/agents/crux-planner.md` | Planning and coordination agent |
 | `.cursor/commands/crux-dream.md` | Dream extraction command |
 | `.cursor/commands/crux-mindreader.md` | Memory query command |
 | `.cursor/skills/crux-skill-memory-*/` | Memory operation skills (CRUD, extract, rebalance, compress, index, reference-tracker) |

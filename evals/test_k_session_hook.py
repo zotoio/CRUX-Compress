@@ -1,6 +1,6 @@
 """Category K: Session Hook tests.
 
-Validates session-start nudge when plan count exceeds threshold and
+Validates session-start nudge when spec count exceeds threshold and
 that disabling memories suppresses the nudge.
 """
 
@@ -24,7 +24,7 @@ def _write_config(tmp_path: Path, *, enable_memories: str = "true", threshold: i
             "hooks": {
                 "sessionStartNudge": {
                     "trigger": "sessionStart",
-                    "watchDir": str(tmp_path / "plans"),
+                    "watchDir": str(tmp_path / "specs"),
                     "threshold": threshold,
                     "message": "Time to dream! Run /crux-dream.",
                 }
@@ -52,15 +52,15 @@ def _run_hook(config_path: Path) -> subprocess.CompletedProcess:
 
 
 class TestNudgeAboveThreshold:
-    """When plan dirs exceed the threshold, a nudge message is emitted."""
+    """When spec dirs exceed the threshold, a nudge message is emitted."""
 
     def test_nudge_emitted_above_threshold(self, tmp_path: Path):
         config_path = _write_config(tmp_path, threshold=2)
 
-        plans_dir = tmp_path / "plans"
-        plans_dir.mkdir(parents=True, exist_ok=True)
+        specs_dir = tmp_path / "specs"
+        specs_dir.mkdir(parents=True, exist_ok=True)
         for i in range(3):
-            (plans_dir / f"plan-{i:03d}").mkdir()
+            (specs_dir / f"spec-{i:03d}").mkdir()
 
         result = _run_hook(config_path)
         assert result.returncode == 0, f"Hook failed: {result.stderr}"
@@ -78,10 +78,10 @@ class TestNudgeAboveThreshold:
     def test_nudge_contains_count_info(self, tmp_path: Path):
         config_path = _write_config(tmp_path, threshold=2)
 
-        plans_dir = tmp_path / "plans"
-        plans_dir.mkdir(parents=True, exist_ok=True)
+        specs_dir = tmp_path / "specs"
+        specs_dir.mkdir(parents=True, exist_ok=True)
         for i in range(5):
-            (plans_dir / f"plan-{i:03d}").mkdir()
+            (specs_dir / f"spec-{i:03d}").mkdir()
 
         result = _run_hook(config_path)
         output = json.loads(result.stdout) if result.stdout.strip() else {}
@@ -91,15 +91,15 @@ class TestNudgeAboveThreshold:
 
 
 class TestNudgeSuppressedWhenDisabled:
-    """When enableMemories is false, no nudge is produced regardless of plan count."""
+    """When enableMemories is false, no nudge is produced regardless of spec count."""
 
     def test_no_nudge_when_disabled(self, tmp_path: Path):
         config_path = _write_config(tmp_path, enable_memories="false", threshold=1)
 
-        plans_dir = tmp_path / "plans"
-        plans_dir.mkdir(parents=True, exist_ok=True)
+        specs_dir = tmp_path / "specs"
+        specs_dir.mkdir(parents=True, exist_ok=True)
         for i in range(10):
-            (plans_dir / f"plan-{i:03d}").mkdir()
+            (specs_dir / f"spec-{i:03d}").mkdir()
 
         result = _run_hook(config_path)
         assert result.returncode == 0
@@ -116,7 +116,7 @@ class TestNudgeSuppressedWhenDisabled:
 
     def test_empty_output_when_disabled_and_no_pending(self, tmp_path: Path):
         config_path = _write_config(tmp_path, enable_memories="false", threshold=1)
-        (tmp_path / "plans").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "specs").mkdir(parents=True, exist_ok=True)
 
         result = _run_hook(config_path)
         assert result.returncode == 0
