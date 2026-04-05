@@ -2,8 +2,8 @@
   "platform": "cursor",
 
   "flags": [
-    { "enableMemories": "false" },
-    { "enableMemoryCompression": "false" }
+    { "enableMemories": "true" },
+    { "enableMemoryCompression": "true" }
   ],
 
   "cruxMemories": {
