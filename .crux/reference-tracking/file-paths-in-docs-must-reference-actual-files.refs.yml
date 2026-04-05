@@ -1,0 +1,10 @@
+# Managed by crux-skill-memory-reference-tracker — do not edit manually
+slug: file-paths-in-docs-must-reference-actual-files
+references: 1
+last_referenced: 2026-04-05
+strength: 1
+recent_references:
+  - conversation_id: "user-query-file-paths-in-docs"
+    count: 1
+    last: 2026-04-05
+    context: "User asked about file paths in documentation and websites; memory content was retrieved and summarized"

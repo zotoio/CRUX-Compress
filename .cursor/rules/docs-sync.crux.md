@@ -1,12 +1,11 @@
 ---
-generated: 2026-03-10 14:30
-sourceChecksum: 347482193
+generated: 2026-04-04 12:00
+sourceChecksum: 1356781034
 cruxLevel: 25
 beforeTokens: 468
-afterTokens: 314
-reducedBy: 33%
-confidence: 92%
-crux: true
+afterTokens: 320
+reducedBy: 32%
+confidence: 88%
 ---
 
 > [!IMPORTANT]
@@ -24,14 +23,14 @@ E.docs{
  web/compress.md/←landing|examples|feature highlights
 }
 Γ.README{
- install.sh→upd install
+ install.py→upd install
  CRUX.md→upd spec+examples
  .cursor/commands/*→upd cmd usage
  .cursor/skills/*/SKILL.md→upd skill desc
 }
 Γ.CONTRIBUTORS{
  .github/workflows/*.yml→upd CI/CD flow+desc
- tests/*.bats→upd test struct|run
+ evals/*.py→upd test struct|run
  scripts/*.sh→upd dev setup
  tests/helpers.bash→upd test helper doc
 }
@@ -52,5 +51,6 @@ P.skip{
  temp|gen files
  ¬spec features→doc existing only
 }
+Ω{concise|actionable}
 ⟧
 ```

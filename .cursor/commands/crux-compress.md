@@ -25,6 +25,7 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 /crux-compress https://a.com https://b.com - Compress multiple URLs
 /crux-compress @file.md --plugin=frontmatter-tagger - Run a plugin while compressing
 /crux-compress ALL --plugin quality-gate --plugin release-notes - Run multiple plugins
+/crux-compress @file.md --no-plugin compression-level  - Disable a default-enabled plugin
 ```
 
 ### Flags
@@ -32,9 +33,10 @@ Compress markdown rule files, code files, and images into CRUX notation for toke
 | Flag | Description | Use Case |
 |------|-------------|----------|
 | `--minified` | Single-line output, no spaces, max compression | Copy-paste demos, LLM testing |
-| `--force` | Delete existing `.crux.md` and `.crux.mdc` files before compression | Force fresh recompression, bypass checksum skip |
+| `--force` | Delete existing CRUX output files (`.crux.mdc` or `.crux.md`) before compression | Force fresh recompression, bypass checksum skip |
 | `--<n>` | Set compression level to `n`% (1-100). Overrides frontmatter `crux: <n>`. Default: 25 | `--40` for 40% target, `--10` for aggressive compression |
 | `--plugin <name>` / `--plugin=<name>` | Enable a named plugin from the plugin registry | Add optional feature behavior without changing core command flow |
+| `--no-plugin <name>` | Disable a specific default-enabled plugin | Opt out of a default plugin without switching to fully-explicit mode |
 
 **Note**: Flags can be combined: `/crux-compress ALL --force --minified --40 --plugin quality-gate`
 
@@ -76,17 +78,23 @@ Plugins are resolved from `.crux/plugins/registry.json` (if present). Minimal sh
 ```json
 {
   "plugins": {
-    "frontmatter-tagger": {
-      "description": "Add standardized metadata after compression",
-      "hooks": ["afterCompress"]
+    "compression-level": {
+      "description": "Enforce compression ratio targets and generate token metrics.",
+      "hooks": ["beforeCompress", "afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": true
     },
-    "quality-gate": {
-      "description": "Apply extra validation policy checks",
-      "hooks": ["afterValidate"]
+    "frontmatter-tagger": {
+      "description": "Add standardized metadata after compression.",
+      "hooks": ["afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": false
     }
   }
 }
 ```
+
+Plugins with `enabledByDefault: true` load automatically when no `--plugin` flags are given. See [Default Plugin Loading](#default-plugin-loading) below.
 
 #### Standard Plugin Hooks
 
@@ -111,7 +119,7 @@ This prevents resource exhaustion and ensures reliable processing.
 
 **CRUX files track the source file's checksum to avoid unnecessary updates.**
 
-Each `.crux.md` file includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file. Before processing:
+Each CRUX output file (`.crux.mdc` or `.crux.md`) includes a `sourceChecksum` field in its frontmatter containing the checksum of the source file. Before processing:
 
 1. Agent gets current checksum using `crux-utils` skill (`--cksum` mode)
 2. If existing CRUX file's `sourceChecksum` matches, the source is unchanged - **skip update**
@@ -137,23 +145,48 @@ The resolved level is:
 
 **Validation**: If the level is outside 1-100, reject with an error message and do not proceed.
 
-### Plugin Resolution (`--plugin`)
+### Plugin Resolution (`--plugin`, `--no-plugin`)
 
 Before source-type routing, resolve enabled plugins:
 
 1. Parse all plugin flags from both forms:
-   - `--plugin <name>`
-   - `--plugin=<name>`
+   - `--plugin <name>` / `--plugin=<name>` (explicit enable)
+   - `--no-plugin <name>` (disable a default-enabled plugin)
 2. Normalize plugin names to lowercase and de-duplicate while preserving order.
-3. If no plugin flags are provided, continue with the base compression flow.
-4. If plugin flags are provided:
-   - Read `.crux/plugins/registry.json` (if present)
-   - Validate each requested plugin exists in `plugins`
-   - Validate each plugin declares at least one supported hook:
-     `beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`
-   - If a requested plugin is unknown, fail fast with an actionable message:
-     `"Unknown plugin: <name>. Add it to .crux/plugins/registry.json or remove the flag."`
-5. Build an in-memory execution plan:
+3. Determine the active plugin set using one of two modes:
+
+#### Default Plugin Loading
+
+When **no `--plugin` flags** are present:
+
+1. Read `.crux/plugins/registry.json` (if present).
+2. Collect all plugins with `enabledByDefault: true`. These load automatically in registry order.
+3. Remove any plugins named in `--no-plugin` flags.
+   - `--no-plugin compression-level` → load defaults minus `compression-level`
+   - `--no-plugin` on a non-default plugin → no-op (it was not going to load)
+   - `--no-plugin` on a nonexistent plugin → warning, no error
+4. If no default-enabled plugins exist and no `--no-plugin` flags are given, continue with the base compression flow (backward-compatible no-plugin path).
+
+#### Explicit Plugin Mode
+
+When **one or more `--plugin` flags** are present:
+
+1. Load **only** the explicitly named plugins. Default-enabled plugins are **not** implicitly added.
+   - `--plugin frontmatter-tagger` loads *only* `frontmatter-tagger`, even if `compression-level` is `enabledByDefault: true`
+   - To get defaults plus extras: `--plugin compression-level --plugin frontmatter-tagger`
+2. `--no-plugin` flags are ignored in explicit mode (the explicit list is authoritative). Emit a warning if both are provided.
+
+This ensures full backward compatibility: existing scripts that pass `--plugin` flags get exactly the same behavior as before.
+
+#### Common Validation (Both Modes)
+
+4. Read `.crux/plugins/registry.json` (if not already loaded).
+5. Validate each active plugin exists in `plugins`.
+6. Validate each plugin declares at least one supported hook:
+   `beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`
+7. If a requested plugin is unknown, fail fast with an actionable message:
+   `"Unknown plugin: <name>. Add it to .crux/plugins/registry.json or remove the flag."`
+8. Build an in-memory execution plan:
    - `pluginsByHook.beforeFetch[]`
    - `pluginsByHook.beforeCompress[]`
    - `pluginsByHook.afterCompress[]`
@@ -173,11 +206,12 @@ When plugin hooks are present, execute them in this order:
 6. `afterValidate` (if validation produced a score)
 
 Execution rules:
-- Run plugins in CLI order (first `--plugin` runs first for each hook).
+- When using default plugin loading, run plugins in registry order. When using explicit mode, run plugins in CLI order (first `--plugin` runs first for each hook).
 - Provide each plugin with a structured context object:
   `sourcePath|sourceUrl`, `sourceType`, `outputPath`, `compressionLevel`,
   `format`, `force`, and current lifecycle data (`beforeTokens`, `afterTokens`,
   `confidence` when available).
+- For the `compression-level` plugin specifically, the context also includes `contentType` (`"text"`, `"code"`, `"url"`, or `"image"`) so it can resolve default targets. See `.crux/plugins/compression-level.md` for full context schema.
 - Plugin failures are recorded per plugin and hook in the final report.
 - Continue base compression unless the plugin explicitly declares `failClosed: true`
   in the registry entry.
@@ -188,14 +222,15 @@ Execution rules:
 When the `--force` flag is passed, **before any compression**:
 
 1. **Identify target CRUX files**:
-   - For each source file to be processed, determine the corresponding `.crux.md` path (and `.crux.mdc` if applicable)
-   - Example: `rules/docs-sync.md` → `rules/docs-sync.crux.md` + `rules/docs-sync.crux.mdc`
+   - For sources in `.cursor/rules/`: the output is `[name].crux.mdc`
+   - For sources elsewhere: the output is `[name].crux.md`
+   - Also check for any leftover intermediary files (e.g., `.crux.md` in `.cursor/rules/`) and delete those too
 
 2. **Delete existing CRUX files**:
-   - Delete each `.crux.md` file that exists
-   - Also delete the corresponding `.crux.mdc` Cursor adapter file if it exists
+   - Delete the CRUX output file for each source
+   - Delete any leftover intermediary `.crux.md` files in `.cursor/rules/` (legacy cleanup)
    - This removes the cached `sourceChecksum`, forcing fresh compression
-   - Log each deletion: "Deleted: rules/docs-sync.crux.md (--force)"
+   - Log each deletion: "Deleted: rules/docs-sync.crux.mdc (--force)"
 
 3. **Proceed with normal compression** (steps below)
 
@@ -318,7 +353,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
 
 ### When invoked with markdown file reference(s) (`@path/to/file.md*`)
 
-1. **If `--force` flag is passed**, delete existing `.crux.md` and `.crux.mdc` files first (see above)
+1. **If `--force` flag is passed**, delete existing CRUX output files first (see above)
 
 2. **For each file reference provided**, spawn a **fresh `crux-cursor-rule-manager` subagent instance**:
    - Each file gets its own dedicated agent instance
@@ -329,11 +364,12 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      ```
      Compress this rule file into CRUX notation:
      - Source: <file path>
-     - Output: <file path with .crux.md extension>
+     - Output: <.crux.mdc if source is in .cursor/rules/, otherwise .crux.md>
+     - For .cursor/rules/ sources: include alwaysApply from source frontmatter in output
+     - For other sources: do NOT include alwaysApply or IDE-specific frontmatter
      - Format: <formatted (default) OR minified if --minified flag was passed>
      - Compression level: <resolved level, default 25>
      - Follow CRUX.md specification
-     - Do NOT include alwaysApply or other IDE-specific frontmatter in .crux.md
      - Check source checksum vs existing CRUX sourceChecksum - skip if unchanged
      - Report before/after token counts using `crux-utils` skill (or "skipped - source unchanged")
      - If source lacks `crux: true` or `crux: <n>` frontmatter, add `crux: true` first
@@ -350,24 +386,18 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
      ```
      Perform semantic validation on this CRUX file:
      - Source: <source .md file path>
-     - CRUX: <generated .crux.md file path>
+     - CRUX: <generated CRUX output file path (.crux.mdc or .crux.md)>
      - DO NOT use the CRUX specification - evaluate purely on semantic understanding
      - Compare meaning and completeness between source and CRUX
      - Return confidence score (0-100%)
      - Flag any issues if confidence < 80%
      ```
    - The validation agent returns the confidence score
-   - Update the `.crux.md` frontmatter with `confidence: XX%`
+   - Update the CRUX output file's frontmatter with `confidence: XX%`
    - Run enabled `afterCompress` plugins after each successful compression
    - Run enabled `afterValidate` plugins after each validation result
 
-5. **Cursor adapter step** (if source is in `.cursor/rules/`):
-   - Copy the `.crux.md` file to `.crux.mdc`
-   - Inject `alwaysApply` from the source file's frontmatter (default `false`)
-   - Copy any other Cursor-specific frontmatter from the source
-   - The `.crux.mdc` is a derived artifact — the `.crux.md` is the source of truth
-
-6. **Collect results** and report:
+5. **Collect results** and report:
    - File processed or skipped (with reason: "source unchanged" or "compression not beneficial")
    - Token reduction achieved (if processed)
    - **Confidence score** from validation
@@ -385,7 +415,8 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
 ### When invoked with `ALL`
 
 1. **If `--force` flag is passed**, delete all existing CRUX output files first:
-   - Find all `.crux.md` and `.crux.mdc` files in `.cursor/rules/` (excluding `_CRUX-RULE.mdc`)
+   - Find all `.crux.mdc` files in `.cursor/rules/` (excluding `_CRUX-RULE.mdc`)
+   - Also delete any leftover `.crux.md` intermediary files in `.cursor/rules/` (legacy cleanup)
    - Delete each one and log the deletion
    - This ensures all eligible sources will be freshly compressed
 
@@ -400,7 +431,7 @@ When any referenced file has a supported code extension (`.sh`, `.bash`, `.ts`, 
    - The subagent will:
      - Read the CRUX specification from `CRUX.md`
      - Compress the source file
-     - Create/update the `[filename].crux.md` version (universal output)
+     - Create/update the `[filename].crux.mdc` output directly (with `alwaysApply` from source frontmatter)
      - Report token reduction metrics
      - Apply enabled `beforeCompress` and `afterCompress` plugin hooks
    - **Process in batches of up to 4 parallel agents**
@@ -502,8 +533,8 @@ To make a rule file eligible for CRUX compression:
 | Type | Extension | Example |
 |------|-----------|---------|
 | Source markdown (human-readable) | `.md` | `core-tenets.md` |
-| Compressed (universal, IDE-agnostic) | `.crux.md` | `core-tenets.crux.md` |
-| Cursor adapter (derived from `.crux.md`) | `.crux.mdc` | `core-tenets.crux.mdc` |
+| Compressed Cursor rule (`.cursor/rules/` sources) | `.crux.mdc` | `core-tenets.crux.mdc` |
+| Compressed (universal, non-rule sources) | `.crux.md` | `core-tenets.crux.md` |
 | Source code | `.sh`, `.ts`, `.py`, etc. | `install.sh` |
 | Compressed code (semantic structure) | `.crux.md` | `install.crux.md` |
 | Source image | `.png`, `.jpg`, etc. | `diagram.png` |
@@ -521,7 +552,7 @@ To make a rule file eligible for CRUX compression:
 
 The `.crux/out/` directory is created automatically if it does not exist. This provides a consistent default location for compression output when there's no local source file to place the output alongside.
 
-**Two-tier output**: All compression produces `.crux.md` (universal). When the source is in `.cursor/rules/`, a `.crux.mdc` Cursor adapter is also produced with `alwaysApply` injected. The `.crux.md` is the source of truth; `.crux.mdc` is derived.
+**Direct output**: For sources in `.cursor/rules/`, compression produces `.crux.mdc` directly (with `alwaysApply` injected from source frontmatter). No intermediary `.crux.md` is created. For all other sources, compression produces `.crux.md`.
 
 **Important**: The CRUX header in compressed files references the source file:
 ```
@@ -537,10 +568,10 @@ When `/crux-compress ALL` finds 4 or fewer eligible files:
 
 ```
 Batch 1 (parallel, max 4):
-├── crux-cursor-rule-manager → core-tenets.md → core-tenets.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → xfi-coding-standards.md → xfi-coding-standards.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → vscode-optimise.md → vscode-optimise.crux.md (+.crux.mdc)
-└── crux-cursor-rule-manager → _IMPORTANT_CORE_MEMORY.md → _IMPORTANT_CORE_MEMORY.crux.md (+.crux.mdc)
+├── crux-cursor-rule-manager → core-tenets.md → core-tenets.crux.mdc
+├── crux-cursor-rule-manager → xfi-coding-standards.md → xfi-coding-standards.crux.mdc
+├── crux-cursor-rule-manager → vscode-optimise.md → vscode-optimise.crux.mdc
+└── crux-cursor-rule-manager → _IMPORTANT_CORE_MEMORY.md → _IMPORTANT_CORE_MEMORY.crux.mdc
 ```
 
 ### With `ALL` (>4 files)
@@ -548,16 +579,16 @@ When `/crux-compress ALL` finds 6 eligible files:
 
 ```
 Batch 1 (parallel, max 4):
-├── crux-cursor-rule-manager → file1.md → file1.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → file2.md → file2.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → file3.md → file3.crux.md (+.crux.mdc)
-└── crux-cursor-rule-manager → file4.md → file4.crux.md (+.crux.mdc)
+├── crux-cursor-rule-manager → file1.md → file1.crux.mdc
+├── crux-cursor-rule-manager → file2.md → file2.crux.mdc
+├── crux-cursor-rule-manager → file3.md → file3.crux.mdc
+└── crux-cursor-rule-manager → file4.md → file4.crux.mdc
 
 [Wait for Batch 1 to complete]
 
 Batch 2 (parallel, remaining files):
-├── crux-cursor-rule-manager → file5.md → file5.crux.md (+.crux.mdc)
-└── crux-cursor-rule-manager → file6.md → file6.crux.md (+.crux.mdc)
+├── crux-cursor-rule-manager → file5.md → file5.crux.mdc
+└── crux-cursor-rule-manager → file6.md → file6.crux.mdc
 ```
 
 ### With file references (>4 files)
@@ -580,14 +611,11 @@ Batch 2 (parallel, remaining):
 When `/crux-compress @.cursor/rules/core-tenets.md`:
 
 ```
-Compression:
-└── crux-cursor-rule-manager → core-tenets.md → core-tenets.crux.md
+Compression (source in .cursor/rules/ → direct .crux.mdc):
+└── crux-cursor-rule-manager → core-tenets.md → core-tenets.crux.mdc
 
 Validation (after compression completes):
-└── crux-cursor-rule-manager (fresh) → validate core-tenets.crux.md → confidence: 92%
-
-Cursor adapter (source in .cursor/rules/):
-└── core-tenets.crux.md → core-tenets.crux.mdc (+alwaysApply)
+└── crux-cursor-rule-manager (fresh) → validate core-tenets.crux.mdc → confidence: 92%
 ```
 
 ### With URL(s)
@@ -609,16 +637,16 @@ When `/crux-compress ALL --force`:
 
 ```
 Force delete (pre-processing):
-├── Deleted: .cursor/rules/docs-sync.crux.md + .crux.mdc
-├── Deleted: .cursor/rules/version-bump.crux.md + .crux.mdc
-├── Deleted: .cursor/rules/ignore-example-rules.crux.md + .crux.mdc
-└── Deleted: .cursor/rules/example/coding-standards-demo.crux.md + .crux.mdc
+├── Deleted: .cursor/rules/docs-sync.crux.mdc
+├── Deleted: .cursor/rules/version-bump.crux.mdc
+├── Deleted: .cursor/rules/ignore-example-rules.crux.mdc
+└── Deleted: .cursor/rules/example/coding-standards-demo.crux.mdc
 
 Batch 1 (parallel, max 4):
-├── crux-cursor-rule-manager → docs-sync.md → docs-sync.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → version-bump.md → version-bump.crux.md (+.crux.mdc)
-├── crux-cursor-rule-manager → ignore-example-rules.md → ignore-example-rules.crux.md (+.crux.mdc)
-└── crux-cursor-rule-manager → coding-standards-demo.md → coding-standards-demo.crux.md (+.crux.mdc)
+├── crux-cursor-rule-manager → docs-sync.md → docs-sync.crux.mdc
+├── crux-cursor-rule-manager → version-bump.md → version-bump.crux.mdc
+├── crux-cursor-rule-manager → ignore-example-rules.md → ignore-example-rules.crux.mdc
+└── crux-cursor-rule-manager → coding-standards-demo.md → coding-standards-demo.crux.mdc
 ```
 
 **Note**: With `--force`, no files are skipped due to "source unchanged" since all CRUX files are deleted first.
@@ -627,11 +655,10 @@ Batch 1 (parallel, max 4):
 
 **Every compression is followed by validation** using a fresh agent instance:
 
-1. Compression agent writes `.crux.md` (without confidence)
-2. Fresh validation agent compares CRUX to source
+1. Compression agent writes the CRUX output (`.crux.mdc` for `.cursor/rules/` sources, `.crux.md` otherwise) without confidence
+2. Fresh validation agent compares CRUX output to source
 3. Validation agent returns confidence score (0-100%)
 4. Frontmatter is updated with `confidence: XX%`
-5. If source is in `.cursor/rules/`, Cursor adapter copies `.crux.md` → `.crux.mdc` with `alwaysApply`
 
 ### Confidence Score
 

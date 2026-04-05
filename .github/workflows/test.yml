@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'feature/**'
+      - 'feat/**'
   pull_request:
     branches:
       - main
@@ -17,22 +18,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq bc
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Setup BATS
-        uses: bats-core/bats-action@2.0.0
+      - name: Install Python test dependencies
+        run: pip install -r evals/requirements.txt
 
-      - name: Run BATS tests
-        run: |
-          bats tests/*.bats --formatter tap
+      - name: Run pytest (evals)
+        run: pytest evals/ -v --tb=short
+
+      - name: Run pytest (plugin)
+        if: hashFiles('plugins/zoto-spec-system/tests/') != ''
+        run: pytest plugins/zoto-spec-system/tests/ -v --tb=short
 
       - name: Validate zip creation
         run: |
-          chmod +x scripts/create-crux-zip.sh
-          ./scripts/create-crux-zip.sh /tmp
+          python3 scripts/create-crux-zip.py /tmp
           
           # Verify zip was created
           ZIP_FILE=$(ls /tmp/CRUX-Compress-v*.zip 2>/dev/null || echo "")
@@ -51,11 +54,11 @@ jobs:
             ".cursor/hooks.json"
             ".cursor/agents/crux-cursor-rule-manager.md"
             ".cursor/commands/crux-compress.md"
-            ".cursor/hooks/crux-detect-changes.sh"
-            ".cursor/hooks/crux-session-start.sh"
+            ".cursor/hooks/crux-detect-changes.py"
+            ".cursor/hooks/crux-session-start.py"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/crux-utils/SKILL.md"
-            ".cursor/skills/crux-utils/scripts/crux-utils.sh"
+            ".cursor/skills/crux-utils/scripts/crux-utils.py"
           )
           
           for file in "${REQUIRED_FILES[@]}"; do
@@ -68,25 +71,14 @@ jobs:
           
           echo "All required files present in zip"
 
-      - name: Validate install script syntax
-        run: |
-          # Check for syntax errors
-          bash -n install.sh
-          echo "Install script syntax OK"
-
-      - name: Test install script help
-        run: |
-          chmod +x install.sh
-          ./install.sh --help
-
       - name: Summary
         run: |
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "All tests passed:" >> $GITHUB_STEP_SUMMARY
-          echo "- BATS test suite" >> $GITHUB_STEP_SUMMARY
+          echo "- pytest suite (evals/)" >> $GITHUB_STEP_SUMMARY
+          echo "- pytest plugin tests (plugins/zoto-spec-system/)" >> $GITHUB_STEP_SUMMARY
           echo "- Zip creation validation" >> $GITHUB_STEP_SUMMARY
-          echo "- Install script syntax check" >> $GITHUB_STEP_SUMMARY
 
   shellcheck:
     runs-on: ubuntu-latest
@@ -100,6 +92,5 @@ jobs:
         with:
           scandir: '.'
           ignore_paths: >-
-            tests/bats
             web
           severity: warning

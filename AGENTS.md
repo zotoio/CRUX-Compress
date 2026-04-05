@@ -17,3 +17,12 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 7. **NEVER EDIT GENERATED CRUX OUTPUT** - Do not edit `.crux.md` or `.crux.mdc` files directly, and do not edit files marked with generated frontmatter (`generated:` plus `sourceChecksum:` or `sourceUrl:`) or the banner `> [!IMPORTANT] > Generated file - do not edit!`
 8. **EDIT THE REAL SOURCE FILE** - Move edits to the underlying source file, then re-generate the derived CRUX output. For example, `[name].crux.md` / `[name].crux.mdc` should be changed by editing the real source such as `[name].md`. `AGENTS.md` itself is a source file in this repository; do not invent `AGENTS.source.md`.
 
+### Available Agents
+
+| Agent | Definition | Purpose |
+|-------|-----------|---------|
+| `crux-cursor-rule-manager` | `.cursor/agents/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
+| `integrity-expert` | `.cursor/agents/integrity-expert.md` | Code quality audits, test coverage, security, CI/CD |
+| `docs-sync-agent` | `.cursor/agents/docs-sync-agent.md` | Documentation synchronization on source changes |
+| `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, MindReader) |
+

@@ -15,6 +15,7 @@ Thank you for your interest in contributing to CRUX Compress! This document prov
 - [Pull Request Process](#pull-request-process)
 - [Reporting Issues](#reporting-issues)
 - [Release Process](#release-process)
+  - [Plugin System](#plugin-system)
 
 ## Code of Conduct
 
@@ -31,127 +32,107 @@ Please be respectful and constructive in all interactions. We are committed to p
 
 ### Prerequisites
 
-- Bash 4.0+
-- [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System) for running tests
-- `jq` for JSON processing
+- Python >= 3.10
+- `jq` for JSON processing (optional, used by some shell scripts)
 - `bc` for calculations
 
-### Installing BATS
+### Installing Python Dependencies
 
 ```bash
-# macOS (Homebrew)
-brew install bats-core
+# MCP server dependencies
+pip install -r crux_mcp_server/requirements.txt
 
-# Ubuntu/Debian
-sudo apt-get install bats
-
-# Or install from source
-git clone https://github.com/bats-core/bats-core.git
-cd bats-core
-./install.sh /usr/local
+# Eval test dependencies
+pip install -r evals/requirements.txt
 ```
 
 ## Testing
 
-CRUX Compress uses [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System) for testing. All shell scripts have corresponding test suites.
+CRUX Compress uses [pytest](https://docs.pytest.org/) for all tests.
 
 ### Test Structure
 
 ```
-tests/
-├── fixtures/               # Test fixtures and sample files
-│   ├── compress-test.crux.md
-│   ├── compress-test.md
-│   ├── no-change.crux.md
-│   ├── no-change.md
-│   ├── no-crux-frontmatter.mdc
-│   ├── sample-rule.crux.md
-│   ├── sample-rule.md
-│   └── special-chars.md
-├── helpers.bash            # Shared test utilities and assertions
-├── test_create_zip.bats    # Tests for scripts/create-crux-zip.sh
-├── test_crux_utils.bats    # Tests for crux-utils skill
-├── test_detect_hook.bats   # Tests for the crux-detect-changes.sh hook
-└── test_install.bats       # Tests for install.sh
+evals/                              # All tests (pytest)
+├── conftest.py                     # Shared fixtures and configuration
+├── fixtures/                       # Test fixtures
+│   └── sample-config.json
+├── test_a_memory_crud.py           # Memory CRUD operations
+├── test_b_dream_workflow.py        # Dream extraction workflow
+├── test_c_rem_sleep.py             # REM sleep rebalancing
+├── test_d_reference_tracking.py    # Reference tracking
+├── test_e_memory_index.py          # Memory index building
+├── test_f_type_transitions.py      # Type transition logic
+├── test_g_compression.py           # Memory compression
+├── test_h_agent_scoping.py         # Agent memory isolation
+├── test_i_scope_ranking.py         # Scope ranking
+├── test_k_session_hook.py          # Session start hook
+├── test_l_mcp_server.py            # MCP server tools
+├── test_m_config_validation.py     # Config validation
+├── test_n_plugin_registry.py       # Plugin registry validation
+├── test_create_zip.py              # Distribution zip creation
+├── test_crux_utils.py              # CRUX utility script
+├── test_detect_hook.py             # File change detection hook
+├── test_install.py                 # Installer script
+├── test_test_runner.py             # Test runner script
+├── requirements.txt                # pytest, pyyaml
+└── USER_EVAL_CHECKLISTS.md         # Manual eval checklists
+
+tests/fixtures/                     # Shared test fixture files
 ```
 
 ### Test Suites
 
 | Test File | Script Under Test | Coverage |
 |-----------|------------------|----------|
-| `test_install.bats` | `install.sh` | Installation script validation, CLI options, dependencies |
-| `test_crux_utils.bats` | `.cursor/skills/crux-utils/scripts/crux-utils.sh` | Token counting, checksums, compression ratio |
-| `test_detect_hook.bats` | `.cursor/hooks/crux-detect-changes.sh` | Hook triggering, file filtering, queue management |
-| `test_create_zip.bats` | `scripts/create-crux-zip.sh` | Zip creation, version matching, required files |
+| `test_install.py` | `install.py` | CLI flags, version comparison, hooks merge, upsert |
+| `test_crux_utils.py` | `crux-utils.py` | Token counting, checksums, compression ratio |
+| `test_detect_hook.py` | `crux-detect-changes.py` | File filtering, queue management |
+| `test_create_zip.py` | `create-crux-zip.py` | Zip contents, version matching, structure |
+| `test_a_memory_crud.py` | Memory skills | Memory create, read, update, delete |
+| `test_b_dream_workflow.py` | Dream extraction | Post-spec memory extraction workflow |
+| `test_c_rem_sleep.py` | REM sleep | Promotion, demotion, archival |
+| `test_d_reference_tracking.py` | Reference tracker | Usage tracking and strength sync |
+| `test_e_memory_index.py` | Memory index | Index building and prioritisation |
+| `test_f_type_transitions.py` | Type transitions | Type transition logic and promotion thresholds |
+| `test_g_compression.py` | Memory compression | CRUX compression of memory bodies |
+| `test_h_agent_scoping.py` | Agent scoping | Agent memory isolation and scope rules |
+| `test_i_scope_ranking.py` | Scope ranking | Scope priority ranking logic |
+| `test_k_session_hook.py` | Session hook | Memory nudge on session start |
+| `test_l_mcp_server.py` | MCP server | MCP server tool validation |
+| `test_m_config_validation.py` | Config validation | Memory configuration validation |
+| `test_n_plugin_registry.py` | Plugin registry | Schema validation, `enabledByDefault` semantics |
 
 ### Running Tests
 
 ```bash
-# Run all tests
-bats tests/*.bats
+# Run all tests (bats + pytest)
+python3 scripts/test.py
+
+# Run all pytest tests
+pytest evals/ -v
 
 # Run a specific test file
-bats tests/test_install.bats
+pytest evals/test_install.py -v
 
-# Run with verbose output
-bats tests/*.bats --verbose-run
-
-# Run with TAP output (used in CI)
-bats tests/*.bats --formatter tap
-
-# Run tests matching a pattern
-bats tests/*.bats --filter "install"
-```
-
-### Test Helpers
-
-The `tests/helpers.bash` file provides common utilities:
-
-```bash
-# Setup/teardown for temp directories
-setup_temp_dir      # Creates TEST_TEMP_DIR
-cleanup_temp_dir    # Removes TEST_TEMP_DIR
-
-# File assertions
-assert_file_exists "$path"
-assert_file_not_exists "$path"
-assert_dir_exists "$path"
-
-# Output assertions
-assert_output_contains "expected string"
-assert_output_not_contains "unexpected string"
-
-# Exit code assertion
-assert_exit_code 0
+# Run with short output
+pytest evals/ --tb=short
 ```
 
 ### Writing New Tests
 
-1. Create a new `.bats` file in the `tests/` directory
-2. Load helpers at the top: `load 'helpers'`
-3. Use `setup()` and `teardown()` for test isolation
-4. Name tests descriptively: `@test "script handles edge case correctly"`
+1. Create a new `test_*.py` file in the `evals/` directory
+2. Use pytest fixtures (especially `tmp_path`) for test isolation
+3. Use `conftest.py` helpers for creating memory/tracker fixtures
+4. Name tests descriptively: `test_handles_edge_case_correctly`
 
 Example:
 
-```bash
-#!/usr/bin/env bats
-
-load 'helpers'
-
-setup() {
-    setup_temp_dir
-}
-
-teardown() {
-    cleanup_temp_dir
-}
-
-@test "my-script.sh handles empty input" {
-    run ./my-script.sh ""
-    assert_exit_code 1
-    assert_output_contains "Error: empty input"
-}
+```python
+def test_script_handles_empty_input(tmp_path):
+    result = subprocess.run(["./my-script.sh", ""], capture_output=True, text=True)
+    assert result.returncode == 1
+    assert "Error: empty input" in result.stderr
 ```
 
 ### CI Integration
@@ -162,10 +143,11 @@ Tests run automatically on:
 - Pull requests to `main`
 
 The CI pipeline (`.github/workflows/test.yml`) runs:
-1. BATS test suite
+1. pytest suite
 2. Zip creation validation
 3. Install script syntax check
 4. ShellCheck linting
+5. Python eval tests (pytest)
 
 ## Commit Guidelines
 
@@ -197,7 +179,7 @@ BREAKING CHANGE: The arrow operator → is now required"
 ## Pull Request Process
 
 1. **Update tests**: Add or update tests for any new functionality
-2. **Run tests locally**: Ensure all tests pass with `bats tests/*.bats`
+2. **Run tests locally**: Ensure all tests pass with `pytest evals/ -v`
 3. **Check linting**: Run ShellCheck on your scripts
 4. **Update documentation**: Update README.md if you've changed functionality
 5. **Descriptive PR title**: Use conventional commit format
@@ -219,7 +201,7 @@ When reporting issues, please include:
 2. **Steps to reproduce**: Minimal steps to reproduce the issue
 3. **Expected behavior**: What you expected to happen
 4. **Actual behavior**: What actually happened
-5. **Environment**: OS, Bash version, BATS version (if relevant)
+5. **Environment**: OS, Python version (if relevant)
 6. **Logs/Output**: Any error messages or relevant output
 
 ## Release Process
@@ -234,7 +216,7 @@ Push to main
     ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  Test Workflow (.github/workflows/test.yml)                     │
-│  ├─ Run BATS test suite                                         │
+│  ├─ Run pytest suite                                            │
 │  ├─ Validate zip creation                                       │
 │  ├─ Check install script syntax                                 │
 │  └─ Run ShellCheck linting                                      │
@@ -274,12 +256,82 @@ Version bumps only occur when these files change (matches distribution zip conte
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Subagent definition |
 | `.cursor/commands/crux-compress.md` | Command definition |
-| `.cursor/hooks/crux-detect-changes.sh` | File change detection hook |
-| `.cursor/hooks/crux-session-start.sh` | Session start hook |
+| `.cursor/hooks/crux-detect-changes.py` | File change detection hook |
+| `.cursor/hooks/crux-session-start.py` | Session start hook |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
 | `.cursor/skills/crux-utils/**` | Utility skill |
 
-Changes to other files (README, tests, examples, scripts) do **not** trigger releases.
+Changes to other files (README, tests, examples, scripts, memory system) do **not** trigger releases.
+
+### Memory System Components
+
+The memory system is a development-time feature not included in the distribution zip:
+
+| Path | Purpose |
+|------|---------|
+| `.crux/crux-memories.json` | Memory system configuration and feature flags |
+| `.crux/memory-index.yml` | Prioritised memory index for agent discovery |
+| `memories/` | Memory file storage (by type: `core/`, `learning/`, `redflag/`, `goal/`, `idea/`) |
+| `memories/agents/` | Agent-scoped memory storage |
+| `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent definition |
+| `.cursor/commands/crux-dream.md` | Dream extraction command |
+| `.cursor/commands/crux-mindreader.md` | Memory query command |
+| `.cursor/skills/crux-skill-memory-*/` | Memory operation skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
+| `crux_mcp_server/` | MCP server for semantic memory search |
+| `evals/` | Python-based eval tests for memory workflows |
+
+### Plugin System
+
+CRUX Compress supports an optional plugin architecture that extends the compression workflow with lifecycle hooks.
+
+#### Registry Structure
+
+Plugins are declared in `.crux/plugins/registry.json`:
+
+```json
+{
+  "plugins": {
+    "<plugin-name>": {
+      "description": "What the plugin does",
+      "hooks": ["beforeCompress", "afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": false
+    }
+  }
+}
+```
+
+Each plugin entry requires:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `description` | string | Human-readable purpose |
+| `hooks` | string[] | Lifecycle hooks the plugin binds to |
+| `failClosed` | boolean | Whether plugin failure blocks compression |
+| `enabledByDefault` | boolean | Whether the plugin loads without explicit `--plugin` flag |
+
+#### Hook Lifecycle
+
+Plugins execute at predefined points in the compression flow:
+
+1. `beforeFetch` — URL sources only, before content is fetched
+2. `beforeCompress` — after source resolution, before compression begins
+3. *Base compression* (core workflow)
+4. `afterCompress` — after CRUX output is generated
+5. *Semantic validation* (core workflow)
+6. `afterValidate` — after validation produces a confidence score
+
+#### Default Plugin Loading (`enabledByDefault`)
+
+Plugins with `enabledByDefault: true` load automatically when no `--plugin` flags are given. Users can opt out with `--no-plugin <name>`. When explicit `--plugin` flags are present, only the named plugins load (defaults are not implicitly added).
+
+#### Adding a New Plugin
+
+1. Add an entry to `.crux/plugins/registry.json` with the required fields
+2. Create a spec file at `.crux/plugins/<plugin-name>.md` documenting the plugin's behavior, inputs, and outputs for each hook
+3. Update the command spec (`.cursor/commands/crux-compress.md`) and agent spec (`.cursor/agents/crux-cursor-rule-manager.md`) if the plugin requires behavioral changes
+4. Add tests in `evals/` validating the registry entry and plugin behavior
+5. Use `compression-level` (`.crux/plugins/compression-level.md`) as the canonical reference implementation
 
 ### Manual Version Bump
 

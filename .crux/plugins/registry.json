@@ -1,19 +1,28 @@
 {
   "plugins": {
+    "compression-level": {
+      "description": "Enforce compression ratio targets and generate token metrics.",
+      "hooks": ["beforeCompress", "afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": true
+    },
     "frontmatter-tagger": {
       "description": "Add standardized metadata after compression.",
       "hooks": ["afterCompress"],
-      "failClosed": false
+      "failClosed": false,
+      "enabledByDefault": false
     },
     "quality-gate": {
       "description": "Apply additional policy checks after validation.",
       "hooks": ["afterValidate"],
-      "failClosed": false
+      "failClosed": false,
+      "enabledByDefault": false
     },
     "release-notes": {
       "description": "Collect per-file reduction metrics for release summaries.",
       "hooks": ["afterCompress", "afterValidate"],
-      "failClosed": false
+      "failClosed": false,
+      "enabledByDefault": false
     }
   }
 }

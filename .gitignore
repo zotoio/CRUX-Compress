@@ -45,6 +45,11 @@ temp/
 *.temp
 *.bak
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+
 # Build outputs
 dist/
 build/
@@ -53,3 +58,6 @@ out/
 # X-Fidelity analysis results
 .xfiResults/
 *.zip
+
+# Archive directory
+.ai-ignored/

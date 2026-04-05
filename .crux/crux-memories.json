@@ -1,0 +1,98 @@
+{
+  "platform": "cursor",
+
+  "flags": [
+    { "enableMemories": "true" },
+    { "enableMemoryCompression": "true" },
+    { "enableMemoryConsolidation": "true" }
+  ],
+
+  "cruxMemories": {
+    "enabled": "${flags.enableMemories}",
+    "compression": "${flags.enableMemoryCompression}",
+    "consolidation": "${flags.enableMemoryConsolidation}",
+
+    "storage": {
+      "memoriesDir": "memories",
+      "agentMemoriesDir": "memories/agents",
+      "archiveDir": ".ai-ignored/executed",
+      "compressionSourceArchive": ".ai-ignored/memories/sources",
+      "indexFile": ".crux/memory-index.yml"
+    },
+
+    "sizeUnit": "lines",
+    "compressionMinLines": 500,
+    "maxMemorySize": 1000,
+    "maxConsolidatedSize": 2000,
+    "compressionTarget": 33,
+    "unitOfWork": "spec",
+
+    "commands": {
+      "dream": {
+        "file": ".cursor/commands/crux-dream.md",
+        "default": "/crux-dream",
+        "description": "Post-execution memory extraction and consolidation"
+      },
+      "mindReader": {
+        "file": ".cursor/commands/crux-mindreader.md",
+        "default": "/crux-mindreader",
+        "description": "Decompress and view memories in chat"
+      }
+    },
+
+    "hooks": {
+      "sessionStartNudge": {
+        "trigger": "sessionStart",
+        "watchDir": "specs",
+        "threshold": 20,
+        "message": "Agent: 🥱 I need a nap to process what we've been working on. Run /crux-dream in a fresh thinking agent. I'll wake up fresh and ready for our next spec after that!"
+      }
+    },
+
+    "dream": {
+      "maxCandidateFacts": 5,
+      "maxUnrelatedChanges": 50,
+      "stateFile": "_execution-state.yml",
+      "workDir": "specs",
+      "summaryPattern": "dream-{slug}-{yyyymmdd}.md"
+    },
+
+    "typePriority": ["core", "redflag", "goal", "learning", "idea", "archived"],
+
+    "typeTransitions": {
+      "idea":     { "promoteAt": 5,  "promoteTo": "learning" },
+      "learning": { "promoteAt": 15, "promoteTo": "core" },
+      "redflag":  { "promoteAt": 10, "promoteTo": "core" },
+      "core":     { "promoteAt": null },
+      "goal":     { "promoteAt": null }
+    },
+
+    "demoteAfterDaysUnreferenced": 90,
+    "archiveAfterDaysUnreferenced": 180,
+
+    "referenceTracking": {
+      "enabled": true,
+      "trackingDir": ".crux/reference-tracking",
+      "indicateInOutput": true,
+      "indicatorFormat": "[memory:{title}]",
+      "promotionToRuleThreshold": 30,
+      "maxReferencesStored": 10
+    },
+
+    "scopeRanking": ["base", "agents", "shared"],
+
+    "scopes": {
+      "base": {
+        "memoriesDir": "memories",
+        "readonly": false
+      },
+      "agents": {
+        "memoriesDir": "memories/agents/{agent-id}",
+        "readonly": false,
+        "writeOnlyDuringDream": true,
+        "boostSameType": true
+      },
+      "shared": []
+    }
+  }
+}

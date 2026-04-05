@@ -51,19 +51,20 @@ jobs:
           DATE=$(date +%Y-%m-%d)
           MANIFEST=".crux/crux-release-files.json"
           
-          # Files included in release (must match create-crux-zip.sh)
+          # Files included in release (must match create-crux-zip.py)
           RELEASE_FILES=(
             "CRUX.md"
+            "install.crux.md"
             ".crux/crux.json"
             "AGENTS.md"
             ".cursor/hooks.json"
             ".cursor/agents/crux-cursor-rule-manager.md"
             ".cursor/commands/crux-compress.md"
-            ".cursor/hooks/crux-detect-changes.sh"
-            ".cursor/hooks/crux-session-start.sh"
+            ".cursor/hooks/crux-detect-changes.py"
+            ".cursor/hooks/crux-session-start.py"
             ".cursor/rules/_CRUX-RULE.mdc"
             ".cursor/skills/crux-utils/SKILL.md"
-            ".cursor/skills/crux-utils/scripts/crux-utils.sh"
+            ".cursor/skills/crux-utils/scripts/crux-utils.py"
           )
           
           echo "Generating checksums for release v${VERSION}..."
@@ -131,8 +132,7 @@ jobs:
       - name: Build distribution zip
         if: steps.tag_check.outputs.exists == 'false'
         run: |
-          chmod +x scripts/create-crux-zip.sh
-          ./scripts/create-crux-zip.sh .
+          python3 scripts/create-crux-zip.py .
           ls -la CRUX-Compress-*.zip
 
       - name: Generate release notes and changelog
@@ -166,7 +166,7 @@ jobs:
             echo "## Installation"
             echo ""
             echo '```bash'
-            echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash"
+            echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.py | python3 -"
             echo '```'
             echo ""
             echo "Or download the zip manually and extract to your project root."
@@ -270,7 +270,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install Command**:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash" >> $GITHUB_STEP_SUMMARY
+          echo "curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.py | python3 -" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Skip message
