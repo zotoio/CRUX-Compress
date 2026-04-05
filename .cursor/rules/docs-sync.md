@@ -18,14 +18,14 @@ When you modify files that affect project functionality or workflows, update the
 ## Trigger Files → Documentation Updates.
 
 ### README.md Updates
-- `install.sh` - Update installation instructions
+- `install.py` - Update installation instructions
 - `CRUX.md` - Update specification references or examples
 - `.cursor/commands/*` - Update command usage examples
 - `.cursor/skills/*/SKILL.md` - Update skill descriptions
 
 ### CONTRIBUTORS.md Updates
 - `.github/workflows/*.yml` - Update CI/CD flow diagram and descriptions
-- `tests/*.bats` - Update test structure or running instructions
+- `evals/*.py` - Update test structure or running instructions
 - `scripts/*.sh` - Update development setup if scripts change
 - `tests/helpers.bash` - Update test helper documentation
 

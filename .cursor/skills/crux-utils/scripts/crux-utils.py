@@ -3,12 +3,15 @@
 
 Usage:
     crux-utils.py --token-count <file>
-    crux-utils.py --token-count --ratio <source_file> <crux_file>
+    crux-utils.py --token-count --ratio <source_file> <crux_file> [--target <n>]
     crux-utils.py --cksum <file>
 
 Modes:
     --token-count   Estimate token count for a file
     --cksum         Get checksum of a file (for sourceChecksum tracking)
+
+Options:
+    --target <n>    Set compression target percentage (1-100, default 25)
 """
 
 from __future__ import annotations
@@ -87,7 +90,7 @@ def _estimate_tokens(filepath: str) -> int:
     return total_tokens
 
 
-def _calculate_ratio(source_file: str, crux_file: str) -> None:
+def _calculate_ratio(source_file: str, crux_file: str, target: int = 25) -> None:
     print("=== Compression Ratio Analysis ===")
     print()
 
@@ -103,10 +106,10 @@ def _calculate_ratio(source_file: str, crux_file: str) -> None:
     if source_tokens > 0:
         ratio = round((crux_tokens * 100) / source_tokens, 1)
         reduction = round(100 - ratio, 1)
-        target_met = "YES" if ratio <= 20 else "NO"
+        target_met = "YES" if ratio <= target else "NO"
         print(f"Ratio:             {ratio}% of original")
         print(f"Reduction:         {reduction}%")
-        print(f"Target (≤20%):     {target_met}")
+        print(f"Target (≤{target}%):    {target_met}")
 
 
 def _run_cksum(filepath: str) -> None:
@@ -140,7 +143,7 @@ CRUX Utils - Multi-purpose utility for CRUX compression workflows
 
 Usage:
   crux-utils.py --token-count <file>
-  crux-utils.py --token-count --ratio <source_file> <crux_file>
+  crux-utils.py --token-count --ratio <source_file> <crux_file> [--target <n>]
   crux-utils.py --cksum <file>
 
 Modes:
@@ -149,9 +152,14 @@ Modes:
   --cksum         Get checksum of a file (for sourceChecksum tracking)
                   Output format: "checksum" (for CRUX frontmatter)
 
+Options:
+  --target <n>    Set compression target percentage (1-100, default 25)
+                  Only used with --ratio mode
+
 Examples:
   crux-utils.py --token-count myfile.md
   crux-utils.py --token-count --ratio source.md source.crux.md
+  crux-utils.py --token-count --ratio source.md source.crux.md --target 40
   crux-utils.py --cksum myfile.md""")
 
 
@@ -171,15 +179,31 @@ def main() -> None:
         if not rest:
             print("Error: --token-count requires a file argument", file=sys.stderr)
             print("Usage: crux-utils.py --token-count <file>", file=sys.stderr)
-            print("       crux-utils.py --token-count --ratio <source> <crux>", file=sys.stderr)
+            print("       crux-utils.py --token-count --ratio <source> <crux> [--target <n>]", file=sys.stderr)
             sys.exit(1)
 
         if rest[0] == "--ratio":
-            if len(rest) != 3:
+            ratio_args = rest[1:]
+            target = 25
+            if "--target" in ratio_args:
+                ti = ratio_args.index("--target")
+                if ti + 1 >= len(ratio_args):
+                    print("Error: --target requires a numeric argument", file=sys.stderr)
+                    sys.exit(1)
+                try:
+                    target = int(ratio_args[ti + 1])
+                except ValueError:
+                    print(f"Error: --target must be an integer, got '{ratio_args[ti + 1]}'", file=sys.stderr)
+                    sys.exit(1)
+                if target < 1 or target > 100:
+                    print(f"Error: --target must be 1-100, got {target}", file=sys.stderr)
+                    sys.exit(1)
+                ratio_args = ratio_args[:ti] + ratio_args[ti + 2:]
+            if len(ratio_args) != 2:
                 print("Error: --ratio requires two file arguments", file=sys.stderr)
-                print("Usage: crux-utils.py --token-count --ratio <source> <crux>", file=sys.stderr)
+                print("Usage: crux-utils.py --token-count --ratio <source> <crux> [--target <n>]", file=sys.stderr)
                 sys.exit(1)
-            _calculate_ratio(rest[1], rest[2])
+            _calculate_ratio(ratio_args[0], ratio_args[1], target)
         else:
             _estimate_tokens(rest[0])
 

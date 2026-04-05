@@ -12,19 +12,19 @@
 Add a CRUX Memories feature section to the website landing page (`web/compress.md/index.html`) so the feature is discoverable. The section should be concise, note the opt-in nature, and link to the README for details.
 
 ## Deliverables Checklist
-- [ ] New "Memories" feature card or section added to `web/compress.md/index.html`
-- [ ] Content covers: what memories are (learning from completed work), lifecycle (Dream/REM/MindReader), opt-in nature
-- [ ] Visual style consistent with existing feature cards (rules, images, code, URLs)
+- [x] New "Memories" feature card or section added to `web/compress.md/index.html`
+- [x] Content covers: what memories are (learning from completed work), lifecycle (Dream/REM/MindReader), opt-in nature
+- [x] Visual style consistent with existing feature cards (rules, images, code, URLs)
 - [ ] Link to README memories section for detailed documentation
-- [ ] Note that memories are disabled by default and require explicit enablement
-- [ ] Update quickstart install command from `install.sh | bash` to `install.py | python3 -` (lines ~406 and ~414 reference stale `install.sh`)
+- [x] Note that memories are disabled by default and require explicit enablement
+- [x] Update quickstart install command from `install.sh | bash` to `install.py | python3 -` (lines ~406 and ~414 reference stale `install.sh`)
 
 ## Definition of Done
-- [ ] Website HTML is well-formed (no unclosed tags)
-- [ ] New section uses existing CSS classes and design patterns
-- [ ] No JavaScript errors introduced
-- [ ] Content accurately represents the memories feature as documented in README
-- [ ] No linter errors in modified files
+- [x] Website HTML is well-formed (no unclosed tags)
+- [x] New section uses existing CSS classes and design patterns
+- [x] No JavaScript errors introduced
+- [x] Content accurately represents the memories feature as documented in README
+- [x] No linter errors in modified files
 
 ## Implementation Notes
 
@@ -56,18 +56,51 @@ The memories section should convey:
 - Defer full website verification to subtask 08
 
 ## Execution Notes
-[To be filled by executing agent]
 
 ### Agent Session Info
-- Agent: [Not yet assigned]
-- Started: [Not yet started]
-- Completed: [Not yet completed]
+- Agent: generalPurpose (subtask 04 executor)
+- Started: 20260404
+- Completed: 20260404
 
 ### Work Log
-[Agent adds notes here during execution]
+1. Read full HTML structure of `web/compress.md/index.html` and `styles/main.css` to understand design patterns
+2. Added new `section--memories` HTML section between URL Compression and Notation sections (lines 208-247)
+3. Added CSS styles for `.section--memories`, `.memories-modes` grid, `.memories-mode` cards, `.memories-optin` notice, and `.memories-optin-badge` — uses teal accent (`--accent-verbose`) to visually distinguish from compression type sections which use amber
+4. Updated quickstart install command from `install.sh | bash` to `install.py | python3 -` in both `data-copy` attribute and visible `<pre><code>` block
+5. Updated prerequisites from `unzip` to `python3`
+6. Verified no linter errors in modified files
 
 ### Blockers Encountered
-[Any blockers or issues]
+None
 
 ### Files Modified
-[List of files changed]
+- `web/compress.md/index.html` — added memories section, updated install command and prerequisites
+- `web/compress.md/styles/main.css` — added memories section CSS styles
+
+### Adversarial Verification (integrity-expert, 20260404)
+
+**Verdict: PARTIAL — 1 item unchecked**
+
+#### Deliverables Verification
+
+| # | Item | Status | Evidence |
+|---|------|--------|----------|
+| 1 | Memories section added | PASS | `index.html` lines 208-247: `<section id="memories" class="section section--memories">` with Dream/REM/MindReader cards |
+| 2 | Content coverage | PASS | Intro text covers what memories are; three mode cards cover Dream, REM Sleep, MindReader; opt-in badge present |
+| 3 | Visual consistency | PASS | Uses existing `.section`, `.section-content`, `.section-title`, `.section-intro`, `.spec-link` classes; CSS uses same design tokens (`--bg-tertiary`, `--border-subtle`, `--radius-lg`); teal accent (`--accent-verbose`) intentionally differentiates from compression-type sections |
+| 4 | README link | **FAIL** | Link at line 243 targets `README.md#crux-memories` but README heading is `## Memories` (line 574), generating anchor `#memories`. The link will land on the README page but will NOT scroll to the correct section. Fix: change `#crux-memories` to `#memories` |
+| 5 | Opt-in noted | PASS | Lines 238-241: "Memories are disabled by default. Enable via `.crux/crux-memories.json`" — matches README wording |
+| 6 | Install command updated | PASS | `data-copy` attribute (line 447) and `<pre><code>` block (line 455) both use `install.py \| python3 -`; prerequisites updated to `python3` (line 442) |
+
+#### Definition of Done Verification
+
+| # | Item | Status | Evidence |
+|---|------|--------|----------|
+| 1 | Well-formed HTML | PASS | All tags in memories section (lines 208-247) properly opened and closed; document structure intact |
+| 2 | Existing CSS classes | PASS | New CSS (main.css lines 1766-1864) follows established patterns; responsive breakpoint at 768px consistent with other sections |
+| 3 | No JS errors | PASS | No JavaScript added; memories section is pure HTML/CSS; existing script references unchanged |
+| 4 | Content accuracy | PASS | Dream/REM Sleep/MindReader descriptions match README § Memories; opt-in mechanism matches README § Enabling Memories |
+| 5 | No linter errors | PASS | `ReadLints` on both files returned zero errors |
+
+#### Required Fix
+- `web/compress.md/index.html` line 243: Change `README.md#crux-memories` → `README.md#memories` to match the actual GitHub-generated anchor for `## Memories`

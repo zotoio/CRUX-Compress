@@ -134,6 +134,71 @@ class TestTokenCount:
         assert result.returncode == 0
         assert "Compression Ratio" in result.stdout or "Compression Summary" in result.stdout
 
+    def test_ratio_default_target_is_25(self, tmp_path: Path):
+        source = tmp_path / "sample.md"
+        crux = tmp_path / "sample.crux.md"
+        source.write_text(SAMPLE_MD, encoding="utf-8")
+        crux.write_text(SAMPLE_CRUX, encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux)])
+        assert result.returncode == 0
+        assert "Target (≤25%)" in result.stdout
+
+    def test_ratio_explicit_target(self, tmp_path: Path):
+        source = tmp_path / "sample.md"
+        crux = tmp_path / "sample.crux.md"
+        source.write_text(SAMPLE_MD, encoding="utf-8")
+        crux.write_text(SAMPLE_CRUX, encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux), "--target", "40"])
+        assert result.returncode == 0
+        assert "Target (≤40%)" in result.stdout
+
+    def test_ratio_target_zero_rejected(self, tmp_path: Path):
+        source = tmp_path / "a.md"
+        crux = tmp_path / "b.md"
+        source.write_text("text", encoding="utf-8")
+        crux.write_text("text", encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux), "--target", "0"])
+        assert result.returncode == 1
+        assert "must be 1-100" in result.stderr
+
+    def test_ratio_target_101_rejected(self, tmp_path: Path):
+        source = tmp_path / "a.md"
+        crux = tmp_path / "b.md"
+        source.write_text("text", encoding="utf-8")
+        crux.write_text("text", encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux), "--target", "101"])
+        assert result.returncode == 1
+        assert "must be 1-100" in result.stderr
+
+    def test_ratio_target_non_integer_rejected(self, tmp_path: Path):
+        source = tmp_path / "a.md"
+        crux = tmp_path / "b.md"
+        source.write_text("text", encoding="utf-8")
+        crux.write_text("text", encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux), "--target", "abc"])
+        assert result.returncode == 1
+        assert "must be an integer" in result.stderr
+
+    def test_ratio_target_missing_value_rejected(self):
+        result = _run(["--token-count", "--ratio", "a.md", "b.md", "--target"])
+        assert result.returncode == 1
+        assert "requires a numeric argument" in result.stderr
+
+    def test_ratio_without_target_works(self, tmp_path: Path):
+        source = tmp_path / "sample.md"
+        crux = tmp_path / "sample.crux.md"
+        source.write_text(SAMPLE_MD, encoding="utf-8")
+        crux.write_text(SAMPLE_CRUX, encoding="utf-8")
+
+        result = _run(["--token-count", "--ratio", str(source), str(crux)])
+        assert result.returncode == 0
+        assert "Compression Summary" in result.stdout
+
     def test_ratio_fails_with_one_arg(self, tmp_path: Path):
         sample = tmp_path / "sample.md"
         sample.write_text(SAMPLE_MD, encoding="utf-8")

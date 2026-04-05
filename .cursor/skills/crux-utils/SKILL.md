@@ -13,8 +13,11 @@ Multi-purpose utility for CRUX compression workflows. Provides deterministic too
 # Token count estimation
 python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count <file>
 
-# Compare source vs CRUX (ratio mode)
+# Compare source vs CRUX (ratio mode, default target 25%)
 python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux>
+
+# Compare with custom target (e.g. 40%)
+python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux> --target 40
 
 # Get checksum for sourceChecksum frontmatter
 python3 .cursor/skills/crux-utils/scripts/crux-utils.py --cksum <file>
@@ -36,9 +39,11 @@ Special tokens:    0
 TOTAL TOKENS:      397
 ```
 
-### `--token-count --ratio <source> <crux>`
+### `--token-count --ratio <source> <crux> [--target <n>]`
 
 Compare source file vs CRUX file and calculate compression ratio.
+
+The `--target` option sets the compression target percentage (1-100). Defaults to 25 if omitted, matching the CRUX spec's recommended target for text/code content.
 
 **Output:**
 ```
@@ -54,7 +59,7 @@ Source tokens:     397
 CRUX tokens:       140
 Ratio:             35.2% of original
 Reduction:         64.8%
-Target (≤20%):     NO
+Target (≤25%):     NO
 ```
 
 ### `--cksum <file>`
@@ -102,4 +107,5 @@ Both modes produce identical output for identical input:
 1. Get source checksum: `--cksum <source>` → use FRONTMATTER value for `sourceChecksum`
 2. Estimate source tokens: `--token-count <source>` → use for `beforeTokens`
 3. After compression: `--token-count <crux>` → use for `afterTokens`
-4. Verify ratio: `--token-count --ratio <source> <crux>` → check Target (≤20%)
+4. Verify ratio: `--token-count --ratio <source> <crux>` → check Target (≤25%)
+   - For custom targets: `--token-count --ratio <source> <crux> --target 40`

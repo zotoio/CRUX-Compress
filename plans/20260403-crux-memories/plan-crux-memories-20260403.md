@@ -1,7 +1,7 @@
 # Plan: CRUX Memories System
 
 ## Status
-Ready for Review
+Complete
 
 ## Overview
 
@@ -137,22 +137,33 @@ graph TD
 | 14 | docs-sync-agent | Documentation updates — README.md, CONTRIBUTORS.md, AGENTS.md |
 
 ## Definition of Done
-- [ ] All 14 subtasks completed
-- [ ] All Python tests passing (`pytest evals/`)
-- [ ] No linter errors in modified files
-- [ ] Documentation updated (README.md, CONTRIBUTORS.md, AGENTS.md)
-- [ ] CRUX files updated for any modified source rules
-- [ ] `.crux/crux-memories.json` config validates against spec schema
-- [ ] `memories/` directory tree matches spec structure
-- [ ] MCP server starts in both HTTP and stdio modes
-- [ ] All 6 skills have SKILL.md with clear instructions
-- [ ] Agent definition references all skills correctly
-- [ ] Commands invoke agent correctly
-- [ ] Cursor hooks detect memory-enabled config and behave accordingly
+- [x] All 14 subtasks completed
+- [x] All Python tests passing (`pytest evals/`)
+- [x] No linter errors in modified files
+- [x] Documentation updated (README.md, CONTRIBUTORS.md, AGENTS.md)
+- [x] CRUX files updated for any modified source rules
+- [x] `.crux/crux-memories.json` config validates against spec schema
+- [x] `memories/` directory tree matches spec structure
+- [x] MCP server starts in both HTTP and stdio modes
+- [x] All 6 skills have SKILL.md with clear instructions
+- [x] Agent definition references all skills correctly
+- [x] Commands invoke agent correctly
+- [x] Cursor hooks detect memory-enabled config and behave accordingly
 
 ## Rollback
 
 All changes are on the `feat/memories` branch. To revert, reset the branch to pre-execution state. No changes are made to `main` until the plan is complete and merged.
 
 ## Execution Notes
-[Filled in during/after execution]
+
+All 14 subtasks were executed across phases 1-7 on 2026-04-03/04. Key outcomes:
+
+- **6 memory skills** implemented: CRUD, reference-tracker, compress, index, extract, rebalance
+- **1 agent** (`crux-cursor-memory-manager`) with full skill orchestration
+- **2 commands** (`/crux-dream`, `/crux-mindreader`) as user entry points
+- **MCP server** (`crux_mcp_server/`) with HTTP+stdio transport, modular tool registration
+- **18 eval test files** in `evals/` covering categories A-N
+- **Cursor wiring**: integration rule, session-start hook, post-dream workflow script
+- **Documentation** updated: README.md, CONTRIBUTORS.md, AGENTS.md
+
+DoD verified and closed out by subtask 05 of the Memories & Plugin Integration plan on 2026-04-04.

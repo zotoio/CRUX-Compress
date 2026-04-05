@@ -8,11 +8,12 @@ Usage:
     python3 .crux/update.py [-y] [--force] [--backup] [--verbose]
 
 Options:
-    -y         Non-interactive mode, assume yes to all confirmations
-    --force    Backup current installation and install regardless of version
-    --backup   Create backups of existing files before overwriting
-    --verbose  Show detailed progress
-    --help     Show this help message
+    -y               Non-interactive mode, assume yes to all confirmations
+    --force          Backup current installation and install regardless of version
+    --backup         Create backups of existing files before overwriting
+    --verbose        Show detailed progress
+    --with-memories  Set up optional memory system scaffolding
+    --help           Show this help message
 """
 
 from __future__ import annotations
@@ -499,7 +500,127 @@ def download_update_script() -> None:
     log_warn("Could not download update script")
 
 
-def show_completion_report(version: str, backup_zip: str) -> None:
+DEFAULT_MEMORIES_CONFIG = {
+    "platform": "cursor",
+    "flags": [
+        {"enableMemories": "false"},
+        {"enableMemoryCompression": "false"},
+    ],
+    "cruxMemories": {
+        "enabled": "${flags.enableMemories}",
+        "compression": "${flags.enableMemoryCompression}",
+        "storage": {
+            "memoriesDir": "memories",
+            "agentMemoriesDir": "memories/agents",
+            "archiveDir": ".ai-ignored/executed",
+            "compressionSourceArchive": ".ai-ignored/memories/sources",
+            "indexFile": ".crux/memory-index.yml",
+        },
+        "maxMemorySize": 2048,
+        "compressionTarget": 33,
+        "unitOfWork": "plan",
+        "commands": {
+            "dream": {
+                "file": ".cursor/commands/crux-dream.md",
+                "default": "/crux-dream",
+                "description": "Post-execution memory extraction and consolidation",
+            },
+            "mindReader": {
+                "file": ".cursor/commands/crux-mindreader.md",
+                "default": "/crux-mindreader",
+                "description": "Decompress and view memories in chat",
+            },
+        },
+        "hooks": {
+            "sessionStartNudge": {
+                "trigger": "sessionStart",
+                "watchDir": "plans",
+                "threshold": 20,
+                "message": (
+                    "Agent: I need a nap to process what we've been working on. "
+                    "Run /crux-dream in a fresh thinking agent. "
+                    "I'll wake up fresh and ready for our next plan after that!"
+                ),
+            },
+        },
+        "dream": {
+            "maxCandidateFacts": 5,
+            "maxUnrelatedChanges": 50,
+            "stateFile": "_execution-state.yml",
+            "workDir": "plans",
+            "summaryPattern": "dream-{slug}-{yyyymmdd}.md",
+        },
+        "typePriority": ["core", "redflag", "goal", "learning", "idea", "archived"],
+        "typeTransitions": {
+            "idea": {"promoteAt": 5, "promoteTo": "learning"},
+            "learning": {"promoteAt": 15, "promoteTo": "core"},
+            "redflag": {"promoteAt": 10, "promoteTo": "core"},
+            "core": {"promoteAt": None},
+            "goal": {"promoteAt": None},
+        },
+        "demoteAfterDaysUnreferenced": 90,
+        "archiveAfterDaysUnreferenced": 180,
+        "referenceTracking": {
+            "enabled": True,
+            "trackingDir": ".crux/reference-tracking",
+            "indicateInOutput": True,
+            "indicatorFormat": "[memory:{title}]",
+            "promotionToRuleThreshold": 30,
+            "maxReferencesStored": 10,
+        },
+        "scopeRanking": ["base", "agents", "shared"],
+        "scopes": {
+            "base": {"memoriesDir": "memories", "readonly": False},
+            "agents": {
+                "memoriesDir": "memories/agents/{agent-id}",
+                "readonly": False,
+                "writeOnlyDuringDream": True,
+                "boostSameType": True,
+            },
+            "shared": [],
+        },
+    },
+}
+
+
+def setup_memories() -> bool:
+    """Create memory system scaffolding. Returns True on success."""
+    config_path = Path(".crux/crux-memories.json")
+    memories_dir = Path("memories")
+    agents_dir = Path("memories/agents")
+    tracking_dir = Path(".crux/reference-tracking")
+
+    if config_path.is_file():
+        log_warn(f"{config_path} already exists, skipping memory config creation")
+    else:
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(
+            json.dumps(DEFAULT_MEMORIES_CONFIG, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        log_success(f"Created {config_path}")
+
+    for d in (memories_dir, agents_dir, tracking_dir):
+        d.mkdir(parents=True, exist_ok=True)
+        log_verbose(f"Created directory: {d}")
+
+    print()
+    print(f"{CYAN}Memory System Scaffolding{NC}")
+    print(f"{'─' * 40}")
+    print(f"  Config:   {config_path}")
+    print(f"  Storage:  {memories_dir}/")
+    print(f"  Tracking: {tracking_dir}/")
+    print()
+    print("To enable memories:")
+    print(f"  1. Set {CYAN}enableMemories{NC} to {GREEN}\"true\"{NC} in {config_path}")
+    print("  2. Optionally configure MCP server for semantic search")
+    print("  3. Use /crux-dream after completing plans to extract learnings")
+    print()
+
+    return True
+
+
+def show_completion_report(version: str, backup_zip: str, with_memories: bool = False) -> None:
     print()
     print(f"{GREEN}{'=' * 43}{NC}")
     print(f"{GREEN}     Installation Complete!{NC}")
@@ -525,10 +646,18 @@ def show_completion_report(version: str, backup_zip: str) -> None:
         print(f"  unzip -o '{backup_zip}'")
         print()
 
+    if with_memories:
+        print(f"{CYAN}Memories:{NC}")
+        print("  Memory system scaffolding installed (disabled by default).")
+        print("  To enable: set enableMemories to \"true\" in .crux/crux-memories.json")
+        print()
+
     print("Next steps:")
     print("  1. Ensure .cursor/hooks.json is recognized by Cursor")
     print("  2. Add 'crux: true' to any rule files you want to compress")
     print("  3. Use /crux-compress ALL to compress eligible files")
+    if not with_memories:
+        print("  4. Run with --with-memories to add optional memory system")
     print()
     print("For updates, run:")
     print("  python3 .crux/update.py")
@@ -553,12 +682,15 @@ def main() -> None:
     parser.add_argument("--force", action="store_true", help="Backup and install regardless of version")
     parser.add_argument("--backup", action="store_true", help="Create backups of existing files")
     parser.add_argument("--verbose", action="store_true", help="Show detailed progress")
+    parser.add_argument("--with-memories", action="store_true",
+                        help="Set up optional memory system scaffolding")
     args = parser.parse_args()
 
     VERBOSE = args.verbose
     NON_INTERACTIVE = args.y
     do_backup = args.backup
     force = args.force
+    with_memories = args.with_memories
     if force:
         do_backup = True
 
@@ -641,7 +773,11 @@ def main() -> None:
     install_from_staging(staging_dir)
     shutil.rmtree(staging_dir.parent, ignore_errors=True)
     download_update_script()
-    show_completion_report(latest_version, backup_zip)
+
+    if with_memories:
+        setup_memories()
+
+    show_completion_report(latest_version, backup_zip, with_memories=with_memories)
 
 
 if __name__ == "__main__":

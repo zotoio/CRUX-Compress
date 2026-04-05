@@ -205,6 +205,47 @@
     </div>
   </section>
 
+  <!-- S3e: CRUX Memories — Agent Learning Capability -->
+  <section id="memories" class="section section--memories">
+    <div class="section-content">
+      <h2 class="section-title">CRUX Memories</h2>
+      <p class="section-intro">Agents that learn. CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions.</p>
+
+      <div class="memories-modes">
+        <div class="memories-mode">
+          <div class="memories-mode-icon">D</div>
+          <div class="memories-mode-text">
+            <strong>Dream</strong>
+            <span>After a plan completes, the agent extracts learnings &mdash; patterns, red flags, ideas &mdash; and stores them as reusable memories</span>
+          </div>
+        </div>
+        <div class="memories-mode">
+          <div class="memories-mode-icon">R</div>
+          <div class="memories-mode-text">
+            <strong>REM Sleep</strong>
+            <span>Periodic rebalancing consolidates memories, promotes strong ones, archives weak ones, and resolves conflicts</span>
+          </div>
+        </div>
+        <div class="memories-mode">
+          <div class="memories-mode-icon">M</div>
+          <div class="memories-mode-text">
+            <strong>MindReader</strong>
+            <span>Query stored memories on demand &mdash; search by topic, type, or relevance to inform current work</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="memories-optin">
+        <span class="memories-optin-badge">Opt-in</span>
+        <span>Memories are disabled by default. Enable via <code>.crux/crux-memories.json</code> to start capturing agent learnings.</span>
+      </div>
+
+      <a href="https://github.com/zotoio/CRUX-Compress/blob/main/README.md#memories" class="spec-link" target="_blank" rel="noopener">
+        Learn more in the README &rarr;
+      </a>
+    </div>
+  </section>
+
   <!-- S3: The Notation — Interactive Spec Explorer -->
   <section id="notation" class="section section--notation">
     <div class="section-content">
@@ -398,12 +439,12 @@
       
       <div class="install-section">
         <h3>Installation</h3>
-        <p class="prereqs">Prerequisites: <code>curl</code>, <code>unzip</code>, <a href="https://cursor.sh" target="_blank" rel="noopener">Cursor IDE</a></p>
+        <p class="prereqs">Prerequisites: <code>curl</code>, <code>python3</code>, <a href="https://cursor.sh" target="_blank" rel="noopener">Cursor IDE</a></p>
         
         <div class="code-block code-block--install">
           <div class="code-block-header">
             <span class="code-block-label">Terminal</span>
-            <button class="copy-button" data-copy="curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash">
+            <button class="copy-button" data-copy="curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 -">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
@@ -411,7 +452,7 @@
               Copy
             </button>
           </div>
-          <pre><code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.sh | bash</code></pre>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 -</code></pre>
         </div>
       </div>
       
@@ -423,8 +464,8 @@
           <div class="file-tree-item"><code>.cursor/rules/_CRUX-RULE.mdc</code><span>Always-applied rule</span></div>
           <div class="file-tree-item"><code>.cursor/agents/crux-cursor-rule-manager.md</code><span>Compression agent</span></div>
           <div class="file-tree-item"><code>.cursor/commands/crux-compress.md</code><span>Compression command</span></div>
-          <div class="file-tree-item"><code>.cursor/hooks/crux-detect-changes.sh</code><span>Change detection hook</span></div>
-          <div class="file-tree-item"><code>.cursor/hooks/crux-session-start.sh</code><span>Session start hook</span></div>
+          <div class="file-tree-item"><code>.cursor/hooks/crux-detect-changes.py</code><span>Change detection hook</span></div>
+          <div class="file-tree-item"><code>.cursor/hooks/crux-session-start.py</code><span>Session start hook</span></div>
           <div class="file-tree-item"><code>.cursor/skills/crux-utils/</code><span>Utility skill</span></div>
           <div class="file-tree-item"><code>.crux/crux.json</code><span>Version tracker</span></div>
         </div>

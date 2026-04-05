@@ -12,20 +12,22 @@
 Implement the `compression-level` plugin as the reference default-enabled plugin. This includes updating the registry (already drafted in subtask 01), making `crux-utils.py` accept a configurable target, and documenting the plugin's behavior specification.
 
 ## Deliverables Checklist
-- [ ] `.crux/plugins/registry.json` finalized with the `compression-level` entry and `enabledByDefault` on all plugins (per subtask 01 design)
-- [ ] `crux-utils.py` updated: `--ratio` accepts optional `--target <n>` parameter (default 25)
-- [ ] `crux-utils.py` `--ratio` output shows target from `--target` instead of hardcoded 20%
-- [ ] `.cursor/skills/crux-utils/SKILL.md` updated to document `--target` parameter
-- [ ] Plugin behavior specification written (can be in a new file `.crux/plugins/compression-level.md` or inline in registry — decide based on subtask 01 design)
+- [x] `.crux/plugins/registry.json` finalized with the `compression-level` entry and `enabledByDefault` on all plugins (per subtask 01 design)
+- [x] `crux-utils.py` updated: `--ratio` accepts optional `--target <n>` parameter (default 25)
+- [x] `crux-utils.py` `--ratio` output shows target from `--target` instead of hardcoded 20%
+- [x] `.cursor/skills/crux-utils/SKILL.md` updated to document `--target` parameter
+- [x] Plugin behavior specification written (can be in a new file `.crux/plugins/compression-level.md` or inline in registry — decide based on subtask 01 design)
 
 ## Definition of Done
-- [ ] `crux-utils.py` syntax-checks cleanly
-- [ ] `crux-utils.py --ratio <source> <crux>` still works without `--target` (default 25)
-- [ ] `crux-utils.py --ratio <source> <crux> --target 40` uses 40% as target
-- [ ] Registry is valid JSON with all 4 plugins
-- [ ] Plugin behavior spec is clear enough for the agent to execute
-- [ ] No breaking changes to existing `crux-utils` usage
-- [ ] No linter errors in modified files
+- [x] `crux-utils.py` syntax-checks cleanly
+- [x] `crux-utils.py --ratio <source> <crux>` still works without `--target` (default 25)
+- [x] `crux-utils.py --ratio <source> <crux> --target 40` uses 40% as target
+- [x] Registry is valid JSON with all 4 plugins
+- [x] Plugin behavior spec is clear enough for the agent to execute
+- [x] No breaking changes to existing `crux-utils` usage
+- [x] No linter errors in modified files
+
+> **Adversarial verification completed 2026-04-04 — ALL items independently confirmed.**
 
 ## Implementation Notes
 
@@ -92,18 +94,79 @@ Recommendation: Option B, consistent with how agent/command specs work
 - Defer full test suite execution to subtask 08
 
 ## Execution Notes
-[To be filled by executing agent]
 
 ### Agent Session Info
-- Agent: [Not yet assigned]
-- Started: [Not yet started]
-- Completed: [Not yet completed]
+- Agent: generalPurpose (subtask executor)
+- Started: 2026-04-04
+- Completed: 2026-04-04
 
 ### Work Log
-[Agent adds notes here during execution]
+
+1. **Verified registry.json** — Confirmed subtask 01 already produced correct `compression-level` entry with `enabledByDefault: true`, `hooks: ["beforeCompress", "afterCompress"]`, `failClosed: false`. All 3 existing plugins have `enabledByDefault: false`. No changes needed.
+
+2. **Updated `crux-utils.py`** — Added `--target <n>` parameter support:
+   - `_calculate_ratio()` now accepts `target: int = 25` parameter (was hardcoded to 20)
+   - CLI parsing extracts `--target` from ratio args, validates range 1-100 and integer type
+   - Error handling for: missing value, non-integer, out-of-range
+   - Updated docstring and `--help` output to document `--target`
+   - Default changed from 20 to 25 to match CRUX spec
+
+3. **Syntax-checked** — `python3 -c "import ast; ast.parse(...)"` passes cleanly
+
+4. **Tested all scenarios**:
+   - `--ratio` without `--target`: shows `Target (≤25%): NO` (default 25)
+   - `--ratio --target 40`: shows `Target (≤40%): NO`
+   - `--ratio --target 15`: shows `Target (≤15%): NO`
+   - `--target 0`: error "must be 1-100"
+   - `--target abc`: error "must be an integer"
+   - `--target` (no value): error "requires a numeric argument"
+
+5. **Updated SKILL.md** — Added `--target` to Quick Start, ratio mode section, and workflow steps. Updated example output from `≤20%` to `≤25%`.
+
+6. **Wrote plugin behavior spec** — Created `.crux/plugins/compression-level.md` with full hook specifications (beforeCompress/afterCompress), context objects, failure modes, CLI integration, default targets table, and plugin interaction notes.
+
+### Adversarial Verification (integrity-expert, 2026-04-04)
+
+**Verdict: VERIFIED — all 12/12 items independently confirmed.**
+
+#### Deliverables Verification
+
+| # | Item | Result | Evidence |
+|---|------|--------|----------|
+| D1 | Registry finalized | PASS | Valid JSON, 4 plugins, `compression-level` has `enabledByDefault: true`, hooks `["beforeCompress","afterCompress"]`, `failClosed: false`. Other 3 plugins have `enabledByDefault: false`. |
+| D2 | `--target` parameter | PASS | `_calculate_ratio(source_file, crux_file, target=25)` at line 93. CLI parsing at lines 188-201 validates integer, range 1-100, missing value. |
+| D3 | Dynamic target output | PASS | Line 112: `f"Target (≤{target}%):    {target_met}"`. Tested: without `--target` shows `≤25%`, with `--target 40` shows `≤40%`. |
+| D4 | SKILL.md updated | PASS | Quick Start, mode syntax, explanatory paragraph, and workflow steps all document `--target`. Example output updated from `≤20%` to `≤25%`. |
+| D5 | Plugin behavior spec | PASS | `.crux/plugins/compression-level.md` (111 lines). Documents `beforeCompress` (input/output context, 5-step behavior, failure mode) and `afterCompress` (input/output context, 7-step behavior, failure mode). Includes CLI integration, default targets table, plugin interaction notes. |
+
+#### Definition of Done Verification
+
+| # | Item | Result | Evidence |
+|---|------|--------|----------|
+| DoD1 | Syntax-checks cleanly | PASS | `python3 -c "import ast; ast.parse(...)"` → `SYNTAX OK`, exit 0 |
+| DoD2 | `--ratio` without `--target` | PASS | Output: `Target (≤25%): YES`, exit 0 (tested with CRUX.md → AGENTS.md) |
+| DoD3 | `--ratio --target 40` | PASS | Output: `Target (≤40%): YES`, exit 0 |
+| DoD4 | Registry valid JSON, 4 plugins | PASS | `python3 -m json.tool` validates; enumerated: compression-level, frontmatter-tagger, quality-gate, release-notes |
+| DoD5 | Plugin spec clear | PASS | Detailed context tables, step-by-step behavior, failure modes, interaction notes — sufficient for agent execution |
+| DoD6 | No breaking changes | PASS | `--token-count` (exit 0), `--cksum` (exit 0), `--ratio` (exit 0) all work unchanged. Default target changed 20→25 (intentional, more lenient, matches CRUX spec). |
+| DoD7 | No linter errors | PASS | ReadLints on all 4 modified files: "No linter errors found" |
+
+#### Error-handling edge cases independently tested
+
+| Input | Expected | Actual | Status |
+|-------|----------|--------|--------|
+| `--target 0` | Error: must be 1-100 | `Error: --target must be 1-100, got 0` (exit 1) | PASS |
+| `--target abc` | Error: must be integer | `Error: --target must be an integer, got 'abc'` (exit 1) | PASS |
+| `--target` (no value) | Error: requires numeric arg | `Error: --target requires a numeric argument` (exit 1) | PASS |
+
+#### Observation (non-blocking)
+
+The default compression target changed from 20% to 25%. This is intentional per the subtask design ("to match CRUX spec") and is more lenient (no false negatives). Existing callers without `--target` will see `≤25%` instead of `≤20%` in output. This is acceptable and documented.
 
 ### Blockers Encountered
-[Any blockers or issues]
+None.
 
 ### Files Modified
-[List of files changed]
+- `.cursor/skills/crux-utils/scripts/crux-utils.py` — added `--target` parameter, changed default from 20 to 25
+- `.cursor/skills/crux-utils/SKILL.md` — documented `--target`, updated examples
+- `.crux/plugins/compression-level.md` — **new file**, plugin behavior specification

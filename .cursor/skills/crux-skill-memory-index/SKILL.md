@@ -22,7 +22,20 @@ python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py
 
 # Rebuild with a custom config path
 python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py --config path/to/config.json
+
+# Post-dream rebuild (checks enableMemories flag, then rebuilds)
+python .cursor/skills/crux-skill-memory-index/scripts/post-dream.py
 ```
+
+### Post-Dream Rebuild
+
+The `post-dream.py` script is a convenience wrapper invoked programmatically by the `/crux-dream` workflow after memory extraction or REM sleep completes. It:
+
+1. Checks `.crux/crux-memories.json` — exits early if `enableMemories` is not `"true"`
+2. Calls `memory-index.py` to rebuild the index
+3. The MCP server's file watcher detects the index timestamp change automatically
+
+This script is **not** a Cursor event hook and is **not** registered in `.cursor/hooks.json`.
 
 ## Configuration
 

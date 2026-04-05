@@ -6,8 +6,10 @@ hooks.json merging, AGENTS.md upsert, checksum, and preview logic.
 
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -68,6 +70,11 @@ class TestCLIFlags:
         assert r.returncode == 0
         for kw in ("CRUX Compress", "--backup", "--verbose", "--force"):
             assert kw in r.stdout, f"Missing keyword: {kw}"
+
+    def test_help_contains_with_memories(self):
+        r = _run(["--help"])
+        assert r.returncode == 0
+        assert "--with-memories" in r.stdout
 
     def test_help_contains_curl(self):
         text = INSTALL_SCRIPT.read_text(encoding="utf-8")
@@ -400,3 +407,121 @@ class TestPreview:
         assert "NO CHANGE" in out
         assert "UPDATE" in out
         assert "CREATE" in out
+
+
+# ── Memory scaffolding (--with-memories) ──
+
+
+class TestWithMemoriesFlag:
+    def test_argparse_accepts_with_memories(self):
+        mod = _load_install()
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--with-memories", action="store_true")
+        args = parser.parse_args(["--with-memories"])
+        assert args.with_memories is True
+
+    def test_argparse_default_no_memories(self):
+        mod = _load_install()
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--with-memories", action="store_true")
+        args = parser.parse_args([])
+        assert args.with_memories is False
+
+
+class TestSetupMemories:
+    def test_creates_config_file(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        config = tmp_path / ".crux" / "crux-memories.json"
+        assert config.is_file()
+        data = json.loads(config.read_text(encoding="utf-8"))
+        assert "cruxMemories" in data
+
+    def test_creates_memories_directory(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert (tmp_path / "memories").is_dir()
+
+    def test_creates_agents_directory(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert (tmp_path / "memories" / "agents").is_dir()
+
+    def test_creates_tracking_directory(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert (tmp_path / ".crux" / "reference-tracking").is_dir()
+
+    def test_skips_if_config_exists(self, tmp_path: Path):
+        mod = _load_install()
+        crux_dir = tmp_path / ".crux"
+        crux_dir.mkdir(parents=True)
+        config = crux_dir / "crux-memories.json"
+        config.write_text('{"existing": true}', encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        data = json.loads(config.read_text(encoding="utf-8"))
+        assert data == {"existing": True}
+
+    def test_returns_true(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            result = mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert result is True
+
+    def test_config_has_disabled_memories_by_default(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        config = tmp_path / ".crux" / "crux-memories.json"
+        data = json.loads(config.read_text(encoding="utf-8"))
+        flags = {k: v for f in data["flags"] for k, v in f.items()}
+        assert flags["enableMemories"] == "false"
+
+
+class TestWithoutMemories:
+    def test_no_memory_files_without_flag(self, tmp_path: Path):
+        """When --with-memories is NOT used, no memory scaffolding should exist."""
+        assert not (tmp_path / ".crux" / "crux-memories.json").exists()
+        assert not (tmp_path / "memories").exists()
+        assert not (tmp_path / ".crux" / "reference-tracking").exists()

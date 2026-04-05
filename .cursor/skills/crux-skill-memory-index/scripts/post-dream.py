@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Post-dream hook: rebuild memory index after dream extraction.
+"""Post-dream index rebuild: verify memories are enabled, then rebuild the index.
 
-Invoked by the crux-dream command/skill after memory extraction completes.
-
-1. Rebuilds .crux/memory-index.yml from all memory files
-2. The MCP server's file watcher detects the index timestamp change automatically
+Called programmatically by the /crux-dream workflow after memory extraction
+completes. This is NOT a Cursor event hook.
 """
 
 from __future__ import annotations
@@ -15,7 +13,7 @@ import sys
 from pathlib import Path
 
 MEMORIES_CONFIG = Path(".crux/crux-memories.json")
-INDEX_SCRIPT = Path(".cursor/skills/crux-skill-memory-index/scripts/memory-index.py")
+INDEX_SCRIPT = Path(__file__).resolve().parent / "memory-index.py"
 
 
 def main() -> None:
@@ -32,7 +30,7 @@ def main() -> None:
                     enable_memories = flag["enableMemories"]
                     break
             if enable_memories != "true":
-                print("Memories disabled \u2014 skipping index rebuild.")
+                print("Memories disabled — skipping index rebuild.")
                 sys.exit(0)
         except (json.JSONDecodeError, OSError):
             pass

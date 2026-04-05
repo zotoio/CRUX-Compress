@@ -376,7 +376,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
   - `.cursor/agents/crux-cursor-memory-manager.md`
   - `.cursor/rules/crux-memories-integration.crux.mdc`
   - `.cursor/hooks/crux-session-start.py`
-  - `.cursor/hooks/crux-post-dream.py`
+  - `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py`
 - `enableMemories` is set to `"true"` in the config
 - At least one completed plan exists for dream testing
 - At least 3-5 memories exist for REM and MindReader testing
@@ -385,7 +385,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 1. **Session hook**: Start a new Cursor chat session. If the number of plan directories under `plans/` exceeds the `sessionStartNudge.threshold` (default 20), verify the nudge message appears
 2. **Dream**: Type `/crux-dream <plan-name>` and run through the full dream flow (see scenario B2 for detailed steps)
-3. **Post-dream hook**: After dream completes, verify the post-dream hook runs (`.cursor/hooks/crux-post-dream.py` — rebuilds the memory index)
+3. **Post-dream rebuild**: After dream completes, verify the post-dream script runs (`.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` — rebuilds the memory index)
 4. **REM sleep**: Type `/crux-dream --rem` and observe the REM analysis (see scenario C1)
 5. **MindReader (no args)**: Type `/crux-mindreader` and verify contextual memories are shown (see scenario J1)
 6. **MindReader (query)**: Type `/crux-mindreader "what memories exist?"` and verify search works (see scenario J2)
@@ -544,7 +544,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `.cursor/commands/crux-dream.md` | Dream command definition (Cursor) |
 | `.cursor/commands/crux-mindreader.md` | MindReader command definition (Cursor) |
 | `.cursor/hooks/crux-session-start.py` | Session start hook |
-| `.cursor/hooks/crux-post-dream.py` | Post-dream hook (index rebuild) |
+| `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` | Post-dream index rebuild |
 
 ### Config Thresholds (Defaults)
 

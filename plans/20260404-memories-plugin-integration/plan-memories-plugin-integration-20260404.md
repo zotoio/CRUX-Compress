@@ -1,7 +1,7 @@
 # Plan: Memories & Plugin Integration
 
 ## Status
-Ready for Review
+Executed — Awaiting Approval
 
 ## Overview
 
@@ -78,16 +78,16 @@ Two workstreams to bring CRUX-Compress to full feature integration maturity:
 
 | ID | File | Subagent | Dependencies | Phase | Status |
 |----|------|----------|-------------|-------|--------|
-| 01 | `subtask-01-mpi-plugin-architecture-design-20260404.md` | generalPurpose | — | 1 | Pending |
-| 02 | `subtask-02-mpi-installer-memories-20260404.md` | generalPurpose | — | 1 | Pending |
-| 03 | `subtask-03-mpi-cicd-fixes-20260404.md` | generalPurpose | — | 1 | Pending |
-| 04 | `subtask-04-mpi-website-memories-20260404.md` | generalPurpose | — | 1 | Pending |
-| 05 | `subtask-05-mpi-hooks-wiring-20260404.md` | generalPurpose | — | 1 | Pending |
-| 06 | `subtask-06-mpi-compression-level-plugin-20260404.md` | generalPurpose | 01 | 2 | Pending |
-| 07 | `subtask-07-mpi-command-agent-spec-updates-20260404.md` | generalPurpose | 06 | 3 | Pending |
-| 08 | `subtask-08-mpi-tests-20260404.md` | generalPurpose | 02, 03, 04, 05, 07 | 4 | Pending |
-| 09 | `subtask-09-mpi-documentation-20260404.md` | docs-sync-agent | 08 | 5 | Pending |
-| 10 | `subtask-10-mpi-integrity-audit-20260404.md` | integrity-expert | 09 | 6 | Pending |
+| 01 | `subtask-01-mpi-plugin-architecture-design-20260404.md` | generalPurpose | — | 1 | Done |
+| 02 | `subtask-02-mpi-installer-memories-20260404.md` | generalPurpose | — | 1 | Done |
+| 03 | `subtask-03-mpi-cicd-fixes-20260404.md` | generalPurpose | — | 1 | Done |
+| 04 | `subtask-04-mpi-website-memories-20260404.md` | generalPurpose | — | 1 | Done |
+| 05 | `subtask-05-mpi-hooks-wiring-20260404.md` | generalPurpose | — | 1 | Done |
+| 06 | `subtask-06-mpi-compression-level-plugin-20260404.md` | generalPurpose | 01 | 2 | Done |
+| 07 | `subtask-07-mpi-command-agent-spec-updates-20260404.md` | generalPurpose | 06 | 3 | Done |
+| 08 | `subtask-08-mpi-tests-20260404.md` | generalPurpose | 02, 03, 04, 05, 07 | 4 | Done |
+| 09 | `subtask-09-mpi-documentation-20260404.md` | docs-sync-agent | 08 | 5 | Done |
+| 10 | `subtask-10-mpi-integrity-audit-20260404.md` | integrity-expert | 09 | 6 | Done |
 
 ## Subtask Dependency Graph
 

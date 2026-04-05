@@ -19,13 +19,13 @@
   - [Compression Flow](#compression-flow)
 - [Installation in Another Project](#installation-in-another-project)
 - [CRUX Components](#crux-components)
-  - [1. The Specification (`CRUX.md`)](#1-the-specification-cruxmd)
-  - [2. Agent Awareness (`AGENTS.md`)](#2-agent-awareness-agentsmd)
-  - [3. `crux-cursor-rule-manager` - The Subagent](#3-crux-cursor-rule-manager---the-subagent)
-  - [4. `/crux-compress` - The Command](#4-crux-compress---the-command)
-  - [5. `crux-session-start.py` - The Hook](#5-crux-session-startsh---the-hook)
-  - [6. `crux-detect-changes.py` - The Hook](#6-crux-detect-changessh---the-hook)
-  - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill)
+  - [1. `CRUX.md` - The Specification](#1-cruxmd---the-specification-project-root)
+  - [2. `AGENTS.md` - Agent Awareness](#2-crux-block-in-agentsmd-project-root)
+  - [3. `_CRUX-RULE.mdc` - Always-Applied Rule](#3-_crux-rulemdc---always-applied-rule-cursorrules)
+  - [4. `crux-cursor-rule-manager.md` - The Subagent](#4-crux-cursor-rule-managermd---the-subagent-cursoragents)
+  - [5. `crux-compress.md` - The Command](#5-crux-compressmd---the-command-cursorcommands)
+  - [6. `crux-detect-changes.py` - The Hook](#6-crux-detect-changespy---the-hook-cursorhooks)
+  - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill-cursorskills)
 - [Memories](#memories)
   - [Enabling Memories](#enabling-memories)
   - [Memory Commands](#memory-commands)
@@ -253,6 +253,9 @@ curl -fsSL .../install.py | python3 - --backup
 # Verbose output
 curl -fsSL .../install.py | python3 - --verbose
 
+# Scaffold optional memory system components
+curl -fsSL .../install.py | python3 - --with-memories
+
 # Show help
 curl -fsSL .../install.py | python3 - --help
 ```
@@ -454,6 +457,7 @@ alwaysApply: true
 | `--minified` | Single-line output, no spaces, max compression |
 | `--force` | Delete existing CRUX output files before compression (bypasses checksum skip) |
 | `--plugin <name>` / `--plugin=<name>` | Enable a named plugin from `.crux/plugins/registry.json` |
+| `--no-plugin <name>` | Disable a specific default-enabled plugin |
 
 **Key Features**:
 
@@ -465,25 +469,49 @@ alwaysApply: true
 - **Two-tier output**: Universal `.crux.md` + Cursor adapter `.crux.mdc` (when source is in `.cursor/rules/`)
 - **Eligibility**: Markdown needs `crux: true` frontmatter; code/images need explicit file reference
 - **Plugin Hooks**: Optional lifecycle plugins (`beforeFetch`, `beforeCompress`, `afterCompress`, `afterValidate`) can be enabled via command param
+- **Default Plugins**: Plugins with `enabledByDefault: true` load automatically when no `--plugin` flags are specified. Use `--no-plugin <name>` to opt out of a default plugin.
 
 **Plugin Registry**:
 
-Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
+Plugins are declared in `.crux/plugins/registry.json`:
 
 ```json
 {
   "plugins": {
+    "compression-level": {
+      "description": "Enforce compression ratio targets and generate token metrics.",
+      "hooks": ["beforeCompress", "afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": true
+    },
     "frontmatter-tagger": {
-      "description": "Add standardized metadata after compression",
-      "hooks": ["afterCompress"]
+      "description": "Add standardized metadata after compression.",
+      "hooks": ["afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": false
     },
     "quality-gate": {
-      "description": "Apply extra validation policy checks",
-      "hooks": ["afterValidate"]
+      "description": "Apply additional policy checks after validation.",
+      "hooks": ["afterValidate"],
+      "failClosed": false,
+      "enabledByDefault": false
+    },
+    "release-notes": {
+      "description": "Collect per-file reduction metrics for release summaries.",
+      "hooks": ["afterCompress", "afterValidate"],
+      "failClosed": false,
+      "enabledByDefault": false
     }
   }
 }
 ```
+
+**Plugin Loading Modes**:
+
+- **No `--plugin` flags**: Default-enabled plugins (e.g. `compression-level`) load automatically. Use `--no-plugin compression-level` to opt out.
+- **Explicit `--plugin` flags**: Only the named plugins load. Defaults are not implicitly added. To get defaults plus extras: `--plugin compression-level --plugin frontmatter-tagger`
+
+The `compression-level` plugin is the reference default plugin. It enforces compression ratio targets and injects token metrics (`beforeTokens`, `afterTokens`, `reducedBy`) into output frontmatter. See `.crux/plugins/compression-level.md` for full specification.
 
 **File Convention**:
 
@@ -549,6 +577,7 @@ Create `.crux/plugins/registry.json` to declare plugins and hook bindings:
 | ------------------------------------ | ------------------------------------------------------- |
 | `--token-count <file>`               | Estimate tokens for a file                              |
 | `--token-count --ratio <src> <crux>` | Compare source vs CRUX, calculate compression ratio     |
+| `--token-count --ratio <src> <crux> --target <n>` | Compare with custom target percentage (default 25) |
 | `--cksum <file>`                     | Get checksum formatted for `sourceChecksum` frontmatter |
 
 
@@ -797,6 +826,8 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Tests               | `evals/*.py`                                 | Pytest test suite              |
 | CI Workflows        | `.github/workflows/`                         | Automated testing and releases |
 | Dev Rules           | `.cursor/rules/*.mdc`                        | Development workflow rules     |
+| Plugin Registry     | `.crux/plugins/registry.json`                | Plugin declarations and hook bindings |
+| Plugin Spec         | `.crux/plugins/compression-level.md`         | Default compression-level plugin spec |
 | Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
 | Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
@@ -909,12 +940,13 @@ python3 scripts/test.py
 ### Test Coverage
 
 
-| Script                       | Test File               | Coverage                                          |
-| ---------------------------- | ----------------------- | ------------------------------------------------- |
-| `crux-utils.py`              | `test_crux_utils.py`    | Token counting, checksums, ratios, error handling |
-| `scripts/create-crux-zip.py` | `test_create_zip.py`    | Zip contents, version embedding, structure        |
-| `crux-detect-changes.py`     | `test_detect_hook.py`   | Frontmatter detection, queue management           |
-| `install.py`                 | `test_install.py`       | CLI flags, version comparison, hooks merge, upsert |
+| Script                       | Test File                  | Coverage                                          |
+| ---------------------------- | -------------------------- | ------------------------------------------------- |
+| `crux-utils.py`              | `test_crux_utils.py`       | Token counting, checksums, ratios, `--target` flag, error handling |
+| `scripts/create-crux-zip.py` | `test_create_zip.py`       | Zip contents, version embedding, structure        |
+| `crux-detect-changes.py`     | `test_detect_hook.py`      | Frontmatter detection, queue management           |
+| `install.py`                 | `test_install.py`          | CLI flags, version comparison, hooks merge, `--with-memories`, upsert |
+| `registry.json`              | `test_n_plugin_registry.py` | Registry schema, `enabledByDefault` semantics, plugin validation |
 
 
 ### Python Eval Tests

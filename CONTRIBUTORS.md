@@ -15,6 +15,7 @@ Thank you for your interest in contributing to CRUX Compress! This document prov
 - [Pull Request Process](#pull-request-process)
 - [Reporting Issues](#reporting-issues)
 - [Release Process](#release-process)
+  - [Plugin System](#plugin-system)
 
 ## Code of Conduct
 
@@ -92,6 +93,7 @@ tests/fixtures/                     # Shared test fixture files
 | `test_d_reference_tracking.py` | Reference tracker | Usage tracking and strength sync |
 | `test_e_memory_index.py` | Memory index | Index building and prioritisation |
 | `test_k_session_hook.py` | Session hook | Memory nudge on session start |
+| `test_n_plugin_registry.py` | Plugin registry | Schema validation, `enabledByDefault` semantics |
 
 ### Running Tests
 
@@ -270,6 +272,59 @@ The memory system is a development-time feature not included in the distribution
 | `.cursor/skills/crux-skill-memory-*/` | Memory operation skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
 | `crux_mcp_server/` | MCP server for semantic memory search |
 | `evals/` | Python-based eval tests for memory workflows |
+
+### Plugin System
+
+CRUX Compress supports an optional plugin architecture that extends the compression workflow with lifecycle hooks.
+
+#### Registry Structure
+
+Plugins are declared in `.crux/plugins/registry.json`:
+
+```json
+{
+  "plugins": {
+    "<plugin-name>": {
+      "description": "What the plugin does",
+      "hooks": ["beforeCompress", "afterCompress"],
+      "failClosed": false,
+      "enabledByDefault": false
+    }
+  }
+}
+```
+
+Each plugin entry requires:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `description` | string | Human-readable purpose |
+| `hooks` | string[] | Lifecycle hooks the plugin binds to |
+| `failClosed` | boolean | Whether plugin failure blocks compression |
+| `enabledByDefault` | boolean | Whether the plugin loads without explicit `--plugin` flag |
+
+#### Hook Lifecycle
+
+Plugins execute at predefined points in the compression flow:
+
+1. `beforeFetch` — URL sources only, before content is fetched
+2. `beforeCompress` — after source resolution, before compression begins
+3. *Base compression* (core workflow)
+4. `afterCompress` — after CRUX output is generated
+5. *Semantic validation* (core workflow)
+6. `afterValidate` — after validation produces a confidence score
+
+#### Default Plugin Loading (`enabledByDefault`)
+
+Plugins with `enabledByDefault: true` load automatically when no `--plugin` flags are given. Users can opt out with `--no-plugin <name>`. When explicit `--plugin` flags are present, only the named plugins load (defaults are not implicitly added).
+
+#### Adding a New Plugin
+
+1. Add an entry to `.crux/plugins/registry.json` with the required fields
+2. Create a spec file at `.crux/plugins/<plugin-name>.md` documenting the plugin's behavior, inputs, and outputs for each hook
+3. Update the command spec (`.cursor/commands/crux-compress.md`) and agent spec (`.cursor/agents/crux-cursor-rule-manager.md`) if the plugin requires behavioral changes
+4. Add tests in `evals/` validating the registry entry and plugin behavior
+5. Use `compression-level` (`.crux/plugins/compression-level.md`) as the canonical reference implementation
 
 ### Manual Version Bump
 
