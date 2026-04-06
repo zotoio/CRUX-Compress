@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Context word-frequency report</title>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --panel: #141a24;
+      --text: #e8edf5;
+      --muted: #8b98ab;
+      --accent: #5eead4;
+      --accent2: #a78bfa;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      padding: 1.75rem clamp(1rem, 4vw, 3rem);
+      border-bottom: 1px solid #243044;
+      background: linear-gradient(180deg, #111827 0%, var(--bg) 100%);
+    }
+    h1 { font-size: clamp(1.35rem, 3vw, 2rem); margin: 0 0 0.35rem; }
+    .sub { color: var(--muted); max-width: 70ch; }
+    main {
+      display: grid;
+      gap: 1.5rem;
+      padding: 1.5rem clamp(1rem, 4vw, 3rem) 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; align-items: start; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #243044;
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    .card h2 { margin: 0 0 0.75rem; font-size: 1.05rem; }
+    .stats {
+      display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat strong { color: var(--accent); }
+    #svg-chart { width: 100%; height: auto; display: block; }
+    #webgpu-wrap {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 220px;
+      background: #0a0d12;
+    }
+    #webgpu-canvas { width: 100%; height: 240px; display: block; }
+    #webgpu-fallback {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    input[type="search"] {
+      flex: 1 1 200px;
+      padding: 0.45rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: var(--text);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th, td { padding: 0.35rem 0.5rem; text-align: left; border-bottom: 1px solid #243044; }
+    th { cursor: pointer; user-select: none; color: var(--muted); font-weight: 600; }
+    th:hover { color: var(--accent); }
+    tbody tr:hover { background: rgba(94, 234, 212, 0.06); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: #1e293b;
+      color: var(--warn);
+      font-size: 0.75rem;
+      margin-left: 0.35rem;
+    }
+    footer {
+      padding: 1rem clamp(1rem, 4vw, 3rem) 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid #243044;
+    }
+    a { color: var(--accent2); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Context word-frequency report</h1>
+    <p class="sub">
+      Reproducible token counts for the <strong>project-local agent context</strong> (rules, <code>AGENTS.md</code>, and a fixed snapshot of session-injected text).
+      See <code>WALKTHROUGH.md</code> for methodology and exclusions.
+    </p>
+  </header>
+  <main>
+    <section class="card" id="summary">
+      <h2>Summary <span class="pill" id="webgpu-badge">WebGPU</span></h2>
+      <div class="stats" id="stats"></div>
+    </section>
+    <div class="grid">
+      <section class="card">
+        <h2>Top terms (SVG)</h2>
+        <svg id="svg-chart" viewBox="0 0 640 320" role="img" aria-label="Bar chart of top word frequencies"></svg>
+      </section>
+      <section class="card">
+        <h2>Frequency field (WebGPU)</h2>
+        <div id="webgpu-wrap">
+          <canvas id="webgpu-canvas" width="800" height="480"></canvas>
+          <div id="webgpu-fallback"></div>
+        </div>
+        <p class="sub" style="margin:0.75rem 0 0;font-size:0.85rem;">
+          Fragment shader uses the top eight counts as harmonics. If WebGPU is unavailable, an SVG pulse is shown instead.
+        </p>
+      </section>
+    </div>
+    <section class="card">
+      <h2>Full table</h2>
+      <div class="controls">
+        <label for="q" class="sr-only">Filter</label>
+        <input type="search" id="q" placeholder="Filter words…" autocomplete="off" />
+        <span class="sub" id="row-count"></span>
+      </div>
+      <div style="overflow:auto; max-height: 55vh;">
+        <table>
+          <thead>
+            <tr>
+              <th data-k="rank">#</th>
+              <th data-k="word">Word</th>
+              <th data-k="count">Count</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer>
+    Open <code>report.html</code> locally or serve the folder. Regenerate data with
+    <code>python3 generate_data.py</code>, then <code>python3 build_report.py</code>.
+  </footer>
+  <script>
+    const DATA = /*__DATA__*/;
+
+    const statsEl = document.getElementById("stats");
+    const tbody = document.getElementById("tbody");
+    const q = document.getElementById("q");
+    const rowCount = document.getElementById("row-count");
+    const svg = document.getElementById("svg-chart");
+    const badge = document.getElementById("webgpu-badge");
+
+    const s = DATA.stats;
+    statsEl.innerHTML = `
+      <div class="stat">Total tokens: <strong>${s.tokenCount.toLocaleString()}</strong></div>
+      <div class="stat">Unique words: <strong>${s.uniqueWords.toLocaleString()}</strong></div>
+      <div class="stat">Corpus chars: <strong>${s.characters.toLocaleString()}</strong></div>
+    `;
+
+    const words = DATA.words.map((row, i) => ({ rank: i + 1, word: row.word, count: row.count }));
+    let sortKey = "rank";
+    let sortDir = 1;
+
+    function renderTable(rows) {
+      tbody.innerHTML = rows.map(r => `<tr><td>${r.rank}</td><td><code>${escapeHtml(String(r.word))}</code></td><td>${r.count}</td></tr>`).join("");
+      rowCount.textContent = `${rows.length} row(s)`;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function sortedRows() {
+      const key = sortKey;
+      const dir = sortDir;
+      const copy = [...words];
+      copy.sort((a, b) => {
+        const av = a[key], bv = b[key];
+        if (typeof av === "number" && typeof bv === "number") return (av - bv) * dir;
+        return String(av).localeCompare(String(bv), undefined, { sensitivity: "base" }) * dir;
+      });
+      return copy;
+    }
+
+    function applySort() {
+      let rows = sortedRows();
+      const term = q.value.trim().toLowerCase();
+      if (term) rows = rows.filter(r => String(r.word).toLowerCase().includes(term));
+      renderTable(rows);
+    }
+
+    document.querySelectorAll("th[data-k]").forEach(th => {
+      th.addEventListener("click", () => {
+        const k = th.getAttribute("data-k");
+        if (sortKey === k) sortDir *= -1;
+        else { sortKey = k; sortDir = k === "word" ? 1 : -1; }
+        applySort();
+      });
+    });
+    q.addEventListener("input", applySort);
+    applySort();
+
+    /* ---- SVG bar chart (animated) ---- */
+    const TOP = Math.min(24, words.length);
+    const topSlice = words.slice(0, TOP);
+    const maxC = topSlice[0]?.count || 1;
+    const NS = "http://www.w3.org/2000/svg";
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const margin = { l: 120, r: 16, t: 16, b: 28 };
+    const W = 640 - margin.l - margin.r;
+    const H = 320 - margin.t - margin.b;
+    const barH = H / TOP - 4;
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("transform", `translate(${margin.l},${margin.t})`);
+    svg.appendChild(g);
+
+    const title = document.createElementNS(NS, "text");
+    title.setAttribute("x", 0);
+    title.setAttribute("y", -2);
+    title.setAttribute("fill", "#8b98ab");
+    title.setAttribute("font-size", "11");
+    title.textContent = `Top ${TOP} tokens`;
+    g.appendChild(title);
+
+    const bars = [];
+    topSlice.forEach((row, i) => {
+      const y = i * (barH + 4);
+      const lab = document.createElementNS(NS, "text");
+      lab.setAttribute("x", -8);
+      lab.setAttribute("y", y + barH * 0.72);
+      lab.setAttribute("text-anchor", "end");
+      lab.setAttribute("fill", "#e8edf5");
+      lab.setAttribute("font-size", "10");
+      lab.textContent = String(row.word).length > 18 ? String(row.word).slice(0, 16) + "…" : String(row.word);
+      g.appendChild(lab);
+
+      const rect = document.createElementNS(NS, "rect");
+      rect.setAttribute("x", 0);
+      rect.setAttribute("y", y);
+      rect.setAttribute("height", barH);
+      rect.setAttribute("rx", 4);
+      rect.setAttribute("fill", "url(#grad)");
+      rect.setAttribute("opacity", "0.92");
+      g.appendChild(rect);
+      bars.push({ rect, target: row.count, w: 0 });
+    });
+
+    const defs = document.createElementNS(NS, "defs");
+    const lg = document.createElementNS(NS, "linearGradient");
+    lg.setAttribute("id", "grad");
+    lg.setAttribute("x1", "0");
+    lg.setAttribute("x2", "1");
+    const s1 = document.createElementNS(NS, "stop");
+    s1.setAttribute("offset", "0%");
+    s1.setAttribute("stop-color", "#5eead4");
+    const s2 = document.createElementNS(NS, "stop");
+    s2.setAttribute("offset", "100%");
+    s2.setAttribute("stop-color", "#a78bfa");
+    lg.appendChild(s1);
+    lg.appendChild(s2);
+    defs.appendChild(lg);
+    svg.insertBefore(defs, svg.firstChild);
+
+    let t0 = performance.now();
+    function tick(now) {
+      const t = (now - t0) / 1000;
+      const ease = 1 - Math.exp(-t * 1.35);
+      bars.forEach(b => {
+        const tw = (b.target / maxC) * W * ease;
+        b.w += (tw - b.w) * 0.12;
+        b.rect.setAttribute("width", Math.max(0, b.w));
+      });
+      if (ease < 0.999) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    /* ---- WebGPU harmonic field ---- */
+    const canvas = document.getElementById("webgpu-canvas");
+    const fallback = document.getElementById("webgpu-fallback");
+
+    async function runWebGPU() {
+      if (!navigator.gpu) throw new Error("WebGPU not available");
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) throw new Error("No GPU adapter");
+      const device = await adapter.requestDevice();
+      const ctx = canvas.getContext("webgpu");
+      const format = navigator.gpu.getPreferredCanvasFormat();
+      ctx.configure({ device, format, alphaMode: "premultiplied" });
+
+      const shaderCode = `
+        struct U {
+          pack0: vec4f,
+          pack1: vec4f,
+          pack2: vec4f,
+        }
+        @group(0) @binding(0) var<uniform> u: U;
+
+        struct VSOut { @builtin(position) pos: vec4f, @location(0) uv: vec2f, }
+
+        @vertex fn vs(@builtin(vertex_index) vi: u32) -> VSOut {
+          var p = array<vec2f, 3>(
+            vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0)
+          );
+          var o: VSOut;
+          o.pos = vec4f(p[vi], 0.0, 1.0);
+          o.uv = p[vi] * 0.5 + vec2f(0.5, 0.5);
+          return o;
+        }
+
+        fn hash(p: vec2f) -> f32 {
+          return fract(sin(dot(p, vec2f(127.1, 311.7))) * 43758.5453);
+        }
+
+        @fragment fn fs(in: VSOut) -> @location(0) vec4f {
+          let uv = in.uv;
+          let t = u.pack0.x;
+          let freqs = array<f32, 8>(
+            u.pack0.y, u.pack0.z, u.pack0.w,
+            u.pack1.x, u.pack1.y, u.pack1.z, u.pack1.w,
+            u.pack2.x
+          );
+          var acc = 0.0;
+          for (var i = 0u; i < 8u; i++) {
+            let w = freqs[i] / max(freqs[0], 1.0);
+            let phase = t * (0.35 + f32(i) * 0.08) + w * 6.2831;
+            let k = 3.0 + f32(i) * 1.7;
+            acc += w * sin(uv.x * k + phase) * cos(uv.y * (k * 0.85) - phase * 0.5);
+          }
+          let n = hash(uv * 400.0 + t) * 0.04;
+          let m = acc * 0.22 + n;
+          let r = 0.08 + 0.45 * (0.5 + 0.5 * sin(m * 3.2 + t));
+          let g = 0.12 + 0.42 * (0.5 + 0.5 * sin(m * 2.7 - t * 0.7));
+          let b = 0.18 + 0.48 * (0.5 + 0.5 * cos(m * 2.2 + t * 0.4));
+          return vec4f(r, g, b, 1.0);
+        }
+      `;
+
+      const module = device.createShaderModule({ code: shaderCode });
+      const pipeline = device.createRenderPipeline({
+        layout: "auto",
+        vertex: { module, entryPoint: "vs" },
+        fragment: {
+          module,
+          entryPoint: "fs",
+          targets: [{ format }],
+        },
+        primitive: { topology: "triangle-list" },
+      });
+
+      const uniformBuffer = device.createBuffer({
+        size: 48,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+
+      const bindGroup = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [{ binding: 0, resource: { buffer: uniformBuffer } }],
+      });
+
+      const counts = topSlice.slice(0, 8).map(r => r.count);
+      while (counts.length < 8) counts.push(0);
+
+      function frame(t) {
+        const arr = new Float32Array(12);
+        arr[0] = t * 0.001;
+        for (let i = 0; i < 8; i++) arr[1 + i] = counts[i];
+        device.queue.writeBuffer(uniformBuffer, 0, arr);
+
+        const encoder = device.createCommandEncoder();
+        const pass = encoder.beginRenderPass({
+          colorAttachments: [{
+            view: ctx.getCurrentTexture().createView(),
+            clearValue: { r: 0.04, g: 0.05, b: 0.07, a: 1 },
+            loadOp: "clear",
+            storeOp: "store",
+          }],
+        });
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bindGroup);
+        pass.draw(3, 1, 0, 0);
+        pass.end();
+        device.queue.submit([encoder.finish()]);
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      badge.textContent = "WebGPU active";
+      badge.style.color = "#5eead4";
+    }
+
+    function runSvgFallback(msg) {
+      fallback.style.display = "flex";
+      fallback.textContent = msg;
+      badge.textContent = "WebGPU off";
+      badge.style.color = "#fbbf24";
+      const pulse = document.createElementNS(NS, "svg");
+      pulse.setAttribute("viewBox", "0 0 200 200");
+      pulse.style.width = "120px";
+      pulse.style.height = "120px";
+      pulse.style.opacity = "0.85";
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", "100");
+      c.setAttribute("cy", "100");
+      c.setAttribute("r", "40");
+      c.setAttribute("fill", "none");
+      c.setAttribute("stroke", "#5eead4");
+      c.setAttribute("stroke-width", "3");
+      const anim = document.createElementNS(NS, "animate");
+      anim.setAttribute("attributeName", "r");
+      anim.setAttribute("values", "28;52;28");
+      anim.setAttribute("dur", "2.2s");
+      anim.setAttribute("repeatCount", "indefinite");
+      c.appendChild(anim);
+      const anim2 = document.createElementNS(NS, "animate");
+      anim2.setAttribute("attributeName", "opacity");
+      anim2.setAttribute("values", "0.5;0.15;0.5");
+      anim2.setAttribute("dur", "2.2s");
+      anim2.setAttribute("repeatCount", "indefinite");
+      c.appendChild(anim2);
+      pulse.appendChild(c);
+      fallback.prepend(pulse);
+    }
+
+    runWebGPU().catch((e) => {
+      console.warn(e);
+      runSvgFallback(String(e.message || e));
+    });
+  </script>
+</body>
+</html>
