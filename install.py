@@ -481,8 +481,9 @@ def get_release_files(version: str) -> list[str]:
                 if files:
                     log_verbose(f"Loaded dist manifest ({len(files)} files)")
                     return files
-            except json.JSONDecodeError:
-                pass
+            except json.JSONDecodeError as exc:
+                # Malformed manifest at this URL; try the next source and fall back if all fail.
+                log_verbose(f"Failed to parse dist manifest from {url}: {exc}")
 
     log_warn("Could not fetch dist manifest, using built-in fallback list")
     return [
