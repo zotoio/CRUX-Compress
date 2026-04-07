@@ -60,8 +60,9 @@ def _set_pending_rebuild(file_path: str) -> None:
     if PENDING_REBUILD.is_file():
         try:
             data = json.loads(PENDING_REBUILD.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            pass
+        except (json.JSONDecodeError, OSError) as exc:
+            # If the pending-rebuild file is unreadable or corrupted, fall back to defaults
+            print(f"Warning: could not read '{PENDING_REBUILD}': {exc}", file=sys.stderr)
 
     data["needsRebuild"] = True
     files = data.get("files", [])
