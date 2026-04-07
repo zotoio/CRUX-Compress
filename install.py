@@ -29,6 +29,7 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from urllib.error import URLError
@@ -52,6 +53,16 @@ NC = "\033[0m"
 
 VERBOSE = False
 NON_INTERACTIVE = False
+
+MEMORY_FILE_PREFIXES = (
+    ".cursor/agents/crux-cursor-memory-manager.md",
+    ".cursor/commands/crux-dream.md",
+    ".cursor/commands/crux-mindreader.md",
+    ".cursor/commands/crux-forget.md",
+    ".cursor/hooks/crux-detect-memory-changes.py",
+    ".cursor/rules/crux-memories-integration.crux.mdc",
+    ".cursor/skills/crux-skill-memory-",
+)
 
 
 def log(msg: str) -> None:
@@ -175,6 +186,14 @@ def get_version_change_type(old_ver: str, new_ver: str) -> str:
     return "patch"
 
 
+def is_memory_file(rel_path: str) -> bool:
+    return any(rel_path.startswith(p) for p in MEMORY_FILE_PREFIXES)
+
+
+def memories_already_installed() -> bool:
+    return Path(".crux/crux-memories.json").is_file()
+
+
 # ── File helpers ──
 
 
@@ -185,6 +204,28 @@ def get_checksum(filepath: str) -> str:
     h = hashlib.sha256()
     h.update(p.read_bytes())
     return h.hexdigest()
+
+
+def load_known_checksums() -> dict[str, set[str]]:
+    """Load all known release checksums per file from crux-release-files.json.
+
+    Returns {filepath: {checksum1, checksum2, ...}} across all versions.
+    """
+    manifest_path = Path(".crux/crux-release-files.json")
+    if not manifest_path.is_file():
+        return {}
+    try:
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+    known: dict[str, set[str]] = {}
+    for release in data.get("releases", {}).values():
+        for filepath, meta in release.get("files", {}).items():
+            cksum = meta.get("checksum", "")
+            if cksum:
+                known.setdefault(filepath, set()).add(cksum)
+    return known
 
 
 def check_not_in_crux_repo() -> None:
@@ -423,31 +464,83 @@ def cleanup_deprecated_hooks() -> None:
 # ── Download ──
 
 
-RELEASE_FILES = [
-    "CRUX.md", "install.crux.md", ".crux/crux.json", ".crux/crux-release-files.json",
-    ".cursor/hooks.json", ".cursor/agents/crux-cursor-rule-manager.md",
-    ".cursor/commands/crux-compress.md",
-    ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
-    ".cursor/rules/_CRUX-RULE.mdc",
-    ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.py",
-]
+def get_release_files(version: str) -> list[str]:
+    """Fetch the dist manifest from CDN/GitHub to get the canonical file list.
+
+    The manifest is written by scripts/create-crux-zip.py (single source of truth).
+    """
+    for url in [
+        f"{JSDELIVR_CDN}@v{version}/.crux/dist-manifest.json",
+        f"{RAW_BASE}/.crux/dist-manifest.json",
+    ]:
+        data = http_get_text(url)
+        if data:
+            try:
+                manifest = json.loads(data)
+                files = manifest.get("files", [])
+                if files:
+                    log_verbose(f"Loaded dist manifest ({len(files)} files)")
+                    return files
+            except json.JSONDecodeError:
+                pass
+
+    log_warn("Could not fetch dist manifest, using built-in fallback list")
+    return [
+        "CRUX.md", "install.crux.md", ".crux/crux.json",
+        ".cursor/hooks.json",
+        ".cursor/agents/crux-cursor-rule-manager.md",
+        ".cursor/agents/crux-cursor-memory-manager.md",
+        ".cursor/commands/crux-compress.md",
+        ".cursor/commands/crux-dream.md",
+        ".cursor/commands/crux-mindreader.md",
+        ".cursor/commands/crux-forget.md",
+        ".cursor/hooks/crux-detect-changes.py",
+        ".cursor/hooks/crux-detect-memory-changes.py",
+        ".cursor/hooks/crux-session-start.py",
+        ".cursor/rules/_CRUX-RULE.mdc",
+        ".cursor/rules/crux-memories-integration.crux.mdc",
+        ".cursor/skills/crux-utils/SKILL.md",
+        ".cursor/skills/crux-utils/scripts/crux-utils.py",
+    ]
+
+
+def _download_one(cdn_base: str, rel_path: str, target_dir: Path) -> tuple[str, bool]:
+    """Download a single file from CDN. Returns (path, success)."""
+    dest = target_dir / rel_path
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    data = http_get(f"{cdn_base}/{rel_path}")
+    if data:
+        dest.write_bytes(data)
+        return rel_path, True
+    return rel_path, False
 
 
 def download_from_cdn(version: str, target_dir: Path) -> None:
     cdn_base = f"{JSDELIVR_CDN}@v{version}"
+    release_files = get_release_files(version)
+    total = len(release_files)
     succeeded = failed = 0
+    done = 0
 
-    for f in RELEASE_FILES:
-        dest = target_dir / f
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        data = http_get(f"{cdn_base}/{f}")
-        if data:
-            dest.write_bytes(data)
-            succeeded += 1
-            log_verbose(f"Downloaded: {f}")
-        else:
-            failed += 1
-            log_verbose(f"Skipped (not found): {f}")
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {
+            pool.submit(_download_one, cdn_base, f, target_dir): f
+            for f in release_files
+        }
+        for future in as_completed(futures):
+            rel_path, ok = future.result()
+            done += 1
+            if ok:
+                succeeded += 1
+                log_verbose(f"Downloaded: {rel_path}")
+            else:
+                failed += 1
+                log_verbose(f"Skipped (not found): {rel_path}")
+            if not VERBOSE and done % 4 == 0:
+                print(f"\r  Downloading... {done}/{total}", end="", flush=True, file=sys.stderr)
+
+    if not VERBOSE and total > 0:
+        print(f"\r  Downloading... {total}/{total}", file=sys.stderr)
 
     agents_data = http_get(f"{cdn_base}/AGENTS.md")
     if agents_data:
@@ -471,6 +564,42 @@ def download_from_cdn(version: str, target_dir: Path) -> None:
         log_warn(f"{failed} files were not available (may be optional)")
 
 
+def verify_checksums(staging_dir: Path, version: str) -> None:
+    """Verify downloaded files against crux-release-files.json checksums."""
+    manifest_path = staging_dir / ".crux" / "crux-release-files.json"
+    if not manifest_path.is_file():
+        log_verbose("No release manifest in staging — skipping checksum verification")
+        return
+
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        release = manifest.get("releases", {}).get(version)
+        if not release:
+            log_verbose(f"No checksums recorded for v{version}")
+            return
+    except (json.JSONDecodeError, OSError):
+        return
+
+    verified = mismatched = skipped = 0
+    for filename, meta in release.get("files", {}).items():
+        expected = meta.get("checksum", "")
+        staged = staging_dir / filename
+        if not staged.is_file():
+            skipped += 1
+            continue
+        actual = get_checksum(str(staged))
+        if actual == expected:
+            verified += 1
+        else:
+            mismatched += 1
+            log_warn(f"Checksum mismatch: {filename}")
+
+    if mismatched:
+        log_warn(f"Checksum verification: {verified} OK, {mismatched} MISMATCH, {skipped} skipped")
+    elif verified:
+        log_verbose(f"Checksum verification: {verified} files OK")
+
+
 def download_and_stage(version: str) -> Path:
     zip_name = f"CRUX-Compress-v{version}.zip"
     download_url = f"{DOWNLOAD_BASE}/v{version}/{zip_name}"
@@ -487,20 +616,31 @@ def download_and_stage(version: str) -> Path:
         try:
             with zipfile.ZipFile(io.BytesIO(data)) as zf:
                 zf.extractall(content_dir)
+            verify_checksums(content_dir, version)
             return content_dir
         except zipfile.BadZipFile:
             log_warn("Downloaded file is not a valid zip")
 
     log_warn("GitHub download failed, trying jsDelivr CDN...")
     download_from_cdn(version, content_dir)
+    verify_checksums(content_dir, version)
     return content_dir
 
 
 # ── Preview ──
 
 
-def preview_installation(staging_dir: Path, show_diff: bool = False) -> None:
+def preview_installation(
+    staging_dir: Path,
+    show_diff: bool = False,
+    known_checksums: dict[str, set[str]] | None = None,
+    install_memories: bool = False,
+) -> list[str]:
+    """Show what will be installed. Returns list of locally-modified file paths."""
     print("\nFiles to be installed/updated:\n")
+
+    locally_modified: list[str] = []
+    skipped_memory = 0
 
     for root, _dirs, files in os.walk(staging_dir):
         for fname in sorted(files):
@@ -508,11 +648,21 @@ def preview_installation(staging_dir: Path, show_diff: bool = False) -> None:
             rel = str(full.relative_to(staging_dir))
             existing = Path(rel)
 
+            if is_memory_file(rel) and not install_memories:
+                skipped_memory += 1
+                continue
+
             if existing.is_file():
-                if get_checksum(str(existing)) == get_checksum(str(full)):
+                existing_cksum = get_checksum(str(existing))
+                if existing_cksum == get_checksum(str(full)):
                     print(f"  {BLUE}[NO CHANGE]{NC} {rel}")
                 else:
-                    print(f"  {YELLOW}[UPDATE]{NC} {rel}")
+                    known = known_checksums.get(rel, set()) if known_checksums else set()
+                    if known and existing_cksum not in known:
+                        print(f"  {RED}[MODIFIED]{NC} {rel}  ← local changes detected")
+                        locally_modified.append(rel)
+                    else:
+                        print(f"  {YELLOW}[UPDATE]{NC} {rel}")
                     if show_diff:
                         try:
                             subprocess.run(
@@ -525,13 +675,17 @@ def preview_installation(staging_dir: Path, show_diff: bool = False) -> None:
             else:
                 print(f"  {GREEN}[CREATE]{NC} {rel}")
 
+    if skipped_memory:
+        print(f"  {BLUE}[SKIP]{NC} {skipped_memory} memory files (use --with-memories to include)")
+
     print()
+    return locally_modified
 
 
 # ── Install ──
 
 
-def install_from_staging(staging_dir: Path) -> None:
+def install_from_staging(staging_dir: Path, install_memories: bool = False) -> None:
     log("Installing CRUX files...")
 
     staging_hooks = None
@@ -545,7 +699,9 @@ def install_from_staging(staging_dir: Path) -> None:
     for root, _dirs, files in os.walk(staging_dir):
         for fname in files:
             src = Path(root) / fname
-            rel = src.relative_to(staging_dir)
+            rel = str(src.relative_to(staging_dir))
+            if is_memory_file(rel) and not install_memories:
+                continue
             dest = Path(rel)
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(str(src), str(dest))
@@ -557,7 +713,11 @@ def install_from_staging(staging_dir: Path) -> None:
     if Path("AGENTS.crux.md").is_file():
         upsert_agents_crux_block("AGENTS.crux.md")
 
-    for script in [".cursor/skills/crux-utils/scripts/crux-utils.py"]:
+    for script in [
+        ".cursor/skills/crux-utils/scripts/crux-utils.py",
+        ".cursor/skills/crux-skill-memory-index/scripts/memory-index.py",
+        ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
+    ]:
         p = Path(script)
         if p.is_file():
             p.chmod(p.stat().st_mode | 0o111)
@@ -565,18 +725,24 @@ def install_from_staging(staging_dir: Path) -> None:
 
 def download_update_script() -> None:
     Path(".crux").mkdir(parents=True, exist_ok=True)
-    log_verbose("Downloading update script...")
+    update_path = Path(".crux/update.py")
 
-    for url in [f"{RAW_BASE}/install.py", f"{JSDELIVR_CDN}@main/install.py"]:
-        data = http_get(url)
-        if data:
-            update_path = Path(".crux/update.py")
-            update_path.write_bytes(data)
-            update_path.chmod(update_path.stat().st_mode | 0o111)
-            log_verbose(f"Update script saved to {update_path}")
-            break
+    source = Path(__file__).resolve() if "__file__" in dir() else None
+    if source and source.is_file() and source.name == "install.py":
+        shutil.copy2(str(source), str(update_path))
+        update_path.chmod(update_path.stat().st_mode | 0o111)
+        log_verbose(f"Copied installer to {update_path}")
     else:
-        log_warn("Could not download update script")
+        log_verbose("Downloading update script (piped install)...")
+        for url in [f"{RAW_BASE}/install.py", f"{JSDELIVR_CDN}@main/install.py"]:
+            data = http_get(url)
+            if data:
+                update_path.write_bytes(data)
+                update_path.chmod(update_path.stat().st_mode | 0o111)
+                log_verbose(f"Update script saved to {update_path}")
+                break
+        else:
+            log_warn("Could not download update script")
 
     for url in [f"{RAW_BASE}/install.crux.md", f"{JSDELIVR_CDN}@main/install.crux.md"]:
         data = http_get(url)
@@ -617,6 +783,11 @@ DEFAULT_MEMORIES_CONFIG = {
                 "file": ".cursor/commands/crux-mindreader.md",
                 "default": "/crux-mindreader",
                 "description": "Decompress and view memories in chat",
+            },
+            "forget": {
+                "file": ".cursor/commands/crux-forget.md",
+                "default": "/crux-forget",
+                "description": "Remove incorrect or unwanted memories",
             },
         },
         "hooks": {
@@ -850,15 +1021,30 @@ def main() -> None:
     else:
         log(f"Fresh installation of v{latest_version}")
 
+    install_memories = with_memories or memories_already_installed()
+    if install_memories and not with_memories:
+        log_verbose("Existing memory installation detected — memory files will be updated")
+
+    known_checksums = load_known_checksums() if installed_version else {}
+
     staging_dir = download_and_stage(latest_version)
-    preview_installation(staging_dir, VERBOSE)
+    locally_modified = preview_installation(
+        staging_dir, VERBOSE, known_checksums, install_memories=install_memories,
+    )
+
+    if locally_modified:
+        print(f"{YELLOW}Note: {len(locally_modified)} file(s) have local modifications "
+              f"that will be overwritten:{NC}\n")
+        for f in locally_modified:
+            print(f"  - {f}")
+        print(f"\n  {CYAN}Tip: review these changes with `git diff` before committing.{NC}\n")
 
     if not confirm("Proceed with installation?"):
         shutil.rmtree(staging_dir.parent, ignore_errors=True)
         log("Installation cancelled.")
         sys.exit(0)
 
-    install_from_staging(staging_dir)
+    install_from_staging(staging_dir, install_memories=install_memories)
     shutil.rmtree(staging_dir.parent, ignore_errors=True)
     cleanup_deprecated_files()
     cleanup_deprecated_hooks()

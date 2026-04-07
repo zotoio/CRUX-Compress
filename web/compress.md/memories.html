@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUX Memories — Agent Learning System</title>
+  <meta name="description" content="CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions. Dream, REM Sleep, and MindReader.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/memories.css">
+</head>
+<body>
+  <nav class="site-nav" id="site-nav"></nav>
+
+  <header class="page-header">
+    <div class="section-content">
+      <h1 class="section-title">CRUX Memories</h1>
+      <p class="section-intro">Agents that learn. CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions &mdash; like long-term memory for your codebase.</p>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       System Architecture Overview
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section">
+    <div class="section-content">
+      <h2 class="section-title">System Architecture</h2>
+      <p class="section-intro">The memory system is fully managed by CRUX. Consumers only provide configuration &mdash; all engine logic, storage, tracking, and lifecycle management ships with the CRUX tool.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 520" class="mem-svg" role="img" aria-label="CRUX Memories Architecture Diagram">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+            <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b8a9a"/>
+            </marker>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+
+          <!-- Commands -->
+          <rect x="20" y="20" width="200" height="108" rx="8" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="120" y="48" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">COMMANDS</text>
+          <text x="120" y="70" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-dream</text>
+          <text x="120" y="88" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-mindreader</text>
+          <text x="120" y="106" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-forget</text>
+
+          <!-- Agent -->
+          <rect x="300" y="20" width="280" height="90" rx="8" fill="#1e2a2a" stroke="#f0c674" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="440" y="48" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">MEMORY MANAGER AGENT</text>
+          <text x="440" y="68" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Orchestrates all memory operations</text>
+          <text x="440" y="84" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">crux-cursor-memory-manager</text>
+
+          <!-- Config -->
+          <rect x="660" y="20" width="220" height="90" rx="8" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="1.5"/>
+          <text x="770" y="48" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">CONFIG</text>
+          <text x="770" y="68" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">.crux/crux-memories.json</text>
+          <text x="770" y="84" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Flags, paths, thresholds, transitions</text>
+
+          <!-- Arrows: Commands → Agent, Agent ← Config -->
+          <line x1="220" y1="65" x2="298" y2="65" stroke="#d4915a" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="658" y1="65" x2="582" y2="65" stroke="#5b8a9a" stroke-width="1.5" marker-end="url(#arrow-teal)"/>
+
+          <!-- Skills row -->
+          <text x="450" y="148" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">6 SKILLS</text>
+          <line x1="440" y1="110" x2="440" y2="136" stroke="#d4915a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="20" y="164" width="130" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="85" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-extract</text>
+          <text x="85" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Analyse &amp; propose</text>
+
+          <rect x="165" y="164" width="130" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="230" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-crud</text>
+          <text x="230" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Create, read, update</text>
+
+          <rect x="310" y="164" width="130" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="375" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-rebalance</text>
+          <text x="375" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Promote &amp; demote</text>
+
+          <rect x="455" y="164" width="130" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="520" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-compress</text>
+          <text x="520" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">CRUX-compress</text>
+
+          <rect x="600" y="164" width="130" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="665" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-index</text>
+          <text x="665" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Build priority index</text>
+
+          <rect x="745" y="164" width="135" height="54" rx="6" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="812" y="186" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">memory-ref-tracker</text>
+          <text x="812" y="200" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Track usage</text>
+
+          <!-- Storage layer -->
+          <text x="450" y="268" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">STORAGE LAYER</text>
+
+          <!-- Memory Files -->
+          <rect x="20" y="284" width="200" height="100" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="120" y="308" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">memories/</text>
+          <text x="120" y="328" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">core/ redflag/ goal/</text>
+          <text x="120" y="344" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">learning/ idea/</text>
+          <text x="120" y="362" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">*.memory.md | *.memory.crux.md</text>
+
+          <!-- Agent Memories -->
+          <rect x="240" y="284" width="200" height="100" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="340" y="308" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">memories/agents/</text>
+          <text x="340" y="328" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">code-reviewer/</text>
+          <text x="340" y="344" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">test-generator/</text>
+          <text x="340" y="362" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Scoped per agent identity</text>
+
+          <!-- Index -->
+          <rect x="460" y="284" width="200" height="100" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="560" y="308" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">.crux/</text>
+          <text x="560" y="328" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">memory-index.yml</text>
+          <text x="560" y="344" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">Prioritised discovery</text>
+          <text x="560" y="362" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Rebuilt after every change</text>
+
+          <!-- Reference Tracking -->
+          <rect x="680" y="284" width="200" height="100" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="780" y="308" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">reference-tracking/</text>
+          <text x="780" y="328" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">*.refs.yml</text>
+          <text x="780" y="344" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">Per-memory usage data</text>
+          <text x="780" y="362" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Drives promote/demote</text>
+
+          <!-- Hooks & MCP -->
+          <rect x="20" y="430" width="200" height="70" rx="8" fill="#1e2a2a" stroke="#2a3838" stroke-width="1"/>
+          <text x="120" y="458" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">HOOKS</text>
+          <text x="120" y="478" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Session start nudge</text>
+          <text x="120" y="492" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Post-dream rebuild</text>
+
+          <rect x="350" y="430" width="200" height="70" rx="8" fill="#1e2a2a" stroke="#2a3838" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="450" y="458" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">MCP SERVER (optional)</text>
+          <text x="450" y="478" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Semantic search via</text>
+          <text x="450" y="492" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">sentence-transformers</text>
+
+          <rect x="680" y="430" width="200" height="70" rx="8" fill="#1e2a2a" stroke="#2a3838" stroke-width="1"/>
+          <text x="780" y="458" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">PLATFORMS</text>
+          <text x="780" y="478" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Cursor | Claude Code | Generic</text>
+          <text x="780" y="492" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Same engine, different wiring</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Memory Lifecycle
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">The Memory Lifecycle</h2>
+      <p class="section-intro">Memories follow a continuous lifecycle: agents do work, learnings are extracted via dreaming, memories are consolidated during REM sleep, and surfaced on demand via MindReader.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 800 360" class="mem-svg" role="img" aria-label="Memory Lifecycle Diagram">
+          <defs>
+            <marker id="lc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+            <marker id="lc-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#e06c75"/>
+            </marker>
+          </defs>
+
+          <!-- Phase 1: Work -->
+          <circle cx="120" cy="120" r="64" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="2"/>
+          <text x="120" y="108" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">WORK</text>
+          <text x="120" y="128" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Complete a spec</text>
+          <text x="120" y="142" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">or unit of work</text>
+
+          <!-- Phase 2: Dream -->
+          <circle cx="380" cy="120" r="64" fill="#1e2a2a" stroke="#d4915a" stroke-width="2"/>
+          <text x="380" y="104" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">DREAM</text>
+          <text x="380" y="122" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Extract learnings</text>
+          <text x="380" y="136" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">/crux-dream</text>
+          <text x="380" y="150" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Analyse &amp; save facts</text>
+
+          <!-- Phase 3: REM Sleep -->
+          <circle cx="640" cy="120" r="64" fill="#1e2a2a" stroke="#f0c674" stroke-width="2"/>
+          <text x="640" y="104" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">REM</text>
+          <text x="640" y="122" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Rebalance</text>
+          <text x="640" y="136" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">/crux-dream --rem</text>
+          <text x="640" y="150" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Promote, demote, merge</text>
+
+          <!-- Phase 4: MindReader -->
+          <circle cx="380" cy="300" r="50" fill="#1e2a2a" stroke="#98c379" stroke-width="2"/>
+          <text x="380" y="290" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">MIND</text>
+          <text x="380" y="306" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">READER</text>
+          <text x="380" y="322" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Query on demand</text>
+
+          <!-- Arrows -->
+          <path d="M 184 120 L 314 120" stroke="#d4915a" stroke-width="2" marker-end="url(#lc-arrow)"/>
+          <path d="M 444 120 L 574 120" stroke="#d4915a" stroke-width="2" marker-end="url(#lc-arrow)"/>
+          <path d="M 640 184 Q 640 300 432 300" stroke="#d4915a" stroke-width="2" marker-end="url(#lc-arrow)" fill="none"/>
+          <path d="M 328 300 Q 120 300 120 186" stroke="#d4915a" stroke-width="2" marker-end="url(#lc-arrow)" fill="none"/>
+
+          <!-- Labels on arrows -->
+          <text x="248" y="108" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">extract</text>
+          <text x="510" y="108" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">consolidate</text>
+          <text x="560" y="260" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">surface</text>
+          <text x="200" y="260" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">inform</text>
+
+          <!-- Forget: exit ramp from any phase -->
+          <rect x="660" y="220" width="120" height="56" rx="8" fill="#1e2a2a" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="720" y="244" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="700">FORGET</text>
+          <text x="720" y="260" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">/crux-forget</text>
+          <text x="720" y="272" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Remove from any phase</text>
+          <path d="M 690 178 L 700 218" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#lc-arrow-red)" fill="none"/>
+          <text x="714" y="200" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9">forget</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Dream Workflow
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section">
+    <div class="section-content">
+      <h2 class="section-title">Dream Workflow</h2>
+      <p class="section-intro">After a spec (or unit of work) completes, run <code>/crux-dream</code> to extract learnings. The agent walks through a structured analysis flow.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 320" class="mem-svg" role="img" aria-label="Dream Workflow Diagram">
+          <defs>
+            <marker id="dw-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+          </defs>
+
+          <!-- Step boxes -->
+          <rect x="10" y="40" width="110" height="60" rx="6" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="1.5"/>
+          <text x="65" y="62" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">1. VERIFY</text>
+          <text x="65" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Check spec</text>
+          <text x="65" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">completed</text>
+
+          <line x1="120" y1="70" x2="140" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="142" y="40" width="110" height="60" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="197" y="62" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">2. DIFF</text>
+          <text x="197" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Repo changes</text>
+          <text x="197" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">since spec start</text>
+
+          <line x1="252" y1="70" x2="272" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="274" y="40" width="110" height="60" rx="6" fill="#1e2a2a" stroke="#f0c674" stroke-width="1.5"/>
+          <text x="329" y="62" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">3. ANALYSE</text>
+          <text x="329" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Spec + output +</text>
+          <text x="329" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">existing memories</text>
+
+          <line x1="384" y1="70" x2="404" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="406" y="40" width="120" height="60" rx="6" fill="#1e2a2a" stroke="#e06c75" stroke-width="1.5"/>
+          <text x="466" y="62" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">4. CONFLICTS</text>
+          <text x="466" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Detect contra-</text>
+          <text x="466" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">dictions, resolve</text>
+
+          <line x1="526" y1="70" x2="546" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="548" y="40" width="110" height="60" rx="6" fill="#1e2a2a" stroke="#98c379" stroke-width="1.5"/>
+          <text x="603" y="62" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">5. PRESENT</text>
+          <text x="603" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Top N candidate</text>
+          <text x="603" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">facts for review</text>
+
+          <line x1="658" y1="70" x2="678" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="680" y="40" width="100" height="60" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="730" y="62" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">6. SAVE</text>
+          <text x="730" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">CRUD memories</text>
+          <text x="730" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">user confirms</text>
+
+          <line x1="780" y1="70" x2="800" y2="70" stroke="#d4915a" stroke-width="1.5" marker-end="url(#dw-arrow)"/>
+
+          <rect x="802" y="40" width="88" height="60" rx="6" fill="#1e2a2a" stroke="#c678dd" stroke-width="1.5"/>
+          <text x="846" y="62" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">7. ARCHIVE</text>
+          <text x="846" y="78" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">Move spec</text>
+          <text x="846" y="90" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="8">or keep</text>
+
+          <!-- Detail boxes below -->
+          <rect x="40" y="140" width="260" height="160" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="170" y="165" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">Candidate Fact Example</text>
+          <text x="60" y="188" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">[learning]</text>
+          <text x="60" y="204" fill="#e8eeee" font-family="Inter,sans-serif" font-size="9">React.memo on list items</text>
+          <text x="60" y="218" fill="#e8eeee" font-family="Inter,sans-serif" font-size="9">reduced re-render time from</text>
+          <text x="60" y="232" fill="#e8eeee" font-family="Inter,sans-serif" font-size="9">480ms to 12ms on 500-item lists</text>
+          <text x="60" y="254" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="8">strength: 1 | source: component-library</text>
+          <text x="60" y="270" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="8">tags: [react, performance, rendering]</text>
+
+          <rect x="340" y="140" width="250" height="160" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="465" y="165" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">Conflict Detection</text>
+          <text x="360" y="188" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">When a new candidate contradicts</text>
+          <text x="360" y="204" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">an existing memory, the agent</text>
+          <text x="360" y="220" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">presents both sides and asks:</text>
+          <text x="360" y="244" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">1. Keep existing</text>
+          <text x="360" y="260" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">2. Replace with new</text>
+          <text x="360" y="276" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">3. Merge both</text>
+          <text x="360" y="292" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">4. Keep both + note</text>
+
+          <rect x="630" y="140" width="250" height="160" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="755" y="165" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">Archival Options</text>
+          <text x="650" y="188" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">After memories are saved, the</text>
+          <text x="650" y="204" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">agent offers to handle the spec:</text>
+          <text x="650" y="232" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">1. Move to archive (recommended)</text>
+          <text x="650" y="248" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">2. Leave in place</text>
+          <text x="650" y="264" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9">3. Delete</text>
+          <text x="650" y="290" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Summary written to spec directory</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       REM Sleep Workflow
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">REM Sleep Workflow</h2>
+      <p class="section-intro">Periodic rebalancing of the entire memory corpus. Run <code>/crux-dream --rem</code> to scan all memories and trackers, detect issues, and apply corrections.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 340" class="mem-svg" role="img" aria-label="REM Sleep Workflow Diagram">
+          <defs>
+            <marker id="rem-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#f0c674"/>
+            </marker>
+          </defs>
+
+          <!-- Steps as vertical flow -->
+          <rect x="20" y="20" width="180" height="50" rx="6" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="1.5"/>
+          <text x="110" y="42" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">1. LOAD</text>
+          <text x="110" y="58" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">All memories + trackers</text>
+
+          <line x1="200" y1="45" x2="230" y2="45" stroke="#f0c674" stroke-width="1.5" marker-end="url(#rem-arrow)"/>
+
+          <rect x="232" y="20" width="180" height="50" rx="6" fill="#1e2a2a" stroke="#f0c674" stroke-width="1.5"/>
+          <text x="322" y="42" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">2. VERIFY</text>
+          <text x="322" y="58" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Consistency check</text>
+
+          <line x1="412" y1="45" x2="442" y2="45" stroke="#f0c674" stroke-width="1.5" marker-end="url(#rem-arrow)"/>
+
+          <rect x="444" y="20" width="180" height="50" rx="6" fill="#1e2a2a" stroke="#e06c75" stroke-width="1.5"/>
+          <text x="534" y="42" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">3. CONFLICTS</text>
+          <text x="534" y="58" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Detect contradictions</text>
+
+          <line x1="624" y1="45" x2="654" y2="45" stroke="#f0c674" stroke-width="1.5" marker-end="url(#rem-arrow)"/>
+
+          <rect x="656" y="20" width="224" height="50" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="768" y="42" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">4. RECOMMEND &amp; APPLY</text>
+          <text x="768" y="58" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">User confirms changes</text>
+
+          <!-- Recommendation categories -->
+          <text x="450" y="110" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">Recommendation Categories</text>
+
+          <rect x="20" y="126" width="160" height="80" rx="6" fill="#141c1c" stroke="#98c379" stroke-width="1"/>
+          <text x="100" y="148" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">PROMOTE</text>
+          <text x="100" y="166" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Strength exceeds</text>
+          <text x="100" y="180" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">promoteAt threshold</text>
+          <text x="100" y="196" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="8">idea@5 → learning@15 → core</text>
+
+          <rect x="200" y="126" width="160" height="80" rx="6" fill="#141c1c" stroke="#e06c75" stroke-width="1"/>
+          <text x="280" y="148" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">DEMOTE</text>
+          <text x="280" y="166" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Unreferenced for</text>
+          <text x="280" y="180" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">longer than threshold</text>
+          <text x="280" y="196" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="8">default: 90 days</text>
+
+          <rect x="380" y="126" width="160" height="80" rx="6" fill="#141c1c" stroke="#5a7070" stroke-width="1"/>
+          <text x="460" y="148" text-anchor="middle" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">ARCHIVE</text>
+          <text x="460" y="166" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Unreferenced for</text>
+          <text x="460" y="180" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">longer than archive</text>
+          <text x="460" y="196" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="8">default: 180 days</text>
+
+          <rect x="560" y="126" width="160" height="80" rx="6" fill="#141c1c" stroke="#61afef" stroke-width="1"/>
+          <text x="640" y="148" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">CONSOLIDATE</text>
+          <text x="640" y="166" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Merge duplicate or</text>
+          <text x="640" y="180" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">near-duplicate memories</text>
+
+          <rect x="740" y="126" width="140" height="80" rx="6" fill="#141c1c" stroke="#f0c674" stroke-width="1"/>
+          <text x="810" y="148" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">PROMOTE TO</text>
+          <text x="810" y="162" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">RULE</text>
+          <text x="810" y="180" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">30+ references</text>
+          <text x="810" y="196" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">→ permanent rule</text>
+
+          <!-- Yolo mode note -->
+          <rect x="20" y="240" width="860" height="80" rx="8" fill="rgba(240, 198, 116, 0.06)" stroke="rgba(240, 198, 116, 0.3)" stroke-width="1"/>
+          <text x="60" y="268" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">--yolo mode</text>
+          <text x="60" y="288" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Auto-applies all non-conflict changes. Conflicts always require user input — even in unattended mode.</text>
+          <text x="60" y="306" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">REM summary written to archiveDir as rem-{yyyymmdd}.md covering all memories reviewed.</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Type Transition & Promotion
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section">
+    <div class="section-content">
+      <h2 class="section-title">Memory Types &amp; Promotion</h2>
+      <p class="section-intro">Memories are classified into types representing different categories of knowledge. As memories prove their value through repeated use, they are automatically promoted to higher-priority types.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 400" class="mem-svg" role="img" aria-label="Memory Type Transition Diagram">
+          <defs>
+            <marker id="tp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+            <marker id="tp-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#e06c75"/>
+            </marker>
+          </defs>
+
+          <!-- Idea -->
+          <rect x="30" y="130" width="140" height="100" rx="10" fill="#1e2a2a" stroke="#c678dd" stroke-width="2"/>
+          <rect x="30" y="130" width="140" height="32" rx="10" fill="rgba(198,120,221,0.15)"/>
+          <text x="100" y="152" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">IDEA</text>
+          <text x="100" y="178" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Speculative thoughts</text>
+          <text x="100" y="194" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">for future exploration</text>
+          <text x="100" y="218" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Priority: 5 (lowest)</text>
+
+          <!-- Arrow idea → learning -->
+          <line x1="170" y1="180" x2="240" y2="180" stroke="#d4915a" stroke-width="2" marker-end="url(#tp-arrow)"/>
+          <text x="205" y="172" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">5 refs</text>
+
+          <!-- Learning -->
+          <rect x="242" y="130" width="140" height="100" rx="10" fill="#1e2a2a" stroke="#98c379" stroke-width="2"/>
+          <rect x="242" y="130" width="140" height="32" rx="10" fill="rgba(152,195,121,0.15)"/>
+          <text x="312" y="152" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">LEARNING</text>
+          <text x="312" y="178" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Patterns &amp; insights</text>
+          <text x="312" y="194" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">from completed work</text>
+          <text x="312" y="218" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Priority: 4</text>
+
+          <!-- Arrow learning → core -->
+          <line x1="382" y1="180" x2="452" y2="180" stroke="#d4915a" stroke-width="2" marker-end="url(#tp-arrow)"/>
+          <text x="417" y="172" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">15 refs</text>
+
+          <!-- Core -->
+          <rect x="454" y="110" width="160" height="120" rx="10" fill="#1e2a2a" stroke="#d4915a" stroke-width="2.5"/>
+          <rect x="454" y="110" width="160" height="36" rx="10" fill="rgba(212,145,90,0.18)"/>
+          <text x="534" y="134" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="14" font-weight="700">CORE</text>
+          <text x="534" y="162" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Proven, high-value</text>
+          <text x="534" y="178" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">knowledge. Highest</text>
+          <text x="534" y="194" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">priority type.</text>
+          <text x="534" y="218" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Priority: 1 (highest)</text>
+
+          <!-- Arrow core → rule -->
+          <line x1="614" y1="170" x2="684" y2="170" stroke="#f0c674" stroke-width="2" marker-end="url(#tp-arrow)"/>
+          <text x="649" y="162" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">30 refs</text>
+
+          <!-- Rule -->
+          <rect x="686" y="130" width="180" height="100" rx="10" fill="#1e2a2a" stroke="#f0c674" stroke-width="2"/>
+          <rect x="686" y="130" width="180" height="32" rx="10" fill="rgba(240,198,116,0.15)"/>
+          <text x="776" y="152" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">CURSOR RULE</text>
+          <text x="776" y="178" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Promoted to permanent</text>
+          <text x="776" y="194" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">.cursor/rules/ file</text>
+          <text x="776" y="218" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Always loaded by agent</text>
+
+          <!-- Red Flag (separate track) -->
+          <rect x="242" y="280" width="140" height="80" rx="10" fill="#1e2a2a" stroke="#e06c75" stroke-width="2"/>
+          <rect x="242" y="280" width="140" height="32" rx="10" fill="rgba(224,108,117,0.15)"/>
+          <text x="312" y="302" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">RED FLAG</text>
+          <text x="312" y="326" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Pitfalls &amp; anti-patterns</text>
+          <text x="312" y="342" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Priority: 2</text>
+
+          <!-- Arrow redflag → core -->
+          <path d="M 382 310 Q 418 310 454 230" stroke="#d4915a" stroke-width="2" marker-end="url(#tp-arrow)" fill="none"/>
+          <text x="440" y="278" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">10 refs</text>
+
+          <!-- Goal (no promotion) -->
+          <rect x="460" y="280" width="140" height="80" rx="10" fill="#1e2a2a" stroke="#61afef" stroke-width="2"/>
+          <rect x="460" y="280" width="140" height="32" rx="10" fill="rgba(97,175,239,0.15)"/>
+          <text x="530" y="302" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">GOAL</text>
+          <text x="530" y="326" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Aspirational targets</text>
+          <text x="530" y="342" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">Priority: 3 | No promotion</text>
+
+          <!-- Demotion arrows (bottom) -->
+          <rect x="30" y="280" width="180" height="80" rx="10" fill="#141c1c" stroke="#2a3838" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="120" y="304" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">ARCHIVED</text>
+          <text x="120" y="324" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Demoted after 90 days unused</text>
+          <text x="120" y="340" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Archived after 180 days</text>
+
+          <!-- Demotion arrow from idea down to archived -->
+          <path d="M 100 230 L 100 278" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#tp-arrow-red)"/>
+          <text x="80" y="256" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="8">stale</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Reference Tracking
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">Reference Tracking</h2>
+      <p class="section-intro">Every time an agent's output is influenced by a memory, the reference tracker increments its count. This externalised tracking drives all promotion and demotion decisions.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 300" class="mem-svg" role="img" aria-label="Reference Tracking Flow Diagram">
+          <defs>
+            <marker id="rt-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+          </defs>
+
+          <!-- Agent Output -->
+          <rect x="20" y="40" width="180" height="80" rx="8" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="1.5"/>
+          <text x="110" y="66" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">AGENT OUTPUT</text>
+          <text x="110" y="86" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Uses a memory insight</text>
+          <text x="110" y="102" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="9">[memory:{title}]</text>
+
+          <line x1="200" y1="80" x2="260" y2="80" stroke="#d4915a" stroke-width="1.5" marker-end="url(#rt-arrow)"/>
+
+          <!-- Tracker File -->
+          <rect x="262" y="24" width="250" height="112" rx="8" fill="#141c1c" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="387" y="48" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">{slug}.refs.yml</text>
+          <text x="282" y="70" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">slug: react-memo-list-rendering</text>
+          <text x="282" y="86" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">references: 12</text>
+          <text x="282" y="102" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">last_referenced: 2026-04-03</text>
+          <text x="282" y="118" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="9">strength: 3</text>
+
+          <line x1="512" y1="80" x2="570" y2="80" stroke="#d4915a" stroke-width="1.5" marker-end="url(#rt-arrow)"/>
+
+          <!-- Strength Sync -->
+          <rect x="572" y="40" width="160" height="80" rx="8" fill="#1e2a2a" stroke="#f0c674" stroke-width="1.5"/>
+          <text x="652" y="66" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">SYNC STRENGTH</text>
+          <text x="652" y="84" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Update memory</text>
+          <text x="652" y="100" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">frontmatter</text>
+
+          <line x1="732" y1="80" x2="780" y2="80" stroke="#d4915a" stroke-width="1.5" marker-end="url(#rt-arrow)"/>
+
+          <!-- Promotion Check -->
+          <rect x="782" y="40" width="100" height="80" rx="8" fill="#1e2a2a" stroke="#98c379" stroke-width="1.5"/>
+          <text x="832" y="66" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">PROMOTE?</text>
+          <text x="832" y="84" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Check</text>
+          <text x="832" y="100" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">threshold</text>
+
+          <!-- Benefits -->
+          <rect x="20" y="170" width="860" height="110" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="450" y="196" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">Why Per-Memory Tracker Files?</text>
+
+          <text x="60" y="224" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Zero contention</text>
+          <text x="60" y="240" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Concurrent sessions write different files</text>
+
+          <text x="310" y="224" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Clean separation</text>
+          <text x="310" y="240" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Memory frontmatter describes what, not usage</text>
+
+          <text x="590" y="224" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Lazy creation</text>
+          <text x="590" y="240" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">No overhead for unreferenced memories</text>
+
+          <text x="60" y="262" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Easy cleanup</text>
+          <text x="60" y="268" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9"> </text>
+
+          <text x="310" y="262" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Small &amp; diffable</text>
+          <text x="310" y="268" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9"> </text>
+
+          <text x="590" y="262" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">Drives REM sleep</text>
+          <text x="590" y="268" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9"> </text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Agent Scoping
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section">
+    <div class="section-content">
+      <h2 class="section-title">Agent Scoping</h2>
+      <p class="section-intro">Memories can be scoped to specific agent identities. Agent-scoped memories are boosted for that agent but never override higher-priority base types. This lets agents develop expertise without polluting shared knowledge.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 360" class="mem-svg" role="img" aria-label="Agent Scoping Diagram">
+          <!-- Base memories -->
+          <rect x="40" y="20" width="300" height="180" rx="10" fill="#141c1c" stroke="#5b8a9a" stroke-width="2"/>
+          <text x="190" y="48" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="600">BASE MEMORIES</text>
+          <text x="190" y="68" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">memories/ — shared across all agents</text>
+
+          <rect x="60" y="82" width="80" height="28" rx="4" fill="rgba(212,145,90,0.15)" stroke="#d4915a" stroke-width="1"/>
+          <text x="100" y="100" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">core/</text>
+
+          <rect x="150" y="82" width="80" height="28" rx="4" fill="rgba(224,108,117,0.15)" stroke="#e06c75" stroke-width="1"/>
+          <text x="190" y="100" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9">redflag/</text>
+
+          <rect x="240" y="82" width="80" height="28" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="1"/>
+          <text x="280" y="100" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="9">goal/</text>
+
+          <rect x="60" y="118" width="80" height="28" rx="4" fill="rgba(152,195,121,0.15)" stroke="#98c379" stroke-width="1"/>
+          <text x="100" y="136" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">learning/</text>
+
+          <rect x="150" y="118" width="80" height="28" rx="4" fill="rgba(198,120,221,0.15)" stroke="#c678dd" stroke-width="1"/>
+          <text x="190" y="136" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="9">idea/</text>
+
+          <text x="190" y="178" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Read/write by all agents</text>
+
+          <!-- Agent memories -->
+          <rect x="400" y="20" width="240" height="180" rx="10" fill="#141c1c" stroke="#c678dd" stroke-width="2"/>
+          <text x="520" y="48" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">AGENT: code-reviewer</text>
+          <text x="520" y="66" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">memories/agents/code-reviewer/</text>
+
+          <rect x="420" y="82" width="90" height="24" rx="4" fill="rgba(224,108,117,0.12)" stroke="#e06c75" stroke-width="1"/>
+          <text x="465" y="98" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="8">redflag/</text>
+
+          <rect x="520" y="82" width="90" height="24" rx="4" fill="rgba(152,195,121,0.12)" stroke="#98c379" stroke-width="1"/>
+          <text x="565" y="98" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="8">learning/</text>
+
+          <rect x="420" y="114" width="90" height="24" rx="4" fill="rgba(198,120,221,0.12)" stroke="#c678dd" stroke-width="1"/>
+          <text x="465" y="130" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="8">idea/</text>
+
+          <text x="520" y="164" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="9">BOOSTED</text>
+          <text x="520" y="180" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Same type → agent wins</text>
+
+          <!-- Another agent -->
+          <rect x="690" y="20" width="190" height="180" rx="10" fill="#141c1c" stroke="#61afef" stroke-width="2"/>
+          <text x="785" y="48" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">AGENT: test-gen</text>
+          <text x="785" y="66" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">memories/agents/test-generator/</text>
+
+          <rect x="710" y="82" width="70" height="24" rx="4" fill="rgba(152,195,121,0.12)" stroke="#98c379" stroke-width="1"/>
+          <text x="745" y="98" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="8">learning/</text>
+
+          <rect x="790" y="82" width="70" height="24" rx="4" fill="rgba(198,120,221,0.12)" stroke="#c678dd" stroke-width="1"/>
+          <text x="825" y="98" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="8">idea/</text>
+
+          <text x="785" y="164" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9">ISOLATED</text>
+          <text x="785" y="180" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Cannot read code-reviewer</text>
+
+          <!-- Priority resolution table -->
+          <rect x="40" y="230" width="840" height="110" rx="8" fill="#141c1c" stroke="#2a3838" stroke-width="1"/>
+          <text x="460" y="256" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">Boost Resolution Rules</text>
+
+          <text x="80" y="280" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">Agent learning/ vs Base learning/</text>
+          <text x="80" y="296" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">→ Agent wins (same type, agent boosted)</text>
+
+          <text x="380" y="280" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">Agent learning/ vs Base redflag/</text>
+          <text x="380" y="296" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="9">→ Base wins (higher-priority type)</text>
+
+          <text x="680" y="280" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">Agent core/ vs Base learning/</text>
+          <text x="680" y="296" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="9">→ Agent wins (higher-priority type)</text>
+
+          <text x="460" y="328" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Agent memories are only written during dream workflow — never during normal agent work</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Directory Structure
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">File Structure &amp; Format</h2>
+      <p class="section-intro">Each memory is self-contained &mdash; its YAML frontmatter and body together provide full context. Files are organised by type in subdirectories.</p>
+
+      <div class="mem-two-col">
+        <div class="mem-diagram-wrap">
+          <svg viewBox="0 0 400 440" class="mem-svg" role="img" aria-label="Memory Directory Structure">
+            <!-- Directory tree -->
+            <text x="20" y="30" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="600">memories/</text>
+
+            <line x1="30" y1="40" x2="30" y2="56" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="56" x2="50" y2="56" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="60" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11">core/</text>
+            <line x1="70" y1="68" x2="70" y2="80" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="80" x2="90" y2="80" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="84" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">react-memo.memory.crux.md</text>
+
+            <line x1="30" y1="56" x2="30" y2="104" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="104" x2="50" y2="104" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="108" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="11">redflag/</text>
+            <line x1="70" y1="116" x2="70" y2="128" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="128" x2="90" y2="128" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="132" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">cache-race.memory.md</text>
+
+            <line x1="30" y1="104" x2="30" y2="152" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="152" x2="50" y2="152" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="156" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="11">goal/</text>
+
+            <line x1="30" y1="152" x2="30" y2="180" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="180" x2="50" y2="180" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="184" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="11">learning/</text>
+            <line x1="70" y1="192" x2="70" y2="204" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="204" x2="90" y2="204" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="208" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">usecallback-stale.memory.md</text>
+
+            <line x1="30" y1="180" x2="30" y2="228" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="228" x2="50" y2="228" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="232" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="11">idea/</text>
+            <line x1="70" y1="240" x2="70" y2="252" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="252" x2="90" y2="252" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="256" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">k8s-limits.memory.md</text>
+
+            <line x1="30" y1="228" x2="30" y2="280" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="280" x2="50" y2="280" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="284" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="11">archived/</text>
+
+            <line x1="30" y1="280" x2="30" y2="310" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="310" x2="50" y2="310" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="314" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="11">agents/</text>
+            <line x1="70" y1="322" x2="70" y2="338" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="338" x2="90" y2="338" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="342" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">code-reviewer/</text>
+            <line x1="110" y1="350" x2="110" y2="366" stroke="#2a3838" stroke-width="1"/>
+            <line x1="110" y1="366" x2="130" y2="366" stroke="#2a3838" stroke-width="1"/>
+            <text x="135" y="370" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="9">redflag/ learning/ idea/</text>
+
+            <line x1="70" y1="338" x2="70" y2="394" stroke="#2a3838" stroke-width="1"/>
+            <line x1="70" y1="394" x2="90" y2="394" stroke="#2a3838" stroke-width="1"/>
+            <text x="95" y="398" fill="#8fa3a3" font-family="'JetBrains Mono',monospace" font-size="9">test-generator/</text>
+
+            <line x1="30" y1="310" x2="30" y2="426" stroke="#2a3838" stroke-width="1"/>
+            <line x1="30" y1="426" x2="50" y2="426" stroke="#2a3838" stroke-width="1"/>
+            <text x="55" y="430" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="11" font-style="italic">shared/ → symlink (read-only)</text>
+          </svg>
+        </div>
+
+        <div class="mem-frontmatter-example">
+          <h3>Memory Frontmatter</h3>
+          <div class="code-block code-block--crux">
+            <div class="code-block-header">
+              <span class="code-block-label">react-memo.memory.crux.md</span>
+            </div>
+            <pre><code>---
+title: "React.memo on list item components
+  prevents full re-render on data changes"
+description: "Wrapping list item components
+  in React.memo with a custom comparator
+  reduced re-render time from 480ms to 12ms
+  on a 500-item list."
+type: "core"
+strength: 3
+created: 2026-04-03
+modified: 2026-04-03
+source: "20260403-component-library"
+tags: [react, performance, rendering]
+promoted_from: "learning"
+---
+
+(CRUX-compressed memory body)</code></pre>
+          </div>
+          <div class="mem-field-grid">
+            <div class="mem-field"><code>title</code> <span>Instructive, descriptive &mdash; conveys insight at a glance</span></div>
+            <div class="mem-field"><code>description</code> <span>Self-contained summary, enough to act on without reading body</span></div>
+            <div class="mem-field"><code>type</code> <span>Category matching directory: core, redflag, goal, learning, idea</span></div>
+            <div class="mem-field"><code>strength</code> <span>Numeric score, auto-incremented on reference</span></div>
+            <div class="mem-field"><code>source</code> <span>Unit of work that originated this memory</span></div>
+            <div class="mem-field"><code>promoted_from</code> <span>Previous type if a transition occurred</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       MindReader
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section">
+    <div class="section-content">
+      <h2 class="section-title">MindReader</h2>
+      <p class="section-intro">Query and surface memories on demand. Compressed memories are decompressed for display without modifying files on disk.</p>
+
+      <div class="mem-commands-grid">
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-dream</code>
+            <span class="memories-command-desc">Extract &amp; rebalance</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-dream &lt;spec-name&gt;</code><span>Extract memories from completed work</span></div>
+            <div class="memories-command-line"><code>/crux-dream --rem</code><span>Run REM sleep rebalancing</span></div>
+            <div class="memories-command-line"><code>/crux-dream --rem --yolo</code><span>Auto-apply non-conflict changes</span></div>
+          </div>
+        </div>
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-mindreader</code>
+            <span class="memories-command-desc">Query &amp; display</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-mindreader</code><span>Show contextually relevant memories</span></div>
+            <div class="memories-command-line"><code>/crux-mindreader "query"</code><span>Search by keyword</span></div>
+            <div class="memories-command-line"><code>/crux-mindreader &lt;spec-name&gt;</code><span>Show memories from a specific spec</span></div>
+          </div>
+        </div>
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-forget</code>
+            <span class="memories-command-desc">Remove memories</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-forget &lt;memory-id&gt;</code><span>Forget a specific memory by ID</span></div>
+            <div class="memories-command-line"><code>/crux-forget "query"</code><span>Search and select memories to forget</span></div>
+            <div class="memories-command-line"><code>/crux-forget</code><span>List all memories for selection</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="memories-subsection-title">Powered by 6 Skills</h3>
+      <p class="memories-subsection-intro">The memory system is modular &mdash; each operation is handled by a dedicated skill, orchestrated by the memory manager agent.</p>
+      <div class="memories-skills">
+        <div class="memories-skill"><code>memory-crud</code><span>Create, read, update, delete</span></div>
+        <div class="memories-skill"><code>memory-extract</code><span>Analyse work, propose candidates</span></div>
+        <div class="memories-skill"><code>memory-rebalance</code><span>Promote, demote, consolidate</span></div>
+        <div class="memories-skill"><code>memory-compress</code><span>CRUX-compress memory bodies</span></div>
+        <div class="memories-skill"><code>memory-index</code><span>Build prioritised index</span></div>
+        <div class="memories-skill"><code>memory-reference-tracker</code><span>Track usage, sync strength</span></div>
+      </div>
+
+      <h3 class="memories-subsection-title">Key Features</h3>
+      <div class="memories-features">
+        <div class="memories-feature">
+          <strong>Reference Tracking</strong>
+          <span>Every time an agent uses a memory, its reference count increments. High-count memories get promoted automatically.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>CRUX Compression</strong>
+          <span>Memory bodies are CRUX-compressed to save context tokens, with original sources archived for rollback.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Agent Scoping</strong>
+          <span>Memories can be scoped to specific agents under <code>memories/agents/{id}/</code>, keeping context isolated.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Conflict Detection</strong>
+          <span>Both dream and REM sleep detect contradictions between memories and present them for manual resolution.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Platform Support & Install
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">Cross-Platform Support</h2>
+      <p class="section-intro">The same memory engine runs identically across platforms. Only the wiring layer differs &mdash; rules location, command format, hook mechanism.</p>
+
+      <div class="mem-platform-grid">
+        <div class="mem-platform-card">
+          <div class="mem-platform-name">Cursor</div>
+          <div class="mem-platform-detail"><code>.cursor/rules/*.mdc</code></div>
+          <div class="mem-platform-detail"><code>.cursor/commands/crux-dream.md</code></div>
+          <div class="mem-platform-detail"><code>.cursor/hooks/*.py</code></div>
+          <div class="mem-platform-detail"><code>.cursor/skills/*/SKILL.md</code></div>
+        </div>
+        <div class="mem-platform-card">
+          <div class="mem-platform-name">Claude Code</div>
+          <div class="mem-platform-detail"><code>CLAUDE.md</code></div>
+          <div class="mem-platform-detail"><code>.claude/commands/crux-dream.md</code></div>
+          <div class="mem-platform-detail"><code>.claude/hooks/session-start.sh</code></div>
+          <div class="mem-platform-detail"><code>.mcp.json</code></div>
+        </div>
+        <div class="mem-platform-card">
+          <div class="mem-platform-name">Generic</div>
+          <div class="mem-platform-detail"><code>MEMORIES_AGENT_RULE.md</code></div>
+          <div class="mem-platform-detail"><code>crux-dream (shell script)</code></div>
+          <div class="mem-platform-detail"><code>Git hooks / manual</code></div>
+          <div class="mem-platform-detail"><code>MCP stdio server</code></div>
+        </div>
+      </div>
+
+      <div class="memories-install" style="margin-top: var(--space-12);">
+        <h3 class="memories-subsection-title">Get Started</h3>
+        <div class="code-block code-block--install memories-install-block">
+          <div class="code-block-header">
+            <span class="code-block-label">Agent Prompt</span>
+            <button class="copy-button" data-copy="Fetch https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md, read it, and follow its instructions to install CRUX Compress with --with-memories">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>Fetch https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.crux.md, read it, and follow its instructions to install CRUX Compress with --with-memories</code></pre>
+        </div>
+        <p class="memories-install-fallback" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">
+          Or with Python: <code>curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-memories</code>
+        </p>
+      </div>
+
+      <div class="memories-optin" style="margin-top: var(--space-6);">
+        <span class="memories-optin-badge">Opt-in</span>
+        <span>Memories are disabled by default. The <code>--with-memories</code> flag scaffolds all memory components. Enable via <code>.crux/crux-memories.json</code> to start capturing agent learnings.</span>
+      </div>
+
+      <a href="https://github.com/zotoio/CRUX-Compress/blob/main/docs/crux-memories.md" class="spec-link" target="_blank" rel="noopener" style="margin-top: var(--space-6); display: inline-flex;">
+        Full Memories Documentation &rarr;
+      </a>
+    </div>
+  </section>
+
+  <footer id="footer" class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h2 class="footer-title">CRUX</h2>
+        <p class="footer-subtitle">Context Reduction Using X-encoding</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/zotoio/CRUX-Compress" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CRUX.md" target="_blank" rel="noopener">Specification</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      </div>
+      <div class="footer-meta">
+        <span class="footer-version">v2.5.0</span>
+        <span class="footer-license">MIT License</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/nav.js"></script>
+  <script src="scripts/compression-demo.js"></script>
+</body>
+</html>

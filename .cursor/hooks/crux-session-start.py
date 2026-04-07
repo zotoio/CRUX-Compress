@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 PENDING_FILE = Path(".crux/pending-compression.json")
+PENDING_REBUILD = Path(".crux/pending-index-rebuild.json")
 MEMORIES_CONFIG = Path(".crux/crux-memories.json")
 
 
@@ -42,6 +43,33 @@ def _read_pending_compression() -> str | None:
         'Start your response with: "Note: There are pending CRUX compressions from a previous session. '
         'Would you like me to run /crux-compress for these files?"\n\n'
         "Then proceed to answer their actual question."
+    )
+
+
+def _read_pending_index_rebuild() -> str | None:
+    if not PENDING_REBUILD.is_file():
+        return None
+
+    try:
+        data = json.loads(PENDING_REBUILD.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+    if not data.get("needsRebuild"):
+        return None
+
+    files = data.get("files", [])
+    count = len(files)
+    file_list = "".join(f"  - {f}\n" for f in files[:10])
+    if count > 10:
+        file_list += f"  - ... and {count - 10} more\n"
+
+    return (
+        "[CRUX Memory Index Stale]\n\n"
+        f"The memory index needs rebuilding — {count} memory file(s) changed since the last rebuild:\n"
+        f"{file_list}\n"
+        "Run: `python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py`\n"
+        "to rebuild, then delete `.crux/pending-index-rebuild.json`."
     )
 
 
@@ -91,6 +119,10 @@ def main() -> None:
     pending = _read_pending_compression()
     if pending:
         parts.append(pending)
+
+    rebuild = _read_pending_index_rebuild()
+    if rebuild:
+        parts.append(rebuild)
 
     nudge = _read_memory_nudge()
     if nudge:

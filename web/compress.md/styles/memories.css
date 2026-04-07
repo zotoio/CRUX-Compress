@@ -1,0 +1,144 @@
+/* ============================================
+   CRUX Memories Page — Dedicated Styles
+   ============================================ */
+
+.mem-section {
+  padding: var(--space-16) var(--space-6);
+}
+
+.mem-section--alt {
+  background: var(--bg-secondary);
+}
+
+/* SVG diagrams */
+.mem-diagram-wrap {
+  margin: var(--space-8) 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mem-svg {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Two-column layout for directory + frontmatter */
+.mem-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.mem-frontmatter-example h3 {
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.mem-field-grid {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.mem-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--accent-compressed);
+}
+
+.mem-field code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent-symbol);
+  background: transparent;
+  padding: 0;
+}
+
+.mem-field span {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Commands grid */
+.mem-commands-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+/* Platform cards */
+.mem-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.mem-platform-card {
+  padding: var(--space-6);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+
+.mem-platform-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--accent-compressed);
+  margin-bottom: var(--space-4);
+}
+
+.mem-platform-detail {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--space-1) 0;
+}
+
+.mem-platform-detail code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  background: rgba(91, 138, 154, 0.08);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .mem-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .mem-platform-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mem-commands-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .mem-section {
+    padding: var(--space-10) var(--space-4);
+  }
+
+  .mem-diagram-wrap {
+    margin: var(--space-4) calc(-1 * var(--space-4));
+    padding: 0 var(--space-2);
+  }
+
+  .mem-svg {
+    min-width: 600px;
+  }
+}

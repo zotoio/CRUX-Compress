@@ -1,6 +1,6 @@
 ---
-generated: 2026-04-05
-sourceChecksum: "1576086510"
+generated: 2026-04-06 11:00
+sourceChecksum: "2960519518"
 beforeTokens: ~7246
 afterTokens: ~2040
 reducedBy: 72%
@@ -52,6 +52,16 @@ E.log{log→BLUE;log_verbose→BLUE(if VERBOSE);
 Λ.confirm{NON_INTERACTIVE→⊤;
  prompt+default[Y|N]→input→y/Y=True|EOFError→default}
 
+M.MEMORY_FILE_PREFIXES{
+ .cursor/[agents/crux-cursor-memory-manager.md,
+  commands/[crux-dream.md,crux-mindreader.md,crux-forget.md],
+  hooks/crux-detect-memory-changes.py,
+  rules/crux-memories-integration.crux.mdc,
+  skills/crux-skill-memory-*]}
+
+Λ.is_memory_file{rel_path.startswith(∈MEMORY_FILE_PREFIXES)}
+Λ.memories_already_installed{.crux/crux-memories.json∃}
+
 Λ.http_get{urllib.request+User-Agent;timeout=30;fail→None}
 
 Λ.get_latest_ver{
@@ -91,29 +101,52 @@ E.log{log→BLUE;log_verbose→BLUE(if VERBOSE);
  ¬AGENTS.md→create w/ block;
  rm AGENTS.crux.md after}
 
+Λ.get_release_files{
+ fetch .crux/dist-manifest.json←CDN|RAW→json .files;
+ ¬avail→fallback built-in minimal list}
+
+Λ._download_one{CDN/{path}→target_dir/{path};return (path,ok)}
+
 Λ.download_from_cdn{
- CDN@v{ver}/file ∀RELEASE_FILES;
+ CDN@v{ver}/file ∀get_release_files(ver);
+ ThreadPoolExecutor(max_workers=8)→parallel DL;
+ progress: done/total every 4 files;
  AGENTS.md→extract <CRUX> block→AGENTS.crux.md;
  0 succeeded→error+exit;report stats}
 
+Λ.verify_checksums{
+ staging/.crux/crux-release-files.json∃→
+ json .releases[ver].files→∀{file,checksum}→
+ sha256 compare;mismatch→warn;report stats}
+
 Λ.download_and_stage{
  url=DL/v{ver}/CRUX-Compress-v{ver}.zip;
- try http_get→zipfile→tmpdir;
- ¬zip|¬GitHub→fallback download_from_cdn;
+ try http_get→zipfile→tmpdir→verify_checksums;
+ ¬zip|¬GitHub→fallback download_from_cdn→verify_checksums;
  return staging_dir}
 
+Λ.load_known_checksums{
+ .crux/crux-release-files.json→∀releases→∀files→
+ collect {filepath→{checksum*}} across all versions}
+
 Λ.preview_install{
- ∀staged files→checksum compare:
- same→[NO CHANGE]BLUE;
- diff→[UPDATE]YELLOW(+diff if verbose);
- ¬∃→[CREATE]GREEN}
+ ∀staged files:
+  is_memory_file+¬install_memories→skip+count;
+  checksum compare:
+   same→[NO CHANGE]BLUE;
+   diff+cksum∉known_releases→[MODIFIED]RED"local changes detected";
+   diff+cksum∈known_releases→[UPDATE]YELLOW(+diff if verbose);
+   ¬∃→[CREATE]GREEN;
+ skipped∃→[SKIP]BLUE"N memory files (use --with-memories)";
+ return locally_modified[]}
 
 Λ.install_from_staging{
  save hooks.json aside→tmpfile;
- shutil.copy2 all files;
+ ∀files: is_memory_file+¬install_memories→skip;
+ else→shutil.copy2;
  merge_hooks_json(saved);
  upsert_agents_crux_block(AGENTS.crux.md);
- chmod +x crux-utils.py}
+ chmod +x [crux-utils.py,memory-index.py,post-dream.py]}
 
 M.DEPRECATED_FILES{
  .cursor/hooks/detect-crux-changes.sh;
@@ -135,7 +168,8 @@ M.DEPRECATED_HOOK_COMMANDS{
  changed→write+report}
 
 Λ.download_update_script{
- try RAW/install.py→.crux/update.py»chmod +x;
+ __file__∃+is install.py→shutil.copy2→.crux/update.py;
+ ¬file(piped)→try RAW/install.py→.crux/update.py»chmod +x;
  ¬GitHub→fallback CDN@main/install.py;
  also fetch RAW/install.crux.md→install.crux.md}
 
@@ -152,7 +186,7 @@ E.DEFAULT_MEMORIES_CONFIG{
    archiveDir=.ai-ignored/executed,indexFile=.crux/memory-index.yml};
   sizeUnit=lines;compressionMinLines=500;maxMemorySize=1000;
   compressionTarget=33;unitOfWork=spec;
-  commands=[/crux-dream,/crux-mindreader];
+  commands=[/crux-dream,/crux-mindreader,/crux-forget];
   typePriority=[core,redflag,goal,learning,idea,archived];
   typeTransitions={idea→5→learning;learning→15→core;redflag→10→core};
   demoteAfterDays=90;archiveAfterDays=180;
@@ -179,8 +213,11 @@ E.DEFAULT_MEMORIES_CONFIG{
   older→warn;FORCE|confirm downgrade|exit
  }»
  BACKUP→create_backup_zip»
- download_and_stage»preview_install»
- confirm→install_from_staging»
+ install_memories=--with-memories|memories_already_installed»
+ load_known_checksums(if upgrade)»
+ download_and_stage»preview_install(install_memories)→locally_modified»
+ locally_modified∃→warn+list+suggest "git diff before commit"»
+ confirm→install_from_staging(install_memories)»
  cleanup_deprecated_files»cleanup_deprecated_hooks»
  download_update_script»
  --with-memories→setup_memories»
@@ -200,27 +237,20 @@ E.DEFAULT_MEMORIES_CONFIG{
   write .crux/crux.json←{"version":"{ver}"}};
  report ver+next steps}
 
-M.RELEASE_FILES{
- CRUX.md;install.crux.md;
- .crux/[crux.json,crux-release-files.json];
- .cursor/[hooks.json,
-  agents/crux-cursor-rule-manager.md,
-  commands/crux-compress.md,
-  hooks/[crux-detect-changes.py,crux-session-start.py],
-  rules/_CRUX-RULE.mdc,
-  skills/crux-utils/[SKILL.md,scripts/crux-utils.py]]}
+M.RELEASE_FILES{←.crux/dist-manifest.json .files
+ (single source of truth: scripts/create-crux-zip.py→DIST_FILES)
+ fallback=built-in minimal list if manifest unavailable}
 
 M.standard_files(backup){
  CRUX.md;AGENTS.md;install.crux.md;
  .crux/[crux.json,crux-release-files.json];
- .cursor/[hooks.json,
-  agents/crux-cursor-rule-manager.md,
+ .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
   commands/crux-compress.md,
   hooks/[crux-detect-changes.py,crux-session-start.py],
   rules/_CRUX-RULE.mdc,
   skills/crux-utils/[SKILL.md,scripts/crux-utils.py]]}
 
-Ω.decomp{lang=python;stdlib=[argparse,hashlib,io,json,os,
+Ω.decomp{lang=python;stdlib=[argparse,concurrent.futures,hashlib,io,json,os,
  re,shutil,subprocess,sys,tempfile,zipfile,datetime,pathlib,
  urllib.error,urllib.request]}
 ⟧

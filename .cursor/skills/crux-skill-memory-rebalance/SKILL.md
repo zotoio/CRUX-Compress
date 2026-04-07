@@ -537,9 +537,19 @@ After all changes are applied, write a summary to `{archiveDir}/rem-{yyyymmdd}.m
 - Untracked: {count}
 ```
 
-### Step 15: Report
+### Step 15: Rebuild Index
 
-Present a concise summary of what changed to the user.
+After all changes are applied and the REM summary is written, rebuild the memory index to reflect the current state of the corpus:
+
+```bash
+python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py
+```
+
+This is **mandatory** — skipping this step leaves the index stale, which causes downstream agents (MindReader, Dream, session-start hooks) to reference moved, deleted, or renamed files. If the script fails, report the error but do not abort — the REM summary and applied changes are still valid.
+
+### Step 16: Report
+
+Present a concise summary of what changed to the user, including confirmation that the memory index was rebuilt (or an error if it failed).
 
 ## File Move Procedure (Detailed)
 
@@ -568,7 +578,7 @@ When a memory transitions between types, follow this exact procedure:
 | Memory CRUD | `.cursor/skills/crux-skill-memory-crud/SKILL.md` | Frontmatter updates, file moves, type transitions |
 | Reference Tracker | `.cursor/skills/crux-skill-memory-reference-tracker/SKILL.md` | Tracker file format, strength sync, cleanup |
 | Memory Compress | `.cursor/skills/crux-skill-memory-compress/SKILL.md` | Compressed file handling during moves |
-| Memory Index | `.cursor/skills/crux-skill-memory-index/SKILL.md` | Index rebuild after rebalance (called post-REM) |
+| Memory Index | `.cursor/skills/crux-skill-memory-index/SKILL.md` | Index rebuild in Step 15 after all changes applied |
 
 ## Error Handling
 
@@ -587,6 +597,6 @@ When a memory transitions between types, follow this exact procedure:
 - Does not create new memories (that is `crux-skill-memory-crud`)
 - Does not perform compression directly — delegates to `crux-skill-memory-compress` when compression is enabled and recommended during Step 8
 - Does not record new references (that is `crux-skill-memory-reference-tracker`)
-- Does not rebuild the memory index (that is `crux-skill-memory-index`, called after REM completes)
+- Does not own the memory index script — it calls `crux-skill-memory-index` as a subprocess in Step 15
 - Does not automatically create rules from promoted memories — it only flags candidates
 - Does not modify `created` dates on any memory

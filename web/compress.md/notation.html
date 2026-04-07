@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Notation — CRUX</title>
+  <meta name="description" content="A symbolic language LLMs interpret naturally. Explore the full CRUX notation specification interactively.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <nav class="site-nav" id="site-nav"></nav>
+
+  <header class="page-header">
+    <div class="section-content">
+      <h1 class="section-title">The Notation</h1>
+      <p class="section-intro">A symbolic language LLMs interpret naturally. Click any section to explore.</p>
+    </div>
+  </header>
+
+  <section class="section section--notation">
+    <div class="section-content">
+      <div class="spec-explorer" id="spec-explorer">
+        <div class="spec-section" data-group="structure">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Structure</span>
+            <span class="spec-section-symbols">&#10214; &#10215; { } [ ] . ;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#10214;CRUX:source...&#10215;</code></td><td>Block delimiters with source reference</td><td><code>&#10214;CRUX:api.md ... &#10215;</code></td></tr>
+              <tr><td><code>{k=v,k2=v2}</code></td><td>Object / map</td><td><code>{timeout=30,retries=3}</code></td></tr>
+              <tr><td><code>[a,b,c]</code></td><td>List / array</td><td><code>[js,ts,py]</code></td></tr>
+              <tr><td><code>.sub</code></td><td>Namespace (e.g., <code>&#928;.core</code>)</td><td><code>R.style{...}</code></td></tr>
+              <tr><td><code>;</code></td><td>Statement separator</td><td><code>a=1; b=2</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="comparison">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Comparison</span>
+            <span class="spec-section-symbols">&gt; &lt; &#8805; &#8804; &#8800; ..</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&gt;</code></td><td>Greater than</td><td><code>size&gt;100</code></td></tr>
+              <tr><td><code>&lt;</code></td><td>Less than</td><td><code>len&lt;50</code></td></tr>
+              <tr><td><code>&#8805;</code></td><td>Greater or equal</td><td><code>version&#8805;2.0</code></td></tr>
+              <tr><td><code>&#8804;</code></td><td>Less or equal</td><td><code>line&#8804;100ch</code></td></tr>
+              <tr><td><code>&#8800;</code></td><td>Not equal</td><td><code>status&#8800;deleted</code></td></tr>
+              <tr><td><code>..</code></td><td>Range</td><td><code>port=8000..9000</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="priority">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Priority</span>
+            <span class="spec-section-symbols">&#8827; &#8826;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#8827;</code></td><td>Preferred over / takes precedence</td><td><code>CONFIRMED&#8827;DRAFT</code></td></tr>
+              <tr><td><code>&#8826;</code></td><td>Ranks below / lower priority</td><td><code>optional&#8826;required</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="dataflow">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Data Flow</span>
+            <span class="spec-section-symbols">&#8594; &#8592;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#8594;</code></td><td>Flows to / maps to / then</td><td><code>&#8704;changes&#8594;run_tests</code></td></tr>
+              <tr><td><code>&#8592;</code></td><td>Flows from / derives from</td><td><code>config&#8592;env_vars</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="sequence">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Sequence</span>
+            <span class="spec-section-symbols">&#187;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#187;</code></td><td>Then / next step / sequential</td><td><code>parse&#187;validate&#187;save</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="relations">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Relations</span>
+            <span class="spec-section-symbols">&#8883; &#8882; @ : = &#8715;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#8883;</code></td><td>Has domain/expertise</td><td><code>agent&#8883;security</code></td></tr>
+              <tr><td><code>&#8882;</code></td><td>Triggered by / activated on</td><td><code>hook&#8882;commit</code></td></tr>
+              <tr><td><code>@</code></td><td>Located at path</td><td><code>config@/etc/app</code></td></tr>
+              <tr><td><code>:</code></td><td>Has type / key-value</td><td><code>port:number</code></td></tr>
+              <tr><td><code>=</code></td><td>Equals / defined as</td><td><code>max=100</code></td></tr>
+              <tr><td><code>&#8715;</code></td><td>Contains / includes</td><td><code>deps&#8715;[react,vue]</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="logic">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Logic</span>
+            <span class="spec-section-symbols">| &amp; &#8868; &#8869; &#8704; &#8707; &#172;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>|</code></td><td>OR / alternatives</td><td><code>format=json|yaml</code></td></tr>
+              <tr><td><code>&amp;</code></td><td>AND / conjunction</td><td><code>valid&amp;complete</code></td></tr>
+              <tr><td><code>&#8868;</code></td><td>True / enabled</td><td><code>debug=&#8868;</code></td></tr>
+              <tr><td><code>&#8869;</code></td><td>False / disabled</td><td><code>cache=&#8869;</code></td></tr>
+              <tr><td><code>&#8704;</code></td><td>For all / universal</td><td><code>&#8704;files&#8594;lint</code></td></tr>
+              <tr><td><code>&#8707;</code></td><td>Exists / some</td><td><code>&#8707;config&#8594;load</code></td></tr>
+              <tr><td><code>&#172;</code></td><td>Not / negation</td><td><code>&#172;tabs!</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="change">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Change</span>
+            <span class="spec-section-symbols">&#916; + -</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#916;</code></td><td>Change / update / delta</td><td><code>&#916;schema&#8594;migrate</code></td></tr>
+              <tr><td><code>+</code></td><td>Add / include / with</td><td><code>+tests,+docs</code></td></tr>
+              <tr><td><code>-</code></td><td>Remove / exclude</td><td><code>-node_modules</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="qualifiers">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Qualifiers</span>
+            <span class="spec-section-symbols">* ? ! # &#8853;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>*</code></td><td>Many / collection</td><td><code>files*&#8594;process</code></td></tr>
+              <tr><td><code>?</code></td><td>Optional</td><td><code>config?</code></td></tr>
+              <tr><td><code>!</code></td><td>Required / important</td><td><code>auth!</code></td></tr>
+              <tr><td><code>#</code></td><td>Comment / note</td><td><code>#deprecated</code></td></tr>
+              <tr><td><code>&#8853;</code></td><td>Optimal / target</td><td><code>&#8853;performance</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="importance">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Importance</span>
+            <span class="spec-section-symbols">&#8859; &#9674;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#8859;</code></td><td>Critical / highest importance</td><td><code>&#8859;security_check</code></td></tr>
+              <tr><td><code>&#9674;</code></td><td>Lowest importance / trivial</td><td><code>&#9674;formatting</code></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="spec-section" data-group="blocks">
+          <button class="spec-section-header">
+            <span class="spec-section-title">Standard Blocks</span>
+            <span class="spec-section-symbols">&#929; E &#923; &#928; &#922; R P &#915; M &#934; &#937;</span>
+            <span class="spec-section-toggle">+</span>
+          </button>
+          <div class="spec-section-content">
+            <table class="spec-table">
+              <tr><td><code>&#929;{...}</code></td><td>Repository/project context</td><td><code>&#929;{api server}</code></td></tr>
+              <tr><td><code>E{...}</code></td><td>Entities (agents, components)</td><td><code>E{user,admin}</code></td></tr>
+              <tr><td><code>&#923;{...}</code></td><td>Commands/actions</td><td><code>&#923;{build,test,deploy}</code></td></tr>
+              <tr><td><code>&#928;{...}</code></td><td>Architecture (modules)</td><td><code>&#928;{src/,lib/}</code></td></tr>
+              <tr><td><code>&#922;{...}</code></td><td>Concepts/definitions</td><td><code>&#922;{token=JWT}</code></td></tr>
+              <tr><td><code>R{...}</code></td><td>Requirements/guidelines</td><td><code>R{&#8704;fn&#8594;test}</code></td></tr>
+              <tr><td><code>P{...}</code></td><td>Policies/constraints</td><td><code>P{&#172;force push}</code></td></tr>
+              <tr><td><code>&#915;{...}</code></td><td>Orchestration (workflows)</td><td><code>&#915;{ci&#187;cd&#187;deploy}</code></td></tr>
+              <tr><td><code>M{...}</code></td><td>Memory/state</td><td><code>M{session,cache}</code></td></tr>
+              <tr><td><code>&#934;{...}</code></td><td>Configuration</td><td><code>&#934;{port=3000}</code></td></tr>
+              <tr><td><code>&#937;{...}</code></td><td>Quality gates</td><td><code>&#937;{cov&#8805;80%}</code></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CRUX.md" class="spec-link" target="_blank" rel="noopener">
+        View Full Specification on GitHub &#8594;
+      </a>
+    </div>
+  </section>
+
+  <footer id="footer" class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h2 class="footer-title">CRUX</h2>
+        <p class="footer-subtitle">Context Reduction Using X-encoding</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/zotoio/CRUX-Compress" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CRUX.md" target="_blank" rel="noopener">Specification</a>
+        <a href="https://github.com/zotoio/CRUX-Compress/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      </div>
+      <div class="footer-meta">
+        <span class="footer-version">v2.5.0</span>
+        <span class="footer-license">MIT License</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/nav.js"></script>
+  <script src="scripts/compression-demo.js"></script>
+  <script src="scripts/spec-expander.js"></script>
+</body>
+</html>

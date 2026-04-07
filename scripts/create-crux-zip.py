@@ -3,16 +3,22 @@
 
 Usage: python3 scripts/create-crux-zip.py [output-dir]
 
-Packages all CRUX-related files for distribution.
-Output: CRUX-Compress-v{version}.zip (version read from .crux/crux.json)
+Single build step for CRUX releases. Produces:
+  - CRUX-Compress-v{version}.zip  (distribution archive)
+  - .crux/dist-manifest.json      (canonical file list for installer/CI)
+  - .crux/crux-release-files.json  (per-version checksums, updated in place)
+
+Version is read from .crux/crux.json.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
 import zipfile
+from datetime import date
 from pathlib import Path
 
 DIST_FILES = [
@@ -21,13 +27,70 @@ DIST_FILES = [
     ".crux/crux.json",
     ".cursor/hooks.json",
     ".cursor/agents/crux-cursor-rule-manager.md",
+    ".cursor/agents/crux-cursor-memory-manager.md",
     ".cursor/commands/crux-compress.md",
+    ".cursor/commands/crux-dream.md",
+    ".cursor/commands/crux-mindreader.md",
+    ".cursor/commands/crux-forget.md",
     ".cursor/hooks/crux-detect-changes.py",
+    ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
     ".cursor/rules/_CRUX-RULE.mdc",
+    ".cursor/rules/crux-memories-integration.crux.mdc",
     ".cursor/skills/crux-utils/SKILL.md",
     ".cursor/skills/crux-utils/scripts/crux-utils.py",
+    ".cursor/skills/crux-skill-memory-crud/SKILL.md",
+    ".cursor/skills/crux-skill-memory-compress/SKILL.md",
+    ".cursor/skills/crux-skill-memory-extract/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/scripts/memory-index.py",
+    ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
+    ".cursor/skills/crux-skill-memory-rebalance/SKILL.md",
+    ".cursor/skills/crux-skill-memory-reference-tracker/SKILL.md",
 ]
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def update_release_manifest(project_root: Path, version: str) -> None:
+    """Update crux-release-files.json with checksums for this version."""
+    manifest_path = project_root / ".crux" / "crux-release-files.json"
+
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    else:
+        manifest = {
+            "description": "CRUX release file manifest with checksums for verification and backup",
+            "releases": {},
+            "allFiles": {},
+        }
+
+    files_entry: dict[str, dict] = {}
+    all_release_files = DIST_FILES + ["AGENTS.md"]
+
+    for rel in all_release_files:
+        src = project_root / rel
+        if src.is_file():
+            checksum = sha256_file(src)
+            size = src.stat().st_size
+            files_entry[rel] = {"checksum": checksum, "size": size}
+            print(f"  {rel}: {checksum[:16]}... ({size} bytes)")
+
+            all_files = manifest.setdefault("allFiles", {})
+            versions = all_files.get(rel, [])
+            if version not in versions:
+                versions.append(version)
+            all_files[rel] = versions
+
+    manifest.setdefault("releases", {})[version] = {
+        "date": date.today().isoformat(),
+        "files": files_entry,
+    }
+
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    print(f"Updated {manifest_path.relative_to(project_root)} for v{version}")
 
 
 def main() -> None:
@@ -41,19 +104,31 @@ def main() -> None:
     print(f"Creating CRUX distribution package v{version}...")
     print(f"Output: {output_dir / zip_name}")
 
+    # 1. Update dist-manifest.json (canonical file list)
+    dist_manifest = project_root / ".crux" / "dist-manifest.json"
+    dist_manifest.write_text(
+        json.dumps({"version": version, "files": DIST_FILES}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Updated {dist_manifest.relative_to(project_root)}")
+
+    # 2. Update crux-release-files.json (per-version checksums)
+    print("Generating checksums...")
+    update_release_manifest(project_root, version)
+
+    # 3. Build the distribution zip
     zip_path = output_dir / zip_name
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        print("Copying core files...")
+        print("Packaging files...")
         for rel in DIST_FILES:
             src = project_root / rel
             if src.is_file():
                 zf.write(src, rel)
 
-        manifest = project_root / ".crux" / "crux-release-files.json"
-        if manifest.is_file():
-            zf.write(manifest, ".crux/crux-release-files.json")
-            print("Included release manifest")
+        release_manifest = project_root / ".crux" / "crux-release-files.json"
+        if release_manifest.is_file():
+            zf.write(release_manifest, ".crux/crux-release-files.json")
 
         print("Extracting CRUX block from AGENTS.md...")
         agents_text = (project_root / "AGENTS.md").read_text(encoding="utf-8")

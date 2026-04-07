@@ -26,20 +26,11 @@ on:
 permissions:
   contents: write
 
-# Files that trigger version bump (must match distribution zip contents)
-# This is checked in the check-release-files job since workflow_run doesn't support paths filter
+# Release paths are loaded from .crux/dist-manifest.json (single source of truth:
+# scripts/create-crux-zip.py). AGENTS.md is added at runtime since it is
+# distributed as an extracted CRUX block rather than listed in the manifest.
 env:
-  RELEASE_PATHS: |
-    CRUX.md
-    AGENTS.md
-    install.crux.md
-    .cursor/hooks.json
-    .cursor/agents/crux-cursor-rule-manager.md
-    .cursor/commands/crux-compress.md
-    .cursor/hooks/crux-detect-changes.py
-    .cursor/hooks/crux-session-start.py
-    .cursor/rules/_CRUX-RULE.mdc
-    .cursor/skills/crux-utils/
+  EXTRA_RELEASE_PATHS: AGENTS.md
 
 jobs:
   check-release-files:
@@ -83,6 +74,20 @@ jobs:
             exit 0
           fi
           
+          # Build RELEASE_PATHS from dist-manifest.json (single source of truth)
+          if [[ -f .crux/dist-manifest.json ]]; then
+            RELEASE_PATHS=$(jq -r '.files[]' .crux/dist-manifest.json)
+            # Collapse file paths to their parent directories for skill bundles
+            RELEASE_PATHS=$(echo "$RELEASE_PATHS" | sed 's|\(.cursor/skills/[^/]*/\).*|\1|' | sort -u)
+          else
+            echo "WARNING: .crux/dist-manifest.json not found, using empty path list"
+            RELEASE_PATHS=""
+          fi
+          # Add paths not in the manifest (distributed differently)
+          RELEASE_PATHS="$RELEASE_PATHS"$'\n'"$EXTRA_RELEASE_PATHS"
+          echo "Release paths:"
+          echo "$RELEASE_PATHS"
+          
           # Get changed files in the triggering commit
           CHANGED_FILES=$(git diff --name-only "${COMMIT_SHA}^" "${COMMIT_SHA}" 2>/dev/null || echo "")
           echo "Changed files:"
@@ -110,11 +115,18 @@ jobs:
       - name: Summary (skipped)
         if: steps.check.outputs.should_bump == 'false'
         run: |
+          # Rebuild RELEASE_PATHS for summary display
+          if [[ -f .crux/dist-manifest.json ]]; then
+            RELEASE_PATHS=$(jq -r '.files[]' .crux/dist-manifest.json | sed 's|\(.cursor/skills/[^/]*/\).*|\1|' | sort -u)
+            RELEASE_PATHS="$RELEASE_PATHS"$'\n'"$EXTRA_RELEASE_PATHS"
+          else
+            RELEASE_PATHS="(manifest not found)"
+          fi
           echo "## Version Bump Skipped" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "No release-relevant files were changed in this commit." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Files that trigger version bump:**" >> $GITHUB_STEP_SUMMARY
+          echo "**Files that trigger version bump** (from .crux/dist-manifest.json):" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "$RELEASE_PATHS" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
