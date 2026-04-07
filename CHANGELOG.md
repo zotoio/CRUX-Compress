@@ -5,6 +5,15 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.8.6](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.8.6) - 2026-04-07
+
+- chore: update release manifests for v2.8.6 [skip ci] (57d9a78)
+- fix: add missing fastmcp and watchdog test dependencies (eb531c1)
+- Potential fix for pull request finding 'Empty except' (d152ce4)
+- Potential fix for pull request finding 'Empty except' (d683b47)
+- feat: add crux-forget command, website pages, and installer improvements (36e1317)
+- docs: update CHANGELOG.md for v2.8.5 [skip ci] (1f76c82)
+
 ## [v2.8.5](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.8.5) - 2026-04-05
 
 - chore: update release manifest for v2.8.5 [skip ci] (4e47076)
