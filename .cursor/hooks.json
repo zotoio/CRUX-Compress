@@ -13,6 +13,10 @@
       {
         "command": "python3 .cursor/hooks/crux-detect-changes.py",
         "description": "CRUX: Queue modified source files (with crux: true) for CRUX compression"
+      },
+      {
+        "command": "python3 .cursor/hooks/crux-detect-memory-changes.py",
+        "description": "CRUX: Flag memory index for rebuild when memory files change"
       }
     ]
   }

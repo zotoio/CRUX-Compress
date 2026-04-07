@@ -18,6 +18,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | dream --rem | `/crux-dream --rem` | REM sleep: verify, consolidate, rebalance existing memories |
 | dream --rem --yolo | `/crux-dream --rem --yolo` | Unattended REM sleep |
 | mindreader [spec... \| memory... \| query] | `/crux-mindreader` | Decompress and display memories in chat. Pass spec(s) to show memories from those specs, memory file(s) to view specific ones, or a question about the current chat. If omitted, shows all memories referenced in the current session with rationale for why each was included |
+| forget [memory... \| query] | `/crux-forget` | Remove incorrect or unwanted memories from the corpus. Pass memory ID(s), slug(s), file path(s), or a search query. If omitted, lists all memories for selection |
 
 ### Hooks (provided by CRUX, configurable triggers)
 
@@ -39,7 +40,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 
 ### Agent: `crux-cursor-memory-manager`
 
-Commands (`/crux-dream`, `/crux-mindreader`) spawn a `crux-cursor-memory-manager` subagent to perform the actual work. This agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
+Commands (`/crux-dream`, `/crux-mindreader`, `/crux-forget`) spawn a `crux-cursor-memory-manager` subagent to perform the actual work. This agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
 
 **Agent definition frontmatter:**
 
@@ -59,6 +60,7 @@ repository: https://github.com/zotoio/CRUX-Compress
 - Execute dream workflow steps (verify execution, diff changes, detect conflicts, present candidates, CRUD, write summary, offer archival)
 - Execute REM sleep workflow steps (load memories, scan trackers, detect conflicts, recommend changes, apply, write summary)
 - Execute MindReader operations (decompress memories, provide rationale for referenced memories, answer queries about memory influence)
+- Execute Forget operations (resolve identifiers, confirm deletion, remove memory files and trackers, rebuild index)
 - Respect agent scoping rules (only write agent memories during dream, only when spec artifacts identify the agent, never access other agents' directories)
 - Respect `scopeRanking` and `typePriority` when presenting memories
 
@@ -76,7 +78,7 @@ repository: https://github.com/zotoio/CRUX-Compress
 | Platform | Agent definition location |
 |---|---|
 | Cursor | `.cursor/agents/crux-cursor-memory-manager.md` |
-| Claude Code | Inline in command definitions (`.claude/commands/crux-dream.md` etc.) — Claude Code does not have a separate agent concept |
+| Claude Code | Inline in command definitions (`.claude/commands/crux-dream.md`, `.claude/commands/crux-forget.md` etc.) — Claude Code does not have a separate agent concept |
 | Generic | Embedded in the `crux-memory-server` or shell script preamble |
 
 ### Memory File Format (managed by CRUX)
@@ -220,6 +222,18 @@ The term "spec" below is the default `unitOfWork` — frameworks can configure t
 7. Write REM sleep summary to `rem-{yyyymmdd}.md` in `archiveDir` (not spec-specific — covers all memories reviewed)
 8. Report what changed
 
+### Forget Workflow (executed by CRUX engine)
+
+The forget command allows users to remove incorrect, outdated, or unwanted memories from the corpus. It is destructive and always requires explicit confirmation.
+
+1. **Resolve input:** Accept one or more memory identifiers — short hash IDs (7-char hex), slugs, file paths, or a quoted search query. If no arguments are given, load the full memory index and present all memories for selection
+2. **Display for confirmation:** Show each matched memory's ID, title, type, strength, and source. Always ask the user to confirm before proceeding — this operation is irreversible
+3. **Delete memories:** For each confirmed memory, delete via `crux-skill-memory-crud`:
+   - Remove the memory file (`*.memory.md` or `*.memory.crux.md`)
+   - Remove the corresponding reference tracker (`{trackingDir}/{slug}.refs.yml`) if it exists
+4. **Rebuild index:** Run `crux-skill-memory-index` to regenerate `.crux/memory-index.yml`
+5. **Report:** Summarise what was deleted — count, types, and IDs of removed memories
+
 ---
 
 ## 2. Consumer Integration Configuration
@@ -233,7 +247,7 @@ The core memory engine is identical across platforms. Only the wiring layer diff
 | Capability | Cursor | Claude Code | Generic / Other |
 |---|---|---|---|
 | Agent rules | `.cursor/rules/*.mdc` | `CLAUDE.md` / `.claude/settings.json` | `memories/MEMORIES_AGENT_RULE.md` |
-| Commands | `/crux-dream` → `.cursor/commands/crux-dream.md` | `/crux-dream` → `.claude/commands/crux-dream.md` | `crux-dream` → shell script or MCP call |
+| Commands | `/crux-dream`, `/crux-mindreader`, `/crux-forget` → `.cursor/commands/crux-*.md` | `/crux-dream`, `/crux-mindreader`, `/crux-forget` → `.claude/commands/crux-*.md` | `crux-dream`, `crux-mindreader`, `crux-forget` → shell scripts or MCP calls |
 | Session hooks | `.cursor/hooks/*.sh` | `.claude/hooks/session-start.sh` | Git hook or manual |
 | Skills/tools | `.cursor/skills/*/SKILL.md` | Tool use via MCP or inline prompts | MCP tools or scripts |
 | Memory discovery (default) | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files |
@@ -280,6 +294,11 @@ The core memory engine is identical across platforms. Only the wiring layer diff
         "file": ".cursor/commands/crux-mindreader.md",
         "default": "/crux-mindreader",
         "description": "Decompress and view memories in chat"
+      },
+      "forget": {
+        "file": ".cursor/commands/crux-forget.md",
+        "default": "/crux-forget",
+        "description": "Remove incorrect or unwanted memories"
       }
     },
 
@@ -672,7 +691,7 @@ Add a clause that:
 
 **D. Commands:** Pointed to by `commands.dream.file` and `commands.mindReader.file` in config.
 
-Defaults to `.cursor/commands/crux-dream.md` and `.cursor/commands/crux-mindreader.md`. These are standard Cursor slash command definitions that invoke the CRUX dream and mindreader skills. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
+Defaults to `.cursor/commands/crux-dream.md`, `.cursor/commands/crux-mindreader.md`, and `.cursor/commands/crux-forget.md`. These are standard Cursor slash command definitions that invoke the CRUX dream, mindreader, and forget skills. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
 
 **E. MCP (optional):** If configured, add CRUX memory MCP server in `.cursor/mcp.json` for semantic memory search. Without MCP, agents use the index file (`.crux/memory-index.yml`) for discovery — no additional setup required.
 
@@ -727,9 +746,9 @@ if [ "$COUNT" -gt "$THRESHOLD" ]; then
 fi
 ```
 
-**C. Commands:** `.claude/commands/crux-dream.md` and `.claude/commands/crux-mindreader.md`
+**C. Commands:** `.claude/commands/crux-dream.md`, `.claude/commands/crux-mindreader.md`, and `.claude/commands/crux-forget.md`
 
-The config `commands.dream.file` points at the command definition. For Claude Code, the default is `.claude/commands/crux-dream.md`. Example:
+The config `commands.dream.file` and `commands.forget.file` point at the command definitions. For Claude Code, the defaults are `.claude/commands/crux-dream.md` and `.claude/commands/crux-forget.md`. Example:
 
 ```markdown
 Analyse unprocessed spec directories and extract memories using the CRUX
@@ -769,7 +788,7 @@ A plain markdown file placed in the memories directory. Agents on any platform c
 crux-memories check-session --config .crux/crux-memories.json
 ```
 
-**C. Commands:** The config `commands.dream.file` and `commands.mindReader.file` point at shell scripts by default on generic platforms:
+**C. Commands:** The config `commands.dream.file`, `commands.mindReader.file`, and `commands.forget.file` point at shell scripts by default on generic platforms:
 
 ```bash
 # Dream (interactive) — default: ./crux-dream
@@ -780,6 +799,9 @@ crux-dream --rem --yolo --config .crux/crux-memories.json
 
 # MindReader — default: ./crux-mindreader
 crux-mindreader --config .crux/crux-memories.json
+
+# Forget — default: ./crux-forget
+crux-forget --config .crux/crux-memories.json
 ```
 
 **D. MCP (optional):** Standard MCP server configuration per the platform's method. Not required — the index file works without any MCP infrastructure.
@@ -794,7 +816,7 @@ The `"platform"` key in config controls which wiring conventions CRUX expects wh
 |---|---|
 | `"cursor"` | Commands default to `.cursor/commands/crux-dream.md` etc. Expects `.cursor/rules/`, `.cursor/hooks/`, `.cursor/mcp.json` |
 | `"claude-code"` | Commands default to `.claude/commands/crux-dream.md` etc. Expects `CLAUDE.md` or `.claude/`, `.mcp.json` |
-| `"generic"` | Commands default to shell scripts (`crux-dream`, `crux-mindreader`). Expects `memories/MEMORIES_AGENT_RULE.md`, manual MCP config |
+| `"generic"` | Commands default to shell scripts (`crux-dream`, `crux-mindreader`, `crux-forget`). Expects `memories/MEMORIES_AGENT_RULE.md`, manual MCP config |
 
 A `crux-memories init --platform <name>` command scaffolds the correct wiring files for the chosen platform.
 
@@ -893,6 +915,27 @@ CRUX: "✅ Moved to .ai-ignored/executed/20260401-component-library/
        Sweet dreams. 🌙"
 ```
 
+```
+User: "/crux-forget a1b2c3d"
+
+CRUX: "Found memory matching ID a1b2c3d:
+
+       [learning] React.memo on list items reduced re-render time
+       from 480ms to 12ms on 500-item lists
+       Strength: 3 | Source: 20260403-component-library
+
+       Are you sure you want to forget this memory? [yes/no]"
+
+User: "yes"
+
+CRUX: "✅ 1 memory forgotten:
+       - [learning] a1b2c3d — React.memo on list items...
+       - Reference tracker removed
+       - Memory index rebuilt
+
+       This knowledge has been removed from the corpus."
+```
+
 ---
 
 ## 6. What Consumers Do NOT Implement
@@ -906,6 +949,7 @@ All of the following are provided entirely by CRUX:
 - REM sleep rebalancing
 - Memory compression
 - MindReader decompression
+- Memory deletion (forget workflow)
 - Reference tracking counters
 - Usage analytics for memories
 
@@ -1029,9 +1073,21 @@ Dev evals should be implementable as shell scripts (bats) or Python tests that s
 
 ### N. Cross-Platform
 
-- **User:** Run full dream/REM/mindreader flow on Cursor, verify wiring works
-- **User:** Run full dream/REM/mindreader flow on Claude Code, verify wiring works
-- **User:** Run full dream/REM/mindreader flow on generic platform via shell scripts
+- **User:** Run full dream/REM/mindreader/forget flow on Cursor, verify wiring works
+- **User:** Run full dream/REM/mindreader/forget flow on Claude Code, verify wiring works
+- **User:** Run full dream/REM/mindreader/forget flow on generic platform via shell scripts
+
+### O. Forget Command
+
+- **Dev:** Run `/crux-forget` with a valid memory ID, verify the memory file and its tracker are deleted
+- **Dev:** Run `/crux-forget` with a valid slug, verify resolution and deletion
+- **Dev:** Run `/crux-forget` with a search query, verify matching memories are presented for selection
+- **Dev:** Run `/crux-forget` with no arguments, verify all memories are listed for selection
+- **Dev:** Verify memory index is rebuilt after deletion
+- **Dev:** Run `/crux-forget` with a non-existent ID, verify graceful error message
+- **User:** Run `/crux-forget`, select memories to delete, verify they are no longer in the corpus
+- **User:** Run `/crux-forget "nonexistent"`, verify graceful handling of no matches
+- **User:** Run `/crux-forget <id>`, decline confirmation, verify memory is preserved
 
 ---
 

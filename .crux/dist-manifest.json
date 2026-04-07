@@ -1,0 +1,30 @@
+{
+  "version": "2.8.5",
+  "files": [
+    "CRUX.md",
+    "install.crux.md",
+    ".crux/crux.json",
+    ".cursor/hooks.json",
+    ".cursor/agents/crux-cursor-rule-manager.md",
+    ".cursor/agents/crux-cursor-memory-manager.md",
+    ".cursor/commands/crux-compress.md",
+    ".cursor/commands/crux-dream.md",
+    ".cursor/commands/crux-mindreader.md",
+    ".cursor/commands/crux-forget.md",
+    ".cursor/hooks/crux-detect-changes.py",
+    ".cursor/hooks/crux-detect-memory-changes.py",
+    ".cursor/hooks/crux-session-start.py",
+    ".cursor/rules/_CRUX-RULE.mdc",
+    ".cursor/rules/crux-memories-integration.crux.mdc",
+    ".cursor/skills/crux-utils/SKILL.md",
+    ".cursor/skills/crux-utils/scripts/crux-utils.py",
+    ".cursor/skills/crux-skill-memory-crud/SKILL.md",
+    ".cursor/skills/crux-skill-memory-compress/SKILL.md",
+    ".cursor/skills/crux-skill-memory-extract/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/scripts/memory-index.py",
+    ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
+    ".cursor/skills/crux-skill-memory-rebalance/SKILL.md",
+    ".cursor/skills/crux-skill-memory-reference-tracker/SKILL.md"
+  ]
+}

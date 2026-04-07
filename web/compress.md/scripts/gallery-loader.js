@@ -179,7 +179,10 @@
       });
       if (ms) ms.style.display = target === 'decompressed' ? '' : 'none';
       if (tokenSpan) {
-        tokenSpan.textContent = item.meta.sourceTokens + ' tokens';
+        var tokens = target === 'decompressed' && item.meta.decompressedTokens
+          ? item.meta.decompressedTokens
+          : item.meta.sourceTokens;
+        tokenSpan.textContent = tokens + ' tokens';
       }
     }
 

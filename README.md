@@ -623,11 +623,12 @@ See `.cursor/skills/crux-utils/SKILL.md` for detailed usage.
 
 CRUX Memories is an optional learning system that lets agents extract, store, and recall knowledge across sessions. Memories persist as structured markdown files and are automatically surfaced to agents based on relevance.
 
-The memory lifecycle has three phases:
+The memory lifecycle has four phases:
 
 - **Dream** — After completing a spec, extract learnings, red flags, goals, and ideas into memory files
 - **REM Sleep** — Periodically rebalance the memory corpus: promote high-value memories, demote stale ones, consolidate duplicates, archive unused entries
 - **MindReader** — Query and display memories in human-readable form (read-only)
+- **Forget** — Remove incorrect or unwanted memories from the corpus
 
 ### Enabling Memories
 
@@ -669,6 +670,8 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-mindreader` | Show contextually relevant memories |
 | `/crux-mindreader "query"` | Search memories by keyword |
 | `/crux-mindreader <spec-name>` | Show memories from a specific spec |
+| `/crux-forget <memory-id>` | Forget a specific memory by ID |
+| `/crux-forget "query"` | Search and select memories to forget |
 
 ### Memory Skills
 
@@ -740,15 +743,23 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | -------------------------------------------- | ----------------------------------------------------------------------------- |
 | `CRUX.md`                                    | Specification (READONLY)                                                      |
 | `AGENTS.md`                                  | Agent awareness notice (or add the `<CRUX>` block to your existing AGENTS.md) |
+| `install.crux.md`                            | Installer spec (update reference)                                             |
 | `.crux/crux.json`                            | Installed CRUX version                                                        |
-| `.crux/crux-release-files.json`              | Release manifest for backup/verification                                      |
+| `.crux/crux-release-files.json`              | Release manifest with per-version checksums                                   |
 | `.cursor/hooks.json`                         | Hook configuration                                                            |
 | `.cursor/hooks/crux-detect-changes.py`       | File change detection hook                                                    |
+| `.cursor/hooks/crux-detect-memory-changes.py` | Memory change detection hook                                                 |
 | `.cursor/hooks/crux-session-start.py`        | Session start hook                                                            |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
+| `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
+| `.cursor/commands/crux-dream.md`             | Memory extraction command                                                     |
+| `.cursor/commands/crux-mindreader.md`        | Memory retrieval command                                                      |
+| `.cursor/commands/crux-forget.md`            | Memory removal command                                                        |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
+| `.cursor/rules/crux-memories-integration.crux.mdc` | Memory integration rule                                                 |
 | `.cursor/skills/crux-utils/`                 | Utility skill (token estimation, checksums)                                   |
+| `.cursor/skills/crux-skill-memory-*/`        | Memory skills (CRUD, compress, extract, index, rebalance, reference tracking) |
 
 
 Then:
@@ -890,6 +901,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
 | Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
 | MindReader Command  | `.cursor/commands/crux-mindreader.md`        | Memory query command           |
+| Forget Command      | `.cursor/commands/crux-forget.md`            | Memory removal interface       |
 | MCP Server          | `crux_mcp_server/`                           | Semantic memory search server  |
 | Memory Skills       | `.cursor/skills/crux-skill-memory-*/`        | Memory operation skills        |
 | Memory Storage      | `memories/`                                  | Memory file storage            |
@@ -1080,13 +1092,12 @@ Version bumping follows conventional commits:
 ### Release Process
 
 1. Push commits to `main` with conventional commit messages
-2. `version-bump.yml` analyzes commits and updates `.crux/crux.json`
-3. `release.yml` detects version change and:
-  - Generates checksums and updates `.crux/crux-release-files.json` manifest
-  - Builds versioned zip via `scripts/create-crux-zip.py`
-  - Creates GitHub Release with tag `vX.X.X`
-  - Attaches zip as release artifact
-  - Generates release notes from commits
+2. `version-bump.yml` reads `.crux/dist-manifest.json` for release-relevant paths, analyzes commits, and updates `.crux/crux.json`
+3. `release.yml` detects version change and runs `scripts/create-crux-zip.py`, which:
+  - Builds the versioned zip (`CRUX-Compress-vX.Y.Z.zip`)
+  - Updates `.crux/dist-manifest.json` (canonical file list)
+  - Generates checksums and updates `.crux/crux-release-files.json`
+4. The workflow then creates a GitHub Release with tag `vX.X.Z`, attaches the zip, and generates release notes
 
 ## Contributing
 

@@ -314,16 +314,165 @@ code {
   color: var(--accent-compressed);
 }
 
+/* Subpage nav — always visible, no transform */
+.site-nav.is-subpage {
+  position: sticky;
+}
+
+/* ── Dropdown ── */
+
+.site-nav-dropdown {
+  position: relative;
+}
+
+.site-nav-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.site-nav-chevron {
+  transition: transform 0.2s ease;
+}
+
+.site-nav-dropdown-toggle.is-open .site-nav-chevron {
+  transform: rotate(180deg);
+}
+
+.site-nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+}
+
+.site-nav-dropdown-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.site-nav-dropdown-item {
+  display: block;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.site-nav-dropdown-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.site-nav-dropdown-item.is-active {
+  color: var(--accent-compressed);
+}
+
+/* ── GitHub logo link ── */
+
+.site-nav-github {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+  margin-left: var(--space-2);
+}
+
+.site-nav-github:hover {
+  color: var(--text-primary);
+}
+
+/* ── Hamburger (mobile) ── */
+
+.site-nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-1);
+}
+
+/* ── Subpage page header ── */
+
+.page-header {
+  padding: calc(60px + var(--space-12)) var(--space-6) var(--space-12);
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.page-header .section-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header .section-title {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-4);
+}
+
+.page-header .section-intro {
+  margin-bottom: 0;
+}
+
 /* ============================================
    Demo Overview Cards
    ============================================ */
 
-@media (max-width: 500px) {
-  
+@media (max-width: 600px) {
+  .site-nav-hamburger {
+    display: block;
+  }
+
+  .site-nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-default);
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .site-nav-links.is-mobile-open {
+    display: flex;
+  }
+
+  .site-nav-dropdown-menu {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    padding-left: var(--space-4);
+    background: transparent;
+  }
+
+  .site-nav-github {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 768px) {
   .site-nav-links {
     gap: var(--space-4);
   }
-  
+
   .site-nav-link {
     font-size: var(--text-xs);
   }
@@ -490,6 +639,35 @@ code {
   font-size: var(--text-sm);
   color: var(--accent-compressed);
   font-weight: 700;
+}
+
+a.intro-card {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.intro-card:hover {
+  transform: translateY(-4px);
+}
+
+.intro-card--memories {
+  border-color: rgba(139, 92, 246, 0.3);
+  grid-column: 1 / -1;
+  max-width: 280px;
+  justify-self: center;
+}
+
+.intro-card--memories .intro-card-icon {
+  color: rgba(167, 139, 250, 0.9);
+}
+
+.intro-card--memories .intro-card-stat {
+  color: rgba(167, 139, 250, 0.8);
+}
+
+.intro-card--memories:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.15);
 }
 
 @media (max-width: 900px) {
@@ -1010,13 +1188,11 @@ code {
 }
 
 .install-section,
-.installed-section,
 .usage-section {
   margin-bottom: var(--space-12);
 }
 
 .install-section h3,
-.installed-section h3,
 .usage-section h3 {
   font-size: var(--text-xl);
   margin-bottom: var(--space-4);
@@ -1030,7 +1206,6 @@ code {
 
 .code-block--install {
   border-left-color: var(--accent-compressed);
-  max-width: 700px;
 }
 
 .copy-button {
@@ -1096,34 +1271,6 @@ code {
   background: rgba(212, 145, 90, 0.2);
   color: var(--accent-compressed);
   border-color: var(--accent-compressed);
-}
-
-/* File Tree */
-.file-tree {
-  display: grid;
-  gap: var(--space-2);
-  max-width: 600px;
-}
-
-.file-tree-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  border-left: 2px solid var(--accent-verbose);
-}
-
-.file-tree-item code {
-  font-size: var(--text-sm);
-  color: var(--accent-symbol);
-  background: var(--bg-tertiary);
-}
-
-.file-tree-item span {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
 }
 
 /* Usage Steps */

@@ -21,6 +21,7 @@ Read `AGENTS.md` if not already loaded in context.
 - **MindReader**: Decompressing and displaying memories in human-readable form
 - **Conflict Detection**: Identifying contradictions between candidate and existing memories
 - **Memory Compression**: Orchestrating CRUX compression of memory bodies
+- **Memory Removal**: Resolving, confirming, and deleting memories and their associated reference trackers
 - **Reference Tracking**: Managing per-memory usage tracking and promotion flags
 
 ## Skills You Use
@@ -88,7 +89,7 @@ Rebalance the entire memory corpus.
 
 7. **Write REM Summary**: Write summary to `{archiveDir}/rem-{yyyymmdd}.md` with all changes applied, skipped items, and corpus statistics.
 
-8. **Rebuild Index**: Invoke `crux-skill-memory-index` to refresh the index.
+8. **Verify Index Rebuild**: The rebalance skill rebuilds the index automatically in its Step 15. Verify the rebuild succeeded by checking that `.crux/memory-index.yml` was updated. If the rebuild failed during the skill run, invoke `crux-skill-memory-index` manually as a fallback. Also delete `.crux/pending-index-rebuild.json` if it exists, since the index is now current.
 
 ### MindReader Mode — `/crux-mindreader`
 
@@ -104,6 +105,33 @@ Query and display memories.
 | `/crux-mindreader path/to/file.memory.md [...]` | Read the specified memory file(s). If compressed (`.memory.crux.md`), decompress and display in human-readable form. Show full frontmatter and body. |
 
 **Decompression display**: When showing compressed memories, use `crux-skill-memory-compress` Decompress logic to expand CRUX notation to terse natural language. Do NOT modify the memory file on disk — MindReader is read-only.
+
+### Forget Mode — `/crux-forget`
+
+Remove one or more memories from the corpus.
+
+**Workflow**:
+
+1. **Parse Input**: Determine the input type from `$ARGUMENTS`:
+   - Memory ID(s) (7-char hex hash): Scan the memory index for matches
+   - Slug(s): Search `memoriesDir` recursively for matching files
+   - File path(s): Read the specified files directly
+   - Quoted text (search query): Search memories by title, description, tags
+   - No arguments: Load the full memory index and present all memories
+
+2. **Resolve Memories**: For each input, resolve to one or more memory files. If no matches found, report to the user and stop.
+
+3. **Display for Confirmation**: Show matched memories with their ID, title, type, strength, and source. Use a table format for clarity.
+
+4. **Confirm Deletion**: Ask the user to confirm which memories to delete. Never auto-delete — forgetting is destructive and irreversible.
+
+5. **Delete Memories**: For each confirmed memory, delegate to `crux-skill-memory-crud` Delete operation. This handles:
+   - Removing the memory file
+   - Removing the corresponding reference tracker from `trackingDir`
+
+6. **Rebuild Index**: Invoke `crux-skill-memory-index` to refresh `.crux/memory-index.yml`.
+
+7. **Report**: Summarize what was deleted — count, types, and IDs of removed memories.
 
 ## Agent Scoping Rules
 
@@ -131,7 +159,7 @@ Agent-scoped memories live under `memories/agents/{agent-id}/{type}/`. These rul
 ### Data Integrity
 - **Never modify `created` dates** on existing memories
 - **Never auto-resolve conflicts** — always present to the user
-- **Always rebuild the index** after any operation that creates, moves, or deletes memories
+- **Always rebuild the index** after any operation that creates, moves, or deletes memories — the rebalance skill does this automatically; for other operations, invoke `crux-skill-memory-index` explicitly and delete `.crux/pending-index-rebuild.json`
 - **Sync strength** between memory frontmatter and tracker files (frontmatter is authoritative)
 
 ### Workflow Discipline

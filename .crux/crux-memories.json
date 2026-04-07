@@ -37,6 +37,11 @@
         "file": ".cursor/commands/crux-mindreader.md",
         "default": "/crux-mindreader",
         "description": "Decompress and view memories in chat"
+      },
+      "forget": {
+        "file": ".cursor/commands/crux-forget.md",
+        "default": "/crux-forget",
+        "description": "Remove incorrect or unwanted memories"
       }
     },
 
