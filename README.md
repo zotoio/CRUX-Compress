@@ -270,6 +270,9 @@ curl -fsSL .../install.py | python3 - --verbose
 # Scaffold optional memory system components
 curl -fsSL .../install.py | python3 - --with-memories
 
+# Install standalone MCP memory server (user-level, all projects)
+curl -fsSL .../install.py | python3 - --with-mcp-server
+
 # Show help
 curl -fsSL .../install.py | python3 - --help
 ```
@@ -702,33 +705,57 @@ Memory bodies can be CRUX-compressed to save storage and context tokens, with th
 
 The CRUX MCP server provides semantic search over the memory corpus via the Model Context Protocol. Agents with MCP access can search memories more effectively than linear index scanning.
 
-To configure the MCP server, add to `.cursor/mcp.json`:
+#### Installation
+
+The MCP server is distributed as a standalone zip and installed independently of any project. It runs at the user level so all your Cursor projects can use it:
+
+```bash
+# Install via the CRUX installer
+curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-mcp-server
+
+# Or add it to an existing CRUX installation
+python3 .crux/update.py --with-mcp-server
+```
+
+This will:
+1. Download the MCP server package from the latest release
+2. Install it to `~/.crux-mcp-server/` (or a directory you choose)
+3. Install Python dependencies (`fastmcp`, `pyyaml`, `watchdog`)
+4. Configure the user-level `~/.cursor/mcp.json` so the server is available across all projects
+
+#### Configuration
+
+The installer configures `~/.cursor/mcp.json` automatically:
 
 ```json
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "python",
-      "args": ["-m", "crux_mcp_server", "-t", "stdio", "--config", ".crux/crux-memories.json"]
+      "command": "python3",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
+      "cwd": "~/.crux-mcp-server"
     }
   }
 }
 ```
 
+Each project still needs its own `.crux/crux-memories.json` (created by `--with-memories`) with memory paths pointing to that project's memory directory.
+
 The server can also run in HTTP mode for external integrations:
 
 ```bash
-python -m crux_mcp_server -t http --port 8742
+cd ~/.crux-mcp-server
+python3 -m crux_mcp_server -t http --port 8742
 ```
 
 See `crux_mcp_server/README.md` for full options and tool documentation.
 
 ### Python Dependencies
 
-The memory system and MCP server require Python >= 3.10. Install dependencies per component:
+The memory system and MCP server require Python >= 3.10. Dependencies are installed automatically by the installer. For manual or dev setup:
 
 ```bash
-# MCP server
+# MCP server (installed automatically by --with-mcp-server)
 pip install -r crux_mcp_server/requirements.txt
 
 # Eval tests
@@ -902,7 +929,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
 | MindReader Command  | `.cursor/commands/crux-mindreader.md`        | Memory query command           |
 | Forget Command      | `.cursor/commands/crux-forget.md`            | Memory removal interface       |
-| MCP Server          | `crux_mcp_server/`                           | Semantic memory search server  |
+| MCP Server          | `crux_mcp_server/`                           | Semantic memory search server (standalone zip) |
 | Memory Skills       | `.cursor/skills/crux-skill-memory-*/`        | Memory operation skills        |
 | Memory Storage      | `memories/`                                  | Memory file storage            |
 | Eval Tests          | `evals/`                                     | Python-based eval test suite   |
@@ -1013,7 +1040,7 @@ python3 scripts/test.py
 | `crux-utils.py`              | `test_crux_utils.py`       | Token counting, checksums, ratios, `--target` flag, error handling |
 | `scripts/create-crux-zip.py` | `test_create_zip.py`       | Zip contents, version embedding, structure        |
 | `crux-detect-changes.py`     | `test_detect_hook.py`      | Frontmatter detection, queue management           |
-| `install.py`                 | `test_install.py`          | CLI flags, version comparison, hooks merge, `--with-memories`, upsert |
+| `install.py`                 | `test_install.py`          | CLI flags, version comparison, hooks merge, `--with-memories`, `--with-mcp-server`, upsert |
 | `registry.json`              | `test_n_plugin_registry.py` | Registry schema, `enabledByDefault` semantics, plugin validation |
 | Memory CRUD                  | `test_a_memory_crud.py`    | Memory create, read, update, delete               |
 | Dream extraction             | `test_b_dream_workflow.py` | Post-spec memory extraction workflow               |

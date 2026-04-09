@@ -1,11 +1,11 @@
 ---
-generated: 2026-04-05 00:00
-sourceChecksum: 3755605339
+generated: 2026-04-09 14:32
+sourceChecksum: 3647310315
 cruxLevel: 25
-beforeTokens: 420
-afterTokens: 185
-reducedBy: 56%
-confidence: 90%
+beforeTokens: 508
+afterTokens: 127
+reducedBy: 75%
+confidence: 89%
 alwaysApply: true
 crux: true
 ---
@@ -18,30 +18,10 @@ crux: true
 ```crux
 ⟦CRUX:crux-memories-integration.md
 Ρ{CRUX Memories agent integration}
-Κ{cfg=.crux/crux-memories.json; idx=.crux/memory-index.yml}
-
-Φ.enabled{enableMemories="true"→
- discover: read idx→load full only likely matches(title|desc|tags)
- MCP configured→semantic search ≻ idx scan
- output: annotate [memory:{title}] when influenced
- refs: increment via crux-skill-memory-reference-tracker; ¬direct file writes
- post-spec→suggest /crux-dream
-}
-
-Φ.disabled{enableMemories="false"→skip all memory ops silently}
-
-R.general{
- ¬direct read|write memory files→use CRUX memory skills
- scope: base+own agent-scoped only
- repo-local: ¬touch other repo memories
- dir: memories/ (cfg: cruxMemories.storage.memoriesDir)
-}
-
-R.mcp{
- .cursor/mcp.json→{mcpServers:{crux-memories:{
-  command:"python",
-  args:["-m","crux_mcp_server","-t","stdio","--config",".crux/crux-memories.json"]}}}
- MCP avail→semantic search ≻ linear idx scan
-}
+Κ{cfg=.crux/crux-memories.json;idx=.crux/memory-index.yml}
+Φ.⊤{→discover(idx)→full@match;MCP→search≻scan;out:[memory:t];refs:skill;spec→dream}
+Φ.⊥{→skip}
+R{¬files→skills;scope:base+own;repo-local;dir:memories/}
+Γ{mcp:~/.cursor/mcp.json;avail→search≻scan}
 ⟧
 ```
