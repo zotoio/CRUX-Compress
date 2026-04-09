@@ -8,12 +8,13 @@ Usage:
     python3 .crux/update.py [-y] [--force] [--backup] [--verbose]
 
 Options:
-    -y               Non-interactive mode, assume yes to all confirmations
-    --force          Backup current installation and install regardless of version
-    --backup         Create backups of existing files before overwriting
-    --verbose        Show detailed progress
-    --with-memories  Set up optional memory system scaffolding
-    --help           Show this help message
+    -y                Non-interactive mode, assume yes to all confirmations
+    --force           Backup current installation and install regardless of version
+    --backup          Create backups of existing files before overwriting
+    --verbose         Show detailed progress
+    --with-memories   Set up optional memory system scaffolding
+    --with-mcp-server Install standalone MCP memory server (user-level, project-independent)
+    --help            Show this help message
 """
 
 from __future__ import annotations
@@ -850,6 +851,180 @@ DEFAULT_MEMORIES_CONFIG = {
 }
 
 
+MCP_SERVER_MODULE = "crux_mcp_server"
+MCP_USER_CONFIG_DIR = Path.home() / ".cursor"
+MCP_USER_CONFIG_FILE = MCP_USER_CONFIG_DIR / "mcp.json"
+MCP_DEFAULT_INSTALL_DIR = Path.home() / ".crux-mcp-server"
+
+
+def get_mcp_server_zip_url(version: str) -> str:
+    return f"{DOWNLOAD_BASE}/v{version}/CRUX-MCP-Server-v{version}.zip"
+
+
+def recommend_mcp_install_dir() -> Path:
+    """Recommend and confirm an installation directory for the MCP server."""
+    default_dir = MCP_DEFAULT_INSTALL_DIR
+
+    print(f"\n{CYAN}MCP Server Installation Directory{NC}")
+    print(f"{'─' * 40}")
+    print("The MCP server runs independently of any project.")
+    print("It should be installed in a dedicated directory outside your git projects.\n")
+    print(f"  Recommended: {GREEN}{default_dir}{NC}\n")
+
+    if NON_INTERACTIVE:
+        return default_dir
+
+    reply = input(f"Install directory [{default_dir}]: ").strip()
+    chosen = Path(reply).expanduser().resolve() if reply else default_dir
+
+    if chosen.exists():
+        if any(chosen.iterdir()):
+            git_dir = chosen / ".git"
+            if git_dir.exists():
+                log_warn(f"{chosen} is inside a git repository.")
+                print("The MCP server should be installed outside of project repositories.")
+                if not confirm("Continue anyway?", default="N"):
+                    return recommend_mcp_install_dir()
+            else:
+                existing_files = list(chosen.iterdir())
+                has_server = (chosen / MCP_SERVER_MODULE).is_dir()
+                if has_server:
+                    log(f"Existing MCP server installation detected at {chosen}")
+                    if not confirm("Overwrite existing installation?"):
+                        log("MCP server installation cancelled.")
+                        sys.exit(0)
+                else:
+                    log_warn(f"Directory {chosen} is not empty ({len(existing_files)} items)")
+                    if not confirm("Continue anyway?", default="N"):
+                        return recommend_mcp_install_dir()
+
+    return chosen
+
+
+def install_mcp_server_deps(install_dir: Path) -> bool:
+    """Install MCP server Python dependencies via pip."""
+    req_file = install_dir / MCP_SERVER_MODULE / "requirements.txt"
+    if not req_file.is_file():
+        log_warn("requirements.txt not found in MCP server package")
+        return False
+
+    log("Installing Python dependencies...")
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", str(req_file)],
+            capture_output=True, text=True, check=False,
+        )
+        if result.returncode == 0:
+            log_success("Dependencies installed successfully")
+            return True
+        log_error(f"pip install failed:\n{result.stderr}")
+        return False
+    except FileNotFoundError:
+        log_error("pip not found — install dependencies manually:")
+        log_error(f"  pip install -r {req_file}")
+        return False
+
+
+def configure_user_mcp_json(install_dir: Path) -> bool:
+    """Add or update the crux-memories entry in the user-level ~/.cursor/mcp.json."""
+    MCP_USER_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+
+    server_entry = {
+        "command": sys.executable,
+        "args": [
+            "-m", MCP_SERVER_MODULE,
+            "-t", "stdio",
+        ],
+        "cwd": str(install_dir),
+    }
+
+    if MCP_USER_CONFIG_FILE.is_file():
+        try:
+            data = json.loads(MCP_USER_CONFIG_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            log_warn(f"Could not parse {MCP_USER_CONFIG_FILE}, creating new config")
+            data = {}
+    else:
+        data = {}
+
+    servers = data.setdefault("mcpServers", {})
+    existing = servers.get("crux-memories")
+
+    if existing:
+        log(f"Existing crux-memories MCP entry found in {MCP_USER_CONFIG_FILE}")
+        print(f"  Current: {json.dumps(existing, indent=2)}")
+        print(f"  New:     {json.dumps(server_entry, indent=2)}")
+        if not confirm("Update existing MCP configuration?"):
+            log("Keeping existing MCP configuration")
+            return True
+
+    servers["crux-memories"] = server_entry
+    MCP_USER_CONFIG_FILE.write_text(
+        json.dumps(data, indent=2) + "\n", encoding="utf-8",
+    )
+    log_success(f"Configured crux-memories in {MCP_USER_CONFIG_FILE}")
+    return True
+
+
+def setup_mcp_server(version: str) -> bool:
+    """Download, extract, and configure the standalone MCP server."""
+    install_dir = recommend_mcp_install_dir()
+    install_dir.mkdir(parents=True, exist_ok=True)
+
+    zip_url = get_mcp_server_zip_url(version)
+    log(f"Downloading MCP server v{version}...")
+    log_verbose(f"URL: {zip_url}")
+
+    data = http_get(zip_url)
+    if not data:
+        log_warn("GitHub download failed, trying jsDelivr CDN...")
+        cdn_url = f"{JSDELIVR_CDN}@v{version}/CRUX-MCP-Server-v{version}.zip"
+        data = http_get(cdn_url)
+
+    if not data:
+        log_error("Failed to download MCP server package")
+        log_error("You can download it manually from:")
+        log_error(f"  https://github.com/{REPO_OWNER}/{REPO_NAME}/releases/latest")
+        return False
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            zf.extractall(install_dir)
+    except zipfile.BadZipFile:
+        log_error("Downloaded file is not a valid zip")
+        return False
+
+    log_success(f"MCP server extracted to {install_dir}")
+
+    deps_ok = install_mcp_server_deps(install_dir)
+    config_ok = configure_user_mcp_json(install_dir)
+
+    print()
+    print(f"{CYAN}MCP Server Installation{NC}")
+    print(f"{'─' * 40}")
+    print(f"  Location:    {install_dir}")
+    print(f"  Module:      {install_dir / MCP_SERVER_MODULE}")
+    print(f"  Config:      {MCP_USER_CONFIG_FILE}")
+    print(f"  Dependencies: {'OK' if deps_ok else 'MANUAL INSTALL NEEDED'}")
+    print()
+    print("The MCP server is configured at the user level and will be")
+    print("available to all Cursor projects with memory configurations.")
+    print()
+    print(f"Each project still needs its own {CYAN}.crux/crux-memories.json{NC}")
+    print("with memory paths pointing to that project's memory directory.")
+    print()
+    if not deps_ok:
+        print(f"  {YELLOW}Install dependencies manually:{NC}")
+        print(f"  pip install -r {install_dir / MCP_SERVER_MODULE / 'requirements.txt'}")
+        print()
+    print("To test the server:")
+    print(f"  cd {install_dir}")
+    print(f"  {sys.executable} -m {MCP_SERVER_MODULE} --help")
+    print()
+
+    return True
+
+
 def setup_memories() -> bool:
     """Create memory system scaffolding. Returns True on success."""
     config_path = Path(".crux/crux-memories.json")
@@ -887,7 +1062,10 @@ def setup_memories() -> bool:
     return True
 
 
-def show_completion_report(version: str, backup_zip: str, with_memories: bool = False) -> None:
+def show_completion_report(
+    version: str, backup_zip: str,
+    with_memories: bool = False, with_mcp_server: bool = False,
+) -> None:
     print()
     print(f"{GREEN}{'=' * 43}{NC}")
     print(f"{GREEN}     Installation Complete!{NC}")
@@ -919,12 +1097,26 @@ def show_completion_report(version: str, backup_zip: str, with_memories: bool = 
         print("  To enable: set enableMemories to \"true\" in .crux/crux-memories.json")
         print()
 
+    if with_mcp_server:
+        print(f"{CYAN}MCP Server:{NC}")
+        print(f"  Installed to {MCP_DEFAULT_INSTALL_DIR}")
+        print(f"  Configured in {MCP_USER_CONFIG_FILE}")
+        print()
+
+    step = 1
     print("Next steps:")
-    print("  1. Ensure .cursor/hooks.json is recognized by Cursor")
-    print("  2. Add 'crux: true' to any rule files you want to compress")
-    print("  3. Use /crux-compress ALL to compress eligible files")
+    print(f"  {step}. Ensure .cursor/hooks.json is recognized by Cursor")
+    step += 1
+    print(f"  {step}. Add 'crux: true' to any rule files you want to compress")
+    step += 1
+    print(f"  {step}. Use /crux-compress ALL to compress eligible files")
+    step += 1
     if not with_memories:
-        print("  4. Run with --with-memories to add optional memory system")
+        print(f"  {step}. Run with --with-memories to add optional memory system")
+        step += 1
+    if not with_mcp_server:
+        print(f"  {step}. Run with --with-mcp-server to add MCP memory search server")
+        step += 1
     print()
     print("For updates, run:")
     print("  python3 .crux/update.py")
@@ -951,6 +1143,8 @@ def main() -> None:
     parser.add_argument("--verbose", action="store_true", help="Show detailed progress")
     parser.add_argument("--with-memories", action="store_true",
                         help="Set up optional memory system scaffolding")
+    parser.add_argument("--with-mcp-server", action="store_true",
+                        help="Install standalone MCP memory server (user-level)")
     args = parser.parse_args()
 
     VERBOSE = args.verbose
@@ -958,6 +1152,7 @@ def main() -> None:
     do_backup = args.backup
     force = args.force
     with_memories = args.with_memories
+    with_mcp_server = args.with_mcp_server
     if force:
         do_backup = True
 
@@ -1061,7 +1256,13 @@ def main() -> None:
     if with_memories:
         setup_memories()
 
-    show_completion_report(latest_version, backup_zip, with_memories=with_memories)
+    if with_mcp_server:
+        setup_mcp_server(latest_version)
+
+    show_completion_report(
+        latest_version, backup_zip,
+        with_memories=with_memories, with_mcp_server=with_mcp_server,
+    )
 
 
 if __name__ == "__main__":

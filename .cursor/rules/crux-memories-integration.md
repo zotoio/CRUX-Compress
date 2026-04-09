@@ -53,14 +53,21 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 
 ## MCP Server Configuration
 
-To enable semantic search over memories, add the MCP server to `.cursor/mcp.json`:
+The MCP server is installed at the user level and shared across all projects. Install it via:
+
+```bash
+python3 install.py --with-mcp-server
+```
+
+This configures `~/.cursor/mcp.json` with:
 
 ```json
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "python",
-      "args": ["-m", "crux_mcp_server", "-t", "stdio", "--config", ".crux/crux-memories.json"]
+      "command": "python3",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
+      "cwd": "~/.crux-mcp-server"
     }
   }
 }

@@ -626,30 +626,33 @@ The MCP server does **not** write memory files or tracker files — it is read-o
 
 A reference implementation is provided as a local stdio server that can be used with any MCP-compatible platform:
 
-The server script uses a Python shebang for portability:
+The reference server is a Python package (`crux_mcp_server/`) available as a standalone zip from [GitHub releases](https://github.com/zotoio/CRUX-Compress/releases):
 
-```python
-#!/usr/bin/env python3
-"""crux-memory-server — MCP stdio server for CRUX memory search."""
+```bash
+# Install via the CRUX installer
+curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --with-mcp-server
 ```
 
-MCP configuration:
+The installer downloads the MCP server to a dedicated directory (default: `~/.crux-mcp-server/`) and configures it in the user-level `~/.cursor/mcp.json` so it's available across all projects.
+
+MCP configuration (automatically set by the installer):
 
 ```json
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "crux-memory-server",
-      "args": ["--config", ".crux/crux-memories.json"]
+      "command": "python3",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
+      "cwd": "~/.crux-mcp-server"
     }
   }
 }
 ```
 
 The reference server:
-- Runs as a local stdio process (no network, no external dependencies)
-- Python script with `#!/usr/bin/env python3` — uses `sentence-transformers` for semantic search when available, falls back to TF-IDF over title, description, and tags
-- Reads config from the specified `--config` path
+- Runs as a local stdio process (no network beyond pip install)
+- Uses `sentence-transformers` for semantic search when available, falls back to TF-IDF over title, description, and tags
+- Auto-detects project config from the working directory's `.crux/crux-memories.json`
 - Watches the filesystem for changes and re-indexes incrementally
 - Respects agent scoping — `agentId` parameter controls which agent directories are visible
 - Decompresses `*.memory.crux.md` bodies on read via the CRUX decompression library
@@ -704,7 +707,7 @@ Add a clause that:
 
 Defaults to `.cursor/commands/crux-dream.md`, `.cursor/commands/crux-mindreader.md`, `.cursor/commands/crux-forget.md`, and `.cursor/commands/crux-amnesia.md`. The first three invoke CRUX memory workflows, while `/crux-amnesia` sets a chat-session-only override that suppresses ambient memory use without changing repo config. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
 
-**E. MCP (optional):** If configured, add CRUX memory MCP server in `.cursor/mcp.json` for semantic memory search. Without MCP, agents use the index file (`.crux/memory-index.yml`) for discovery — no additional setup required.
+**E. MCP (optional):** Install the standalone MCP memory server via `--with-mcp-server` (see [Reference Local stdio Server](#reference-local-stdio-server)). This configures user-level `~/.cursor/mcp.json` for semantic memory search across all projects. Without MCP, agents use the index file (`.crux/memory-index.yml`) for discovery — no additional setup required.
 
 ---
 
@@ -775,8 +778,9 @@ Pass $ARGUMENTS as the spec directory to process (or list available if empty).
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "crux-memory-server",
-      "args": ["--config", ".crux/crux-memories.json"]
+      "command": "python3",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
+      "cwd": "~/.crux-mcp-server"
     }
   }
 }

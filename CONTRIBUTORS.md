@@ -287,7 +287,7 @@ Memory tooling (agent, commands, skills, rule) is included in the distribution z
 | `.crux/memory-index.yml` | No | Prioritised memory index for agent discovery |
 | `memories/` | No | Memory file storage (by type: `core/`, `learning/`, `redflag/`, `goal/`, `idea/`) |
 | `memories/agents/` | No | Agent-scoped memory storage |
-| `crux_mcp_server/` | No | MCP server for semantic memory search |
+| `crux_mcp_server/` | Separate zip | MCP server for semantic memory search (`CRUX-MCP-Server-v*.zip`) |
 | `evals/` | No | Python-based eval tests for memory workflows |
 
 ### Plugin System

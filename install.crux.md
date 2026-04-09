@@ -36,7 +36,8 @@ note: includes agent bootstrap instructions not present in source
 Φ.opts{
  -y→NON_INTERACTIVE;--force→FORCE(+BACKUP);
  --backup→BACKUP;--verbose→VERBOSE;
- --with-memories→MEMORIES;--help→usage+exit
+ --with-memories→MEMORIES;--with-mcp-server→MCP_SERVER;
+ --help→usage+exit
 }
 
 Φ.usage{
@@ -178,6 +179,31 @@ M.DEPRECATED_HOOK_COMMANDS{
  mkdir [memories/,memories/agents/,.crux/reference-tracking/];
  print enable instructions;return True}
 
+M.MCP{MODULE=crux_mcp_server;
+ USER_CFG=~/.cursor/mcp.json;
+ DEFAULT_DIR=~/.crux-mcp-server}
+
+Λ.setup_mcp_server{
+ recommend_mcp_install_dir→confirm fresh dir outside git;
+ DL MCP zip←DL/v{ver}/CRUX-MCP-Server-v{ver}.zip;
+ ¬GitHub→fallback CDN;extract→install_dir;
+ pip install -r requirements.txt;
+ configure_user_mcp_json→~/.cursor/mcp.json{
+  mcpServers.crux-memories={command:python3,
+   args:[-m,crux_mcp_server,-t,stdio],
+   cwd:install_dir}};
+ existing entry→confirm overwrite;
+ report location+config+test cmd}
+
+Λ.recommend_mcp_install_dir{
+ default=~/.crux-mcp-server;
+ NON_INTERACTIVE→default;
+ prompt user→chosen;
+ chosen∃+.git→warn "outside git projects";
+ chosen∃+has server→confirm overwrite;
+ chosen∃+¬empty→warn+confirm;
+ return chosen}
+
 E.DEFAULT_MEMORIES_CONFIG{
  platform=cursor;
  flags=[enableMemories=false,enableMemoryCompression=false];
@@ -221,6 +247,7 @@ E.DEFAULT_MEMORIES_CONFIG{
  cleanup_deprecated_files»cleanup_deprecated_hooks»
  download_update_script»
  --with-memories→setup_memories»
+ --with-mcp-server→setup_mcp_server(ver)»
  show_completion_report}
 
 Γ.bootstrap_upgrade{

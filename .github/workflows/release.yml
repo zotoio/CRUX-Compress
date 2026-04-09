@@ -44,12 +44,12 @@ jobs:
             echo "Tag v${{ steps.version.outputs.version }} does not exist"
           fi
 
-      - name: Build distribution zip
+      - name: Build distribution zips
         if: steps.tag_check.outputs.exists == 'false'
         run: |
-          # Single build step: creates zip, updates dist-manifest.json and crux-release-files.json
+          # Single build step: creates both zips, updates dist-manifest.json and crux-release-files.json
           python3 scripts/create-crux-zip.py .
-          ls -la CRUX-Compress-*.zip
+          ls -la CRUX-Compress-*.zip CRUX-MCP-Server-*.zip
 
       - name: Commit release manifests
         if: steps.tag_check.outputs.exists == 'false'
@@ -128,7 +128,9 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: CRUX Compress v${{ steps.version.outputs.version }}
           body_path: release_notes.md
-          files: CRUX-Compress-v${{ steps.version.outputs.version }}.zip
+          files: |
+            CRUX-Compress-v${{ steps.version.outputs.version }}.zip
+            CRUX-MCP-Server-v${{ steps.version.outputs.version }}.zip
           draft: false
           prerelease: false
         env:
@@ -193,6 +195,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Assets**:" >> $GITHUB_STEP_SUMMARY
           echo "- CRUX-Compress-v${{ steps.version.outputs.version }}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- CRUX-MCP-Server-v${{ steps.version.outputs.version }}.zip" >> $GITHUB_STEP_SUMMARY
           echo "- CHANGELOG.md updated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install Command**:" >> $GITHUB_STEP_SUMMARY
