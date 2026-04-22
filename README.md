@@ -672,6 +672,12 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-mindreader <spec-name>` | Show memories from a specific spec |
 | `/crux-forget <memory-id>` | Forget a specific memory by ID |
 | `/crux-forget "query"` | Search and select memories to forget |
+| `/crux-amnesia` | Toggle session-only amnesia mode for ambient memory usage |
+| `/crux-amnesia on\|off\|status` | Disable, restore, or inspect session memory mode without changing repo config |
+
+### Session-Only Memory Override
+
+Use `/crux-amnesia` when you want a clean chat session without ambient memory recall, annotations, or reference tracking. This override only affects the current chat session and spawned subagents for ordinary work; it never edits `.crux/crux-memories.json` and does not block explicit memory-management commands like `/crux-dream`, `/crux-mindreader`, or `/crux-forget`.
 
 ### Memory Skills
 

@@ -59,6 +59,7 @@ MEMORY_FILE_PREFIXES = (
     ".cursor/commands/crux-dream.md",
     ".cursor/commands/crux-mindreader.md",
     ".cursor/commands/crux-forget.md",
+    ".cursor/commands/crux-amnesia.md",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/rules/crux-memories-integration.crux.mdc",
     ".cursor/skills/crux-skill-memory-",
@@ -495,6 +496,7 @@ def get_release_files(version: str) -> list[str]:
         ".cursor/commands/crux-dream.md",
         ".cursor/commands/crux-mindreader.md",
         ".cursor/commands/crux-forget.md",
+        ".cursor/commands/crux-amnesia.md",
         ".cursor/hooks/crux-detect-changes.py",
         ".cursor/hooks/crux-detect-memory-changes.py",
         ".cursor/hooks/crux-session-start.py",
@@ -789,6 +791,11 @@ DEFAULT_MEMORIES_CONFIG = {
                 "file": ".cursor/commands/crux-forget.md",
                 "default": "/crux-forget",
                 "description": "Remove incorrect or unwanted memories",
+            },
+            "amnesia": {
+                "file": ".cursor/commands/crux-amnesia.md",
+                "default": "/crux-amnesia",
+                "description": "Toggle session-scoped ambient memory usage",
             },
         },
         "hooks": {

@@ -19,6 +19,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | dream --rem --yolo | `/crux-dream --rem --yolo` | Unattended REM sleep |
 | mindreader [spec... \| memory... \| query] | `/crux-mindreader` | Decompress and display memories in chat. Pass spec(s) to show memories from those specs, memory file(s) to view specific ones, or a question about the current chat. If omitted, shows all memories referenced in the current session with rationale for why each was included |
 | forget [memory... \| query] | `/crux-forget` | Remove incorrect or unwanted memories from the corpus. Pass memory ID(s), slug(s), file path(s), or a search query. If omitted, lists all memories for selection |
+| amnesia [on\|off\|status] | `/crux-amnesia` | Toggle a chat-session-only override that suppresses ambient memory usage for normal work while leaving repo config unchanged |
 
 ### Hooks (provided by CRUX, configurable triggers)
 
@@ -40,7 +41,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 
 ### Agent: `crux-cursor-memory-manager`
 
-Commands (`/crux-dream`, `/crux-mindreader`, `/crux-forget`) spawn a `crux-cursor-memory-manager` subagent to perform the actual work. This agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
+Commands (`/crux-dream`, `/crux-mindreader`, `/crux-forget`) spawn a `crux-cursor-memory-manager` subagent to perform the actual work. `/crux-amnesia` is different: it is a lightweight chat-session instruction toggle that does not mutate files and instead tells the current agent and ordinary-work subagents to suppress ambient memory usage. The memory manager agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
 
 **Agent definition frontmatter:**
 
@@ -247,7 +248,7 @@ The core memory engine is identical across platforms. Only the wiring layer diff
 | Capability | Cursor | Claude Code | Generic / Other |
 |---|---|---|---|
 | Agent rules | `.cursor/rules/*.mdc` | `CLAUDE.md` / `.claude/settings.json` | `memories/MEMORIES_AGENT_RULE.md` |
-| Commands | `/crux-dream`, `/crux-mindreader`, `/crux-forget` → `.cursor/commands/crux-*.md` | `/crux-dream`, `/crux-mindreader`, `/crux-forget` → `.claude/commands/crux-*.md` | `crux-dream`, `crux-mindreader`, `crux-forget` → shell scripts or MCP calls |
+| Commands | `/crux-dream`, `/crux-mindreader`, `/crux-forget`, `/crux-amnesia` → `.cursor/commands/crux-*.md` | `/crux-dream`, `/crux-mindreader`, `/crux-forget`, `/crux-amnesia` → `.claude/commands/crux-*.md` | `crux-dream`, `crux-mindreader`, `crux-forget`, `crux-amnesia` → shell scripts or MCP calls |
 | Session hooks | `.cursor/hooks/*.sh` | `.claude/hooks/session-start.sh` | Git hook or manual |
 | Skills/tools | `.cursor/skills/*/SKILL.md` | Tool use via MCP or inline prompts | MCP tools or scripts |
 | Memory discovery (default) | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files |
@@ -299,6 +300,11 @@ The core memory engine is identical across platforms. Only the wiring layer diff
         "file": ".cursor/commands/crux-forget.md",
         "default": "/crux-forget",
         "description": "Remove incorrect or unwanted memories"
+      },
+      "amnesia": {
+        "file": ".cursor/commands/crux-amnesia.md",
+        "default": "/crux-amnesia",
+        "description": "Toggle session-scoped ambient memory usage"
       }
     },
 
@@ -664,6 +670,11 @@ Regardless of platform, the agent rule must convey:
   - Clearly indicate when output is influenced by a memory: `[memory:{title}]`
   - Increment reference tracking (delegated to CRUX skill)
   - After spec execution completes, suggest running `/crux-dream`
+- When the current chat session has explicitly enabled `/crux-amnesia`, that session override takes precedence over `enableMemories: "true"` for ordinary work:
+  - Skip discovery, loading, output annotations, reference tracking, and automatic dream nudges
+  - Never change `.crux/crux-memories.json`, memory files, trackers, or the index to represent this override
+  - Propagate the same amnesia state to subagents spawned for ordinary work
+  - If the user explicitly invokes `/crux-dream`, `/crux-mindreader`, or `/crux-forget`, treat that as direct intent to use memory tooling even while amnesia mode is on
 - When `enableMemories` is `"false"`, agents skip all memory operations silently
 - Agents never directly read/write memory files — they use CRUX memory skills
 - Agents only see base memories and their own agent-scoped memories — never other agents' memories
@@ -689,9 +700,9 @@ Add a clause that:
 
 - If `enableMemories` is `"true"` and spec execution status is `complete`, suggest running the configured dream command (default: `/crux-dream`)
 
-**D. Commands:** Pointed to by `commands.dream.file` and `commands.mindReader.file` in config.
+**D. Commands:** Pointed to by `commands.dream.file`, `commands.mindReader.file`, `commands.forget.file`, and `commands.amnesia.file` in config.
 
-Defaults to `.cursor/commands/crux-dream.md`, `.cursor/commands/crux-mindreader.md`, and `.cursor/commands/crux-forget.md`. These are standard Cursor slash command definitions that invoke the CRUX dream, mindreader, and forget skills. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
+Defaults to `.cursor/commands/crux-dream.md`, `.cursor/commands/crux-mindreader.md`, `.cursor/commands/crux-forget.md`, and `.cursor/commands/crux-amnesia.md`. The first three invoke CRUX memory workflows, while `/crux-amnesia` sets a chat-session-only override that suppresses ambient memory use without changing repo config. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
 
 **E. MCP (optional):** If configured, add CRUX memory MCP server in `.cursor/mcp.json` for semantic memory search. Without MCP, agents use the index file (`.crux/memory-index.yml`) for discovery — no additional setup required.
 
@@ -746,9 +757,9 @@ if [ "$COUNT" -gt "$THRESHOLD" ]; then
 fi
 ```
 
-**C. Commands:** `.claude/commands/crux-dream.md`, `.claude/commands/crux-mindreader.md`, and `.claude/commands/crux-forget.md`
+**C. Commands:** `.claude/commands/crux-dream.md`, `.claude/commands/crux-mindreader.md`, `.claude/commands/crux-forget.md`, and `.claude/commands/crux-amnesia.md`
 
-The config `commands.dream.file` and `commands.forget.file` point at the command definitions. For Claude Code, the defaults are `.claude/commands/crux-dream.md` and `.claude/commands/crux-forget.md`. Example:
+The config `commands.dream.file`, `commands.mindReader.file`, `commands.forget.file`, and `commands.amnesia.file` point at the command definitions. For Claude Code, the defaults are `.claude/commands/crux-dream.md`, `.claude/commands/crux-mindreader.md`, `.claude/commands/crux-forget.md`, and `.claude/commands/crux-amnesia.md`. Example:
 
 ```markdown
 Analyse unprocessed spec directories and extract memories using the CRUX
@@ -788,7 +799,7 @@ A plain markdown file placed in the memories directory. Agents on any platform c
 crux-memories check-session --config .crux/crux-memories.json
 ```
 
-**C. Commands:** The config `commands.dream.file`, `commands.mindReader.file`, and `commands.forget.file` point at shell scripts by default on generic platforms:
+**C. Commands:** The config `commands.dream.file`, `commands.mindReader.file`, `commands.forget.file`, and `commands.amnesia.file` point at shell scripts by default on generic platforms:
 
 ```bash
 # Dream (interactive) — default: ./crux-dream
@@ -802,6 +813,9 @@ crux-mindreader --config .crux/crux-memories.json
 
 # Forget — default: ./crux-forget
 crux-forget --config .crux/crux-memories.json
+
+# Amnesia — default: ./crux-amnesia
+crux-amnesia on --config .crux/crux-memories.json
 ```
 
 **D. MCP (optional):** Standard MCP server configuration per the platform's method. Not required — the index file works without any MCP infrastructure.
