@@ -1,4 +1,4 @@
-# crux-mindreader
+# crux-recall
 
 Decompress, query, and display CRUX memories in human-readable form.
 
@@ -7,15 +7,22 @@ Decompress, query, and display CRUX memories in human-readable form.
 ## Usage
 
 ```
-/crux-mindreader                                    - Show contextually relevant memories
-/crux-mindreader "search query"                     - Search memories by keyword
-/crux-mindreader 20260403-crux-memories              - Show memories from a specific spec
-/crux-mindreader memories/core/some-memory.memory.md - Display a specific memory file
+/crux-recall                                    - Show contextually relevant memories
+/crux-recall "search query"                     - Search memories by keyword
+/crux-recall 20260403-crux-memories              - Show memories from a specific spec
+/crux-recall memories/core/some-memory.memory.md - Display a specific memory file
+/crux-recall --total                             - Visualize the entire memory system as a 3D graph
 ```
+
+## Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `--total` | Generate an interactive 3D force-directed visualization of the entire memory system. Uses `/canvas` to render a `3d-force-graph` ([vasturiano/3d-force-graph](https://github.com/vasturiano/3d-force-graph)) with all memory data embedded. Nodes represent memories (sized by strength, colored by type, labeled by title). Edges connect memories sharing tags or source specs (thickness proportional to connection strength). Supports click-to-detail, hover highlighting, search/filter, and force simulation controls. |
 
 ## Instructions
 
-When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in MindReader mode to query and display memories. MindReader is **read-only** — it never modifies memory files on disk.
+When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in Recall mode to query and display memories. Recall is **read-only** — it never modifies memory files on disk.
 
 ### Argument Handling
 
@@ -23,6 +30,7 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in M
 - **Quoted text** (e.g. `"performance optimization"`): The manager searches existing memories by title, description, tags, and body content. Results are ranked by relevance with decompressed body content shown for compressed memories. Pass `$ARGUMENTS` to the subagent as the search query.
 - **Spec name(s)** (e.g. `20260403-crux-memories`): The manager finds all memories whose `source` field matches the given spec slug(s). Results are grouped by type. Pass `$ARGUMENTS` to the subagent as the spec name(s).
 - **File path(s)** (e.g. `memories/learning/foo.memory.md`): The manager reads the specified memory file(s) directly. Compressed files (`.memory.crux.md`) are decompressed for display. Full frontmatter and body are shown. Pass `$ARGUMENTS` to the subagent as the file path(s).
+- **`--total`**: The manager gathers the complete memory corpus — index metadata, all memory files, and their relationships — then uses `/canvas` to generate an interactive 3D force-directed graph visualization of the entire memory system. No table or text output is produced; the canvas is the deliverable.
 
 ### What Happens
 
@@ -32,8 +40,9 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in M
    - Searches memory files for keyword matches
    - Filters memories by source spec slug
    - Reads specific memory files directly
+   - (`--total`) Reads the full memory index and all memory files, builds a relationship graph, and generates a 3D visualization via `/canvas`
 3. For compressed memories (`.memory.crux.md`), decompresses the CRUX body to terse natural language for display — without modifying the file on disk
-4. Presents results with frontmatter metadata and readable body content
+4. Presents results with frontmatter metadata and readable body content (or as an interactive 3D graph when `--total` is used)
 
 ### Display Format
 
@@ -59,7 +68,7 @@ After the table(s), show a **Details** section with each memory's body content (
 
 ### Post-Display: Next Steps Menu
 
-After displaying the MindReader results, use the `AskQuestion` tool with a single multi-select question offering these actions:
+After displaying the Recall results, use the `AskQuestion` tool with a single multi-select question offering these actions:
 
 | Option | Label | What it does |
 |--------|-------|-------------|
@@ -81,3 +90,6 @@ If the user selects one or more actions, execute them in order:
 - `crux-skill-memory-compress` skill — Decompression logic for compressed memories
 - `crux-skill-memory-index` skill — Memory index used for discovery
 - `/crux-dream` — Extract and create memories from completed work
+- `/crux-forget` — Remove memories from the corpus
+- `/crux-remember` — Create ad-hoc memories outside of spec workflows
+- `/crux-meditate` — Recursive memory-informed exploration
