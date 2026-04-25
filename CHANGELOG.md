@@ -5,6 +5,18 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.9.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.1) - 2026-04-25
+
+- chore: update release manifests for v2.9.1 [skip ci] (a0a61e4)
+- Potential fix for pull request finding 'Unused local variable' (cc2be68)
+- feat: sync CRUX.md version in release workflow and add release files to site (9922269)
+- feat: add standalone MCP server installation and configuration (e9faff2)
+- docs: add analysis note on context usage, hash IDs, and hooks (19c47b0)
+- feat: add /crux-amnesia session override (7b75b22)
+- fix: update install.crux.md to reflect /crux-amnesia command wiring (f169fd9)
+- chore: update CRUX output for crux-memories-integration rule (c0cfb6f)
+- docs: update CHANGELOG.md for v2.8.6 [skip ci] (97abb1c)
+
 ## [v2.8.6](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.8.6) - 2026-04-07
 
 - chore: update release manifests for v2.8.6 [skip ci] (57d9a78)
