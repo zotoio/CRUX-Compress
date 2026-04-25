@@ -997,7 +997,7 @@ def setup_mcp_server(version: str) -> bool:
     log_success(f"MCP server extracted to {install_dir}")
 
     deps_ok = install_mcp_server_deps(install_dir)
-    config_ok = configure_user_mcp_json(install_dir)
+    configure_user_mcp_json(install_dir)
 
     print()
     print(f"{CYAN}MCP Server Installation{NC}")
