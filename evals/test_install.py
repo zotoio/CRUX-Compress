@@ -518,6 +518,21 @@ class TestSetupMemories:
         flags = {k: v for f in data["flags"] for k, v in f.items()}
         assert flags["enableMemories"] == "false"
 
+    def test_config_includes_amnesia_command(self, tmp_path: Path):
+        mod = _load_install()
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.setup_memories()
+        finally:
+            os.chdir(orig_cwd)
+
+        config = tmp_path / ".crux" / "crux-memories.json"
+        data = json.loads(config.read_text(encoding="utf-8"))
+        amnesia = data["cruxMemories"]["commands"]["amnesia"]
+        assert amnesia["file"] == ".cursor/commands/crux-amnesia.md"
+        assert amnesia["default"] == "/crux-amnesia"
+
 
 class TestWithoutMemories:
     def test_no_memory_files_without_flag(self, tmp_path: Path):

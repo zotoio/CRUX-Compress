@@ -1,9 +1,9 @@
 ---
-generated: 2026-04-06 11:00
-sourceChecksum: "2960519518"
-beforeTokens: ~7246
-afterTokens: ~2040
-reducedBy: 72%
+generated: 2026-04-22 15:30
+sourceChecksum: "1739657208"
+beforeTokens: ~9185
+afterTokens: ~2510
+reducedBy: 73%
 note: includes agent bootstrap instructions not present in source
 ---
 
@@ -36,7 +36,8 @@ note: includes agent bootstrap instructions not present in source
 Φ.opts{
  -y→NON_INTERACTIVE;--force→FORCE(+BACKUP);
  --backup→BACKUP;--verbose→VERBOSE;
- --with-memories→MEMORIES;--help→usage+exit
+ --with-memories→MEMORIES;--with-mcp-server→MCP_SERVER;
+ --help→usage+exit
 }
 
 Φ.usage{
@@ -54,7 +55,7 @@ E.log{log→BLUE;log_verbose→BLUE(if VERBOSE);
 
 M.MEMORY_FILE_PREFIXES{
  .cursor/[agents/crux-cursor-memory-manager.md,
-  commands/[crux-dream.md,crux-mindreader.md,crux-forget.md],
+  commands/[crux-dream.md,crux-mindreader.md,crux-forget.md,crux-amnesia.md],
   hooks/crux-detect-memory-changes.py,
   rules/crux-memories-integration.crux.mdc,
   skills/crux-skill-memory-*]}
@@ -178,6 +179,31 @@ M.DEPRECATED_HOOK_COMMANDS{
  mkdir [memories/,memories/agents/,.crux/reference-tracking/];
  print enable instructions;return True}
 
+M.MCP{MODULE=crux_mcp_server;
+ USER_CFG=~/.cursor/mcp.json;
+ DEFAULT_DIR=~/.crux-mcp-server}
+
+Λ.setup_mcp_server{
+ recommend_mcp_install_dir→confirm fresh dir outside git;
+ DL MCP zip←DL/v{ver}/CRUX-MCP-Server-v{ver}.zip;
+ ¬GitHub→fallback CDN;extract→install_dir;
+ pip install -r requirements.txt;
+ configure_user_mcp_json→~/.cursor/mcp.json{
+  mcpServers.crux-memories={command:python3,
+   args:[-m,crux_mcp_server,-t,stdio],
+   cwd:install_dir}};
+ existing entry→confirm overwrite;
+ report location+config+test cmd}
+
+Λ.recommend_mcp_install_dir{
+ default=~/.crux-mcp-server;
+ NON_INTERACTIVE→default;
+ prompt user→chosen;
+ chosen∃+.git→warn "outside git projects";
+ chosen∃+has server→confirm overwrite;
+ chosen∃+¬empty→warn+confirm;
+ return chosen}
+
 E.DEFAULT_MEMORIES_CONFIG{
  platform=cursor;
  flags=[enableMemories=false,enableMemoryCompression=false];
@@ -186,7 +212,7 @@ E.DEFAULT_MEMORIES_CONFIG{
    archiveDir=.ai-ignored/executed,indexFile=.crux/memory-index.yml};
   sizeUnit=lines;compressionMinLines=500;maxMemorySize=1000;
   compressionTarget=33;unitOfWork=spec;
-  commands=[/crux-dream,/crux-mindreader,/crux-forget];
+  commands=[/crux-dream,/crux-mindreader,/crux-forget,/crux-amnesia];
   typePriority=[core,redflag,goal,learning,idea,archived];
   typeTransitions={idea→5→learning;learning→15→core;redflag→10→core};
   demoteAfterDays=90;archiveAfterDays=180;
@@ -221,6 +247,7 @@ E.DEFAULT_MEMORIES_CONFIG{
  cleanup_deprecated_files»cleanup_deprecated_hooks»
  download_update_script»
  --with-memories→setup_memories»
+ --with-mcp-server→setup_mcp_server(ver)»
  show_completion_report}
 
 Γ.bootstrap_upgrade{

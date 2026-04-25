@@ -113,5 +113,21 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', buildNav);
+  function loadFooterVersion() {
+    fetch('version.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.version) return;
+        var els = document.querySelectorAll('.footer-version');
+        for (var i = 0; i < els.length; i++) {
+          els[i].textContent = 'v' + data.version;
+        }
+      })
+      .catch(function () {});
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    buildNav();
+    loadFooterVersion();
+  });
 })();

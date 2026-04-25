@@ -42,6 +42,11 @@
         "file": ".cursor/commands/crux-forget.md",
         "default": "/crux-forget",
         "description": "Remove incorrect or unwanted memories"
+      },
+      "amnesia": {
+        "file": ".cursor/commands/crux-amnesia.md",
+        "default": "/crux-amnesia",
+        "description": "Toggle session-scoped ambient memory usage"
       }
     },
 

@@ -6,7 +6,16 @@ crux: true
 
 # CRUX Memories Integration Rule
 
-This rule governs how agents interact with the CRUX Memories system. Behavior is controlled by the `enableMemories` flag in `.crux/crux-memories.json`.
+This rule governs how agents interact with the CRUX Memories system. Behavior is controlled by the `enableMemories` flag in `.crux/crux-memories.json`, unless the current chat session explicitly enables `/crux-amnesia`.
+
+## Session Override: `/crux-amnesia`
+
+- `/crux-amnesia` is a **chat-session-only** override
+- When amnesia mode is on, it takes precedence over `enableMemories: "true"`
+- Amnesia mode suppresses ambient memory discovery, loading, annotation, reference tracking, and automatic `/crux-dream` nudges during ordinary work
+- This override must **never** modify `.crux/crux-memories.json`, memory files, trackers, or the memory index
+- Subagents spawned for ordinary work inherit the same amnesia state and must suppress ambient memory usage too
+- If the user explicitly invokes a memory-management command (`/crux-dream`, `/crux-mindreader`, `/crux-forget`), treat that as direct user intent to interact with memories even while amnesia mode is on
 
 ## When Memories Are Enabled (`enableMemories: "true"`)
 
@@ -44,14 +53,21 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 
 ## MCP Server Configuration
 
-To enable semantic search over memories, add the MCP server to `.cursor/mcp.json`:
+The MCP server is installed at the user level and shared across all projects. Install it via:
+
+```bash
+python3 install.py --with-mcp-server
+```
+
+This configures `~/.cursor/mcp.json` with:
 
 ```json
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "python",
-      "args": ["-m", "crux_mcp_server", "-t", "stdio", "--config", ".crux/crux-memories.json"]
+      "command": "python3",
+      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
+      "cwd": "~/.crux-mcp-server"
     }
   }
 }
