@@ -220,8 +220,8 @@ jobs:
           # Update frontmatter version (line: version: X.Y.Z)
           sed -i "s/^version: .*/version: $NEW_VERSION/" CRUX.md
           
-          # Update heading version (line: # CRUX Rule Compression Specification vX.Y.Z)
-          sed -i "s/# CRUX Rule Compression Specification v.*/# CRUX Rule Compression Specification v$NEW_VERSION/" CRUX.md
+          # Update first markdown heading version (# CRUX ... Specification vX.Y.Z)
+          sed -i "s/^# CRUX.*Specification v.*/# CRUX Compression Specification v$NEW_VERSION/" CRUX.md
           
           echo "Updated CRUX.md to version $NEW_VERSION"
 
@@ -296,8 +296,8 @@ jobs:
           # Update frontmatter version
           sed -i "s/^version: .*/version: $VERSION/" CRUX.md
           
-          # Update heading version
-          sed -i "s/# CRUX Rule Compression Specification v.*/# CRUX Rule Compression Specification v$VERSION/" CRUX.md
+          # Update first markdown heading version
+          sed -i "s/^# CRUX.*Specification v.*/# CRUX Compression Specification v$VERSION/" CRUX.md
           
           echo "Synced CRUX.md to version $VERSION"
 

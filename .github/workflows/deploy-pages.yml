@@ -42,13 +42,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare site with release files
+        run: |
+          SITE_DIR="web/compress.md"
+          VERSION=$(jq -r '.version' .crux/crux.json)
+          echo "Preparing site for v${VERSION}"
+
+          # Copy spec and install guide to site root
+          cp CRUX.md "${SITE_DIR}/CRUX.md"
+          cp install.crux.md "${SITE_DIR}/install.crux.md"
+
+          # Create llms.txt (copy of CRUX.md for LLM discovery)
+          cp CRUX.md "${SITE_DIR}/llms.txt"
+
+          # Generate version.json for dynamic footer updates
+          echo "{\"version\":\"${VERSION}\"}" > "${SITE_DIR}/version.json"
+
+          echo "Site files:"
+          ls -la "${SITE_DIR}/CRUX.md" "${SITE_DIR}/install.crux.md" "${SITE_DIR}/llms.txt" "${SITE_DIR}/version.json"
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the web/compress.md directory as the site root
           path: 'web/compress.md'
 
       - name: Deploy to GitHub Pages
@@ -57,6 +75,15 @@ jobs:
 
       - name: Summary
         run: |
+          VERSION=$(jq -r '.version' .crux/crux.json)
           echo "## Pages Deployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: v${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release files copied to site root**:" >> $GITHUB_STEP_SUMMARY
+          echo "- CRUX.md (specification)" >> $GITHUB_STEP_SUMMARY
+          echo "- install.crux.md (install guide)" >> $GITHUB_STEP_SUMMARY
+          echo "- llms.txt (LLM discovery)" >> $GITHUB_STEP_SUMMARY
+          echo "- version.json (dynamic version)" >> $GITHUB_STEP_SUMMARY
