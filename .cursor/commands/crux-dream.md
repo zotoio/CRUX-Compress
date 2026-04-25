@@ -51,7 +51,7 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 
 ### After Dreaming
 
-- Use `/crux-mindreader` to view created or modified memories
+- Use `/crux-recall` to view created or modified memories
 - Run `/crux-dream --rem` periodically to keep the memory corpus healthy
 - Memories with high reference counts may be flagged for promotion to permanent rules
 
@@ -60,4 +60,7 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 - `crux-cursor-memory-manager` agent — The specialist that manages the memory lifecycle
 - `crux-skill-memory-extract` skill — Dream extraction analysis
 - `crux-skill-memory-rebalance` skill — REM sleep rebalancing
-- `/crux-mindreader` — View and query memories
+- `/crux-recall` — View and query memories
+- `/crux-forget` — Remove memories from the corpus
+- `/crux-remember` — Create ad-hoc memories outside of spec workflows
+- `/crux-meditate` — Recursive memory-informed exploration

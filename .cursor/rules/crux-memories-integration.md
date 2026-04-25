@@ -15,7 +15,7 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 - Amnesia mode suppresses ambient memory discovery, loading, annotation, reference tracking, and automatic `/crux-dream` nudges during ordinary work
 - This override must **never** modify `.crux/crux-memories.json`, memory files, trackers, or the memory index
 - Subagents spawned for ordinary work inherit the same amnesia state and must suppress ambient memory usage too
-- If the user explicitly invokes a memory-management command (`/crux-dream`, `/crux-mindreader`, `/crux-forget`), treat that as direct user intent to interact with memories even while amnesia mode is on
+- If the user explicitly invokes a memory-management command (`/crux-dream`, `/crux-recall`, `/crux-remember`, `/crux-meditate`, `/crux-forget`), treat that as direct user intent to interact with memories even while amnesia mode is on
 
 ## When Memories Are Enabled (`enableMemories: "true"`)
 

@@ -92,7 +92,7 @@ Restore a compressed memory for editing.
 4. Write the result as `{slug}.memory.md` (rename from `.memory.crux.md` to `.memory.md`)
 5. Delete the `.memory.crux.md` file
 
-**Decompression style**: Expand CRUX notation to terse natural language. Do not inflate back to original verbosity — aim for compact, readable content that preserves all semantic meaning. This matches the MindReader display style.
+**Decompression style**: Expand CRUX notation to terse natural language. Do not inflate back to original verbosity — aim for compact, readable content that preserves all semantic meaning. This matches the Recall display style.
 
 **Source recovery**: If the original exists in the source archive (check `sourceArchive` frontmatter field), offer to restore the exact original instead of decompressing.
 

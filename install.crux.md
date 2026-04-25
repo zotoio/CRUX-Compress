@@ -1,9 +1,10 @@
 ---
-generated: 2026-04-22 15:30
-sourceChecksum: "1739657208"
-beforeTokens: ~9185
-afterTokens: ~2510
-reducedBy: 73%
+generated: 2026-04-25 23:53
+sourceChecksum: "271551948"
+cruxLevel: 25
+beforeTokens: 11202
+afterTokens: 2780
+reducedBy: 75%
 note: includes agent bootstrap instructions not present in source
 ---
 
@@ -55,7 +56,7 @@ E.log{log→BLUE;log_verbose→BLUE(if VERBOSE);
 
 M.MEMORY_FILE_PREFIXES{
  .cursor/[agents/crux-cursor-memory-manager.md,
-  commands/[crux-dream.md,crux-mindreader.md,crux-forget.md,crux-amnesia.md],
+  commands/[crux-dream.md,crux-meditate.md,crux-recall.md,crux-remember.md,crux-forget.md,crux-amnesia.md],
   hooks/crux-detect-memory-changes.py,
   rules/crux-memories-integration.crux.mdc,
   skills/crux-skill-memory-*]}
@@ -212,7 +213,7 @@ E.DEFAULT_MEMORIES_CONFIG{
    archiveDir=.ai-ignored/executed,indexFile=.crux/memory-index.yml};
   sizeUnit=lines;compressionMinLines=500;maxMemorySize=1000;
   compressionTarget=33;unitOfWork=spec;
-  commands=[/crux-dream,/crux-mindreader,/crux-forget,/crux-amnesia];
+  commands=[/crux-dream,/crux-recall,/crux-remember,/crux-meditate,/crux-forget,/crux-amnesia];
   typePriority=[core,redflag,goal,learning,idea,archived];
   typeTransitions={idea→5→learning;learning→15→core;redflag→10→core};
   demoteAfterDays=90;archiveAfterDays=180;

@@ -18,6 +18,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import zipfile
 from datetime import date
@@ -31,9 +32,12 @@ DIST_FILES = [
     ".cursor/agents/crux-cursor-rule-manager.md",
     ".cursor/agents/crux-cursor-memory-manager.md",
     ".cursor/commands/crux-compress.md",
+    ".cursor/commands/crux-amnesia.md",
     ".cursor/commands/crux-dream.md",
-    ".cursor/commands/crux-mindreader.md",
     ".cursor/commands/crux-forget.md",
+    ".cursor/commands/crux-meditate.md",
+    ".cursor/commands/crux-recall.md",
+    ".cursor/commands/crux-remember.md",
     ".cursor/hooks/crux-detect-changes.py",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
@@ -54,6 +58,18 @@ DIST_FILES = [
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def get_git_commit_hash() -> str | None:
+    """Return the current HEAD commit hash, or None if not in a git repo."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, check=True,
+        )
+        return result.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
 
 
 def update_release_manifest(project_root: Path, version: str) -> None:
@@ -86,13 +102,20 @@ def update_release_manifest(project_root: Path, version: str) -> None:
                 versions.append(version)
             all_files[rel] = versions
 
-    manifest.setdefault("releases", {})[version] = {
+    commit_hash = get_git_commit_hash()
+
+    release_entry: dict = {
         "date": date.today().isoformat(),
+        "commit": commit_hash,
         "files": files_entry,
     }
 
+    manifest.setdefault("releases", {})[version] = release_entry
+
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(f"Updated {manifest_path.relative_to(project_root)} for v{version}")
+    if commit_hash:
+        print(f"  commit: {commit_hash}")
 
 
 def build_mcp_server_zip(project_root: Path, output_dir: Path, version: str) -> Path:

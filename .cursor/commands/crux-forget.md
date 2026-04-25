@@ -43,4 +43,6 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 - `crux-cursor-memory-manager` agent — The specialist that manages the memory lifecycle
 - `crux-skill-memory-crud` skill — Delete operation that handles memory file and tracker removal
 - `/crux-dream` — Extract and create memories from completed work
-- `/crux-mindreader` — View and query memories
+- `/crux-recall` — View and query memories
+- `/crux-remember` — Create ad-hoc memories outside of spec workflows
+- `/crux-meditate` — Recursive memory-informed exploration

@@ -545,7 +545,7 @@ After all changes are applied and the REM summary is written, rebuild the memory
 python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py
 ```
 
-This is **mandatory** — skipping this step leaves the index stale, which causes downstream agents (MindReader, Dream, session-start hooks) to reference moved, deleted, or renamed files. If the script fails, report the error but do not abort — the REM summary and applied changes are still valid.
+This is **mandatory** — skipping this step leaves the index stale, which causes downstream agents (Recall, Dream, session-start hooks) to reference moved, deleted, or renamed files. If the script fails, report the error but do not abort — the REM summary and applied changes are still valid.
 
 ### Step 16: Report
 

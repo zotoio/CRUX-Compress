@@ -37,7 +37,7 @@ When amnesia mode is active for this chat session:
 5. Do **not** suggest `/crux-dream` automatically after ordinary work
 6. When spawning subagents for ordinary work, explicitly tell them that CRUX memories are disabled for this chat session and they must not use them
 
-This override applies only to **ambient memory usage during ordinary work**. If the user explicitly invokes a memory command such as `/crux-dream`, `/crux-mindreader`, or `/crux-forget`, treat that as direct user intent to interact with the memory system.
+This override applies only to **ambient memory usage during ordinary work**. If the user explicitly invokes a memory command such as `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, or `/crux-meditate`, treat that as direct user intent to interact with the memory system.
 
 ### What Amnesia OFF Means
 
@@ -57,5 +57,7 @@ Respond with a short status confirmation:
 ## Related
 
 - `/crux-dream` — Extract or rebalance memories intentionally
-- `/crux-mindreader` — Inspect memories intentionally
+- `/crux-recall` — Inspect memories intentionally
 - `/crux-forget` — Remove memories intentionally
+- `/crux-remember` — Create ad-hoc memories intentionally
+- `/crux-meditate` — Recursive memory-informed exploration

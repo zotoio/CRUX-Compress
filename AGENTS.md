@@ -24,5 +24,27 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 | `crux-cursor-rule-manager` | `.cursor/agents/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
 | `integrity-expert` | `.cursor/agents/integrity-expert.md` | Code quality audits, test coverage, security, CI/CD |
 | `docs-sync-agent` | `.cursor/agents/docs-sync-agent.md` | Documentation synchronization on source changes |
-| `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, MindReader, Forget) |
+| `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, Recall, Forget, Remember, Meditate) |
+| `crux-platform-architect` | `.cursor/agents/crux-platform-architect.md` | Platform architecture, Cursor/LLM harness design, documentation, and eval strategy |
+| `crux-software-engineer` | `.cursor/agents/crux-software-engineer.md` | Core implementation — Python, shell, MCP server, hooks, skills, and evals |
+
+### Spec Execution — Agent Allocation
+
+When building or executing engineering specs in this repository, **always use the CRUX agents** instead of `generalPurpose`. Assign subtasks based on their nature:
+
+| Subtask Type | Assign To |
+|-------------|-----------|
+| Architecture, design, trade-off analysis | `crux-platform-architect` |
+| Documentation updates (README, AGENTS.md, CONTRIBUTORS) | `crux-platform-architect` |
+| Eval strategy and test design | `crux-platform-architect` |
+| Code implementation (Python, shell, MCP, hooks, skills) | `crux-software-engineer` |
+| Bug fixes, refactoring, feature implementation | `crux-software-engineer` |
+| Writing evals and tests | `crux-software-engineer` |
+| Integration testing and verification | `crux-software-engineer` |
+| CRUX compression or decompression tasks | `crux-cursor-rule-manager` |
+| Memory lifecycle operations (dream, REM, recall) | `crux-cursor-memory-manager` |
+| Code quality audits, security reviews, CI/CD checks | `integrity-expert` |
+| Documentation sync after source changes | `docs-sync-agent` |
+
+**Do not default to `generalPurpose`** — every subtask in a spec should map to the most appropriate CRUX agent above.
 

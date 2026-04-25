@@ -58,7 +58,9 @@ NON_INTERACTIVE = False
 MEMORY_FILE_PREFIXES = (
     ".cursor/agents/crux-cursor-memory-manager.md",
     ".cursor/commands/crux-dream.md",
-    ".cursor/commands/crux-mindreader.md",
+    ".cursor/commands/crux-meditate.md",
+    ".cursor/commands/crux-recall.md",
+    ".cursor/commands/crux-remember.md",
     ".cursor/commands/crux-forget.md",
     ".cursor/commands/crux-amnesia.md",
     ".cursor/hooks/crux-detect-memory-changes.py",
@@ -495,7 +497,9 @@ def get_release_files(version: str) -> list[str]:
         ".cursor/agents/crux-cursor-memory-manager.md",
         ".cursor/commands/crux-compress.md",
         ".cursor/commands/crux-dream.md",
-        ".cursor/commands/crux-mindreader.md",
+        ".cursor/commands/crux-recall.md",
+        ".cursor/commands/crux-remember.md",
+        ".cursor/commands/crux-meditate.md",
         ".cursor/commands/crux-forget.md",
         ".cursor/commands/crux-amnesia.md",
         ".cursor/hooks/crux-detect-changes.py",
@@ -783,10 +787,20 @@ DEFAULT_MEMORIES_CONFIG = {
                 "default": "/crux-dream",
                 "description": "Post-execution memory extraction and consolidation",
             },
-            "mindReader": {
-                "file": ".cursor/commands/crux-mindreader.md",
-                "default": "/crux-mindreader",
+            "recall": {
+                "file": ".cursor/commands/crux-recall.md",
+                "default": "/crux-recall",
                 "description": "Decompress and view memories in chat",
+            },
+            "remember": {
+                "file": ".cursor/commands/crux-remember.md",
+                "default": "/crux-remember",
+                "description": "Create ad-hoc memories outside of spec workflows",
+            },
+            "meditate": {
+                "file": ".cursor/commands/crux-meditate.md",
+                "default": "/crux-meditate",
+                "description": "Recursive memory-informed exploration and insight synthesis",
             },
             "forget": {
                 "file": ".cursor/commands/crux-forget.md",
