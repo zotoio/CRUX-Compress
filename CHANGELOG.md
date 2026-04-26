@@ -5,6 +5,17 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.9.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.2) - 2026-04-26
+
+- chore: update release manifests for v2.9.2 [skip ci] (5232234)
+- chore: update crux-release-files.json and pending-compression.json for version 2.9.1 (bb72d3a)
+- docs: update agent, config, docs, install, and dist for recall/remember/meditate (f1f25c8)
+- chore: update amnesia overrides and add spec execution agent definitions (cfb6418)
+- feat: add /crux-meditate recursive memory-informed exploration command (469d587)
+- feat: add /crux-remember command for ad-hoc memory creation (bf199b1)
+- feat: rename /crux-mindreader to /crux-recall and add --total visualization (3e4542b)
+- docs: update CHANGELOG.md for v2.9.1 [skip ci] (ca16684)
+
 ## [v2.9.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.1) - 2026-04-25
 
 - chore: update release manifests for v2.9.1 [skip ci] (a0a61e4)
