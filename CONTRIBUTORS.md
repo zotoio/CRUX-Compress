@@ -260,8 +260,10 @@ Version bumps only occur when these files change. The file list is read from `.c
 | `.cursor/agents/crux-cursor-memory-manager.md` | Memory manager agent definition |
 | `.cursor/commands/crux-compress.md` | Compression command |
 | `.cursor/commands/crux-dream.md` | Dream extraction command |
-| `.cursor/commands/crux-mindreader.md` | Memory query command |
+| `.cursor/commands/crux-recall.md` | Memory query command |
 | `.cursor/commands/crux-forget.md` | Memory forget command |
+| `.cursor/commands/crux-remember.md` | Ad-hoc memory creation command |
+| `.cursor/commands/crux-meditate.md` | Recursive exploration command |
 | `.cursor/hooks/crux-detect-changes.py` | File change detection hook |
 | `.cursor/hooks/crux-session-start.py` | Session start hook |
 | `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
@@ -279,8 +281,10 @@ Memory tooling (agent, commands, skills, rule) is included in the distribution z
 |------|:---:|---------|
 | `.cursor/agents/crux-cursor-memory-manager.md` | Yes | Memory lifecycle agent definition |
 | `.cursor/commands/crux-dream.md` | Yes | Dream extraction command |
-| `.cursor/commands/crux-mindreader.md` | Yes | Memory query command |
+| `.cursor/commands/crux-recall.md` | Yes | Memory query command |
 | `.cursor/commands/crux-forget.md` | Yes | Memory forget command |
+| `.cursor/commands/crux-remember.md` | Yes | Ad-hoc memory creation command |
+| `.cursor/commands/crux-meditate.md` | Yes | Recursive exploration command |
 | `.cursor/skills/crux-skill-memory-*/` | Yes | Memory skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
 | `.cursor/rules/crux-memories-integration.crux.mdc` | Yes | Memory integration rule |
 | `.crux/crux-memories.json` | No | Memory system configuration and feature flags (created by `--with-memories`) |

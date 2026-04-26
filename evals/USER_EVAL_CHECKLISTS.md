@@ -237,11 +237,11 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
-## J. MindReader All Invocation Modes
+## J. Recall All Invocation Modes
 
-### J1. MindReader — No Arguments (Contextual Memories)
+### J1. Recall — No Arguments (Contextual Memories)
 
-**Category**: J — MindReader
+**Category**: J — Recall
 
 **Prerequisites**:
 - General prerequisites above
@@ -253,7 +253,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
 2. Have a brief conversation related to topics covered by existing memories (e.g. discuss performance optimization if a memory about React.memo exists)
-3. Type `/crux-mindreader` with no arguments and send
+3. Type `/crux-recall` with no arguments and send
 4. Observe the output
 
 **Expected Outcomes**:
@@ -271,9 +271,9 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
-### J2. MindReader — Query Mode (Influence Identification)
+### J2. Recall — Query Mode (Influence Identification)
 
-**Category**: J — MindReader
+**Category**: J — Recall
 
 **Prerequisites**:
 - General prerequisites above
@@ -285,7 +285,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 1. Open a new Cursor chat session (agent mode with a thinking model)
 2. Have a conversation where the agent gives advice on a topic covered by a memory (e.g. ask "How should I optimize my React list component?")
 3. Note a specific suggestion the agent made
-4. Type `/crux-mindreader "why did you suggest <specific suggestion>?"` (e.g. `/crux-mindreader "why did you suggest using React.memo?"`) and send
+4. Type `/crux-recall "why did you suggest <specific suggestion>?"` (e.g. `/crux-recall "why did you suggest using React.memo?"`) and send
 5. Observe the output
 
 **Expected Outcomes**:
@@ -301,9 +301,9 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
-### J3. MindReader — Spec Name(s) (Source Filtering)
+### J3. Recall — Spec Name(s) (Source Filtering)
 
-**Category**: J — MindReader
+**Category**: J — Recall
 
 **Prerequisites**:
 - General prerequisites above
@@ -313,7 +313,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 **Steps**:
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
-2. Type `/crux-mindreader <spec-name>` (e.g. `/crux-mindreader 20260403-crux-memories`) and send
+2. Type `/crux-recall <spec-name>` (e.g. `/crux-recall 20260403-crux-memories`) and send
 3. Observe the output
 
 **Expected Outcomes**:
@@ -330,9 +330,9 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
-### J4. MindReader — Memory File(s) (Direct Display)
+### J4. Recall — Memory File(s) (Direct Display)
 
-**Category**: J — MindReader
+**Category**: J — Recall
 
 **Prerequisites**:
 - General prerequisites above
@@ -342,9 +342,9 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 **Steps**:
 
 1. Open a new Cursor chat session (agent mode with a thinking model)
-2. Type `/crux-mindreader memories/learning/some-memory.memory.md` and send (use an actual existing path)
+2. Type `/crux-recall memories/learning/some-memory.memory.md` and send (use an actual existing path)
 3. Observe the output for the uncompressed file
-4. If a compressed file exists, type `/crux-mindreader memories/core/some-memory.memory.crux.md` and send
+4. If a compressed file exists, type `/crux-recall memories/core/some-memory.memory.crux.md` and send
 5. Observe the output for the compressed file
 
 **Expected Outcomes**:
@@ -361,9 +361,167 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
+## O. Remember Interactive Flow
+
+### O1. Remember — Interactive Creation
+
+**Category**: O — Remember Workflow (Interactive)
+
+**Prerequisites**:
+- General prerequisites above
+- `enableMemories` is set to `"true"` in `.crux/crux-memories.json`
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-remember` with no arguments and send
+3. When prompted, provide insight text (e.g. "Always validate checksums before overwriting files")
+4. When prompted, select a memory type (e.g. `learning`)
+5. When prompted, provide tags (e.g. `validation, files, safety`)
+6. Observe the memory creation output
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 2 | The agent spawns a `crux-cursor-memory-manager` subagent | A subagent is invoked (visible in chat or agent logs) |
+| 2 | The agent prompts for the memory content | A question asking what the user wants to remember appears |
+| 4 | The agent presents type options from config `typeTransitions` keys | Options include at minimum: idea, learning, redflag, core, goal |
+| 6 | A memory file is created in the correct type subdirectory | File exists at `memories/<type>/<slug>.memory.md` with valid frontmatter |
+| 6 | Frontmatter contains `source: "adhoc"` | The source field distinguishes ad-hoc from spec-extracted memories |
+| 6 | The memory index is rebuilt | `.crux/memory-index.yml` timestamp is updated; new memory appears in the index |
+| 6 | Confirmation shows the memory's hash ID, title, type, and file path | All four fields are present in the confirmation message |
+
+**Pass/Fail**: PASS if the interactive flow collects content, type, and tags, creates the memory file correctly, and rebuilds the index. FAIL if any step is skipped, the file is malformed, or the index is not rebuilt.
+
+---
+
+### O2. Remember — One-Shot with Type Flag
+
+**Category**: O — Remember Workflow (One-Shot)
+
+**Prerequisites**:
+- General prerequisites above
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-remember "Cache TTLs should match the data refresh interval" --type redflag` and send
+3. Observe the output
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | The type selection prompt is skipped | The agent does not ask for type selection — it uses `redflag` directly |
+| 3 | A memory file is created at `memories/redflag/<slug>.memory.md` | File exists with `type: "redflag"` in frontmatter |
+| 3 | The agent still asks for optional tags and description | Tag and description prompts appear (or sensible defaults are generated) |
+| 3 | Confirmation includes the memory's hash ID | Output shows the short hash for future reference |
+
+**Pass/Fail**: PASS if the `--type` flag bypasses type selection and the memory is created in the correct directory. FAIL if the flag is ignored or the memory goes to the wrong directory.
+
+---
+
+## Q. Meditate Interactive Flow
+
+### Q1. Meditate — No Arguments (Context-Derived Facets)
+
+**Category**: Q — Meditate Workflow (Context-Derived)
+
+**Prerequisites**:
+- General prerequisites above
+- At least 5-10 memories exist in `memories/` with varied types and tags
+- The memory index at `.crux/memory-index.yml` is up to date
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Have a brief conversation about a topic covered by existing memories (e.g. discuss performance optimization)
+3. Type `/crux-meditate` with no arguments and send
+4. Observe the facet derivation
+5. Observe the recursive exploration
+6. Review the consolidated insights
+7. Respond to the interactive continuation menu
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | The agent spawns a `crux-cursor-memory-manager` subagent in Meditate mode | A subagent is invoked |
+| 4 | The agent derives 3 distinct exploration facets from the current conversation context | Output shows 3 labelled facets (e.g. theme, topic, intent) derived from step 2 |
+| 4 | 3 parallel Level 1 agents are spawned, one per facet | Agent spawning visible in chat or agent logs |
+| 5 | Each Level 1 agent queries memories relevant to its facet | Evidence of memory index or MCP search in agent output |
+| 5 | Each Level 1 agent spawns a Level 2 child with refined queries | Recursive spawning visible |
+| 5 | Each Level 2 agent spawns a Level 3 child (terminal depth) | Level 3 agents do NOT recurse further |
+| 6 | Insights consolidate back: Level 3 → Level 2 → Level 1 → Level 0 | Consolidated output organized by branch with cross-branch connections highlighted |
+| 7 | Interactive menu offers: expansion directions, "Save as draft spec", "End meditation" | All three option types present |
+
+**Pass/Fail**: PASS if all three levels of recursion execute, memories are queried at each level, insights consolidate correctly, and the interactive menu is presented. FAIL if recursion does not occur, no memories are queried, or the flow crashes.
+
+---
+
+### Q2. Meditate — Topic Argument
+
+**Category**: Q — Meditate Workflow (Topic-Driven)
+
+**Prerequisites**:
+- General prerequisites above
+- At least 3-5 memories exist related to the chosen topic
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-meditate "how should we handle caching strategies"` and send
+3. Observe the facet derivation from the provided topic
+4. Wait for the 3-level recursive exploration to complete
+5. Review the consolidated insights
+6. Select "Save meditation as draft spec" from the continuation menu
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | The agent derives 3 facets from the provided topic text | Facets are clearly related to "caching strategies" |
+| 4 | All three recursion levels execute to completion | Evidence of Level 1, Level 2, and Level 3 agents running |
+| 5 | Consolidated insights reference relevant existing memories | At least one memory is cited in the output |
+| 5 | Cross-branch connections and emergent themes are highlighted | Output explicitly identifies patterns or connections across the 3 branches |
+| 6 | A draft spec outline is written to `specs/` | File exists under `specs/` with a recognizable name derived from the topic |
+
+**Pass/Fail**: PASS if the topic drives facet derivation, all levels recurse, and "Save as draft spec" produces a file. FAIL if facets are unrelated to the topic, recursion stalls, or the spec save fails.
+
+---
+
+### Q3. Meditate — File/Folder References
+
+**Category**: Q — Meditate Workflow (Code-Referenced)
+
+**Prerequisites**:
+- General prerequisites above
+- At least one source file or directory exists in the repository
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-meditate @src/auth/` (use an actual directory in the repo) and send
+3. Observe the facet derivation from the referenced code
+4. Wait for the exploration to complete
+5. Select "End meditation" from the continuation menu
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | The agent examines the referenced code to derive facets | Facets relate to architecture, patterns, or purpose of the referenced code |
+| 4 | Recursive exploration queries memories relevant to the code's domain | Memory queries are contextually appropriate |
+| 5 | Session concludes cleanly with no errors | No crashes or orphaned subagents |
+
+**Pass/Fail**: PASS if code references produce relevant facets and the session ends cleanly. FAIL if the agent ignores the file references or the session hangs.
+
+---
+
 ## N. Cross-Platform Flows
 
-### N1. Cursor — Full Dream/REM/MindReader Flow (Primary Platform)
+### N1. Cursor — Full Dream/REM/Recall Flow (Primary Platform)
 
 **Category**: N — Cross-Platform
 
@@ -372,14 +530,16 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 - `.crux/crux-memories.json` has `"platform": "cursor"`
 - The following Cursor-specific files exist:
   - `.cursor/commands/crux-dream.md`
-  - `.cursor/commands/crux-mindreader.md`
+  - `.cursor/commands/crux-recall.md`
+  - `.cursor/commands/crux-remember.md`
+  - `.cursor/commands/crux-meditate.md`
   - `.cursor/agents/crux-cursor-memory-manager.md`
   - `.cursor/rules/crux-memories-integration.crux.mdc`
   - `.cursor/hooks/crux-session-start.py`
   - `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py`
 - `enableMemories` is set to `"true"` in the config
 - At least one completed spec exists for dream testing
-- At least 3-5 memories exist for REM and MindReader testing
+- At least 3-5 memories exist for REM and Recall testing
 
 **Steps**:
 
@@ -387,9 +547,10 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 2. **Dream**: Type `/crux-dream <spec-name>` and run through the full dream flow (see scenario B2 for detailed steps)
 3. **Post-dream rebuild**: After dream completes, verify the post-dream script runs (`.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` — rebuilds the memory index)
 4. **REM sleep**: Type `/crux-dream --rem` and observe the REM analysis (see scenario C1)
-5. **MindReader (no args)**: Type `/crux-mindreader` and verify contextual memories are shown (see scenario J1)
-6. **MindReader (query)**: Type `/crux-mindreader "what memories exist?"` and verify search works (see scenario J2)
-7. **MindReader (file)**: Type `/crux-mindreader memories/<type>/<slug>.memory.md` for a memory created in step 2 and verify display (see scenario J4)
+5. **Recall (no args)**: Type `/crux-recall` and verify contextual memories are shown (see scenario J1)
+6. **Recall (query)**: Type `/crux-recall "what memories exist?"` and verify search works (see scenario J2)
+7. **Recall (file)**: Type `/crux-recall memories/<type>/<slug>.memory.md` for a memory created in step 2 and verify display (see scenario J4)
+8. **Meditate**: Type `/crux-meditate "performance patterns"` and verify the 3-level recursive exploration runs, queries memories at each level, and presents consolidated insights (see scenario Q1)
 
 **Expected Outcomes**:
 
@@ -399,10 +560,11 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | 2 | Full dream flow works as documented | All B2 criteria are met |
 | 3 | `.crux/memory-index.yml` is rebuilt after dream | Index file timestamp is updated; new memories from dream appear in the index |
 | 4 | REM sleep analysis runs and presents recommendations | All C1 criteria are met |
-| 5-7 | All MindReader modes work correctly | J1, J2, J4 criteria are met respectively |
+| 5-7 | All Recall modes work correctly | J1, J2, J4 criteria are met respectively |
+| 8 | Meditate explores memories recursively and presents insights | Q1 criteria are met |
 | all | The `crux-cursor-memory-manager` subagent is spawned for each command | Agent spawning is visible in Cursor's agent/subagent panel or logs |
 
-**Pass/Fail**: PASS if the complete Cursor workflow (hook → dream → post-dream → REM → MindReader) functions end-to-end. FAIL if any command fails to invoke, the subagent is not spawned, or platform-specific wiring is broken.
+**Pass/Fail**: PASS if the complete Cursor workflow (hook → dream → post-dream → REM → Recall → Remember → Meditate) functions end-to-end. FAIL if any command fails to invoke, the subagent is not spawned, or platform-specific wiring is broken.
 
 ---
 
@@ -420,7 +582,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 1. **Verify config platform**: Confirm `.crux/crux-memories.json` can be set to `"platform": "claude-code"` — the config is valid and parsed correctly
 2. **Verify `.claude/` directory structure**: Check that the following files would be created or documented:
    - `.claude/commands/crux-dream.md` — dream command definition
-   - `.claude/commands/crux-mindreader.md` — MindReader command definition
+   - `.claude/commands/crux-recall.md` — Recall command definition
    - `.claude/hooks/session-start.sh` — session start hook
 3. **Verify `CLAUDE.md` rule content**: The `CLAUDE.md` file (or `.claude/memories-rule.md`) should contain the agent rule text described in the spec:
    - Instructs agents to read `.crux/memory-index.yml` when `enableMemories` is true
@@ -489,7 +651,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
    crux-dream --config .crux/crux-memories.json             # Interactive dream
    crux-dream --rem --config .crux/crux-memories.json        # REM sleep
    crux-dream --rem --yolo --config .crux/crux-memories.json # Unattended REM
-   crux-mindreader --config .crux/crux-memories.json         # MindReader
+   crux-recall --config .crux/crux-memories.json              # Recall
    ```
 4. **Verify MCP server can start in stdio mode**: Run the MCP server directly:
    ```bash
@@ -508,7 +670,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 |------|----------|---------------|
 | 1 | Generic platform rule file location is documented | `docs/crux-memories.md` Section 3c specifies `memories/MEMORIES_AGENT_RULE.md` |
 | 2 | Session hook approach is documented for non-IDE environments | Manual or git-hook approach described with config reading logic |
-| 3 | Shell commands are documented with `--config` flag | All four command variants (dream, dream --rem, dream --rem --yolo, mindreader) are described |
+| 3 | Shell commands are documented with `--config` flag | All four command variants (dream, dream --rem, dream --rem --yolo, recall) are described |
 | 4 | MCP server starts in stdio mode | Process starts, no import errors or crashes. Server responds to MCP protocol handshake |
 | 5 | Index script runs and produces valid YAML | `.crux/memory-index.yml` is created/updated with a valid `memories:` list |
 
@@ -526,10 +688,17 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `/crux-dream <spec-name>` | Extract memories from a specific completed spec |
 | `/crux-dream --rem` | Run REM sleep — rebalance all memories interactively |
 | `/crux-dream --rem --yolo` | Run REM sleep — auto-apply non-conflict changes |
-| `/crux-mindreader` | Show contextually relevant memories |
-| `/crux-mindreader "query"` | Search memories by keyword |
-| `/crux-mindreader <spec-name>` | Show memories from a specific spec |
-| `/crux-mindreader <file-path>` | Display a specific memory file |
+| `/crux-recall` | Show contextually relevant memories |
+| `/crux-recall "query"` | Search memories by keyword |
+| `/crux-recall <spec-name>` | Show memories from a specific spec |
+| `/crux-recall <file-path>` | Display a specific memory file |
+| `/crux-forget <memory-id>` | Forget a specific memory by ID |
+| `/crux-forget "query"` | Search and select memories to forget |
+| `/crux-remember` | Interactively create a new ad-hoc memory |
+| `/crux-remember "insight"` | Create a memory from provided text |
+| `/crux-remember "insight" --type learning` | Create with a specific type |
+| `/crux-meditate` | Recursive memory-informed exploration of current context |
+| `/crux-meditate "topic"` | Explore a specific theme with 3-level deep memory search |
 
 ### Key Files
 
@@ -542,7 +711,10 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `memories/{type}/*.memory.crux.md` | Memory files (compressed) |
 | `.cursor/agents/crux-cursor-memory-manager.md` | Agent definition (Cursor) |
 | `.cursor/commands/crux-dream.md` | Dream command definition (Cursor) |
-| `.cursor/commands/crux-mindreader.md` | MindReader command definition (Cursor) |
+| `.cursor/commands/crux-recall.md` | Recall command definition (Cursor) |
+| `.cursor/commands/crux-forget.md` | Forget command definition (Cursor) |
+| `.cursor/commands/crux-remember.md` | Remember command definition (Cursor) |
+| `.cursor/commands/crux-meditate.md` | Meditate command definition (Cursor) |
 | `.cursor/hooks/crux-session-start.py` | Session start hook |
 | `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` | Post-dream index rebuild |
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRUX Memories — Agent Learning System</title>
-  <meta name="description" content="CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions. Dream, REM Sleep, and MindReader.">
+  <meta name="description" content="CRUX Memories lets your AI agents extract insights from completed work and reuse them in future sessions. Dream, REM Sleep, and Recall.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -43,11 +43,13 @@
           </defs>
 
           <!-- Commands -->
-          <rect x="20" y="20" width="200" height="108" rx="8" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
-          <text x="120" y="48" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">COMMANDS</text>
-          <text x="120" y="70" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-dream</text>
-          <text x="120" y="88" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-mindreader</text>
-          <text x="120" y="106" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-forget</text>
+          <rect x="20" y="20" width="200" height="124" rx="8" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="120" y="44" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">COMMANDS</text>
+          <text x="120" y="62" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-dream</text>
+          <text x="120" y="78" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-recall</text>
+          <text x="120" y="94" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-forget</text>
+          <text x="120" y="110" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-remember</text>
+          <text x="120" y="126" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-meditate</text>
 
           <!-- Agent -->
           <rect x="300" y="20" width="280" height="90" rx="8" fill="#1e2a2a" stroke="#f0c674" stroke-width="1.5" filter="url(#glow)"/>
@@ -150,7 +152,7 @@
   <section class="section mem-section mem-section--alt">
     <div class="section-content">
       <h2 class="section-title">The Memory Lifecycle</h2>
-      <p class="section-intro">Memories follow a continuous lifecycle: agents do work, learnings are extracted via dreaming, memories are consolidated during REM sleep, and surfaced on demand via MindReader.</p>
+      <p class="section-intro">Memories follow a continuous lifecycle: agents do work, learnings are extracted via dreaming, memories are consolidated during REM sleep, and surfaced on demand via Recall.</p>
 
       <div class="mem-diagram-wrap">
         <svg viewBox="0 0 800 360" class="mem-svg" role="img" aria-label="Memory Lifecycle Diagram">
@@ -183,10 +185,9 @@
           <text x="640" y="136" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">/crux-dream --rem</text>
           <text x="640" y="150" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Promote, demote, merge</text>
 
-          <!-- Phase 4: MindReader -->
+          <!-- Phase 4: Recall -->
           <circle cx="380" cy="300" r="50" fill="#1e2a2a" stroke="#98c379" stroke-width="2"/>
-          <text x="380" y="290" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">MIND</text>
-          <text x="380" y="306" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">READER</text>
+          <text x="380" y="298" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="14" font-weight="700">RECALL</text>
           <text x="380" y="322" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Query on demand</text>
 
           <!-- Arrows -->
@@ -751,11 +752,11 @@ promoted_from: "learning"
   </section>
 
   <!-- ═══════════════════════════════════════════
-       MindReader
+       Recall
        ═══════════════════════════════════════════ -->
   <section class="section mem-section">
     <div class="section-content">
-      <h2 class="section-title">MindReader</h2>
+      <h2 class="section-title">Recall</h2>
       <p class="section-intro">Query and surface memories on demand. Compressed memories are decompressed for display without modifying files on disk.</p>
 
       <div class="mem-commands-grid">
@@ -772,13 +773,13 @@ promoted_from: "learning"
         </div>
         <div class="memories-command">
           <div class="memories-command-header">
-            <code class="memories-command-name">/crux-mindreader</code>
+            <code class="memories-command-name">/crux-recall</code>
             <span class="memories-command-desc">Query &amp; display</span>
           </div>
           <div class="memories-command-usage">
-            <div class="memories-command-line"><code>/crux-mindreader</code><span>Show contextually relevant memories</span></div>
-            <div class="memories-command-line"><code>/crux-mindreader "query"</code><span>Search by keyword</span></div>
-            <div class="memories-command-line"><code>/crux-mindreader &lt;spec-name&gt;</code><span>Show memories from a specific spec</span></div>
+            <div class="memories-command-line"><code>/crux-recall</code><span>Show contextually relevant memories</span></div>
+            <div class="memories-command-line"><code>/crux-recall "query"</code><span>Search by keyword</span></div>
+            <div class="memories-command-line"><code>/crux-recall &lt;spec-name&gt;</code><span>Show memories from a specific spec</span></div>
           </div>
         </div>
         <div class="memories-command">
@@ -790,6 +791,28 @@ promoted_from: "learning"
             <div class="memories-command-line"><code>/crux-forget &lt;memory-id&gt;</code><span>Forget a specific memory by ID</span></div>
             <div class="memories-command-line"><code>/crux-forget "query"</code><span>Search and select memories to forget</span></div>
             <div class="memories-command-line"><code>/crux-forget</code><span>List all memories for selection</span></div>
+          </div>
+        </div>
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-remember</code>
+            <span class="memories-command-desc">Ad-hoc memory creation</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-remember</code><span>Interactively create a new memory</span></div>
+            <div class="memories-command-line"><code>/crux-remember "insight"</code><span>Create from provided text</span></div>
+            <div class="memories-command-line"><code>/crux-remember "insight" --type learning</code><span>Create with specific type</span></div>
+          </div>
+        </div>
+        <div class="memories-command">
+          <div class="memories-command-header">
+            <code class="memories-command-name">/crux-meditate</code>
+            <span class="memories-command-desc">Recursive exploration</span>
+          </div>
+          <div class="memories-command-usage">
+            <div class="memories-command-line"><code>/crux-meditate</code><span>Explore facets from current context</span></div>
+            <div class="memories-command-line"><code>/crux-meditate "topic"</code><span>3-level deep memory-informed exploration</span></div>
+            <div class="memories-command-line"><code>/crux-meditate @file @folder/</code><span>Explore referenced code architecture</span></div>
           </div>
         </div>
         <div class="memories-command">
@@ -834,6 +857,200 @@ promoted_from: "learning"
           <strong>Conflict Detection</strong>
           <span>Both dream and REM sleep detect contradictions between memories and present them for manual resolution.</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Meditate Architecture
+       ═══════════════════════════════════════════ -->
+  <section class="section mem-section mem-section--alt">
+    <div class="section-content">
+      <h2 class="section-title">Meditate: Recursive Exploration</h2>
+      <p class="section-intro">Run <code>/crux-meditate</code> to launch a 3-level recursive, memory-informed exploration. The agent derives facets from your context, spawns parallel agents that query memories at each level, and consolidates insights back up for review.</p>
+
+      <div class="mem-diagram-wrap">
+        <svg viewBox="0 0 900 680" class="mem-svg" role="img" aria-label="Meditate Architecture Diagram — 3-level recursive exploration">
+          <defs>
+            <marker id="med-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>
+            </marker>
+            <marker id="med-arrow-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#98c379"/>
+            </marker>
+            <marker id="med-arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b8a9a"/>
+            </marker>
+            <filter id="med-glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+
+          <!-- User invocation -->
+          <rect x="320" y="10" width="260" height="44" rx="8" fill="#1e2a2a" stroke="#5b8a9a" stroke-width="2"/>
+          <text x="450" y="28" text-anchor="middle" fill="#5b8a9a" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">USER</text>
+          <text x="450" y="44" text-anchor="middle" fill="#e8eeee" font-family="'JetBrains Mono',monospace" font-size="10">/crux-meditate "topic"</text>
+
+          <!-- Arrow down to Level 0 -->
+          <line x1="450" y1="54" x2="450" y2="72" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+
+          <!-- Level 0 -->
+          <rect x="280" y="74" width="340" height="56" rx="8" fill="#1e2a2a" stroke="#f0c674" stroke-width="2" filter="url(#med-glow)"/>
+          <text x="450" y="96" text-anchor="middle" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">LEVEL 0 — ORCHESTRATOR</text>
+          <text x="450" y="114" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="10">Derive 3 facets &bull; Spawn 3 parallel agents</text>
+
+          <!-- Level 0 label -->
+          <text x="40" y="104" fill="#f0c674" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">depth: 0</text>
+
+          <!-- Arrows from Level 0 down to Level 1 (three branches) -->
+          <line x1="350" y1="130" x2="150" y2="168" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="450" y1="130" x2="450" y2="168" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="550" y1="130" x2="750" y2="168" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+
+          <!-- Branch labels -->
+          <text x="230" y="148" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">facet A</text>
+          <text x="450" y="152" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">facet B</text>
+          <text x="670" y="148" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="9">facet C</text>
+
+          <!-- Level 1 boxes -->
+          <rect x="40" y="170" width="220" height="70" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="150" y="192" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 1 — AGENT A</text>
+          <text x="150" y="210" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="150" y="226" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <rect x="340" y="170" width="220" height="70" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="450" y="192" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 1 — AGENT B</text>
+          <text x="450" y="210" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="450" y="226" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <rect x="640" y="170" width="220" height="70" rx="6" fill="#1e2a2a" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="750" y="192" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 1 — AGENT C</text>
+          <text x="750" y="210" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="750" y="226" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <!-- Level 1 label -->
+          <text x="40" y="268" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">depth: 1</text>
+
+          <!-- Arrows from Level 1 to Level 2 -->
+          <line x1="150" y1="240" x2="150" y2="284" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="450" y1="240" x2="450" y2="284" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="750" y1="240" x2="750" y2="284" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+
+          <!-- Memory query indicators (Level 1) -->
+          <rect x="190" y="248" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="220" y="262" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="490" y="248" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="520" y="262" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="790" y="248" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="820" y="262" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+
+          <!-- Level 2 boxes -->
+          <rect x="40" y="286" width="220" height="70" rx="6" fill="#141c1c" stroke="#c678dd" stroke-width="1.5"/>
+          <text x="150" y="308" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 2 — CHILD A</text>
+          <text x="150" y="326" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="150" y="342" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <rect x="340" y="286" width="220" height="70" rx="6" fill="#141c1c" stroke="#c678dd" stroke-width="1.5"/>
+          <text x="450" y="308" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 2 — CHILD B</text>
+          <text x="450" y="326" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="450" y="342" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <rect x="640" y="286" width="220" height="70" rx="6" fill="#141c1c" stroke="#c678dd" stroke-width="1.5"/>
+          <text x="750" y="308" text-anchor="middle" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 2 — CHILD C</text>
+          <text x="750" y="326" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="750" y="342" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="9">Refine queries &bull; Spawn child</text>
+
+          <!-- Level 2 label -->
+          <text x="40" y="384" fill="#c678dd" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">depth: 2</text>
+
+          <!-- Arrows from Level 2 to Level 3 -->
+          <line x1="150" y1="356" x2="150" y2="400" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="450" y1="356" x2="450" y2="400" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+          <line x1="750" y1="356" x2="750" y2="400" stroke="#d4915a" stroke-width="1.5" marker-end="url(#med-arrow)"/>
+
+          <!-- Memory query indicators (Level 2) -->
+          <rect x="190" y="364" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="220" y="378" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="490" y="364" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="520" y="378" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="790" y="364" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="820" y="378" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+
+          <!-- Level 3 boxes (terminal) -->
+          <rect x="40" y="402" width="220" height="56" rx="6" fill="#141c1c" stroke="#e06c75" stroke-width="1.5"/>
+          <text x="150" y="422" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 3 — LEAF A</text>
+          <text x="150" y="440" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="150" y="452" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">No further recursion</text>
+
+          <rect x="340" y="402" width="220" height="56" rx="6" fill="#141c1c" stroke="#e06c75" stroke-width="1.5"/>
+          <text x="450" y="422" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 3 — LEAF B</text>
+          <text x="450" y="440" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="450" y="452" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">No further recursion</text>
+
+          <rect x="640" y="402" width="220" height="56" rx="6" fill="#141c1c" stroke="#e06c75" stroke-width="1.5"/>
+          <text x="750" y="422" text-anchor="middle" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">LEVEL 3 — LEAF C</text>
+          <text x="750" y="440" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Query memories &bull; Expand</text>
+          <text x="750" y="452" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">No further recursion</text>
+
+          <!-- Level 3 label -->
+          <text x="40" y="478" fill="#e06c75" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">depth: 3</text>
+
+          <!-- Memory query indicators (Level 3) -->
+          <rect x="190" y="432" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="220" y="446" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="490" y="432" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="520" y="446" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+          <rect x="790" y="432" width="60" height="20" rx="4" fill="rgba(97,175,239,0.15)" stroke="#61afef" stroke-width="0.8"/>
+          <text x="820" y="446" text-anchor="middle" fill="#61afef" font-family="'JetBrains Mono',monospace" font-size="7">memories</text>
+
+          <!-- Consolidation arrows flowing back UP (green) -->
+          <text x="450" y="498" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">CONSOLIDATION FLOW</text>
+
+          <!-- Level 3 → Level 2 return arrows -->
+          <line x1="130" y1="402" x2="130" y2="360" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="430" y1="402" x2="430" y2="360" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="730" y1="402" x2="730" y2="360" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+
+          <!-- Level 2 → Level 1 return arrows -->
+          <line x1="130" y1="286" x2="130" y2="244" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="430" y1="286" x2="430" y2="244" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="730" y1="286" x2="730" y2="244" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+
+          <!-- Level 1 → Level 0 return arrows -->
+          <line x1="130" y1="170" x2="330" y2="134" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="430" y1="170" x2="430" y2="134" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+          <line x1="730" y1="170" x2="570" y2="134" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#med-arrow-up)"/>
+
+          <!-- Consolidated output box -->
+          <rect x="250" y="520" width="400" height="50" rx="8" fill="#1e2a2a" stroke="#98c379" stroke-width="2"/>
+          <text x="450" y="542" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="11" font-weight="600">CONSOLIDATED INSIGHTS</text>
+          <text x="450" y="560" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Cross-branch connections &bull; Emergent themes &bull; Patterns</text>
+
+          <!-- Arrow from Level 0 down to consolidated output -->
+          <path d="M 450 130 Q 880 330 650 540" stroke="#98c379" stroke-width="1.5" fill="none" marker-end="url(#med-arrow-up)"/>
+
+          <!-- User choices -->
+          <rect x="140" y="600" width="180" height="56" rx="8" fill="#141c1c" stroke="#d4915a" stroke-width="1.5"/>
+          <text x="230" y="622" text-anchor="middle" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">EXPAND</text>
+          <text x="230" y="640" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Pick tangent directions</text>
+          <text x="230" y="652" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">Repeat from Level 0</text>
+
+          <rect x="360" y="600" width="180" height="56" rx="8" fill="#141c1c" stroke="#98c379" stroke-width="1.5"/>
+          <text x="450" y="622" text-anchor="middle" fill="#98c379" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">SAVE AS SPEC</text>
+          <text x="450" y="640" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Write draft spec outline</text>
+          <text x="450" y="652" text-anchor="middle" fill="#5a7070" font-family="Inter,sans-serif" font-size="8">to specs/ directory</text>
+
+          <rect x="580" y="600" width="180" height="56" rx="8" fill="#141c1c" stroke="#5a7070" stroke-width="1.5"/>
+          <text x="670" y="622" text-anchor="middle" fill="#5a7070" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">END</text>
+          <text x="670" y="640" text-anchor="middle" fill="#8fa3a3" font-family="Inter,sans-serif" font-size="9">Complete the session</text>
+
+          <!-- Arrows from consolidated to choices -->
+          <line x1="370" y1="570" x2="270" y2="598" stroke="#d4915a" stroke-width="1" marker-end="url(#med-arrow)"/>
+          <line x1="450" y1="570" x2="450" y2="598" stroke="#d4915a" stroke-width="1" marker-end="url(#med-arrow)"/>
+          <line x1="530" y1="570" x2="630" y2="598" stroke="#d4915a" stroke-width="1" marker-end="url(#med-arrow)"/>
+
+          <!-- Expand loop arrow back to Level 0 -->
+          <path d="M 140 628 Q 20 628 20 104 L 38 104" stroke="#d4915a" stroke-width="1.5" stroke-dasharray="6,3" fill="none" marker-end="url(#med-arrow)"/>
+          <text x="20" y="370" fill="#d4915a" font-family="'JetBrains Mono',monospace" font-size="8" transform="rotate(-90 20 370)">repeat</text>
+        </svg>
       </div>
     </div>
   </section>

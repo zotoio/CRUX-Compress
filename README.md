@@ -630,7 +630,7 @@ The memory lifecycle has four phases:
 
 - **Dream** — After completing a spec, extract learnings, red flags, goals, and ideas into memory files
 - **REM Sleep** — Periodically rebalance the memory corpus: promote high-value memories, demote stale ones, consolidate duplicates, archive unused entries
-- **MindReader** — Query and display memories in human-readable form (read-only)
+- **Recall** — Query and display memories in human-readable form (read-only)
 - **Forget** — Remove incorrect or unwanted memories from the corpus
 
 ### Enabling Memories
@@ -670,17 +670,23 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-dream <spec-name>` | Extract memories from a completed spec |
 | `/crux-dream --rem` | Run REM sleep (rebalance all memories) |
 | `/crux-dream --rem --yolo` | REM sleep with auto-apply for non-conflict changes |
-| `/crux-mindreader` | Show contextually relevant memories |
-| `/crux-mindreader "query"` | Search memories by keyword |
-| `/crux-mindreader <spec-name>` | Show memories from a specific spec |
+| `/crux-recall` | Show contextually relevant memories |
+| `/crux-recall "query"` | Search memories by keyword |
+| `/crux-recall <spec-name>` | Show memories from a specific spec |
+| `/crux-recall --total` | Visualize the entire memory system as a 3D graph |
 | `/crux-forget <memory-id>` | Forget a specific memory by ID |
 | `/crux-forget "query"` | Search and select memories to forget |
+| `/crux-remember` | Interactively create a new ad-hoc memory |
+| `/crux-remember "insight"` | Create a memory from provided text |
+| `/crux-remember "insight" --type learning` | Create with a specific type |
+| `/crux-meditate` | Recursive memory-informed exploration of current context |
+| `/crux-meditate "topic"` | Explore a specific theme with 3-level deep memory search |
 | `/crux-amnesia` | Toggle session-only amnesia mode for ambient memory usage |
 | `/crux-amnesia on\|off\|status` | Disable, restore, or inspect session memory mode without changing repo config |
 
 ### Session-Only Memory Override
 
-Use `/crux-amnesia` when you want a clean chat session without ambient memory recall, annotations, or reference tracking. This override only affects the current chat session and spawned subagents for ordinary work; it never edits `.crux/crux-memories.json` and does not block explicit memory-management commands like `/crux-dream`, `/crux-mindreader`, or `/crux-forget`.
+Use `/crux-amnesia` when you want a clean chat session without ambient memory recall, annotations, or reference tracking. This override only affects the current chat session and spawned subagents for ordinary work; it never edits `.crux/crux-memories.json` and does not block explicit memory-management commands like `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, or `/crux-meditate`.
 
 ### Memory Skills
 
@@ -787,8 +793,10 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
 | `.cursor/commands/crux-dream.md`             | Memory extraction command                                                     |
-| `.cursor/commands/crux-mindreader.md`        | Memory retrieval command                                                      |
+| `.cursor/commands/crux-recall.md`            | Memory retrieval command                                                      |
 | `.cursor/commands/crux-forget.md`            | Memory removal command                                                        |
+| `.cursor/commands/crux-remember.md`          | Ad-hoc memory creation command                                                |
+| `.cursor/commands/crux-meditate.md`          | Recursive exploration command                                                  |
 | `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
 | `.cursor/rules/crux-memories-integration.crux.mdc` | Memory integration rule                                                 |
 | `.cursor/skills/crux-utils/`                 | Utility skill (token estimation, checksums)                                   |
@@ -933,8 +941,10 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
 | Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
 | Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
-| MindReader Command  | `.cursor/commands/crux-mindreader.md`        | Memory query command           |
+| Recall Command      | `.cursor/commands/crux-recall.md`            | Memory query command           |
 | Forget Command      | `.cursor/commands/crux-forget.md`            | Memory removal interface       |
+| Remember Command    | `.cursor/commands/crux-remember.md`          | Ad-hoc memory creation         |
+| Meditate Command    | `.cursor/commands/crux-meditate.md`          | Recursive memory exploration   |
 | MCP Server          | `crux_mcp_server/`                           | Semantic memory search server (standalone zip) |
 | Memory Skills       | `.cursor/skills/crux-skill-memory-*/`        | Memory operation skills        |
 | Memory Storage      | `memories/`                                  | Memory file storage            |

@@ -33,10 +33,20 @@
         "default": "/crux-dream",
         "description": "Post-execution memory extraction and consolidation"
       },
-      "mindReader": {
-        "file": ".cursor/commands/crux-mindreader.md",
-        "default": "/crux-mindreader",
-        "description": "Decompress and view memories in chat"
+      "recall": {
+        "file": ".cursor/commands/crux-recall.md",
+        "default": "/crux-recall",
+        "description": "Decompress, view, and visualize memories"
+      },
+      "remember": {
+        "file": ".cursor/commands/crux-remember.md",
+        "default": "/crux-remember",
+        "description": "Create ad-hoc memories outside of spec workflows"
+      },
+      "meditate": {
+        "file": ".cursor/commands/crux-meditate.md",
+        "default": "/crux-meditate",
+        "description": "Recursive memory-informed exploration and insight synthesis"
       },
       "forget": {
         "file": ".cursor/commands/crux-forget.md",

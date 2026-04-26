@@ -1,10 +1,10 @@
 ---
-generated: 2026-04-22 14:35
-sourceChecksum: 193025359
+generated: 2026-04-25 23:50
+sourceChecksum: 3751030988
 cruxLevel: 25
-beforeTokens: 688
-afterTokens: 351
-reducedBy: 49%
+beforeTokens: 719
+afterTokens: 355
+reducedBy: 51%
 confidence: 91%
 alwaysApply: true
 crux: true
@@ -22,7 +22,7 @@ crux: true
 
 Φ.amnesia{/crux-amnesia=session override ≻ enableMemories;
  suppress[discover,load,annotate,refs,dream-nudge]; ¬Δ cfg|files|trackers|idx;
- subagents→inherit; explicit /crux-dream|mindreader|forget→user intent OK}
+ subagents→inherit; explicit /crux-dream|recall|remember|meditate|forget→user intent OK}
 
 Φ.enabled{enableMemories="true"→
  discover: read idx→load likely matches(title|desc|tags);
