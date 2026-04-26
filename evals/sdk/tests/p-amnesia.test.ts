@@ -64,8 +64,9 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-amnesia");
-      const result = await collectRun(run);
+      const prompt = "/crux-amnesia";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
 
@@ -85,11 +86,13 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const onRun = await agent.send("/crux-amnesia on");
-      await collectRun(onRun);
+      const onPrompt = "/crux-amnesia on";
+      const onRun = await agent.send(onPrompt);
+      await collectRun(onRun, onPrompt);
 
-      const offRun = await agent.send("/crux-amnesia off");
-      const result = await collectRun(offRun);
+      const offPrompt = "/crux-amnesia off";
+      const offRun = await agent.send(offPrompt);
+      const result = await collectRun(offRun, offPrompt);
 
       const confirmsOff =
         result.assistantText.toLowerCase().includes("off") ||
@@ -112,8 +115,9 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-amnesia on");
-      await collectRun(run);
+      const prompt = "/crux-amnesia on";
+      const run = await agent.send(prompt);
+      await collectRun(run, prompt);
 
       const afterContent = fs.existsSync(configPath)
         ? fs.readFileSync(configPath, "utf-8")
@@ -129,13 +133,14 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const amnesiaRun = await agent.send("/crux-amnesia on");
-      await collectRun(amnesiaRun);
+      const amnesiaPrompt = "/crux-amnesia on";
+      const amnesiaRun = await agent.send(amnesiaPrompt);
+      await collectRun(amnesiaRun, amnesiaPrompt);
 
-      const taskRun = await agent.send(
-        "How should I implement authentication for my API?"
-      );
-      const result = await collectRun(taskRun);
+      const taskPrompt =
+        "How should I implement authentication for my API?";
+      const taskRun = await agent.send(taskPrompt);
+      const result = await collectRun(taskRun, taskPrompt);
 
       assertOutputExcludes(
         result.assistantText,
@@ -153,11 +158,13 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const amnesiaRun = await agent.send("/crux-amnesia on");
-      await collectRun(amnesiaRun);
+      const amnesiaPrompt = "/crux-amnesia on";
+      const amnesiaRun = await agent.send(amnesiaPrompt);
+      await collectRun(amnesiaRun, amnesiaPrompt);
 
-      const recallRun = await agent.send("/crux-recall");
-      const result = await collectRun(recallRun);
+      const recallPrompt = "/crux-recall";
+      const recallRun = await agent.send(recallPrompt);
+      const result = await collectRun(recallRun, recallPrompt);
 
       expect(result.status).toBe("finished");
 
@@ -182,13 +189,14 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const amnesiaRun = await agent.send("/crux-amnesia on");
-      await collectRun(amnesiaRun);
+      const amnesiaPrompt = "/crux-amnesia on";
+      const amnesiaRun = await agent.send(amnesiaPrompt);
+      await collectRun(amnesiaRun, amnesiaPrompt);
 
-      const rememberRun = await agent.send(
-        '/crux-remember "Test memory during amnesia" --type idea'
-      );
-      const result = await collectRun(rememberRun);
+      const rememberPrompt =
+        '/crux-remember "Test memory during amnesia" --type idea';
+      const rememberRun = await agent.send(rememberPrompt);
+      const result = await collectRun(rememberRun, rememberPrompt);
 
       const createsMemory =
         result.assistantText.toLowerCase().includes("created") ||
@@ -208,13 +216,14 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const amnesiaRun = await agent.send("/crux-amnesia on");
-      await collectRun(amnesiaRun);
+      const amnesiaPrompt = "/crux-amnesia on";
+      const amnesiaRun = await agent.send(amnesiaPrompt);
+      await collectRun(amnesiaRun, amnesiaPrompt);
 
-      const taskRun = await agent.send(
-        "Create a simple utility function that validates email addresses"
-      );
-      const result = await collectRun(taskRun);
+      const taskPrompt =
+        "Create a simple utility function that validates email addresses";
+      const taskRun = await agent.send(taskPrompt);
+      const result = await collectRun(taskRun, taskPrompt);
 
       assertOutputExcludes(
         result.assistantText,
@@ -232,8 +241,9 @@ describe("P: Amnesia", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-amnesia status");
-      const result = await collectRun(run);
+      const prompt = "/crux-amnesia status";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       const showsStatus =
         result.assistantText.toLowerCase().includes("status") ||

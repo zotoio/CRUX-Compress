@@ -88,8 +88,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-recall");
-      const result = await collectRun(run);
+      const prompt = "/crux-recall";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
 
@@ -111,8 +112,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-recall");
-      const result = await collectRun(run);
+      const prompt = "/crux-recall";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       const text = result.assistantText.toLowerCase();
       const hasTitle = /title|name|slug/i.test(result.assistantText) ||
@@ -132,8 +134,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-recall");
-      const result = await collectRun(run);
+      const prompt = "/crux-recall";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       const hasStructuredFormat =
         result.assistantText.includes("[core]") ||
@@ -156,8 +159,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send('/crux-recall "performance"');
-      const result = await collectRun(run);
+      const prompt = '/crux-recall "performance"';
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
       assertOutputContains(
@@ -174,15 +178,14 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const setupRun = await agent.send(
-        "How should I optimize my React list component for better performance?"
-      );
-      await collectRun(setupRun);
+      const setupPrompt =
+        "How should I optimize my React list component for better performance?";
+      const setupRun = await agent.send(setupPrompt);
+      await collectRun(setupRun, setupPrompt);
 
-      const recallRun = await agent.send(
-        '/crux-recall "why did you suggest memoization?"'
-      );
-      const result = await collectRun(recallRun);
+      const recallPrompt = '/crux-recall "why did you suggest memoization?"';
+      const recallRun = await agent.send(recallPrompt);
+      const result = await collectRun(recallRun, recallPrompt);
 
       const hasExplanation =
         result.assistantText.toLowerCase().includes("memo") ||
@@ -202,8 +205,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-recall 20260403-security-audit");
-      const result = await collectRun(run);
+      const prompt = "/crux-recall 20260403-security-audit";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
 
@@ -221,8 +225,9 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send("/crux-recall 20260403-security-audit");
-      const result = await collectRun(run);
+      const prompt = "/crux-recall 20260403-security-audit";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       const showsOnlySecuritySource =
         !result.assistantText.includes("sdk-test-recall-performance") ||
@@ -240,10 +245,10 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        "/crux-recall memories/learning/sdk-test-recall-performance.memory.md"
-      );
-      const result = await collectRun(run);
+      const prompt =
+        "/crux-recall memories/learning/sdk-test-recall-performance.memory.md";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
       assertOutputContains(
@@ -260,10 +265,10 @@ describe("J: Recall", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        "/crux-recall memories/core/sdk-test-recall-caching.memory.md"
-      );
-      const result = await collectRun(run);
+      const prompt =
+        "/crux-recall memories/core/sdk-test-recall-caching.memory.md";
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       assertOutputContains(
         result.assistantText,

@@ -52,10 +52,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: always use semantic versioning" --type learning'
-      );
-      const result = await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: always use semantic versioning" --type learning\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
 
@@ -81,10 +83,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: prefer composition over inheritance" --type learning'
-      );
-      await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: prefer composition over inheritance" --type learning\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      await collectRun(run, prompt);
 
       const afterFiles = listMemoryFiles(ws.root);
       const newFiles = afterFiles.filter((f) => !beforeFiles.includes(f));
@@ -102,10 +106,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: use descriptive variable names" --type idea'
-      );
-      await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: use descriptive variable names" --type idea\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      await collectRun(run, prompt);
 
       const ideaDir = path.join(ws.root, "memories", "idea");
       if (fs.existsSync(ideaDir)) {
@@ -133,10 +139,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: document public APIs" --type learning'
-      );
-      await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: document public APIs" --type learning\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      await collectRun(run, prompt);
 
       await new Promise((r) => setTimeout(r, 500));
 
@@ -159,10 +167,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: use constants for magic numbers" --type redflag'
-      );
-      const result = await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: use constants for magic numbers" --type redflag\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       assertOutputContains(
         result.assistantText,
@@ -189,10 +199,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: validate input at boundaries" --type redflag'
-      );
-      const result = await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: validate input at boundaries" --type redflag\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      const result = await collectRun(run, prompt);
 
       expect(result.status).toBe("finished");
 
@@ -211,10 +223,12 @@ describe("O: Remember", () => {
         local: { cwd: ws.root },
       });
 
-      const run = await agent.send(
-        '/crux-remember "SDK test: handle edge cases explicitly" --type core'
-      );
-      await collectRun(run);
+      const prompt =
+        '/crux-remember "SDK test: handle edge cases explicitly" --type core\n\n' +
+        'IMPORTANT: Do NOT use AskQuestion or prompt for any input. ' +
+        'Use sensible defaults for tags and description. Create the memory file immediately.';
+      const run = await agent.send(prompt);
+      await collectRun(run, prompt);
 
       const coreDir = path.join(ws.root, "memories", "core");
       if (fs.existsSync(coreDir)) {

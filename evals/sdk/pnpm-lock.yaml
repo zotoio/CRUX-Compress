@@ -9,37 +9,37 @@ importers:
   .:
     dependencies:
       dotenv:
-        specifier: ^16.4.0
+        specifier: ^16.6.0
         version: 16.6.1
     devDependencies:
       '@cursor/february':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
       '@types/node':
-        specifier: ^22.0.0
+        specifier: ^22.19.0
         version: 22.19.17
       typescript:
-        specifier: ^5.7.0
+        specifier: ^5.9.0
         version: 5.9.3
       vitest:
-        specifier: ^3.0.0
+        specifier: ^3.2.0
         version: 3.2.4(@types/node@22.19.17)
     optionalDependencies:
       '@cursor/february-darwin-arm64':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
       '@cursor/february-darwin-x64':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
       '@cursor/february-linux-arm64':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
       '@cursor/february-linux-x64':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
       '@cursor/february-win32-x64':
-        specifier: 1.0.5
-        version: 1.0.5
+        specifier: 1.0.7
+        version: 1.0.7
 
 packages:
 
@@ -58,33 +58,33 @@ packages:
     peerDependencies:
       '@bufbuild/protobuf': ^1.10.0
 
-  '@cursor/february-darwin-arm64@1.0.5':
-    resolution: {integrity: sha512-ls3ywSczgYi/Tk/XqHfti2ZdsOdjq+FVlxyDC7pRDT5ACNMuPQbD5JwfC2f0cwW8RdBs6/7aBqpdJx49/SEOOA==}
+  '@cursor/february-darwin-arm64@1.0.7':
+    resolution: {integrity: sha512-itw4Qu/sQ5DfUYjq94cRSxLYDIANNS8URQe7wDOC9Pg+QNlvAMjARVMiIfqR6Dox9w19d8QIjqp2hyN1MaS93w==}
     cpu: [arm64]
     os: [darwin]
 
-  '@cursor/february-darwin-x64@1.0.5':
-    resolution: {integrity: sha512-gzTRRMFtCOkD5gLGP+8Fs62J6OaJLtwZmdlCdEA3uSIrqox7Yxsw3n4wqqu6SAJFY2559cYQMcxZZHUt61Fzug==}
+  '@cursor/february-darwin-x64@1.0.7':
+    resolution: {integrity: sha512-dtKaoJOH4oNvKIacALKeKc0s50ZXe8CntKsY6LBNqRK7JVsb/MYJenqjol2ENp5u3OzJZu8kiTG1k4CMNiXcnw==}
     cpu: [x64]
     os: [darwin]
 
-  '@cursor/february-linux-arm64@1.0.5':
-    resolution: {integrity: sha512-Y7ssfffsos6IiIDSdIFTlcDmUh0In97WN1htAFUAnrC8zZ00nadDxoQFmnNvqXv0UhUx0APc7TETG5jyFQ+5nQ==}
+  '@cursor/february-linux-arm64@1.0.7':
+    resolution: {integrity: sha512-XLG5WUpDbCiZ+P8QteGRIj9nB5fOOcow2py4Fe1jyBzDqrxGfrhVwMXvRm+RkL7iA2A6tWai2Rr5gRnRhbMbsQ==}
     cpu: [arm64]
     os: [linux]
 
-  '@cursor/february-linux-x64@1.0.5':
-    resolution: {integrity: sha512-ujiKx2nfOQrK5SOSZ0vBQKLuMtRAAiG/Uiiiq40htL5/kMvZfoHPwNdbs5irQEGBlIWOaBnosAdW4p4AtFs7hg==}
+  '@cursor/february-linux-x64@1.0.7':
+    resolution: {integrity: sha512-ppJmk3gdg2eua7ZZnN0S+AHB2WncAQ4MGni39wnOe97UNU7RgcOz2nUbe0WJ+1znxIa3U4Zsu+ntU1iMRj9UoA==}
     cpu: [x64]
     os: [linux]
 
-  '@cursor/february-win32-x64@1.0.5':
-    resolution: {integrity: sha512-eP7sktz9zoMr1+NkDmwXklm/u6dmNiRo+tkSKe5hGnXo6VdOkIf8rbkvHtsefyClYREsuiCUWmsrj6fFbBQjpw==}
+  '@cursor/february-win32-x64@1.0.7':
+    resolution: {integrity: sha512-vT/jjBB85d9AN9gLNaohJeMxaju33kdRUU5JisZukndn3mdd61Pf5OZNVGbjL53MYjbDiWS1p+grgkLDte5Jxw==}
     cpu: [x64]
     os: [win32]
 
-  '@cursor/february@1.0.5':
-    resolution: {integrity: sha512-ts03wz2R0AaIlQUWlIsBWb33f/nklVTumrkMxqNCwmhGRzFsBwkX1jPyeJ/lGO5Xx+OfRzjWzddGyzRY6sPN2w==}
+  '@cursor/february@1.0.7':
+    resolution: {integrity: sha512-IJ3VCrSvyvhKssX6WYq4HWlFOTZrgOFj0XidyrbNofRRhNKVI2awFQPmg+fHBnahZ+jYeVp9+NOHmNJz8nUryA==}
     engines: {node: '>=18'}
 
   '@esbuild/aix-ppc64@0.27.7':
@@ -1101,22 +1101,22 @@ snapshots:
     dependencies:
       '@bufbuild/protobuf': 1.10.0
 
-  '@cursor/february-darwin-arm64@1.0.5':
+  '@cursor/february-darwin-arm64@1.0.7':
     optional: true
 
-  '@cursor/february-darwin-x64@1.0.5':
+  '@cursor/february-darwin-x64@1.0.7':
     optional: true
 
-  '@cursor/february-linux-arm64@1.0.5':
+  '@cursor/february-linux-arm64@1.0.7':
     optional: true
 
-  '@cursor/february-linux-x64@1.0.5':
+  '@cursor/february-linux-x64@1.0.7':
     optional: true
 
-  '@cursor/february-win32-x64@1.0.5':
+  '@cursor/february-win32-x64@1.0.7':
     optional: true
 
-  '@cursor/february@1.0.5':
+  '@cursor/february@1.0.7':
     dependencies:
       '@bufbuild/protobuf': 1.10.0
       '@connectrpc/connect': 1.7.0(@bufbuild/protobuf@1.10.0)
@@ -1124,11 +1124,11 @@ snapshots:
       sqlite3: 5.1.7
       zod: 3.25.76
     optionalDependencies:
-      '@cursor/february-darwin-arm64': 1.0.5
-      '@cursor/february-darwin-x64': 1.0.5
-      '@cursor/february-linux-arm64': 1.0.5
-      '@cursor/february-linux-x64': 1.0.5
-      '@cursor/february-win32-x64': 1.0.5
+      '@cursor/february-darwin-arm64': 1.0.7
+      '@cursor/february-darwin-x64': 1.0.7
+      '@cursor/february-linux-arm64': 1.0.7
+      '@cursor/february-linux-x64': 1.0.7
+      '@cursor/february-win32-x64': 1.0.7
     transitivePeerDependencies:
       - bluebird
       - supports-color

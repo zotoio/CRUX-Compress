@@ -1,11 +1,12 @@
 /**
  * Vitest setup file - runs before all tests.
- * Loads environment variables, enforces global max duration.
+ * Loads environment variables, enforces global max duration, initialises run logger.
  */
 
 import * as dotenv from "dotenv";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { initRunLogger, getRunLogger } from "./helpers/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, ".env");
@@ -62,3 +63,17 @@ if (process.env.SDK_EVAL_SKIP_EXPENSIVE !== "false") {
       "(set SDK_EVAL_SKIP_EXPENSIVE=false to run them)"
   );
 }
+
+// ---------------------------------------------------------------------------
+// Run logger — captures all prompts, responses, thinking, tools into logs/
+// ---------------------------------------------------------------------------
+
+const logger = initRunLogger();
+console.log(`✓ Run logger initialised: ${logger.runDir}`);
+
+process.on("exit", () => {
+  const rl = getRunLogger();
+  if (rl) {
+    rl.writeSummary();
+  }
+});

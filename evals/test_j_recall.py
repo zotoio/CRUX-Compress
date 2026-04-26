@@ -97,7 +97,7 @@ class TestRecallCommandDefinition:
 
 
 class TestRecallTotalVisualization:
-    """The --total flag generates an interactive 3D force-directed graph."""
+    """The --total flag generates an interactive canvas visualization."""
 
     def _read_cmd(self) -> str:
         cmd_file = (
@@ -111,9 +111,9 @@ class TestRecallTotalVisualization:
         content = self._read_cmd()
         assert "canvas" in content.lower()
 
-    def test_total_uses_3d_force_graph(self):
+    def test_total_uses_cursor_canvas_sdk(self):
         content = self._read_cmd()
-        assert "3d-force-graph" in content.lower() or "force-directed" in content.lower()
+        assert "cursor/canvas" in content.lower() or "canvas sdk" in content.lower()
 
     def test_total_nodes_represent_memories(self):
         content = self._read_cmd()
