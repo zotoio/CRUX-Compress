@@ -673,7 +673,7 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-recall` | Show contextually relevant memories |
 | `/crux-recall "query"` | Search memories by keyword |
 | `/crux-recall <spec-name>` | Show memories from a specific spec |
-| `/crux-recall --total` | Visualize the entire memory system as a 3D graph |
+| `/crux-recall --total` | Visualize the entire memory system as an interactive canvas |
 | `/crux-forget <memory-id>` | Forget a specific memory by ID |
 | `/crux-forget "query"` | Search and select memories to forget |
 | `/crux-remember` | Interactively create a new ad-hoc memory |
