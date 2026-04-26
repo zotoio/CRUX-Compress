@@ -18,6 +18,12 @@
         "command": "python3 .cursor/hooks/crux-detect-memory-changes.py",
         "description": "CRUX: Flag memory index for rebuild when memory files change"
       }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "python3 .cursor/hooks/crux-track-memory-references.py",
+        "description": "CRUX: Auto-track memory references from [memory:*] annotations in agent output"
+      }
     ]
   }
 }

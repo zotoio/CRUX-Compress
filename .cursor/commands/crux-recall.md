@@ -11,14 +11,14 @@ Decompress, query, and display CRUX memories in human-readable form.
 /crux-recall "search query"                     - Search memories by keyword
 /crux-recall 20260403-crux-memories              - Show memories from a specific spec
 /crux-recall memories/core/some-memory.memory.md - Display a specific memory file
-/crux-recall --total                             - Visualize the entire memory system as a 3D graph
+/crux-recall --total                             - Visualize the entire memory system as an interactive canvas
 ```
 
 ## Parameters
 
 | Parameter | Description |
 |-----------|-------------|
-| `--total` | Generate an interactive 3D force-directed visualization of the entire memory system. Uses `/canvas` to render a `3d-force-graph` ([vasturiano/3d-force-graph](https://github.com/vasturiano/3d-force-graph)) with all memory data embedded. Nodes represent memories (sized by strength, colored by type, labeled by title). Edges connect memories sharing tags or source specs (thickness proportional to connection strength). Supports click-to-detail, hover highlighting, search/filter, and force simulation controls. |
+| `--total` | Generate an interactive canvas visualization of the entire memory system using only `cursor/canvas` SDK primitives. The canvas includes: summary stats, type/search filters, an SVG force-directed graph (2D, pre-computed at module scope via Verlet simulation), a detail panel for selected memories, type/strength distribution charts (`PieChart`/`BarChart`), and a filterable memory table. Nodes represent memories (sized by strength, colored by type, labeled by title). Edges connect memories sharing tags or source specs. Supports click-to-detail, hover highlighting, type filter toggles, and text search. |
 
 ## Instructions
 
@@ -30,7 +30,7 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in R
 - **Quoted text** (e.g. `"performance optimization"`): The manager searches existing memories by title, description, tags, and body content. Results are ranked by relevance with decompressed body content shown for compressed memories. Pass `$ARGUMENTS` to the subagent as the search query.
 - **Spec name(s)** (e.g. `20260403-crux-memories`): The manager finds all memories whose `source` field matches the given spec slug(s). Results are grouped by type. Pass `$ARGUMENTS` to the subagent as the spec name(s).
 - **File path(s)** (e.g. `memories/learning/foo.memory.md`): The manager reads the specified memory file(s) directly. Compressed files (`.memory.crux.md`) are decompressed for display. Full frontmatter and body are shown. Pass `$ARGUMENTS` to the subagent as the file path(s).
-- **`--total`**: The manager gathers the complete memory corpus — index metadata, all memory files, and their relationships — then uses `/canvas` to generate an interactive 3D force-directed graph visualization of the entire memory system. No table or text output is produced; the canvas is the deliverable.
+- **`--total`**: The manager gathers the complete memory corpus — index metadata, all memory files, and their relationships — then uses `/canvas` to generate an interactive visualization of the entire memory system using only `cursor/canvas` SDK components and inline SVG. No table or text output is produced; the canvas is the deliverable.
 
 ### What Happens
 
@@ -40,9 +40,9 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in R
    - Searches memory files for keyword matches
    - Filters memories by source spec slug
    - Reads specific memory files directly
-   - (`--total`) Reads the full memory index and all memory files, builds a relationship graph, and generates a 3D visualization via `/canvas`
+   - (`--total`) Reads the full memory index and all memory files, builds a relationship graph, and generates a canvas visualization using `cursor/canvas` SDK primitives and inline SVG
 3. For compressed memories (`.memory.crux.md`), decompresses the CRUX body to terse natural language for display — without modifying the file on disk
-4. Presents results with frontmatter metadata and readable body content (or as an interactive 3D graph when `--total` is used)
+4. Presents results with frontmatter metadata and readable body content (or as an interactive canvas when `--total` is used)
 
 ### Display Format
 

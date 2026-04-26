@@ -64,7 +64,7 @@
       "sessionStartNudge": {
         "trigger": "sessionStart",
         "watchDir": "specs",
-        "threshold": 20,
+        "threshold": 5,
         "message": "Agent: 🥱 I need a nap to process what we've been working on. Run /crux-dream in a fresh thinking agent. I'll wake up fresh and ready for our next spec after that!"
       }
     },

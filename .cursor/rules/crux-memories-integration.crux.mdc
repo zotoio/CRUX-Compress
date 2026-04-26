@@ -1,13 +1,12 @@
 ---
-generated: 2026-04-25 23:50
-sourceChecksum: 3751030988
+generated: 2026-04-26 23:36
+sourceChecksum: "2461297412"
 cruxLevel: 25
-beforeTokens: 719
-afterTokens: 355
+beforeTokens: 714
+afterTokens: 347
 reducedBy: 51%
-confidence: 91%
+confidence: 
 alwaysApply: true
-crux: true
 ---
 
 > [!IMPORTANT]
@@ -35,8 +34,8 @@ crux: true
 R.general{¬direct read|write→use skills; scope=base+own agent; repo-local;
  dir=memories/ (cfg: cruxMemories.storage.memoriesDir)}
 
-R.mcp{.cursor/mcp.json→{mcpServers:{crux-memories:{command:"python",
- args:["-m","crux_mcp_server","-t","stdio","--config",".crux/crux-memories.json"]}}}
+R.mcp{~/.cursor/mcp.json→{mcpServers:{crux-memories:{command:"crux-mcp-server",
+ args:["-t","stdio","--config",".crux/crux-memories.json"]}}}
  MCP avail→semantic search ≻ linear idx scan}
 ⟧
 ```

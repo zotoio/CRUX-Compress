@@ -56,7 +56,7 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 The MCP server is installed at the user level and shared across all projects. Install it via:
 
 ```bash
-python3 install.py --with-mcp-server
+pipx install ./crux_mcp_server
 ```
 
 This configures `~/.cursor/mcp.json` with:
@@ -65,9 +65,8 @@ This configures `~/.cursor/mcp.json` with:
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "python3",
-      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
-      "cwd": "~/.crux-mcp-server"
+      "command": "crux-mcp-server",
+      "args": ["-t", "stdio", "--config", ".crux/crux-memories.json"]
     }
   }
 }
