@@ -519,6 +519,160 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 ---
 
+## P. Amnesia Interactive Flow
+
+### P1. Amnesia — Toggle Mode
+
+**Category**: P — Amnesia (Session Override)
+
+**Prerequisites**:
+- General prerequisites above
+- `enableMemories` is set to `"true"` in `.crux/crux-memories.json`
+- At least 1-2 memories exist in `memories/` (to verify they are NOT loaded during amnesia)
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-amnesia` with no arguments and send
+3. Observe the response
+4. Have a brief conversation about a topic covered by existing memories
+5. Observe whether memories are surfaced or referenced
+6. Type `/crux-amnesia` again to toggle back
+7. Have the same conversation topic again
+8. Observe whether memories are now surfaced
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | Agent confirms amnesia mode is ON | Response shows `amnesia-on` and `current chat session only` |
+| 3 | Config file is NOT modified | `.crux/crux-memories.json` content is unchanged (verify with `git diff`) |
+| 4-5 | No memories are discovered, loaded, annotated, or referenced | No `[memory:{title}]` annotations appear; no dream nudge is suggested |
+| 6 | Agent confirms amnesia mode is OFF | Response shows `config-driven` |
+| 7-8 | Memories are now surfaced normally | `[memory:{title}]` annotations appear if relevant memories exist |
+
+**Pass/Fail**: PASS if toggling amnesia on/off correctly suppresses/restores ambient memory usage without modifying config. FAIL if config is modified, memories leak during amnesia, or restoration does not work.
+
+---
+
+### P2. Amnesia — Explicit Memory Commands Still Work
+
+**Category**: P — Amnesia (Command Override)
+
+**Prerequisites**:
+- General prerequisites above
+- Amnesia mode is ON (run `/crux-amnesia on` first)
+- At least 3-5 memories exist in `memories/`
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-amnesia on` and confirm amnesia is active
+3. Type `/crux-recall` and send
+4. Observe whether memories are displayed
+5. Type `/crux-remember "test memory during amnesia"` and send
+6. Observe whether the memory is created
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3-4 | `/crux-recall` works normally despite amnesia | Memories are displayed with full metadata and body content |
+| 5-6 | `/crux-remember` creates a memory despite amnesia | A new `.memory.md` file is created with `source: "adhoc"` |
+| all | Explicit commands are treated as user intent | The agent does not refuse or warn about amnesia when explicit commands are used |
+
+**Pass/Fail**: PASS if explicit memory commands work normally during amnesia. FAIL if any explicit command is blocked, refused, or degraded.
+
+---
+
+### P3. Amnesia — Subagent Inheritance
+
+**Category**: P — Amnesia (Subagent Behavior)
+
+**Prerequisites**:
+- General prerequisites above
+- Amnesia mode is ON
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-amnesia on` and confirm amnesia is active
+3. Ask the agent to perform a task that spawns subagents (e.g. "Refactor this function" or run a spec)
+4. Observe subagent output for memory annotations
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 4 | Subagents do NOT use ambient memories | No `[memory:{title}]` annotations from subagents |
+| 4 | Subagents are explicitly told memories are disabled | Subagent prompt includes amnesia state context |
+
+**Pass/Fail**: PASS if subagents inherit amnesia state. FAIL if subagents use memories despite parent being in amnesia mode.
+
+---
+
+## R. Forget Interactive Flow
+
+### R1. Forget — By Memory ID
+
+**Category**: R — Forget Workflow
+
+**Prerequisites**:
+- General prerequisites above
+- At least 2-3 memories exist (run `/crux-recall` first to get IDs)
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Run `/crux-recall` to see existing memories and note a memory's short hash ID
+3. Type `/crux-forget <memory-id>` and send
+4. Observe the confirmation prompt
+5. Confirm deletion
+6. Observe the result
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 4 | Agent shows the memory details and asks for confirmation | Memory title, type, and content are displayed with a yes/no prompt |
+| 4 | Agent does NOT delete without confirmation | No file is removed before user confirms |
+| 6 | The memory file is deleted | File no longer exists at `memories/<type>/<slug>.memory.md` |
+| 6 | The reference tracker is deleted if it existed | `<slug>.refs.yml` no longer exists in `.crux/reference-tracking/` |
+| 6 | The memory index is rebuilt | `.crux/memory-index.yml` no longer contains the deleted memory |
+
+**Pass/Fail**: PASS if deletion requires confirmation, removes both the memory file and tracker, and rebuilds the index. FAIL if deletion happens without confirmation, leaves orphaned files, or the index is stale.
+
+---
+
+### R2. Forget — Search and Select
+
+**Category**: R — Forget Workflow (Search)
+
+**Prerequisites**:
+- General prerequisites above
+- At least 3-5 memories exist with varied tags
+
+**Steps**:
+
+1. Open a new Cursor chat session (agent mode with a thinking model)
+2. Type `/crux-forget "performance"` and send
+3. Observe search results
+4. Select one or more memories to forget
+5. Confirm deletion
+
+**Expected Outcomes**:
+
+| Step | Expected | Pass Criteria |
+|------|----------|---------------|
+| 3 | Matching memories are displayed with relevance ranking | Results are ordered by relevance with title, type, and strength shown |
+| 3 | User is prompted to select which to forget | A multi-select interface or numbered list is presented |
+| 5 | Only selected memories are deleted | Non-selected memories remain intact |
+| 5 | Index is rebuilt after all deletions | Index reflects the new state |
+
+**Pass/Fail**: PASS if search returns relevant results, allows selection, and deletes only selected memories. FAIL if wrong memories are deleted or search returns no results when matches exist.
+
+---
+
 ## N. Cross-Platform Flows
 
 ### N1. Cursor — Full Dream/REM/Recall Flow (Primary Platform)
@@ -697,6 +851,10 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `/crux-remember` | Interactively create a new ad-hoc memory |
 | `/crux-remember "insight"` | Create a memory from provided text |
 | `/crux-remember "insight" --type learning` | Create with a specific type |
+| `/crux-amnesia` | Toggle session-scoped ambient memory suppression |
+| `/crux-amnesia on` | Enable amnesia mode for the current chat session |
+| `/crux-amnesia off` | Restore config-driven memory behavior |
+| `/crux-amnesia status` | Show the current session memory mode |
 | `/crux-meditate` | Recursive memory-informed exploration of current context |
 | `/crux-meditate "topic"` | Explore a specific theme with 3-level deep memory search |
 
