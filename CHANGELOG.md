@@ -5,6 +5,33 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.9.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.4) - 2026-05-03
+
+- chore: update release manifests for v2.9.4 [skip ci] (1272664)
+- Potential fix for pull request finding 'Unused import' (c745424)
+- Potential fix for pull request finding 'Unused import' (a896b1f)
+- Potential fix for pull request finding 'Unused import' (69a5802)
+- Potential fix for pull request finding 'Unused import' (e94b94f)
+- Potential fix for pull request finding 'Unused import' (2222d0e)
+- Potential fix for pull request finding 'Unused import' (538e784)
+- Potential fix for pull request finding 'Unused import' (aeee663)
+- Potential fix for pull request finding 'Unused variable, import, function or class' (4421d75)
+- Potential fix for pull request finding 'Unused variable, import, function or class' (bdb2203)
+- Potential fix for pull request finding 'Unused variable, import, function or class' (3fdab14)
+- Potential fix for pull request finding 'Unused variable, import, function or class' (f25d579)
+- fix: install crux_mcp_server in CI so MCP eval suites can import it (ed35ab8)
+- feat: add new memory ideas for automation and architectural enforcement (9c8aebc)
+- feat: update memory integration rules and add reference tracking (e52e0b4)
+- chore: remove original recall spec files after archive move (d4de0bb)
+- docs: update README with latest command and feature references (59f5647)
+- feat: expand SDK eval suite with dream, REM, forget, meditate, and integration tests (f70394f)
+- feat: add 28 new memory files across core, idea, learning, and redflag types (5830710)
+- feat: update memory agent, commands, hooks, and integration rules (b0b16bb)
+- refactor: restructure crux_mcp_server into proper Python package layout (08b938b)
+- chore: archive executed specs and clean up completed spec directories (b177ec5)
+- feat: add comprehensive tests for recall, remember, amnesia, and meditate workflows (d2946df)
+- docs: update CHANGELOG.md for v2.9.2 [skip ci] (d617a57)
+
 ## [v2.9.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.2) - 2026-04-26
 
 - chore: update release manifests for v2.9.2 [skip ci] (5232234)
