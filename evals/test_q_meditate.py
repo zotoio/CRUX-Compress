@@ -9,8 +9,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from conftest import _make_config
-
 
 class TestMeditateConfigPresence:
     """The meditate command is properly configured in crux-memories.json."""
