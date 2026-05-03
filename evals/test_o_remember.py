@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from conftest import MEMORY_TYPES, _make_config, write_memory
+from conftest import _make_config, write_memory
 
 
 def _parse_frontmatter(path: Path) -> dict:
