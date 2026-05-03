@@ -1,0 +1,23 @@
+{
+  "unitOfWork": "spec",
+  "specsDir": "specs",
+  "workDir": "specs/current",
+  "spec": {
+    "maxSubtasks": 99,
+    "parallelLimit": 4,
+    "adversarialVerification": true
+  },
+  "hooks": {
+    "sessionStartNudge": {
+      "enabled": true,
+      "threshold": 20,
+      "message": "You have ${count} unprocessed ${unitOfWork}s in specs/current. Consider running /zoto-spec-create to organize them."
+    }
+  },
+  "extensions": {
+    "memory": {
+      "enabled": true,
+      "plugin": "crux-memories"
+    }
+  }
+}

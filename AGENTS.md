@@ -48,3 +48,17 @@ When building or executing engineering specs in this repository, **always use th
 
 **Do not default to `generalPurpose`** — every subtask in a spec should map to the most appropriate CRUX agent above.
 
+### Spec System commands (`zoto-spec-system` plugin)
+
+This repository wires up the [`zoto-spec-system`](https://github.com/zotoio/zoto-agents/tree/main/plugins/zoto-spec-system) Cursor plugin via `.zoto-spec-system/config.json`. When the plugin is installed, these commands are available:
+
+- `/zoto-spec-create` — Create a structured spec under `specs/[yyyymmdd]-[feature-name]/`.
+- `/zoto-spec-judge` — Independent assessment of a spec or the repo. Offers to apply fixes.
+- `/zoto-spec-execute` — Run a spec with subagent coordination and adversarial verification.
+
+Configuration:
+- `unitOfWork=spec`, `specsDir=specs`, `workDir=specs/current`.
+- `extensions.memory.enabled=true` with `plugin=crux-memories` — the CRUX memory commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-meditate`) integrate with the spec lifecycle.
+
+See [`docs/zoto-spec-system.md`](docs/zoto-spec-system.md) for installation and daily-workflow details. Existing examples: `specs/20260406-crux-forget/`, `specs/20260425-crux-recall/`.
+
