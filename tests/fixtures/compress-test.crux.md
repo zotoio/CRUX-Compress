@@ -1,12 +1,10 @@
 ---
-generated: 2026-04-25 19:26
+generated: 2026-04-26 00:55
 sourceChecksum: "2179275645"
 cruxLevel: 25
 beforeTokens: 480
-afterTokens: 305
-reducedBy: 36%
-confidence: pending
-crux: true
+afterTokens: 247
+reducedBy: 49%
 ---
 
 > [!IMPORTANT]
@@ -17,46 +15,40 @@ crux: true
 ```crux
 ⟦CRUX:compress-test.md
 Ρ{test coding standards rule}
-Κ{ut=unit test; fx=fixture; hlp=helper}
+Κ{ut=unit test; fx=fixture; h=helper}
 
 R.naming{
-  ut→test_*.bats(test_utils.bats)
-  fx→*.md|*.mdc(sample-rule.md)
-  hlp→helpers.bash
+  ut:test_*.bats; fx:*.md|*.mdc; h:helpers.bash
 }
 
-R.structure{
-  setup()→init env; teardown()→cleanup tmp
-  ¬leave artifacts; use $BATS_TMPDIR
+R.struct{
+  setup()→init env; teardown()→cleanup
+  ¬artifacts!; tmp→$BATS_TMPDIR
 }
 
 R.assert{
-  success→assert_success; fail→assert_failure
-  substr→assert_output --partial; ln→assert_line
+  assert_success|assert_failure
+  assert_output --partial→substring
+  assert_line→specific ln
 }
 
 E.good{
-  @test "desc" {run fn ""; assert_failure; assert_output --partial "err"}
+  @test "desc" { run fn ""; assert_failure; assert_output --partial "err" }
 }
 
 E.bad{
-  @test "vague" {fn ""} #¬run,¬assert
+  @test "test" { fn "" } # ¬run,¬assert
 }
 
-Γ.apply{
-  +BATS tests; +review PR; +debug fail
-}
+Λ.apply{+BATS tests|PR review|debug}
 
 P.critical{
-  ⊛¬skip run⊲assert!
-  ⊛cleanup tmp@teardown!
-  ⊛desc test names!
-  ⊛¬hardcoded paths→use vars
+  ¬skip run!; cleanup in teardown!
+  test names=descriptive!; ¬hardcoded paths→use vars
 }
 
-P.err.debug{
-  $output→err msg; $status→exit code
-  $lines→ln-by-ln; set -x→temp debug
+P.err{
+  fail→check[$output,$status,$lines]; debug→set -x
 }
 ⟧
 ```

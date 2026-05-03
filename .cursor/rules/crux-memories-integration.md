@@ -25,15 +25,13 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 - Load full memory files only for likely matches (by title, description, or tags)
 - If MCP is configured, agents may use semantic search instead of index scanning
 
-### Output Annotation
+### Output Annotation (CRITICAL)
 
-- Agents annotate output with `[memory:{title}]` when influenced by a memory
-- This enables reference tracking and memory strength scoring
-
-### Reference Tracking
-
-- Agents increment reference tracking via the CRUX memory reference-tracker skill
-- Never manipulate reference tracking files directly
+- When a memory influences your response, you **MUST** include `[memory:{title}]` in your output, where `{title}` is the memory's exact title from its frontmatter
+- Place the annotation inline near the relevant statement, or at the end of the paragraph it influenced
+- This is how the system tracks which memories are valuable — an `afterAgentResponse` hook automatically scans for these annotations and updates reference trackers
+- Example: "Components should use memoization with custom comparators. [memory:React.memo on list item components prevents full re-render on data changes]"
+- You do NOT need to manually invoke the reference-tracker skill — the hook handles all `.refs.yml` bookkeeping automatically
 
 ### Dream Nudge
 
@@ -56,7 +54,7 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 The MCP server is installed at the user level and shared across all projects. Install it via:
 
 ```bash
-python3 install.py --with-mcp-server
+pipx install ./crux_mcp_server
 ```
 
 This configures `~/.cursor/mcp.json` with:
@@ -65,9 +63,8 @@ This configures `~/.cursor/mcp.json` with:
 {
   "mcpServers": {
     "crux-memories": {
-      "command": "python3",
-      "args": ["-m", "crux_mcp_server", "-t", "stdio"],
-      "cwd": "~/.crux-mcp-server"
+      "command": "crux-mcp-server",
+      "args": ["-t", "stdio", "--config", ".crux/crux-memories.json"]
     }
   }
 }

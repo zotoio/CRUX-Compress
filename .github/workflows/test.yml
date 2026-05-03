@@ -26,6 +26,9 @@ jobs:
       - name: Install Python test dependencies
         run: pip install -r evals/requirements.txt
 
+      - name: Install crux_mcp_server (editable)
+        run: pip install -e ./crux_mcp_server
+
       - name: Run pytest (evals)
         run: pytest evals/ -v --tb=short
 

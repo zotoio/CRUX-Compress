@@ -5,13 +5,36 @@ A modular MCP (Model Context Protocol) server providing read-only access to the 
 ## Requirements
 
 - Python >= 3.10
-- Dependencies: `fastmcp`, `pyyaml`, `watchdog`
-- Optional: `sentence-transformers` for embedding-based semantic search (falls back to TF-IDF)
 
 ## Install
 
 ```bash
-pip install -r crux_mcp_server/requirements.txt
+pipx install ./crux_mcp_server
+```
+
+With embedding-based semantic search (optional, falls back to TF-IDF without it):
+
+```bash
+pipx install "./crux_mcp_server[embeddings]"
+```
+
+Or with pip:
+
+```bash
+pip install ./crux_mcp_server
+```
+
+Then add the server to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "crux-memories": {
+      "command": "crux-mcp-server",
+      "args": ["-t", "stdio", "--config", ".crux/crux-memories.json"]
+    }
+  }
+}
 ```
 
 ## Usage
@@ -19,13 +42,13 @@ pip install -r crux_mcp_server/requirements.txt
 ### stdio transport (default)
 
 ```bash
-python -m crux_mcp_server
+crux-mcp-server
 ```
 
 ### HTTP transport
 
 ```bash
-python -m crux_mcp_server -t http --port 8742
+crux-mcp-server -t http --port 8742
 ```
 
 ### Options
@@ -61,6 +84,8 @@ Summary statistics: counts by type, total memories, index freshness, search back
 
 ```
 crux_mcp_server/
+├── pyproject.toml       # Package metadata and dependencies
+├── __init__.py          # Package marker
 ├── __main__.py          # CLI entry point
 ├── server.py            # Server creation and lifecycle
 ├── config.py            # Configuration loader

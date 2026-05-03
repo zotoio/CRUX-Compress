@@ -1,0 +1,44 @@
+{
+  "name": "crux-memories-sdk-evals",
+  "version": "1.0.0",
+  "description": "Cursor SDK-based eval tests for CRUX Memories system",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:recall": "vitest run --grep 'Recall'",
+    "test:amnesia": "vitest run --grep 'Amnesia'",
+    "test:remember": "vitest run --grep 'Remember'",
+    "test:dream": "vitest run --grep 'Dream'",
+    "test:rem": "vitest run --grep 'REM'",
+    "test:forget": "vitest run --grep 'Forget'",
+    "test:meditate": "SDK_EVAL_SKIP_EXPENSIVE=false vitest run --grep 'Meditate'",
+    "test:integration": "SDK_EVAL_SKIP_EXPENSIVE=false vitest run --grep 'Integration'"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.0"
+  },
+  "devDependencies": {
+    "@cursor/february": "1.0.7",
+    "@types/node": "^22.19.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "optionalDependencies": {
+    "@cursor/february-darwin-arm64": "1.0.7",
+    "@cursor/february-darwin-x64": "1.0.7",
+    "@cursor/february-linux-arm64": "1.0.7",
+    "@cursor/february-linux-x64": "1.0.7",
+    "@cursor/february-win32-x64": "1.0.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sqlite3"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48"
+}

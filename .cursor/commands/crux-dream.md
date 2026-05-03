@@ -16,6 +16,10 @@ Post-execution memory extraction and REM sleep rebalancing.
 
 When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to handle the memory workflow. The manager orchestrates the six memory skills to perform extraction or rebalancing.
 
+**Candidate visibility**: The subagent MUST return its ranked candidates (or REM recommendations) in its final response so they are visible to the user in the chat. The parent agent then asks the user for decisions using `AskQuestion` — never before the candidates are displayed. This ensures the user can read what was extracted before being asked to accept or reject.
+
+**User decisions**: Whenever user approval is needed (accepting candidates, applying REM changes, archiving), use the `AskQuestion` tool in the **parent agent** (not the subagent) to present structured multiple-choice options instead of free-text prompts. This ensures clean, single-click interaction.
+
 ### Argument Handling
 
 - **Spec name** (e.g. `20260403-crux-memories`): The manager runs the dream extraction workflow on the completed spec. It verifies execution, analyses artifacts, compares with existing memories, detects conflicts, presents ranked candidates, and creates accepted memories. Pass `$ARGUMENTS` to the subagent as the spec name.
@@ -31,11 +35,12 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 3. Reads all spec artifacts (subtask files, execution reports, work logs, diffs)
 4. Extracts candidate facts — learnings, red flags, goals, ideas, core patterns
 5. Compares candidates against existing memories for novelty and conflicts
-6. Presents the top candidates ranked by value for user review
-7. Creates accepted memories via `crux-skill-memory-crud`
-8. Writes a dream summary to the spec directory
-9. Rebuilds the memory index
-10. Offers to archive the completed spec directory
+6. Returns the top candidates ranked by value in the subagent response (user-visible)
+7. Parent agent uses the `AskQuestion` tool to collect the user's accept/skip decision with structured options (e.g. "Accept all", "Select individually", "Skip all") and whether to archive the spec directory
+8. Parent resumes the subagent with the user's decisions; subagent creates accepted memories via `crux-skill-memory-crud`
+9. Writes a dream summary to the spec directory
+10. Rebuilds the memory index
+11. Archives the spec directory if the user opted in
 
 #### REM Sleep (`--rem`)
 
@@ -44,8 +49,8 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 3. Detects conflicts between existing memories
 4. Evaluates promotions, demotions, archival, and consolidation candidates
 5. Detects uncompressed memories for CRUX compression (when `enableMemoryCompression` is enabled)
-6. Presents a structured report for user approval
-7. Applies confirmed changes (including compression via `crux-skill-memory-compress`)
+6. Returns recommendations in the subagent response (user-visible); parent agent uses the `AskQuestion` tool to collect the user's approval decision with structured options (e.g. "Apply all", "Select individually", "Skip all") — conflicts always require individual resolution
+7. Parent resumes the subagent with the user's decisions; subagent applies confirmed changes (including compression via `crux-skill-memory-compress`)
 8. Writes a REM summary
 9. Rebuilds the memory index
 
