@@ -1,11 +1,11 @@
 ---
-generated: 2026-04-26 23:36
-sourceChecksum: "2461297412"
+generated: 2026-04-27 01:42
+sourceChecksum: "4002236386"
 cruxLevel: 25
-beforeTokens: 714
-afterTokens: 347
-reducedBy: 51%
-confidence: 
+beforeTokens: 821
+afterTokens: 370
+reducedBy: 55% 
+confidence: 93%
 alwaysApply: true
 ---
 
@@ -26,7 +26,8 @@ alwaysApply: true
 Φ.enabled{enableMemories="true"→
  discover: read idx→load likely matches(title|desc|tags);
  MCP→semantic search ≻ idx scan;
- annotate [memory:{title}]; refs via skill; ¬direct writes;
+ ⊛annotate: [memory:{title}] inline near influenced stmt!;
+ afterAgentResponse hook→auto .refs.yml tracking; ¬manual ref-tracker skill;
  post-spec→suggest /crux-dream}
 
 Φ.disabled{enableMemories="false"→skip all silently}
