@@ -17,7 +17,6 @@ import { getApiKey } from "../helpers/config.js";
 import {
   type CollectedRun,
   type IsolatedWorkspace,
-  assertOutputContains,
   collectRun,
   createIsolatedWorkspace,
   createMemoryFixture,
