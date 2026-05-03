@@ -9,8 +9,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import yaml
-
 from conftest import _make_config, write_memory, write_tracker
 
 
