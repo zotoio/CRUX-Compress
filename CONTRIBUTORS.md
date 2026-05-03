@@ -39,11 +39,12 @@ Please be respectful and constructive in all interactions. We are committed to p
 ### Installing Python Dependencies
 
 ```bash
-# MCP server dependencies
-pip install -r crux_mcp_server/requirements.txt
-
 # Eval test dependencies
 pip install -r evals/requirements.txt
+
+# MCP server (editable install — required for the test_l_mcp_server.py and
+# test_m_config_validation.py suites to resolve `crux_mcp_server.*` imports)
+pip install -e ./crux_mcp_server
 ```
 
 ## Testing
