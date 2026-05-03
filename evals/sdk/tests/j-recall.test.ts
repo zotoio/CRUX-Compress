@@ -125,6 +125,7 @@ describe("J: Recall", () => {
 
       expect(hasTitle).toBe(true);
       expect(hasType).toBe(true);
+      expect(hasStrength).toBe(true);
     });
 
     it("uses structured display format", async () => {
