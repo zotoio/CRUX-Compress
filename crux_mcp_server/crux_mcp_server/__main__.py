@@ -34,13 +34,13 @@ def main() -> None:
         "--config",
         type=Path,
         default=None,
-        help="Path to crux-memories.json (default: auto-detect from CWD)",
+        help="Path to crux-memories.json (optional fallback when MCP roots unavailable)",
     )
     parser.add_argument(
         "--project-root",
         type=Path,
         default=None,
-        help="Project root directory (default: CWD)",
+        help="Project root directory (optional fallback when MCP roots unavailable)",
     )
     parser.add_argument(
         "--log-level",
@@ -61,7 +61,7 @@ def main() -> None:
 
     from crux_mcp_server.server import create_server
 
-    server, ctx = create_server(
+    server, registry = create_server(
         config_path=args.config,
         project_root=args.project_root,
     )
@@ -72,8 +72,7 @@ def main() -> None:
         else:
             server.run(transport="http", host=args.host, port=args.port)
     finally:
-        if ctx.watcher is not None:
-            ctx.watcher.stop()
+        registry.shutdown()
 
 
 if __name__ == "__main__":
