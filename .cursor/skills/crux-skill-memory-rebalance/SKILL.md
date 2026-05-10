@@ -396,7 +396,7 @@ Apply all recommendations? [all/select/skip]
 
 **In `--yolo` mode**: Auto-apply everything EXCEPT conflicts (Step 3). Conflicts always require user input.
 
-**In interactive mode**: Present the full report and wait for user confirmation. Options:
+**In interactive mode**: Return the full report in your response. Do NOT call `AskQuestion` — the calling agent (or its parent) will present the report to the user and collect the confirmation decision, then pass it back to you. Expected options for the user:
 - **all**: Apply all non-conflict recommendations; then prompt for each conflict individually
 - **select**: Walk through each recommendation individually for accept/reject
 - **skip**: Abort without changes
@@ -590,7 +590,7 @@ When a memory transitions between types, follow this exact procedure:
 | Target directory cannot be created | Abort the specific move, report filesystem error |
 | Conflict between two memories | Always present to user, never auto-resolve |
 | Strength exceeds `promoteAt` but `promoteTo` is not in `typePriority` | Skip promotion, report config issue |
-| File move would overwrite an existing file | Prompt user before overwriting |
+| File move would overwrite an existing file | Return `needs_user_input` for the calling agent to confirm with the user |
 
 ## What This Skill Does NOT Do
 

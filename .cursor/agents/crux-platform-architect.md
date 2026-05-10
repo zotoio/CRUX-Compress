@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-platform-architect
-model: claude-4.6-opus-high-thinking
+model: claude-opus-4-7
 description: Expert CRUX platform engineer and architect specializing in Cursor IDE tooling, LLM-based engineering harnesses, documentation systems, and testing with evals. Use proactively for architectural decisions, platform design, eval strategy, agent/skill/rule design, and documentation structure.
 ---
 

@@ -38,13 +38,16 @@ Confirm the unit of work completed successfully before extracting memories.
 
 **Input**: Path to the work item directory (e.g. `specs/20260403-crux-memories/`)
 
+**Path validation — CRITICAL**: The work item directory MUST be a subdirectory of the configured `workDir` (`cruxMemories.dream.workDir`, default `specs`). If the provided path points to a directory outside `workDir`, abort with an error listing the available specs from `workDir`. Do not search `.ai-ignored/specs/`, `.ai-ignored/executed/`, or other directories.
+
 **Steps**:
 
-1. Look for the configured `stateFile` (default `_execution-state.yml`) inside the work item directory
-2. Parse the state file and check the `status` field
-3. If status is not `complete` (or equivalent success state), report the current status and abort extraction — incomplete work items should not produce memories
-4. If no state file exists, warn the user and ask whether to proceed anyway (the work item may have been executed outside the standard workflow)
-5. Record the execution start date from the state file for use in diff analysis
+1. Verify the work item directory exists within the configured `workDir`; if not, abort and list available specs
+2. Look for the configured `stateFile` (default `_execution-state.yml`) inside the work item directory
+3. Parse the state file and check the `status` field
+4. If status is not `complete` (or equivalent success state), report the current status and abort extraction — incomplete work items should not produce memories
+5. If no state file exists, return a `needs_user_input` response asking whether to proceed anyway (the work item may have been executed outside the standard workflow) — the calling agent will ask the user and resume you with the decision
+6. Record the execution start date from the state file for use in diff analysis
 
 ### 2. Diff Analysis
 
@@ -58,8 +61,8 @@ Assess the scope of repository changes since the work item started to determine 
 2. Count the number of changed files in the repository since the baseline
 3. Compare the count against `maxUnrelatedChanges` (default `50`)
 4. If the count exceeds the threshold:
-   - Warn the user: "Found {count} changed files since {unitOfWork} start (threshold: {maxUnrelatedChanges}). Many changes may be unrelated to this {unitOfWork}, which could reduce extraction quality."
-   - Present options: proceed anyway, increase threshold, or abort
+   - Return a `needs_user_input` response with the warning: "Found {count} changed files since {unitOfWork} start (threshold: {maxUnrelatedChanges}). Many changes may be unrelated to this {unitOfWork}, which could reduce extraction quality."
+   - Include options: proceed anyway, increase threshold, or abort — the calling agent will present these to the user and resume you with the decision
 5. If within threshold, report the count and continue
 
 The purpose of this check is to avoid extracting noise from unrelated work that happened concurrently.
@@ -276,9 +279,9 @@ source: "20260401-component-library"  # work item identifier
 | `related_memories` | No | Paths to existing memories on similar topics (for near-duplicates or related content) |
 | `source` | Yes | Identifier of the originating work item (slug from the work directory name) |
 
-## Presentation to User
+## Response Format
 
-After ranking, present candidates to the user for review. If resolved bugs were detected (step 9), present them in a separate section after the new candidates:
+This skill follows **Pattern B (work first, then escalate)** — you perform analysis and ranking first, then return results for the calling agent to present to the user. Do NOT call `AskQuestion` — the calling agent (or its parent) handles all user interaction. Include the following structure in your response:
 
 ```
 Analysing {unitOfWork} "{work-item-id}"...
@@ -299,11 +302,9 @@ Top {N} candidate facts:
      ...
 
   {conflict reports, if any}
-
-Accept all? Or review individually? [all/individual/skip]
 ```
 
-If resolved bugs were detected:
+If resolved bugs were detected, include them in a separate section:
 
 ```
 🐛 Resolved bugs detected — {count} redflag memories may no longer be needed:
@@ -314,9 +315,9 @@ If resolved bugs were detected:
 
   2. [{confidence}] {title}
      ...
-
-Forget all resolved bugs? Or review individually? [all/individual/skip]
 ```
+
+The calling agent will use `AskQuestion` to collect the user's accept/skip decisions for both candidates and resolved bugs, then pass those decisions back to you.
 
 Each resolved bug the user confirms is deleted via `crux-skill-memory-crud` Delete operation (memory file and its reference tracker are both removed).
 
@@ -359,9 +360,9 @@ All config values come from `.crux/crux-memories.json`:
 | Condition | Action |
 |-----------|--------|
 | `enableMemories` is not `"true"` | Abort, inform caller memories are disabled |
-| State file missing | Warn, ask user whether to proceed without execution verification |
+| State file missing | Return `needs_user_input` asking the calling agent to confirm whether to proceed |
 | State file shows incomplete execution | Report status, abort extraction |
-| Changed file count exceeds `maxUnrelatedChanges` | Warn, present options (proceed, adjust threshold, abort) |
+| Changed file count exceeds `maxUnrelatedChanges` | Return `needs_user_input` with options (proceed, adjust threshold, abort) |
 | No artifacts found in work item directory | Report that no analyzable artifacts were found, abort |
 | Zero candidates after comparison filtering | Report that all potential insights are already captured in existing memories |
 | Conflict detected with existing memory | Present conflict report, require user resolution (never auto-resolve) |

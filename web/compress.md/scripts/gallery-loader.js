@@ -572,20 +572,10 @@
       var dots = dotsWrap.querySelectorAll('.gallery-dot');
 
       function lockHeight() {
-        var max = 0;
-        for (var i = 0; i < galleryItems.length; i++) {
-          galleryItems[i].style.position = 'relative';
-          galleryItems[i].style.opacity = '1';
-          galleryItems[i].style.transform = 'none';
-          var h = galleryItems[i].offsetHeight;
-          if (h > max) max = h;
+        var active = itemsWrap.querySelector('.gallery-item--active');
+        if (active) {
+          itemsWrap.style.height = active.offsetHeight + 'px';
         }
-        for (var j = 0; j < galleryItems.length; j++) {
-          galleryItems[j].style.position = '';
-          galleryItems[j].style.opacity = '';
-          galleryItems[j].style.transform = '';
-        }
-        itemsWrap.style.height = max + 'px';
       }
 
       lockHeight();

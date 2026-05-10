@@ -123,7 +123,7 @@ When compression is enabled on a repo with existing uncompressed memories, detec
 
 1. Scan `memoriesDir` recursively for `*.memory.md` files (exclude any already-compressed `*.memory.crux.md`)
 2. For each uncompressed file, estimate current size and projected compressed size
-3. Present a migration plan:
+3. Return a migration plan in your response. Do NOT call `AskQuestion` — the calling agent handles user interaction:
    ```
    Found N uncompressed memory files:
 
@@ -132,9 +132,8 @@ When compression is enabled on a repo with existing uncompressed memories, detec
    | core/react-memo.memory.md | 85 lines | ~28 lines | Yes |
    | learning/stale-closure.memory.md | 45 lines | ~15 lines | Yes |
    | idea/visual-regression.memory.md | 120 lines | ~40 lines | Yes |
-
-   Compress all? [all/select/skip]
    ```
+   The calling agent will present this to the user and collect their decision (all/select/skip) via `AskQuestion`, then pass the confirmed list back to you.
 4. On confirmation, compress each file using the [Compress](#1-compress) operation (files below `compressionMinLines` are automatically skipped)
 5. Report results: how many compressed, how many skipped (below minimum), any that exceeded `maxMemorySize` and were flagged
 
@@ -181,5 +180,5 @@ All config values come from `.crux/crux-memories.json`:
 | File is not a `.memory.md` or `.memory.crux.md` | Reject with descriptive error |
 | Compressed output exceeds `maxMemorySize` (in configured `sizeUnit`) at max compression | Flag for manual review, do not write output |
 | Source archive directory cannot be created | Abort compression, report filesystem error |
-| Decompressed file would overwrite existing `.memory.md` | Prompt before overwriting |
+| Decompressed file would overwrite existing `.memory.md` | Return `needs_user_input` for the calling agent to confirm with the user |
 | Config file missing or malformed | Report error with path and expected structure |

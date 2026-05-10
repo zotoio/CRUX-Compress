@@ -24,6 +24,8 @@ Decompress, query, and display CRUX memories in human-readable form.
 
 When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in Recall mode to query and display memories. Recall is **read-only** — it never modifies memory files on disk.
 
+**User input escalation — CRITICAL**: This command uses **Pattern B (work first, then escalate)** — the subagent queries and formats memories first, then the parent handles post-display interactions. The subagent NEVER calls `AskQuestion` directly. After displaying recall results, the **parent agent** (you) handles all post-display interactions (delete, consolidate, promote, skip) using `AskQuestion`. If the subagent needs user input, it returns a `needs_user_input` section in its response.
+
 ### Argument Handling
 
 - **No arguments**: The manager loads the memory index (`.crux/memory-index.yml`) and surfaces memories most likely to be relevant to the current conversation context. For each memory, it shows title, type, strength, reference count, and a brief rationale for why it was surfaced.

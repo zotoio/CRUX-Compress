@@ -162,6 +162,7 @@ function animateHeroStats() {
   if (!hero) return;
   
   let lastProgress = -1;
+  let ticking = false;
   
   function updateStats() {
     const rect = hero.getBoundingClientRect();
@@ -176,24 +177,28 @@ function animateHeroStats() {
       progress = Math.min(1, Math.max(0, -rect.top / heroHeight));
     }
     
-    // Only update DOM if progress changed significantly
     if (Math.abs(progress - lastProgress) > 0.01) {
       lastProgress = progress;
       
-      // Animate compression bar
       if (compressionFill) {
         compressionFill.style.width = `${progress * 100}%`;
       }
       
-      // Calculate percentage recovered
       const recovered = Math.round(progress * 80);
       if (percentage) {
         percentage.textContent = recovered;
       }
     }
     
-    requestAnimationFrame(updateStats);
+    ticking = false;
   }
+  
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(updateStats);
+      ticking = true;
+    }
+  }, { passive: true });
   
   updateStats();
 }

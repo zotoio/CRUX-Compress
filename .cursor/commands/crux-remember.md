@@ -14,7 +14,7 @@ Store ad-hoc memories outside of spec workflows. These memories participate in s
 
 ## Instructions
 
-When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in Remember mode. The manager uses `crux-skill-memory-crud` to create the memory and `crux-skill-memory-index` to rebuild the index afterwards.
+This command primarily uses **Pattern A (pre-collect then spawn)** — the user's choices (type, tags, description) are known upfront. The **parent agent** (you) collects all input via `AskQuestion` FIRST, then spawns a `crux-cursor-memory-manager` subagent with the pre-collected answers. The subagent never calls `AskQuestion` directly. If the subagent encounters an unexpected decision during creation (e.g. conflict, size limit), it falls back to **Pattern B** and returns `needs_user_input`.
 
 ### Argument Handling
 
@@ -24,20 +24,24 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in R
 
 ### What Happens
 
-1. The manager reads `.crux/crux-memories.json` to load configuration (check `enableMemories` flag)
-2. Parses the input — if no text provided, asks the user what they want to remember
-3. Uses the `AskQuestion` tool to ask the user to select the memory type. Present options from the `typeTransitions` keys in config: `idea`, `learning`, `redflag`, `core`, `goal`. If `--type` was provided, skip this step.
-4. Asks the user for optional tags (comma-separated) and a brief description. Suggest relevant tags based on the memory content and current context.
-5. Delegates to `crux-skill-memory-crud` Create operation with:
-   - `title`: the user's insight text (concise)
-   - `description`: brief summary of the memory
-   - `type`: selected type
-   - `tags`: user-provided tags
-   - `source`: `"adhoc"` to distinguish from spec-extracted memories
-   - `strength`: 1 (default for new memories)
-   - Body: the full memory content
-6. Rebuilds the memory index via `crux-skill-memory-index`
-7. Confirms to the user with the memory's short hash ID, title, type, and file path
+**Phase 1 — Parent collects user input (before spawning subagent)**:
+
+1. If no text was provided, ask the user what they want to remember
+2. Use the `AskQuestion` tool to ask the user to select the memory type. Present options from the `typeTransitions` keys in config: `idea`, `learning`, `redflag`, `core`, `goal`. If `--type` was provided, skip this step.
+3. Use the `AskQuestion` tool to ask the user for optional tags (comma-separated) and a brief description. Suggest relevant tags based on the memory content and current context.
+
+**Phase 2 — Spawn subagent with all answers**:
+
+4. Spawn a `crux-cursor-memory-manager` subagent in Remember mode, passing ALL collected answers in the task prompt:
+   - The memory content/insight text
+   - The selected type
+   - The user's tags
+   - The user's description
+   - `source: "adhoc"`
+5. The subagent creates the memory via `crux-skill-memory-crud` and rebuilds the index via `crux-skill-memory-index`
+6. Display the subagent's confirmation to the user — the memory's short hash ID, title, type, and file path
+
+**If the subagent returns `needs_user_input`**: Use `AskQuestion` to collect the requested information, then resume the subagent with the answers.
 
 ## Related
 
