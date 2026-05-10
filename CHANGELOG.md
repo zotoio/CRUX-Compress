@@ -5,6 +5,19 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.10.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.1) - 2026-05-10
+
+- chore: update release manifests for v2.10.1 [skip ci] (84dc6ff)
+- chore: update crux-release-files.json for version 2.10.0 (699945e)
+- chore: update user input escalation protocols and enhance memory management (3fdf67c)
+- chore: rebuild memory index and remove archived meditation spec (5cc2253)
+- chore: add memories extracted from crux-memories and meditate specs (4c4d3c2)
+- chore: REM sleep — archive demoted memories and move executed spec to archived (b33e2f6)
+- fix: enforce foreground execution and full output relay in dream workflow (70aa2b4)
+- feat: add multi-project partition support to MCP server (f280762)
+- feat: enhance meditate with file-based agent coordination and 3-way fan-out (d5ce2ea)
+- docs: update CHANGELOG.md for v2.9.4 [skip ci] (76dae3b)
+
 ## [v2.9.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.9.4) - 2026-05-03
 
 - chore: update release manifests for v2.9.4 [skip ci] (1272664)
