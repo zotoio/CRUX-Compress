@@ -38,13 +38,16 @@ Confirm the unit of work completed successfully before extracting memories.
 
 **Input**: Path to the work item directory (e.g. `specs/20260403-crux-memories/`)
 
+**Path validation — CRITICAL**: The work item directory MUST be a subdirectory of the configured `workDir` (`cruxMemories.dream.workDir`, default `specs`). If the provided path points to a directory outside `workDir`, abort with an error listing the available specs from `workDir`. Do not search `.ai-ignored/specs/`, `.ai-ignored/executed/`, or other directories.
+
 **Steps**:
 
-1. Look for the configured `stateFile` (default `_execution-state.yml`) inside the work item directory
-2. Parse the state file and check the `status` field
-3. If status is not `complete` (or equivalent success state), report the current status and abort extraction — incomplete work items should not produce memories
-4. If no state file exists, warn the user and ask whether to proceed anyway (the work item may have been executed outside the standard workflow)
-5. Record the execution start date from the state file for use in diff analysis
+1. Verify the work item directory exists within the configured `workDir`; if not, abort and list available specs
+2. Look for the configured `stateFile` (default `_execution-state.yml`) inside the work item directory
+3. Parse the state file and check the `status` field
+4. If status is not `complete` (or equivalent success state), report the current status and abort extraction — incomplete work items should not produce memories
+5. If no state file exists, warn the user and ask whether to proceed anyway (the work item may have been executed outside the standard workflow)
+6. Record the execution start date from the state file for use in diff analysis
 
 ### 2. Diff Analysis
 

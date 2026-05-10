@@ -44,6 +44,13 @@ Always read the relevant skill file before invoking its operations.
 
 Extract memories from a completed unit of work.
 
+**Spec validation — CRITICAL**: The spec name MUST correspond to a subdirectory within the configured `workDir` (`cruxMemories.dream.workDir` from `.crux/crux-memories.json`, default `specs`). Before proceeding with any extraction work:
+
+1. Resolve the `workDir` path from config
+2. Verify the named spec exists as a subdirectory of `workDir` (e.g. `specs/20260403-crux-memories/`)
+3. If the spec does not exist in `workDir`, abort and report the error — list the available specs from `workDir` so the calling agent can present them to the user
+4. Do NOT search other directories (`.ai-ignored/specs/`, `.ai-ignored/executed/`, or anywhere else) — only the configured `workDir` is a valid source
+
 **Workflow**:
 
 1. **Verify Execution**: Use `crux-skill-memory-extract` to confirm the work item completed successfully. Check for the configured `stateFile` (default `_execution-state.yml`). If the work item is incomplete, report status and abort.
@@ -59,6 +66,16 @@ Extract memories from a completed unit of work.
 6. **Classify and Scope**: Assign each candidate a memory type (`core`, `redflag`, `goal`, `learning`, `idea`) using `typePriority` from config. Determine agent scoping — only place a memory under `memories/agents/{agent-id}/` when the insight is clearly agent-specific.
 
 7. **Present Candidates**: Rank by type priority, measurability, recurrence, actionability, and novelty. Present the top `maxCandidateFacts` (default `5`) candidates to the user. In `--yolo` mode, auto-accept all except those with conflicts.
+
+**CRITICAL — Full analysis in response**: Your response back to the calling agent MUST include the **complete analysis**, not just the ranked candidates. Specifically include:
+   - Execution verification results (subtask count, completion status)
+   - Diff analysis summary (change count, threshold status)
+   - Key findings from artifact examination (what you read, what patterns you found)
+   - Comparison results against existing memories (how many compared, duplicates filtered, near-duplicates flagged)
+   - The full ranked candidate list with all fields (rank, type, title, description, tags, scope, rationale, conflicts, related memories)
+   - Resolved bug detection results (if any redflags appear to have been fixed)
+   
+   The calling agent runs you in the foreground specifically to receive this complete output and relay it to the user. If you only return a summary, the user loses visibility into the analysis that produced the recommendations.
 
 8. **Create Memories**: For accepted candidates, delegate to `crux-skill-memory-crud` Create operation. Pass type, title, description, tags, source slug, and scope.
 
@@ -85,6 +102,15 @@ Rebalance the entire memory corpus.
 4. **Recommend Changes**: Evaluate promotions (strength meets `promoteAt` threshold), demotions (unreferenced for `demoteAfterDaysUnreferenced` days), archival (unreferenced for `archiveAfterDaysUnreferenced` days), consolidations (when `enableMemoryConsolidation` is `"true"` — group related memories by subject/type overlap and merge into single compressed files with shared metadata and keywords), compression of remaining uncompressed memories (when `enableMemoryCompression` is `"true"`), strength rebalances, and rule promotion flags.
 
 5. **Present Report**: Show the full REM sleep analysis report. In interactive mode, wait for user confirmation (all/select/skip). In `--yolo` mode, auto-apply everything except conflicts.
+
+**CRITICAL — Full analysis in response**: Your response back to the calling agent MUST include the **complete REM analysis**, not just a summary of recommendations. Specifically include:
+   - Corpus statistics (total memories, type distribution, strength distribution)
+   - Consistency verification results (orphaned trackers, broken chains, missing trackers)
+   - Conflict detection results (any contradictions between existing memories)
+   - Full list of recommended changes with rationale (promotions, demotions, archival, consolidations, compressions, strength rebalances)
+   - Rule promotion flags (memories that crossed the promotion threshold)
+   
+   The calling agent runs you in the foreground specifically to receive this complete output and relay it to the user.
 
 6. **Apply Changes**: Execute confirmed changes via `crux-skill-memory-rebalance` — file moves for promotions/demotions/archival, consolidated group merges (combined body → compressed `.memory.crux.md` via `crux-skill-memory-compress`), individual compression for remaining uncompressed memories, tracker updates for strength rebalances, cleanup for orphaned trackers.
 
