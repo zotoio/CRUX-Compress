@@ -72,20 +72,35 @@ def _build_ctx(tmp_path: Path, config_path: Path | None = None):
     return AppContext(config=cfg, memory_index=index, search_engine=engine)
 
 
-def _register_tools(ctx):
+def _build_registry(tmp_path: Path, config_path: Path | None = None):
+    """Build a ProjectRegistry with a single pre-loaded partition for testing."""
+    from crux_mcp_server.server import ProjectRegistry
+    return ProjectRegistry(
+        fallback_root=tmp_path,
+        fallback_config=config_path or _write_config(tmp_path),
+    )
+
+
+class _MockContext:
+    """Stub for fastmcp.Context; forces registry to fall back to pre-loaded partition."""
+    async def list_roots(self):
+        raise RuntimeError("no roots in test")
+
+
+def _register_tools(registry):
     """Create a FastMCP server with all tools registered, return the server."""
     from fastmcp import FastMCP
     from crux_mcp_server.tools import discover_and_register
 
     server = FastMCP(name="test-server")
-    discover_and_register(server, ctx)
+    discover_and_register(server, registry)
     return server
 
 
-def _get_tool_fn(server, tool_name: str):
-    """Retrieve a tool's underlying function from the FastMCP server."""
+def _call_tool(server, tool_name: str, **kwargs):
+    """Call an async tool function with a mock Context."""
     tool = asyncio.run(server.get_tool(tool_name))
-    return tool.fn
+    return asyncio.run(tool.fn(ctx=_MockContext(), **kwargs))
 
 
 def _write_tracker_with_total(tracking_dir: Path, slug: str, total: int) -> Path:
@@ -530,16 +545,16 @@ class TestToolRegistration:
         from crux_mcp_server.tools import discover_and_register
         from fastmcp import FastMCP
 
-        ctx = _build_ctx(tmp_path)
+        registry = _build_registry(tmp_path)
         server = FastMCP(name="test")
-        registered = discover_and_register(server, ctx)
+        registered = discover_and_register(server, registry)
 
         assert "memory" in registered
 
     def test_all_three_tools_registered(self, tmp_path: Path):
         (tmp_path / "memories").mkdir()
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
         tools = asyncio.run(server.list_tools())
         tool_names = [t.name for t in tools]
@@ -562,11 +577,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "beta-topic", mem_type="learning",
                      body="Beta topic discussion", tags=["beta"])
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="alpha topic")
+        results = _call_tool(server, "memory-search", query="alpha topic")
         assert isinstance(results, list)
         assert len(results) >= 1
         assert results[0]["slug"] == "alpha-topic"
@@ -577,11 +591,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "core-item", mem_type="core", body="shared keyword")
         write_memory(mem_dir, "idea-item", mem_type="idea", body="shared keyword")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="shared keyword", types=["core"])
+        results = _call_tool(server, "memory-search", query="shared keyword", types=["core"])
         assert all(r["type"] == "core" for r in results)
 
     def test_search_tag_filter(self, tmp_path: Path):
@@ -591,11 +604,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "tagged-b", mem_type="learning", body="content",
                      tags=["trivial"])
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="content", tags=["important"])
+        results = _call_tool(server, "memory-search", query="content", tags=["important"])
         slugs = [r["slug"] for r in results]
         assert "tagged-a" in slugs
         assert "tagged-b" not in slugs
@@ -605,11 +617,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "weak", mem_type="learning", body="keyword", strength=1)
         write_memory(mem_dir, "strong", mem_type="learning", body="keyword", strength=10)
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="keyword", minStrength=5)
+        results = _call_tool(server, "memory-search", query="keyword", minStrength=5)
         slugs = [r["slug"] for r in results]
         assert "strong" in slugs
         assert "weak" not in slugs
@@ -620,11 +631,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "agent-mem", mem_type="core", body="shared keyword",
                      agent_id="reviewer")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="shared keyword", agentId="reviewer")
+        results = _call_tool(server, "memory-search", query="shared keyword", agentId="reviewer")
         slugs = [r["slug"] for r in results]
         assert "agent-mem" in slugs
         assert "base-mem" not in slugs
@@ -633,14 +643,13 @@ class TestMemorySearchTool:
         mem_dir = tmp_path / "memories"
         write_memory(mem_dir, "with-body", mem_type="learning", body="detailed body text")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        without = search_fn(query="detailed body", includeContent=False)
+        without = _call_tool(server, "memory-search", query="detailed body", includeContent=False)
         assert "content" not in without[0]
 
-        with_content = search_fn(query="detailed body", includeContent=True)
+        with_content = _call_tool(server, "memory-search", query="detailed body", includeContent=True)
         assert "content" in with_content[0]
         assert "detailed body text" in with_content[0]["content"]
 
@@ -649,11 +658,10 @@ class TestMemorySearchTool:
         for i in range(8):
             write_memory(mem_dir, f"repeat-{i}", mem_type="learning", body="repeat keyword")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="repeat keyword", limit=3)
+        results = _call_tool(server, "memory-search", query="repeat keyword", limit=3)
         assert len(results) <= 3
 
     def test_search_result_schema(self, tmp_path: Path):
@@ -661,11 +669,10 @@ class TestMemorySearchTool:
         write_memory(mem_dir, "schema-check", mem_type="core", body="schema content",
                      tags=["check"], strength=3)
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        search_fn = _get_tool_fn(server, "memory-search")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = search_fn(query="schema content")
+        results = _call_tool(server, "memory-search", query="schema content")
         assert len(results) >= 1
         r = results[0]
         required_keys = {"slug", "title", "description", "type", "strength", "tags", "file", "score"}
@@ -683,11 +690,10 @@ class TestMemoryReadTool:
         mem_dir = tmp_path / "memories"
         write_memory(mem_dir, "readable", mem_type="core", body="Read me!")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(slugs=["readable"])
+        results = _call_tool(server, "memory-read", slugs=["readable"])
         assert len(results) == 1
         assert results[0]["slug"] == "readable"
         assert "Read me!" in results[0]["content"]
@@ -698,31 +704,28 @@ class TestMemoryReadTool:
         path = write_memory(mem_dir, "by-file", mem_type="learning", body="File body")
         rel = str(path.relative_to(tmp_path))
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(files=[rel])
+        results = _call_tool(server, "memory-read", files=[rel])
         assert len(results) == 1
         assert "File body" in results[0]["content"]
 
     def test_read_missing_slug(self, tmp_path: Path):
         (tmp_path / "memories").mkdir()
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(slugs=["nonexistent"])
+        results = _call_tool(server, "memory-read", slugs=["nonexistent"])
         assert len(results) == 1
         assert results[0]["error"] == "not found"
 
     def test_read_missing_file(self, tmp_path: Path):
         (tmp_path / "memories").mkdir()
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(files=["memories/ghost.memory.md"])
+        results = _call_tool(server, "memory-read", files=["memories/ghost.memory.md"])
         assert len(results) == 1
         assert "error" in results[0]
 
@@ -745,11 +748,10 @@ class TestMemoryReadTool:
         """)
         (mem_dir / "compressed-test.memory.crux.md").write_text(content, encoding="utf-8")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(slugs=["compressed-test"])
+        results = _call_tool(server, "memory-read", slugs=["compressed-test"])
         assert len(results) == 1
         assert "⟦CRUX:" not in results[0]["content"]
         assert "leads to" in results[0]["content"]
@@ -759,11 +761,10 @@ class TestMemoryReadTool:
         write_memory(mem_dir, "first", mem_type="core", body="First body")
         write_memory(mem_dir, "second", mem_type="learning", body="Second body")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(slugs=["first", "second"])
+        results = _call_tool(server, "memory-read", slugs=["first", "second"])
         assert len(results) == 2
         slugs_returned = {r["slug"] for r in results}
         assert slugs_returned == {"first", "second"}
@@ -776,11 +777,10 @@ class TestMemoryReadTool:
         orphan = mem_dir / "orphan.txt"
         orphan.write_text("---\ntitle: Orphan\n---\nOrphan body.", encoding="utf-8")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(files=["memories/core/orphan.txt"])
+        results = _call_tool(server, "memory-read", files=["memories/core/orphan.txt"])
         assert len(results) == 1
         assert "Orphan body." in results[0]["content"]
 
@@ -789,11 +789,10 @@ class TestMemoryReadTool:
         write_memory(mem_dir, "fm-check", mem_type="core", strength=5,
                      tags=["tag1", "tag2"], body="Body here")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        read_fn = _get_tool_fn(server, "memory-read")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        results = read_fn(slugs=["fm-check"])
+        results = _call_tool(server, "memory-read", slugs=["fm-check"])
         fm = results[0]["frontmatter"]
         assert fm["type"] == "core"
         assert fm["strength"] == 5
@@ -813,11 +812,10 @@ class TestMemoryStatsTool:
         write_memory(mem_dir, "s-learn", mem_type="learning")
         write_memory(mem_dir, "s-crux", mem_type="idea", compressed=True)
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        stats_fn = _get_tool_fn(server, "memory-stats")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        stats = stats_fn()
+        stats = _call_tool(server, "memory-stats")
         assert stats["totalMemories"] == 3
         assert stats["byType"]["core"] == 1
         assert stats["byType"]["learning"] == 1
@@ -828,11 +826,10 @@ class TestMemoryStatsTool:
 
     def test_stats_empty_corpus(self, tmp_path: Path):
         (tmp_path / "memories").mkdir()
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        stats_fn = _get_tool_fn(server, "memory-stats")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        stats = stats_fn()
+        stats = _call_tool(server, "memory-stats")
         assert stats["totalMemories"] == 0
         assert stats["byType"] == {}
         assert stats["compressedCount"] == 0
@@ -843,11 +840,10 @@ class TestMemoryStatsTool:
         idx_file.parent.mkdir(parents=True, exist_ok=True)
         idx_file.write_text("memories: []\n", encoding="utf-8")
 
-        ctx = _build_ctx(tmp_path)
-        server = _register_tools(ctx)
-        stats_fn = _get_tool_fn(server, "memory-stats")
+        registry = _build_registry(tmp_path)
+        server = _register_tools(registry)
 
-        stats = stats_fn()
+        stats = _call_tool(server, "memory-stats")
         assert stats["indexLastModified"] is not None
         assert "T" in stats["indexLastModified"]
 
@@ -909,14 +905,17 @@ class TestServerIntegration:
 
         from crux_mcp_server.server import create_server
 
-        server, ctx = create_server(
+        server, registry = create_server(
             config_path=config_path,
             project_root=tmp_path,
         )
 
         try:
-            assert len(ctx.memory_index.entries) == 1
-            assert ctx.memory_index.by_slug["int-test"].body.strip() == "Integration test memory"
+            partitions = registry.get_all()
+            assert len(partitions) == 1
+            partition = partitions[0]
+            assert len(partition.memory_index.entries) == 1
+            assert partition.memory_index.by_slug["int-test"].body.strip() == "Integration test memory"
 
             tools = asyncio.run(server.list_tools())
             tool_names = [t.name for t in tools]
@@ -924,24 +923,24 @@ class TestServerIntegration:
             assert "memory-read" in tool_names
             assert "memory-stats" in tool_names
         finally:
-            if ctx.watcher is not None:
-                ctx.watcher.stop()
+            registry.shutdown()
 
     def test_create_server_no_memories_dir(self, tmp_path: Path, monkeypatch):
         config_path = _write_config(tmp_path)
         monkeypatch.chdir(tmp_path)
 
         from crux_mcp_server.server import create_server
-        server, ctx = create_server(
+        server, registry = create_server(
             config_path=config_path,
             project_root=tmp_path,
         )
 
         try:
-            assert len(ctx.memory_index.entries) == 0
+            partitions = registry.get_all()
+            assert len(partitions) == 1
+            assert len(partitions[0].memory_index.entries) == 0
         finally:
-            if ctx.watcher is not None:
-                ctx.watcher.stop()
+            registry.shutdown()
 
 
 # ===================================================================

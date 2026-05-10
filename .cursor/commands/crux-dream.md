@@ -16,6 +16,8 @@ Post-execution memory extraction and REM sleep rebalancing.
 
 When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to handle the memory workflow. The manager orchestrates the six memory skills to perform extraction or rebalancing.
 
+**User input escalation — CRITICAL**: This command uses **Pattern B (work first, then escalate)** — the subagent must analyse artifacts and rank candidates before the user can make decisions. The subagent NEVER calls `AskQuestion` directly. ALL user-facing questions (accepting candidates, applying REM changes, resolving conflicts, archiving) are handled by the **parent agent** (you) using `AskQuestion`. The subagent returns its analysis and any `needs_user_input` sections; you collect answers from the user and resume the subagent with them.
+
 **Foreground execution — CRITICAL**: The subagent MUST run in the **foreground** (`run_in_background: false`). Background subagents only return a truncated summary notification to the parent — the full analysis is lost. Foreground execution blocks the parent until the subagent completes and returns its **complete response**, which the parent then displays verbatim to the user.
 
 **Full output relay — CRITICAL**: The parent agent MUST relay the subagent's complete response to the user **without summarizing, truncating, or paraphrasing**. The subagent's response contains the full spec analysis — artifact examination, candidate ranking, conflict reports, resolved bug detection — and all of this must be visible to the user before any decisions are requested. If the response is long, display it in full; do not condense it.

@@ -16,6 +16,8 @@ Recursive memory-informed exploration of themes, topics, and intent through 3-le
 
 When this command is invoked, spawn a `crux-cursor-memory-manager` subagent in Meditate mode. The manager orchestrates a 3-level recursive exploration by spawning child instances of itself, each querying memories, expanding on discoveries, and writing consolidated insights to markdown files in a shared working directory.
 
+**User input escalation — CRITICAL**: This command uses **Pattern B (work first, then escalate)** — the subagent tree must complete its recursive exploration before the user can decide on next steps. Subagents in the meditation tree NEVER call `AskQuestion` directly. ALL user-facing interactions (selecting expansion directions, saving as spec/report, ending meditation) are handled by the **parent agent** (you) using `AskQuestion` after the subagent tree completes.
+
 **Critical**: All agents coordinate through markdown files in `.ai-ignored/meditations/{yyyymmdd}-{topic-slug}/`, not through in-context return values or JSONL transcript polling. The subagent performs steps 1–6 and writes `consolidation.md` to the working directory. You then read that file and handle steps 7–9 directly with the user.
 
 ### Argument Handling

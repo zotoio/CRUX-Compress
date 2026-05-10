@@ -28,6 +28,36 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 | `crux-platform-architect` | `.cursor/agents/crux-platform-architect.md` | Platform architecture, Cursor/LLM harness design, documentation, and eval strategy |
 | `crux-software-engineer` | `.cursor/agents/crux-software-engineer.md` | Core implementation — Python, shell, MCP server, hooks, skills, and evals |
 
+### User Input Escalation — Subagent Protocol
+
+Subagents NEVER call `AskQuestion` directly. All user-facing prompts must be handled by the **parent agent** (the top-level agent that the user interacts with).
+
+**Two supported patterns** — choose the one that fits the workflow:
+
+#### Pattern A: Pre-collect then spawn
+
+Use when all user choices are known before the subagent starts (e.g. memory type, tags).
+
+1. Parent uses `AskQuestion` to collect all answers
+2. Parent spawns subagent with pre-collected answers in the task prompt
+3. Subagent executes using the provided answers without asking again
+
+#### Pattern B: Work first, then escalate
+
+Use when the subagent must do analysis, search, or computation before it can formulate the right questions (e.g. resolve memory matches before asking which to delete, analyse artifacts before presenting candidates).
+
+1. Parent spawns subagent (foreground recommended for complex workflows)
+2. Subagent does its work (search, analysis, extraction, etc.)
+3. Subagent returns results **plus** a `needs_user_input` section describing the decisions needed
+4. Parent displays the subagent's analysis to the user
+5. Parent uses `AskQuestion` to collect the user's decisions
+6. Parent resumes the subagent with the collected answers
+7. Subagent applies the confirmed decisions
+
+**Mixing patterns is fine.** A command can pre-collect simple choices (Pattern A) while using Pattern B for decisions that depend on subagent analysis. For example, `/crux-remember` pre-collects type and tags, but if the subagent discovers a conflict with an existing memory, it escalates that decision via Pattern B.
+
+Commands that invoke subagents (e.g. `/crux-dream`, `/crux-remember`, `/crux-forget`, `/crux-recall`, `/crux-meditate`) document which pattern applies to each interaction point.
+
 ### Spec Execution — Agent Allocation
 
 When building or executing engineering specs in this repository, **always use the CRUX agents** instead of `generalPurpose`. Assign subtasks based on their nature:
