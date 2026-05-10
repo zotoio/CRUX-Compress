@@ -20,7 +20,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | recall [spec... \| memory... \| query] | `/crux-recall` | Decompress and display memories in chat. Pass spec(s) to show memories from those specs, memory file(s) to view specific ones, or a question about the current chat. If omitted, shows all memories referenced in the current session with rationale for why each was included |
 | forget [memory... \| query] | `/crux-forget` | Remove incorrect or unwanted memories from the corpus. Pass memory ID(s), slug(s), file path(s), or a search query. If omitted, lists all memories for selection |
 | remember ["insight"] [--type \<type\>] | `/crux-remember` | Create an ad-hoc memory outside of spec workflows. Pass insight text and optional type. If omitted, prompts interactively |
-| meditate ["topic"] | `/crux-meditate` | Recursive memory-informed exploration through 3-level agent inception. Derives facets from context, spawns parallel agents that query memories and recurse deeper |
+| meditate ["topic"] | `/crux-meditate` | Recursive memory-informed exploration through 3-level agent inception with 3-way fan-out at each level. Agents coordinate via markdown files in `.ai-ignored/meditations/`, each writing discoveries to a predictable path. Derives facets from context, spawns parallel agents that query memories, derive distinct subfocuses, and recurse deeper |
 | amnesia [on\|off\|status] | `/crux-amnesia` | Toggle a chat-session-only override that suppresses ambient memory usage for normal work while leaving repo config unchanged |
 
 ### Hooks (provided by CRUX, configurable triggers)
@@ -1137,15 +1137,20 @@ Dev evals should be implementable as shell scripts (bats) or Python tests that s
 
 ### Q. Meditate Command
 
-- **User:** Run `/crux-meditate` with no arguments, verify the agent derives 3 facets from current context and spawns 3 parallel Level 1 agents
-- **User:** Run `/crux-meditate "performance optimization"`, verify the agent uses the provided topic to derive facets
+- **User:** Run `/crux-meditate` with no arguments, verify the agent derives 3 facets from current context, creates `.ai-ignored/meditations/{yyyymmdd}-{slug}/`, writes `facets.md`, and spawns 3 parallel Level 1 agents
+- **User:** Run `/crux-meditate "performance optimization"`, verify the agent uses the provided topic to derive facets and the working directory slug reflects the topic
+- **User:** Verify each agent at depth 1 and 2 derives 3 distinct child subfocuses that are narrower than its own subfocus and non-overlapping with siblings
+- **User:** Verify each agent writes its output to the correct file path in the working directory (e.g. `branch-2-depth-3-sub-4.md`)
+- **User:** Verify parent agents poll for child output files via `ls` (not JSONL transcripts) and only aggregate after all child files exist
 - **User:** Verify each level queries relevant memories via the memory index or MCP search
-- **User:** Verify Level 3 agents do not recurse further (terminal depth)
-- **User:** Verify insights consolidate back from Level 3 → Level 2 → Level 1 → Level 0 and are presented coherently
+- **User:** Verify Level 3 agents do not recurse further (terminal depth) and write leaf output files
+- **User:** Verify insights consolidate back from Level 3 → Level 2 → Level 1 → Level 0 via file reads and are presented coherently
+- **User:** Verify `consolidation.md` is written to the working directory with cross-branch synthesis
 - **User:** Verify the interactive continuation menu offers: expansion directions, "Save as draft spec", and "End meditation"
 - **User:** Select "Save as draft spec", verify a draft spec outline is written to `specs/`
 - **User:** Select "End meditation", verify the session concludes cleanly
 - **User:** Run `/crux-meditate @src/file.ts`, verify file-referenced exploration derives facets from the code
+- **Dev:** Verify working directory structure contains expected files: `facets.md`, `branch-{1..3}.md`, `branch-{N}-depth-2-sub-{1..3}.md`, `branch-{N}-depth-3-sub-{1..9}.md`, and `consolidation.md`
 
 ---
 

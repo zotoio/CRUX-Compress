@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: docs-sync-agent
-model: claude-4.6-opus-high-thinking
+model: claude-sonnet-4-6
 description: Documentation synchronization agent. Automatically updates README.md, CONTRIBUTORS.md, and web/compress.md/ when source files change.
 is_background: true
 ---
