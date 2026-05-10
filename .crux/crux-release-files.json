@@ -1391,7 +1391,7 @@
     },
     "2.10.0": {
       "date": "2026-05-10",
-      "commit": "5cc225387f205730c3f1bf6b9123c8d50c90867a",
+      "commit": "3fdf67cde90c0604775fb7d35928fb01efbf916c",
       "files": {
         "CRUX.md": {
           "checksum": "9299dc4f8a158946671a2b3a80a47456861ded4b75103314f70efffd0254f32d",
@@ -1414,8 +1414,8 @@
           "size": 20525
         },
         ".cursor/agents/crux-cursor-memory-manager.md": {
-          "checksum": "5aa76a3fc179049b2540adb2fa28bd7e32289ca8f242034e4c289a74ad390b8e",
-          "size": 34275
+          "checksum": "d6426c714ce0b8ceaeb88ef0c2e3d0abf5126a03f6d1716e9e71f4046568a69d",
+          "size": 37434
         },
         ".cursor/commands/crux-compress.md": {
           "checksum": "82e5fa9360a461a6e5a32a4084aac330c78dd3253d91458309c60fde8a09bea0",
@@ -1426,24 +1426,24 @@
           "size": 2822
         },
         ".cursor/commands/crux-dream.md": {
-          "checksum": "b980735f429cf212dfdffbf4117d08284ce9d5c580ffa961955c061c2199d7ef",
-          "size": 6637
+          "checksum": "5351c1498b5aff3e47d63901848242905a57a5a66db65fb809cbd857835409d0",
+          "size": 7189
         },
         ".cursor/commands/crux-forget.md": {
-          "checksum": "00c9988a9afb6152590df25dd5778460c5c3b6599ee7e42f24a35b9be23a2292",
-          "size": 3072
+          "checksum": "8fc0593e045d4af11526a4bddfddddf544d9916a274c541690107d32f72f5b5d",
+          "size": 3158
         },
         ".cursor/commands/crux-meditate.md": {
-          "checksum": "478123c0b992f8e3731ec05237e3ed567ed0af09ce3b1aff4dae216163a5bdf7",
-          "size": 8368
+          "checksum": "1d456c9f6180e5dd51276edb0f00618e505023be6ea42702173c5d5bac327c2c",
+          "size": 8842
         },
         ".cursor/commands/crux-recall.md": {
-          "checksum": "60ed22d3bbf0b42f311efea8eaef0dc1dffc8711ed0133a4f10ee3985aaa0ea3",
-          "size": 6316
+          "checksum": "e004e50d64d4419771498c427ca17ed2136af94d1665b16f3d2fb7b1a06dfa72",
+          "size": 6817
         },
         ".cursor/commands/crux-remember.md": {
-          "checksum": "8a0f48ffce2f81e4b5d0d9cc7fb1033d6d3c612562cf42e965907f25df3cc85a",
-          "size": 2662
+          "checksum": "e3ff2579e57cd9f864922264fdc889aed2a09a2d62e545a05eab938a69e16531",
+          "size": 3084
         },
         ".cursor/hooks/crux-detect-changes.py": {
           "checksum": "0a3e1d46ba20939c19a69a033a8327ea7e99062bcec0443a8f19fbc009e9ca01",
@@ -1478,12 +1478,12 @@
           "size": 8895
         },
         ".cursor/skills/crux-skill-memory-compress/SKILL.md": {
-          "checksum": "7dd196110de6a7f7e3cb27fa78ac314bb8d5ebd28e5b178ed48af0837aa5ff6b",
-          "size": 10160
+          "checksum": "0494ec00a0cd1f0793b96ab16aba257035b7356628ccef2fa6da5a414d0aba6f",
+          "size": 10418
         },
         ".cursor/skills/crux-skill-memory-extract/SKILL.md": {
-          "checksum": "ed959e75152b2bc21587d023972550a8d76531566ac202d05d485460a74b110a",
-          "size": 21271
+          "checksum": "c0790270c73ae82cc1b944c84d5500630bb3100538071735955d3824641b2f5e",
+          "size": 21743
         },
         ".cursor/skills/crux-skill-memory-index/SKILL.md": {
           "checksum": "9e7e7868fbe074d143380c4dd5d61a59b0256b8e3a1fdf2b0128ac7ccaa7143e",
@@ -1498,16 +1498,16 @@
           "size": 1393
         },
         ".cursor/skills/crux-skill-memory-rebalance/SKILL.md": {
-          "checksum": "4f825152ebb6455e183f77d6083275e2aacf15ad8ef3c703e1a4ea2357d9e8dc",
-          "size": 31214
+          "checksum": "5696e0e0af2282916502496e8c9bbad966220f3a1e075af71ae362d4a1adb0bd",
+          "size": 31428
         },
         ".cursor/skills/crux-skill-memory-reference-tracker/SKILL.md": {
           "checksum": "92d1beb527f196184e4e8d898b790d565026063f8df893db6c5082b8123b6d80",
           "size": 9944
         },
         "AGENTS.md": {
-          "checksum": "2a5be11cef93feea8437fc43ba4c4543583251fe9ab9d80cbcbfd13efacfc6e9",
-          "size": 4524
+          "checksum": "d5e44c9cb8a580acff30a649f202a157adb116de9d177a88b3335525b2744532",
+          "size": 6341
         }
       }
     }
