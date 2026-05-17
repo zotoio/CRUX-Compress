@@ -55,6 +55,9 @@ dist/
 build/
 out/
 
+# Meditation runtime artifacts
+meditations/
+
 # X-Fidelity analysis results
 .xfiResults/
 *.zip

@@ -1,0 +1,41 @@
+schema_version: 1
+subtask_id: "08"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-software-engineer"
+model: "unassigned"
+token_budget: 200000
+state: "pending"
+checklist:
+  - id: "D01"
+    text: "**`evals/test_q_meditate.py`** updated:"
+    done: false
+    evidence_path: null
+  - id: "D02"
+    text: "**`evals/test_p_amnesia.py`** updated:"
+    done: false
+    evidence_path: null
+  - id: "D03"
+    text: "**`evals/sdk/tests/q-meditate.test.ts`** updated:"
+    done: false
+    evidence_path: null
+  - id: "D04"
+    text: "**`evals/conftest.py`** updated:"
+    done: false
+    evidence_path: null
+  - id: "D05"
+    text: "**`evals/USER_EVAL_CHECKLISTS.md`** and **`evals/sdk/README.md`**"
+    done: false
+    evidence_path: null
+  - id: "D06"
+    text: "Run the **specific** test suites locally to confirm green:"
+    done: false
+    evidence_path: null
+  - id: "D07"
+    text: "If any pre-existing test failure is unrelated, capture it as"
+    done: false
+    evidence_path: null
+artifacts: []
+errors: []
+notes: |
+  Pending — execution has not yet started.
+extra: {}

@@ -1,0 +1,57 @@
+schema_version: 1
+subtask_id: "07"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-software-engineer"
+model: "unassigned"
+token_budget: 200000
+state: "pending"
+checklist:
+  - id: "D01"
+    text: "For each section listed in subtask 02's \"memory-manager trim"
+    done: false
+    evidence_path: null
+  - id: "D02"
+    text: "**Phases A–G research** — removed; pointer added."
+    done: false
+    evidence_path: null
+  - id: "D03"
+    text: "**Quick 6-step protocol** — removed; pointer added."
+    done: false
+    evidence_path: null
+  - id: "D04"
+    text: "**Ensemble Aggregation sub-mode** — removed; pointer added."
+    done: false
+    evidence_path: null
+  - id: "D05"
+    text: "**Adversarial Review sub-mode** — removed; pointer added."
+    done: false
+    evidence_path: null
+  - id: "D06"
+    text: "**Meditate-only invocation rows** in the agent's invocation"
+    done: false
+    evidence_path: null
+  - id: "D07"
+    text: "**Meditate-only sections of the `Skills You Use` table** —"
+    done: false
+    evidence_path: null
+  - id: "D08"
+    text: "**Examples and prompts** that are Meditate-only — removed; if"
+    done: false
+    evidence_path: null
+  - id: "D09"
+    text: "**Front-matter, persona prologue, generic `needs_user_input`"
+    done: false
+    evidence_path: null
+  - id: "D10"
+    text: "Verify that the memory-manager file is still a complete,"
+    done: false
+    evidence_path: null
+  - id: "D11"
+    text: "Verify the file no longer contains substrings:"
+    done: false
+    evidence_path: null
+artifacts: []
+errors: []
+notes: |
+  Pending — execution has not yet started.
+extra: {}

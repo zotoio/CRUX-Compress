@@ -20,7 +20,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | recall [spec... \| memory... \| query] | `/crux-recall` | Decompress and display memories in chat. Pass spec(s) to show memories from those specs, memory file(s) to view specific ones, or a question about the current chat. If omitted, shows all memories referenced in the current session with rationale for why each was included |
 | forget [memory... \| query] | `/crux-forget` | Remove incorrect or unwanted memories from the corpus. Pass memory ID(s), slug(s), file path(s), or a search query. If omitted, lists all memories for selection |
 | remember ["insight"] [--type \<type\>] | `/crux-remember` | Create an ad-hoc memory outside of spec workflows. Pass insight text and optional type. If omitted, prompts interactively |
-| meditate ["topic"] | `/crux-meditate` | Recursive memory-informed exploration through 3-level agent inception with 3-way fan-out at each level. Agents coordinate via markdown files in `.ai-ignored/meditations/`, each writing discoveries to a predictable path. Derives facets from context, spawns parallel agents that query memories, derive distinct subfocuses, and recurse deeper |
+| meditate ["topic"] | `/crux-meditate` | Recursive memory-informed exploration through 3-level agent inception with 3-way fan-out at each level. Agents coordinate via markdown files in `meditations/`, each writing discoveries to a predictable path. Derives facets from context, spawns parallel agents that query memories, derive distinct subfocuses, and recurse deeper |
 | amnesia [on\|off\|status] | `/crux-amnesia` | Toggle a chat-session-only override that suppresses ambient memory usage for normal work while leaving repo config unchanged |
 
 ### Hooks (provided by CRUX, configurable triggers)
@@ -1137,7 +1137,7 @@ Dev evals should be implementable as shell scripts (bats) or Python tests that s
 
 ### Q. Meditate Command
 
-- **User:** Run `/crux-meditate` with no arguments, verify the agent derives 3 facets from current context, creates `.ai-ignored/meditations/{yyyymmdd}-{slug}/`, writes `facets.md`, and spawns 3 parallel Level 1 agents
+- **User:** Run `/crux-meditate` with no arguments, verify the agent derives 3 facets from current context, creates `meditations/{yyyymmdd}-{slug}/`, writes `facets.md`, and spawns 3 parallel Level 1 agents
 - **User:** Run `/crux-meditate "performance optimization"`, verify the agent uses the provided topic to derive facets and the working directory slug reflects the topic
 - **User:** Verify each agent at depth 1 and 2 derives 3 distinct child subfocuses that are narrower than its own subfocus and non-overlapping with siblings
 - **User:** Verify each agent writes its output to the correct file path in the working directory (e.g. `branch-2-depth-3-sub-4.md`)

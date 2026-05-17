@@ -1,0 +1,78 @@
+# =============================================================================
+# Zoto Spec System — .zoto/spec-system/config.yml
+# =============================================================================
+# Every key below is **commented out**. The values shown are the internal
+# defaults that the plugin will apply when a key is absent. Uncomment any
+# line(s) to override.
+#
+# Schema: plugins/zoto-spec-system/templates/schema/config.schema.json
+# Docs:   plugins/zoto-spec-system/docs/config-schema.md
+# =============================================================================
+
+
+# ─────────────────────────────────  core  ────────────────────────────────────
+# Term used for work items in user-facing prompts (e.g. spec, prp, task).
+# unitOfWork: spec
+
+# Directory where spec folders are created (relative to repo root).
+# specsDir: specs
+
+# Directory monitored by hooks for unprocessed items (relative to repo root).
+# workDir: specs/current
+
+
+# ─────────────────────────────────  spec  ────────────────────────────────────
+# spec:
+#   maxSubtasks: 99
+#   parallelLimit: 4
+#   adversarialVerification: true
+
+
+# ──────────────────────────────  subagents  ──────────────────────────────────
+# Per-role token budgets and optional model overrides. Roles inherit from
+# `default` when their tokenBudget / model is omitted.
+# subagents:
+#   default:
+#     tokenBudget: 200000
+#     # model: gpt-5.2
+#   generator:
+#     tokenBudget: 250000
+#     # model: claude-opus-4-7-thinking-xhigh
+#   executor:
+#     tokenBudget: 180000
+#     # model: gpt-5.2-codex-high-fast
+#   judge:
+#     tokenBudget: 300000
+#     # model: gpt-5.2-codex-high-fast
+#   subtask:
+#     tokenBudget: 150000
+#     # model: gpt-5.2
+
+
+# ──────────────────────────────  aggregator  ─────────────────────────────────
+# Background status aggregator that rolls per-subtask .status.yml files into
+# spec-level status.md / status.yml outputs.
+# aggregator:
+#   enabled: true
+#   pollIntervalMs: 1500       # min 250, max 60000
+#   debounceMs: 250            # min 50,  max 5000
+#   outputs:
+#     specStatusMd: status.md
+#     specStatusYml: status.yml
+
+
+# ────────────────────────────────  hooks  ────────────────────────────────────
+# Session-start nudge that fires when workDir contains many unprocessed items.
+# hooks:
+#   sessionStartNudge:
+#     enabled: true
+#     threshold: 20
+#     message: "You have ${count} unprocessed ${unitOfWork}s. Consider running /z-spec-create to organize."
+
+
+# ─────────────────────────────  extensions  ──────────────────────────────────
+# Optional integrations layered on the core workflow.
+# extensions:
+#   memory:
+#     enabled: false
+#     plugin: null

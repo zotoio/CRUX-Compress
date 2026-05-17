@@ -1,0 +1,45 @@
+schema_version: 1
+subtask_id: "02"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-platform-architect"
+model: "unassigned"
+token_budget: 200000
+state: "pending"
+checklist:
+  - id: "D01"
+    text: "Create `meditate-decomp-architecture-design-20260517.md` inside this"
+    done: false
+    evidence_path: null
+  - id: "D02"
+    text: "**Final agent specification**: `crux-cursor-meditation-guide`"
+    done: false
+    evidence_path: null
+  - id: "D03"
+    text: "**Final skill list** with one row per skill:"
+    done: false
+    evidence_path: null
+  - id: "D04"
+    text: "**Section-mapping table**: one row per contract item from"
+    done: false
+    evidence_path: null
+  - id: "D05"
+    text: "**Coordinator command shape**: outline what stays in"
+    done: false
+    evidence_path: null
+  - id: "D06"
+    text: "**Memory-manager trim plan**: list every section / heading to"
+    done: false
+    evidence_path: null
+  - id: "D07"
+    text: "**Backwards-compat plan**: what happens during the brief"
+    done: false
+    evidence_path: null
+  - id: "D08"
+    text: "**Risks & open questions**: list any contract items where the"
+    done: false
+    evidence_path: null
+artifacts: []
+errors: []
+notes: |
+  Pending — execution has not yet started.
+extra: {}
