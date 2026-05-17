@@ -5,6 +5,16 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.10.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.2) - 2026-05-17
+
+- chore: update release manifests for v2.10.2 [skip ci] (473802a)
+- chore: refresh CRUX release metadata (0af49af)
+- test: refresh CRUX compression validation artifacts (dde86c0)
+- fix: guard memory watcher shutdown (4eee3dd)
+- feat: enhance meditate research coordination (3393387)
+- docs: add meditate overhaul and decomposition specs (338fc70)
+- docs: update CHANGELOG.md for v2.10.1 [skip ci] (d48d4e7)
+
 ## [v2.10.1](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.1) - 2026-05-10
 
 - chore: update release manifests for v2.10.1 [skip ci] (84dc6ff)
