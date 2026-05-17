@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import json
+import sys
 import textwrap
 from datetime import date
 from pathlib import Path
 
 import pytest
 import yaml
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_MCP_PKG_DIR = _PROJECT_ROOT / "crux_mcp_server"
+if str(_MCP_PKG_DIR) not in sys.path:
+    sys.path.insert(0, str(_MCP_PKG_DIR))
 
 MEMORY_TYPES = ["core", "redflag", "goal", "learning", "idea", "archived"]
 

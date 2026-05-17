@@ -103,7 +103,7 @@ class TestMeditateFacetStructure:
 
 
 class TestMeditateRecursiveDepth:
-    """Meditate uses 3-level recursive exploration with depth tracking."""
+    """Meditate uses configurable recursive depth (1-3 levels, default 3) with depth tracking."""
 
     def _read_cmd(self) -> str:
         cmd_file = (
@@ -123,11 +123,25 @@ class TestMeditateRecursiveDepth:
 
     def test_level_3_is_terminal(self):
         content = self._read_cmd()
-        assert "level 3" in content.lower() or "deepest" in content.lower()
+        low = content.lower()
+        assert "depth-3" in low or "depth 3" in low or "level 3" in low or "deepest" in low
 
     def test_recursive_structure(self):
         content = self._read_cmd()
         assert "recursive" in content.lower()
+
+    def test_depth_is_configurable(self):
+        content = self._read_cmd()
+        low = content.lower()
+        assert "maxdepth" in low or "depth selection" in low
+
+    def test_depth_selection_question_exists(self):
+        content = self._read_cmd()
+        assert "Q-Depth-Selection" in content
+
+    def test_depth_defaults_to_three(self):
+        content = self._read_cmd()
+        assert "default" in content.lower() and "3" in content
 
 
 class TestMeditateMemoryQuerying:

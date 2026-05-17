@@ -680,7 +680,7 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-remember "insight"` | Create a memory from provided text |
 | `/crux-remember "insight" --type learning` | Create with a specific type |
 | `/crux-meditate` | Recursive memory-informed exploration of current context via file-based agent coordination |
-| `/crux-meditate "topic"` | Explore a specific theme — 3-level deep, 3-way fan-out at each level, outputs to `.ai-ignored/meditations/` |
+| `/crux-meditate "topic"` | Explore a specific theme — 3-level deep, 3-way fan-out at each level, outputs to `meditations/` |
 | `/crux-amnesia` | Toggle session-only amnesia mode for ambient memory usage |
 | `/crux-amnesia on\|off\|status` | Disable, restore, or inspect session memory mode without changing repo config |
 

@@ -77,6 +77,15 @@
       "summaryPattern": "dream-{slug}-{yyyymmdd}.md"
     },
 
+    "meditate": {
+      "modelPool": [
+        { "slug": "gpt-5.5-medium", "label": "GPT 5.5" },
+        { "slug": "claude-opus-4-7-thinking-xhigh", "label": "Opus 4.7" },
+        { "slug": "gemini-3.1-pro", "label": "Gemini Pro 3.1" }
+      ],
+      "ensembleAggregatorModel": null
+    },
+
     "typePriority": ["core", "redflag", "goal", "learning", "idea", "archived"],
 
     "typeTransitions": {
