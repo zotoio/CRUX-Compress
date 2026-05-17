@@ -1,0 +1,33 @@
+schema_version: 1
+subtask_id: "10"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-cursor-rule-manager"
+model: "unassigned"
+token_budget: 200000
+state: "pending"
+checklist:
+  - id: "D01"
+    text: "List every source file modified by subtasks 06, 07, 09 and"
+    done: false
+    evidence_path: null
+  - id: "D02"
+    text: "For each candidate, decide regenerate vs. skip:"
+    done: false
+    evidence_path: null
+  - id: "D03"
+    text: "For each \"regenerate\" item, run the `crux-cursor-rule-manager`"
+    done: false
+    evidence_path: null
+  - id: "D04"
+    text: "Run the project's CRUX validator if one exists (e.g. a script"
+    done: false
+    evidence_path: null
+  - id: "D05"
+    text: "Confirm that no source file was hand-edited as a side effect."
+    done: false
+    evidence_path: null
+artifacts: []
+errors: []
+notes: |
+  Pending — execution has not yet started.
+extra: {}
