@@ -62,6 +62,7 @@ class MemoryWatcher:
         self._config = config
         self._on_change = on_change
         self._observer: Observer | None = None
+        self._started = False
 
     def start(self) -> None:
         root = self._config.project_root
@@ -86,10 +87,12 @@ class MemoryWatcher:
 
         self._observer.daemon = True
         self._observer.start()
+        self._started = True
         logger.info("File watcher started")
 
     def stop(self) -> None:
         if self._observer is not None:
             self._observer.stop()
-            self._observer.join(timeout=5)
+            if self._started:
+                self._observer.join(timeout=5)
             logger.info("File watcher stopped")
