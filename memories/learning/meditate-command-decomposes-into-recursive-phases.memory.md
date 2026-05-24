@@ -3,9 +3,9 @@ id: "0a157b3"
 title: "Meditate command decomposes into recursive phases"
 description: "The /crux-meditate command implements a recursive exploration pattern: initial recall → gap analysis → targeted research → synthesis → optional memory creation. Each phase feeds the next, enabling deep understanding of topics the memory corpus only partially covers."
 type: "learning"
-strength: 1
+strength: 2
 created: 2026-04-27
-modified: 2026-04-27
+modified: 2026-05-24
 source: "spec:20260425-crux-meditate"
 tags: [meditate, workflow, phases, recursion, exploration, design-pattern]
 ---
