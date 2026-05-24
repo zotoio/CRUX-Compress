@@ -41,9 +41,7 @@ The model strategy is an orthogonal axis that controls how `cruxMemories.meditat
 | **Model per branch** | `--model-per-branch` | 1, each top-level facet branch is assigned a distinct model from the pool (sampling without replacement when `poolSize ≥ branchCount`, otherwise round-robin); all descendants in that branch inherit the assigned model | same as baseline | no |
 | **Ensemble (max)** | `--ensemble` | N parallel trees (one per pool entry), then 1 aggregator | `~N × baseline + 1` | yes (`cross-model-synthesis.md` + ensemble report pair) |
 
-**Common ground**: every model strategy shares every user-facing safeguard — cost ack with richness selection, theme preflight, combined facet/sections/visualisations/focus-areas confirmation, the post-consolidation `Q-Finalisation-Enhancements` gate, the Branch & Leaf Index update in `facets.md`, and the mandatory adversarial review-and-fix cycle (see the dedicated sections below; mandatory report generation is fully documented by subtask 05). Random and Model-per-branch produce single-tree artifacts (no `model-{slug}/` subdirs, no `cross-model-synthesis.md`, no `ensemble-report-*` pair) — they only change which model executes which agent in the standard single-tree flow. Ensemble Max is the only strategy that runs the full Ensemble Protocol with parallel trees and cross-model aggregation.
-
-**Strategy selection at gate time**: the cost-and-richness acknowledgment gate offers in-place swaps between strategies whenever `cruxMemories.meditate.modelPool` has ≥1 entry (Random) or ≥2 entries (Per-Branch, Ensemble Max). See **Sub-Q2** of `Q-Cost-and-Richness-Acknowledgment` below.
+**Common ground & strategy selection**: every model strategy shares every user-facing safeguard (cost ack with richness selection, theme preflight, combined facet/sections/visualisations/focus-areas confirmation, post-consolidation `Q-Finalisation-Enhancements` gate, Branch & Leaf Index update, mandatory adversarial review-and-fix cycle, mandatory paired HTML+PDF report). Random and Model-per-branch produce single-tree artifacts (no `model-{slug}/` subdirs, no `cross-model-synthesis.md`, no `ensemble-report-*` pair) and only change which model executes which agent; Ensemble Max is the only strategy that runs the Ensemble Protocol with parallel trees and cross-model aggregation. The cost-and-richness gate offers in-place swaps whenever `cruxMemories.meditate.modelPool` has ≥1 entry (Random) or ≥2 entries (Per-Branch, Ensemble Max) — see **Sub-Q2** of `Q-Cost-and-Richness-Acknowledgment` below.
 
 ## Instructions
 
@@ -69,11 +67,7 @@ Model strategy (the four flags are mutually exclusive — abort with `"--random-
 - If `--ensemble` is present → set `modelStrategy.mode: "ensemble_max"` (also referred to as `ensembleMode: true` for backwards compatibility with the existing Ensemble Protocol section). Read `cruxMemories.meditate.modelPool`. If the pool is empty or has fewer than 2 entries, abort with a clear error pointing the user at the config. `--ensemble` can combine with `--quick` (ensemble of Quick-mode trees) or run with default Research mode. **Strip the flag** before deriving the topic-slug.
 - If none of the model-strategy flags are present → set `modelStrategy.mode: "none"` (the caller's own model runs the whole tree).
 
-**Per-branch assignment policy** (`modelStrategy.mode == "per_branch"`): once the final confirmed-branch count `B` is known (after step 4b reconciles any `additional_facet` opt-ins), assign models as follows. Let `P = poolSize`.
-- If `P ≥ B` → shuffle the pool and take the first `B` entries; each branch gets a distinct model.
-- If `P < B` → cycle/round-robin through the pool in shuffled order (`branch_i.model = shuffled_pool[i mod P]`); some branches will share a model. Log a one-line note in the depth-0 manager output: `"per_branch model strategy: poolSize=P < branchCount=B; rounded-robin assignments may repeat"`.
-
-In all cases, record the resolved `branch_assignments` (one entry per confirmed branch, with `branch_index`, `slug`, `label`) into `modelStrategy.branch_assignments` before spawning depth-1 children, and surface them in `facets.md` per the `crux-skill-memory-meditation-coordination` skill.
+**Per-branch assignment policy** (`modelStrategy.mode == "per_branch"`): the depth-0 manager resolves `modelStrategy.branch_assignments[]` in step 4b — after facet confirmation and any cost-ack re-presentation — using a deterministic shuffle of `cruxMemories.meditate.modelPool`. When `poolSize ≥ branchCount`, sample without replacement (each branch gets a distinct model); otherwise round-robin (some branches share a model) and set `assignment_policy_note` accordingly. The verbatim resolution algorithm (seed derivation, branch-count computation including `additional_facet` opt-ins, round-robin warning string) lives in step 4b of the `crux-skill-memory-meditation-research` and `crux-skill-memory-meditation-quick` skills; the resolved assignments are surfaced in `facets.md` per the `crux-skill-memory-meditation-coordination` skill.
 
 Propagate the resolved `meditateMode` and `modelStrategy` into the depth-0 subagent's task prompt; the subagent in turn forwards both unchanged to every child it spawns (with `modelStrategy.resolved_model_slug` or `modelStrategy.branch_assignments[branch_index]` used to drive per-spawn `model:` selection — see the **Model Strategy Payload** section below). When `modelStrategy.mode == "ensemble_max"`, propagate `meditateMode` to each model-specific depth-0 subagent and the per-tree `modelStrategy` is effectively `mode: "random"` pinned to that tree's model (handled internally by the Ensemble Protocol).
 
@@ -208,22 +202,17 @@ When `modelStrategy.mode == "ensemble_max"` (`ensembleMode: true`), replace the 
     ensemble aggregation produces a separate cross-model synthesis report. All trees
     share the same user-confirmed facets for apples-to-apples comparison.
 
-When `modelStrategy.mode == "random"`, append this short notice to the preamble (before Sub-Q1):
+When `modelStrategy.mode == "random"`, append before Sub-Q1:
 
-    Model strategy: random — this meditation will run as a single tree, with the entire
-    tree (depth-0 manager and all descendants) running on a randomly-selected model from
-    the configured pool. Picked: {resolved_model_label}. Agent count is unchanged from
-    the single-model baseline shown above.
+    Model strategy: random — single tree, entire tree runs on a randomly-selected
+    pool model. Picked: {resolved_model_label}. Agent count unchanged from baseline.
 
-When `modelStrategy.mode == "per_branch"`, append this short notice to the preamble (before Sub-Q1):
+When `modelStrategy.mode == "per_branch"`, append before Sub-Q1:
 
-    Model strategy: model-per-branch — this meditation will run as a single tree. The
-    depth-0 manager runs on the caller's model; each of the {branchCount} top-level
-    facet branches will be assigned a distinct model from the configured pool (sampling
-    without replacement when poolSize >= branchCount, otherwise round-robin), and all
-    descendants in that branch will inherit the assigned model. Per-branch assignment
-    happens after facet confirmation. Agent count is unchanged from the single-model
-    baseline shown above; the report will include per-branch model attribution.
+    Model strategy: model-per-branch — single tree. Depth-0 manager runs on caller's
+    model; each of {branchCount} top-level branches assigned a distinct pool model
+    (sampling without replacement when poolSize >= branchCount, otherwise round-robin);
+    descendants inherit. Agent count unchanged; report includes per-branch attribution.
 
 **Sub-Q1 — Richness level** (single-select, **preselected = the level literally named `default`**):
 
@@ -257,13 +246,7 @@ Cancel:
 
 Substitute all `{...Count}` placeholders with the accurate agent counts from the depth table for the user's selected `maxDepth`.
 
-**Mode-swap preserves richness**: the Sub-Q1 richness selection is preserved across any mode-swap or model-strategy-swap decision. The prompt prose already displays all 4 richness rows for the current mode; a swap recomputes the agent count but does not reset richness.
-
-**Model-strategy-swap semantics**:
-- `switch_to_random_model` → set `modelStrategy.mode = "random"`, immediately pick a model uniformly at random from `cruxMemories.meditate.modelPool`, record as `resolved_model_slug` / `resolved_model_label`, and continue to Theme Preflight. Do not re-prompt.
-- `switch_to_model_per_branch` → set `modelStrategy.mode = "per_branch"`. Per-branch assignment happens after facet confirmation (see step 4b). Continue to Theme Preflight.
-- `switch_to_ensemble` → set `modelStrategy.mode = "ensemble_max"` (equivalent to setting `ensembleMode: true`) and continue with the Ensemble Protocol below.
-- `switch_to_single` → set `modelStrategy.mode = "none"` and continue with the standard single-tree flow on the caller's model.
+**Mode-swap preserves richness**: the Sub-Q1 richness selection is preserved across any mode-swap or model-strategy-swap decision. The prompt prose already displays all 4 richness rows for the current mode; a swap recomputes the agent count but does not reset richness. Model-strategy-swap semantics: `switch_to_random_model` immediately picks `resolved_model_slug` uniformly at random from the pool; `switch_to_model_per_branch` defers `branch_assignments` resolution to step 4b; `switch_to_ensemble` enters the Ensemble Protocol below; `switch_to_single` resets to the caller's model. All swaps continue to Theme Preflight without re-prompting.
 
 #### Behaviour rules
 
@@ -453,44 +436,24 @@ The calling agent serialises the resolved model strategy into a `modelStrategy:`
 ```yaml
 modelStrategy:
   mode: "none" | "random" | "per_branch" | "ensemble_max"
-  pool:                                  # full modelPool, in case branches need to pick lazily
-    - slug: "gpt-5.5-medium"
-      label: "GPT 5.5"
-    - slug: "claude-opus-4-7-thinking-xhigh"
-      label: "Opus 4.7"
-    - slug: "gemini-3.1-pro"
-      label: "Gemini Pro 3.1"
-  resolved_model_slug: null              # set for mode: "random" — the picked model
-  resolved_model_label: null
-  branch_assignments: []                 # set for mode: "per_branch" after facet confirmation (step 4b)
-    # - branch_index: 1
-    #   slug: "gpt-5.5-medium"
-    #   label: "GPT 5.5"
-    # - branch_index: 2
-    #   slug: "claude-opus-4-7-thinking-xhigh"
-    #   label: "Opus 4.7"
-    # - branch_index: 3
-    #   slug: "gemini-3.1-pro"
-    #   label: "Gemini Pro 3.1"
+  pool: [{slug, label}, ...]            # full modelPool from .crux/crux-memories.json
+  resolved_model_slug: null | "<slug>"   # set for mode: "random"
+  resolved_model_label: null | "<label>"
+  branch_assignments: []                 # set for mode: "per_branch" in step 4b
+    # - { branch_index: N, slug: "<slug>", label: "<label>" }
   assignment_policy_note: null           # set when mode == "per_branch" and poolSize < branchCount
-                                         # e.g. "per_branch model strategy: poolSize=2 < branchCount=3; rounded-robin assignments may repeat"
 ```
 
-**Per-spawn `model:` selection rules** (the depth-0 subagent and every child use these rules when invoking the Task tool to spawn a sub-agent):
+**Per-spawn `model:` selection rules** (four-case table — verbatim implementation lives in the `crux-cursor-meditation-guide` agent's step 5 / 7 / 10 and the research/quick skills):
 
-- `mode: "none"` → omit `model:` from every Task invocation (use the caller's model)
-- `mode: "random"` → pass `model: modelStrategy.resolved_model_slug` on every Task invocation in the entire tree (including child agents, peer reviewers, and the adversarial reviewer)
-- `mode: "per_branch"` → at the depth-0 → depth-1 spawn, the depth-0 manager looks up `modelStrategy.branch_assignments[branch_index].slug` for that branch's depth-1 spawn and passes it as `model:`. The depth-1 agent records that slug as its own `ensembleModel` (in the legacy field name) and propagates it to every descendant in its subtree. **Peer reviewers and the adversarial reviewer run on the caller's model (no `model:` parameter)** so they see all branches fairly with a unified evaluator.
-- `mode: "ensemble_max"` → handled by the Ensemble Protocol below: each per-tree depth-0 manager receives its own pinned model, propagates it to all its descendants, and the cross-model aggregator either uses `cruxMemories.meditate.ensembleAggregatorModel` or the caller's model.
+- `mode: "none"` → omit `model:` from every Task invocation (use the caller's model).
+- `mode: "random"` → pass `model: modelStrategy.resolved_model_slug` on every Task invocation in the entire tree (children, peer reviewers, adversarial reviewer).
+- `mode: "per_branch"` → at the depth-0 → depth-1 spawn, look up `modelStrategy.branch_assignments[branch_index].slug` and pass as `model:`; that depth-1 agent records the slug as its own `ensembleModel` and propagates to descendants. **Peer reviewers and the adversarial reviewer run on the caller's model** (no `model:` parameter) so the cross-branch evaluator stays unified.
+- `mode: "ensemble_max"` → handled by the Ensemble Protocol below; each per-tree depth-0 manager receives an internally-pinned model and the cross-model aggregator uses `cruxMemories.meditate.ensembleAggregatorModel` (or the caller's model when unset).
 
-**Legacy `ensembleModel` field**: the existing `ensembleModel` field used throughout the meditation skills (Research step 5, Quick step 3, agent docs) remains the carrier inside each subtree spawn — it is derived from `modelStrategy` at the depth-0 manager (and the per-branch dispatch point for `per_branch` mode). The skills MUST keep reading `ensembleModel` for spawn-time `model:` selection; new behaviour is gated by the depth-0 manager populating `ensembleModel` correctly per the rules above.
+**Legacy `ensembleModel` field**: the existing `ensembleModel` field carried in child spawn prompts remains the spawn-time `model:` carrier inside each subtree; it is **derived** from `modelStrategy` at the depth-0 manager (and at the depth-0 → depth-1 dispatch point for `per_branch`). The skills continue to consume `ensembleModel` unchanged.
 
-**Branch assignment resolution** (`mode: "per_branch"`): the depth-0 manager performs assignment in step 4b — after facet confirmation, after `additional_focus_areas[]` reconciliation, and AFTER the cost-ack re-presentation gate resolves (if it fires). The depth-0 manager:
-1. Computes `B = len(confirmed_facets) + len(additional_facet_opt_ins)` (the final branch count)
-2. Computes `P = len(modelStrategy.pool)`
-3. If `P ≥ B`: deterministically shuffles the pool (seed derived from `topic_slug + ts` for reproducibility within a run) and takes the first `B` entries
-4. If `P < B`: shuffles the pool the same way and assigns `branch_i.model = shuffled_pool[i mod P]` (round-robin); sets `assignment_policy_note` to the round-robin warning string
-5. Writes the resolved `branch_assignments` into the in-memory `modelStrategy:` payload AND surfaces them in `facets.md` Branch & Leaf Index per the `crux-skill-memory-meditation-coordination` skill
+The verbatim branch-assignment resolution algorithm (deterministic shuffle, seed derivation, round-robin warning string) lives in step 4b of the `crux-skill-memory-meditation-research` and `crux-skill-memory-meditation-quick` skills.
 
 ### Facet Confirmation — MANDATORY at depth 0, opt-in deeper
 
@@ -862,12 +825,7 @@ The depth-0 Quick mode workflow (steps 1–8: feature guard, create working dire
 
 #### Single-tree model strategies (`--random-model` and `--model-per-branch`)
 
-When `modelStrategy.mode ∈ {"random", "per_branch"}`, the meditation runs as a **single tree** with the standard Research- or Quick-mode workflow described above (steps 1–13). Nothing about the workflow shape changes — there is one working directory, one `consolidation.md`, one `facets.md`, one paired HTML+PDF report, no `cross-model-synthesis.md`, and no `model-{slug}/` subdirectories. The model strategy only changes which model executes which agent:
-
-- **`random`**: the depth-0 manager and every descendant (depth-1, depth-2, depth-3, peer reviewers, adversarial reviewer) all run on `modelStrategy.resolved_model_slug`. Functionally equivalent to a single-tree run except the caller's model is replaced by the randomly-picked pool entry. `facets.md` frontmatter and the report footer record the picked model.
-- **`per_branch`**: the depth-0 manager runs on the caller's model. After facet confirmation in step 4b, the depth-0 manager resolves `modelStrategy.branch_assignments` per the **Per-branch assignment policy** in the Argument Handling section, then at step 5 spawns each depth-1 branch with `model: branch_assignments[branch_index].slug`. That depth-1 agent treats the assigned slug as its own `ensembleModel` and propagates it to every descendant in its subtree (depth-2, depth-3). **Peer reviewers and the adversarial reviewer run on the caller's model** (no `model:` parameter) so the cross-branch evaluator sees all branches fairly. `facets.md` Branch & Leaf Index records the per-branch model; the report per-facet sections carry `[branch model: {label}]` attribution.
-
-Both single-tree strategies use the existing single-tree `finalisation-enhancements.yml` write path (no layered cadence, no cross-model reflection) and produce a single `report-{topic-slug}-{ts}.html` / `.pdf` pair via the standard mandatory report contract.
+When `modelStrategy.mode ∈ {"random", "per_branch"}`, the meditation runs as a **single tree** with the standard Research- or Quick-mode workflow above — one working directory, one `consolidation.md` / `facets.md` / report pair, no `cross-model-synthesis.md`, no `model-{slug}/` subdirectories, single-tree `finalisation-enhancements.yml` cadence. The model strategy only changes which model executes which agent — see the **Per-spawn `model:` selection rules** in the Model Strategy payload section above. `facets.md` frontmatter, the Branch & Leaf Index, and the report footer record the resolved strategy per the `crux-skill-memory-meditation-coordination` and `crux-skill-memory-meditation-report` skills; `--model-per-branch` additionally renders `[branch model: {label}]` attribution in per-facet report sections.
 
 #### Ensemble Max mode (`--ensemble`, `modelStrategy.mode == "ensemble_max"`)
 
