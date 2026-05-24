@@ -6,6 +6,7 @@ type: "learning"
 strength: 2
 created: 2026-04-27
 modified: 2026-05-24
+
 source: "spec:20260425-crux-meditate"
 tags: [meditate, workflow, phases, recursion, exploration, design-pattern]
 ---
@@ -33,7 +34,7 @@ Each phase is a separate cognitive operation with its own success criteria. Trea
 
 ## Concrete shape in the meditate workflow
 
-The `crux-cursor-memory-manager` Meditate Mode embeds this pipeline at every depth:
+The `crux-cursor-meditation-guide` agent (via the `crux-skill-memory-meditation-research` skill) embeds this pipeline at every depth:
 
 | Depth | Phases performed | Output to parent |
 |-------|-----------------|------------------|
@@ -55,4 +56,4 @@ The pattern is portable: when a command must combine prior knowledge with fresh 
 
 ## Source
 
-`spec-crux-meditate-20260425.md` and the `crux-cursor-memory-manager` Meditate Mode workflow. The phase pipeline is implicit in the agent definition's recursive exploration protocol (query → expand → craft queries → recurse → aggregate), where each step corresponds to one phase of the decomposition.
+`spec-crux-meditate-20260425.md` and the `crux-cursor-meditation-guide` agent (decomposed from `crux-cursor-memory-manager` by the 20260517-meditate-agent-skill-decomposition spec). The phase pipeline is owned by the `crux-skill-memory-meditation-research` skill's recursive exploration protocol (query → expand → craft queries → recurse → aggregate), where each step corresponds to one phase of the decomposition.
