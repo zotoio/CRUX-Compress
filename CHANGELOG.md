@@ -5,6 +5,15 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.10.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.4) - 2026-05-24
+
+- chore: update release manifests for v2.10.4 [skip ci] (6a9d10c)
+- chore(release): update crux-release-files.json for version 2.10.3 (57d88c9)
+- fix(meditate): trim command file under 1100-line soft cap (5288b6f)
+- feat(meditate): add random-model and model-per-branch strategies (b9b2a42)
+- chore: update .gitignore to include Yarn install state file (dcf5c8a)
+- docs: update CHANGELOG.md for v2.10.3 [skip ci] (8d9231c)
+
 ## [v2.10.3](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.3) - 2026-05-24
 
 - chore: update release manifests for v2.10.3 [skip ci] (64457a8)
