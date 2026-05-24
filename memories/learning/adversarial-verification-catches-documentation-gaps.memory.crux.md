@@ -3,9 +3,9 @@ id: "6c16dc6"
 title: "Adversarial verification catches real documentation gaps that slip through initial implementation"
 description: "Across two plans, adversarial verification caught 6 issues in 24 subtasks (25% hit rate). Independent verification by a separate agent consistently finds documentation gaps, stale references, and backward-compatibility oversights that implementing agents miss."
 type: "learning"
-strength: 2
+strength: 3
 created: 2026-04-05
-modified: 2026-04-05
+modified: 2026-05-24
 source: "20260403-crux-memories"
 tags: [verification, adversarial, documentation, quality, multi-plan]
 compressed: true

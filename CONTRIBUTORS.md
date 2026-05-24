@@ -71,6 +71,7 @@ evals/                              # All tests (pytest)
 ├── test_l_mcp_server.py            # MCP server tools
 ├── test_m_config_validation.py     # Config validation
 ├── test_n_plugin_registry.py       # Plugin registry validation
+├── test_q_meditate.py              # Meditate command eval
 ├── test_create_zip.py              # Distribution zip creation
 ├── test_crux_utils.py              # CRUX utility script
 ├── test_detect_hook.py             # File change detection hook
@@ -78,6 +79,9 @@ evals/                              # All tests (pytest)
 ├── test_test_runner.py             # Test runner script
 ├── requirements.txt                # pytest, pyyaml
 └── USER_EVAL_CHECKLISTS.md         # Manual eval checklists
+
+evals/sdk/tests/                    # TypeScript SDK eval tests
+└── q-meditate.test.ts              # Meditate SDK eval
 
 tests/fixtures/                     # Shared test fixture files
 ```
@@ -103,6 +107,8 @@ tests/fixtures/                     # Shared test fixture files
 | `test_l_mcp_server.py` | MCP server | MCP server tool validation |
 | `test_m_config_validation.py` | Config validation | Memory configuration validation |
 | `test_n_plugin_registry.py` | Plugin registry | Schema validation, `enabledByDefault` semantics |
+| `test_q_meditate.py` | Meditate command | Meditation guide agent, skill delegation, mode gates |
+| `evals/sdk/tests/q-meditate.test.ts` | Meditate SDK | TypeScript SDK eval for meditate command |
 
 ### Running Tests
 
@@ -259,6 +265,7 @@ Version bumps only occur when these files change. The file list is read from `.c
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Rule manager agent definition |
 | `.cursor/agents/crux-cursor-memory-manager.md` | Memory manager agent definition |
+| `.cursor/agents/crux-cursor-meditation-guide.md` | Meditation guide agent definition |
 | `.cursor/commands/crux-compress.md` | Compression command |
 | `.cursor/commands/crux-dream.md` | Dream extraction command |
 | `.cursor/commands/crux-recall.md` | Memory query command |
@@ -281,12 +288,19 @@ Memory tooling (agent, commands, skills, rule) is included in the distribution z
 | Path | Distributed? | Purpose |
 |------|:---:|---------|
 | `.cursor/agents/crux-cursor-memory-manager.md` | Yes | Memory lifecycle agent definition |
+| `.cursor/agents/crux-cursor-meditation-guide.md` | Yes | Meditation guide agent definition |
 | `.cursor/commands/crux-dream.md` | Yes | Dream extraction command |
 | `.cursor/commands/crux-recall.md` | Yes | Memory query command |
 | `.cursor/commands/crux-forget.md` | Yes | Memory forget command |
 | `.cursor/commands/crux-remember.md` | Yes | Ad-hoc memory creation command |
 | `.cursor/commands/crux-meditate.md` | Yes | Recursive exploration command |
 | `.cursor/skills/crux-skill-memory-*/` | Yes | Memory skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
+| `.cursor/skills/crux-skill-memory-meditation-research/` | Yes | Research-mode Phases A–G recursion skill |
+| `.cursor/skills/crux-skill-memory-meditation-quick/` | Yes | Quick-mode parallel fan-out skill |
+| `.cursor/skills/crux-skill-memory-meditation-ensemble/` | Yes | Ensemble Aggregation skill |
+| `.cursor/skills/crux-skill-memory-meditation-review/` | Yes | Adversarial review skill |
+| `.cursor/skills/crux-skill-memory-meditation-report/` | Yes | HTML+PDF report generation skill |
+| `.cursor/skills/crux-skill-memory-meditation-coordination/` | Yes | File coordination primitives skill |
 | `.cursor/rules/crux-memories-integration.crux.mdc` | Yes | Memory integration rule |
 | `.crux/crux-memories.json` | No | Memory system configuration and feature flags (created by `--with-memories`) |
 | `.crux/memory-index.yml` | No | Prioritised memory index for agent discovery |

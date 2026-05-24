@@ -1,0 +1,85 @@
+schema_version: 1
+subtask_id: "05"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-software-engineer"
+model: "claude-sonnet-4-6"
+token_budget: 200000
+state: "completed"
+started_at: "2026-05-24T05:14:00Z"
+last_heartbeat: "2026-05-24T05:45:00Z"
+completed_at: "2026-05-24T05:45:00Z"
+checklist:
+  - id: "D01"
+    text: "**`crux-skill-memory-meditation-research`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md"
+  - id: "D02"
+    text: "**`crux-skill-memory-meditation-quick`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md"
+  - id: "D03"
+    text: "**`crux-skill-memory-meditation-ensemble`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md"
+  - id: "D04"
+    text: "**`crux-skill-memory-meditation-review`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md"
+  - id: "D05"
+    text: "**`crux-skill-memory-meditation-report`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md"
+  - id: "D06"
+    text: "**`crux-skill-memory-meditation-coordination`** —"
+    done: true
+    evidence_path: ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md"
+  - id: "D07"
+    text: "Frontmatter contains `name: <skill-dir-name>` and a"
+    done: true
+    evidence_path: null
+  - id: "D08"
+    text: "Body opens with a \"When to use\" section that states which"
+    done: true
+    evidence_path: null
+  - id: "D09"
+    text: "Body includes the contract items assigned to that skill in"
+    done: true
+    evidence_path: null
+  - id: "D10"
+    text: "Body references the new guide agent by exact name"
+    done: true
+    evidence_path: null
+  - id: "D11"
+    text: "`SKILL.md` lints cleanly (frontmatter parses, no broken"
+    done: true
+    evidence_path: null
+artifacts:
+  - path: ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md"
+    type: "skill"
+    line_count: 678
+  - path: ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md"
+    type: "skill"
+    line_count: 238
+  - path: ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md"
+    type: "skill"
+    line_count: 346
+  - path: ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md"
+    type: "skill"
+    line_count: 276
+  - path: ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md"
+    type: "skill"
+    line_count: 344
+  - path: ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md"
+    type: "skill"
+    line_count: 273
+errors: []
+notes: |
+  Completed 2026-05-24. All six SKILL.md files created with verbatim contracts
+  from source files. ReadLints clean on all six. Canonical additional_focus_areas[]
+  schema with per-item treatment: field used throughout. Frontmatter name fields
+  match directory names; all descriptions contain the substring "meditation".
+  13+ adversarial review dimensions in meditation-review. Comprehensiveness Level
+  Mapping (12×4 table) verbatim in meditation-report. K10 layered cadence steps
+  3b–3f in meditation-ensemble. init-suggestions-{ts}.yml and
+  finalisation-enhancements.yml filename rows in meditation-coordination.
+extra: {}

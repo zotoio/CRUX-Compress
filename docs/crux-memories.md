@@ -20,7 +20,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | recall [spec... \| memory... \| query] | `/crux-recall` | Decompress and display memories in chat. Pass spec(s) to show memories from those specs, memory file(s) to view specific ones, or a question about the current chat. If omitted, shows all memories referenced in the current session with rationale for why each was included |
 | forget [memory... \| query] | `/crux-forget` | Remove incorrect or unwanted memories from the corpus. Pass memory ID(s), slug(s), file path(s), or a search query. If omitted, lists all memories for selection |
 | remember ["insight"] [--type \<type\>] | `/crux-remember` | Create an ad-hoc memory outside of spec workflows. Pass insight text and optional type. If omitted, prompts interactively |
-| meditate ["topic"] | `/crux-meditate` | Recursive memory-informed exploration through 3-level agent inception with 3-way fan-out at each level. Agents coordinate via markdown files in `meditations/`, each writing discoveries to a predictable path. Derives facets from context, spawns parallel agents that query memories, derive distinct subfocuses, and recurse deeper |
+| meditate ["topic"] [--quick] [--ensemble] | `/crux-meditate` | Deep research exploration via a recursive tree of memory-informed subagents. Three modes: **Research** (default) runs depth-first serial recursion with mandatory inline citations and branch peer review; `--quick` runs the legacy parallel fan-out (warn-only citations, no peer review) for speed; `--ensemble` runs the entire meditation N times across `cruxMemories.meditate.modelPool` and aggregates into a cross-model synthesis. A merged pre-spawn gate covers cost, scope, and richness level selection (`compact` / `default` / `detailed` / `exhaustive`, `default` preselected). Every meditation produces a paired HTML + PDF report with infographics, a citations index, and a mandatory adversarial review pass under `meditations/{yyyymmdd}-{topic-slug}/`. A post-consolidation finalisation-enhancement gate (K10, multi-select 0–5) refines the report before adversarial review runs; skipping all reproduces previous behaviour. |
 | amnesia [on\|off\|status] | `/crux-amnesia` | Toggle a chat-session-only override that suppresses ambient memory usage for normal work while leaving repo config unchanged |
 
 ### Hooks (provided by CRUX, configurable triggers)
@@ -40,10 +40,16 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 | `crux-skill-memory-compress` | CRUX-compress memory files, manage source archive for originals |
 | `crux-skill-memory-reference-tracker` | Track which memories are referenced in agent output, increment strength counters |
 | `crux-skill-memory-index` | Python script that builds a prioritised index from all memory frontmatter |
+| `crux-skill-memory-meditation-research` | Research-mode Phases A–G depth-first recursion; facet registry, citations index, peer review |
+| `crux-skill-memory-meditation-quick` | Quick-mode 6-step parallel fan-out; warn-only citations, no peer review |
+| `crux-skill-memory-meditation-ensemble` | Ensemble Aggregation: cross-model synthesis, K10 layered cadence, ensemble report |
+| `crux-skill-memory-meditation-review` | 13-dimension adversarial review-and-fix cycle; ≤3-iteration loop, `MUST_FIX` schema |
+| `crux-skill-memory-meditation-report` | Paired HTML+PDF report generation; Comprehensiveness Level Mapping (12 × 4) |
+| `crux-skill-memory-meditation-coordination` | File-based coordination primitives; artefact filename grammar (18-row table) |
 
 ### Agent: `crux-cursor-memory-manager`
 
-Commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, `/crux-meditate`) spawn a `crux-cursor-memory-manager` subagent to perform the actual work. `/crux-amnesia` is different: it is a lightweight chat-session instruction toggle that does not mutate files and instead tells the current agent and ordinary-work subagents to suppress ambient memory usage. The memory manager agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
+Commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`) spawn a `crux-cursor-memory-manager` subagent. `/crux-meditate` spawns `crux-cursor-meditation-guide` instead — a dedicated recursive research orchestrator (see below). `/crux-amnesia` is different: it is a lightweight chat-session instruction toggle that does not mutate files and instead tells the current agent and ordinary-work subagents to suppress ambient memory usage. The memory manager agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
 
 **Agent definition frontmatter:**
 
@@ -83,6 +89,10 @@ repository: https://github.com/zotoio/CRUX-Compress
 | Cursor | `.cursor/agents/crux-cursor-memory-manager.md` |
 | Claude Code | Inline in command definitions (`.claude/commands/crux-dream.md`, `.claude/commands/crux-forget.md` etc.) — Claude Code does not have a separate agent concept |
 | Generic | Embedded in the `crux-memory-server` or shell script preamble |
+
+### Agent: `crux-cursor-meditation-guide`
+
+`/crux-meditate` spawns `crux-cursor-meditation-guide` as the dedicated recursive research orchestrator. It owns the Meditate persona end-to-end: Research Phases A–G depth-first recursion, Quick 6-step parallel fan-out, K10 finalisation-enhancement reflection, Ensemble Aggregation cross-model synthesis, and the 13-dimension adversarial review-and-fix cycle that gates every report. Six dedicated skills support its work (`crux-skill-memory-meditation-research`, `crux-skill-memory-meditation-quick`, `crux-skill-memory-meditation-ensemble`, `crux-skill-memory-meditation-review`, `crux-skill-memory-meditation-report`, `crux-skill-memory-meditation-coordination`). It is spawned exclusively by `/crux-meditate` and never invoked directly.
 
 ### Memory File Format (managed by CRUX)
 
@@ -382,6 +392,30 @@ The core memory engine is identical across platforms. Only the wiring layer diff
   }
 }
 ```
+
+#### Optional: `cruxMemories.meditate.finalisationEnhancements`
+
+Controls scoring weights for the post-consolidation K10 finalisation-enhancement gate. This key is **optional** — when absent, defaults apply automatically. Do **not** add to `install.py` config-write defaults (K8: absent → defaults work without the key being present).
+
+```json
+"meditate": {
+  "finalisationEnhancements": {
+    "weights": {
+      "impact": 1.0,
+      "insight_value": 1.0
+    },
+    "formula": "product",
+    "minimum_impact_threshold": 6
+  }
+}
+```
+
+| Field | Default | Description |
+|---|---|---|
+| `weights.impact` | `1.0` | Weight applied to the enhancement's impact score |
+| `weights.insight_value` | `1.0` | Weight applied to the enhancement's insight-value score |
+| `formula` | `"product"` | Scoring formula: `"product"` multiplies weights × scores; `"sum"` adds them |
+| `minimum_impact_threshold` | `6` | Minimum combined score for an enhancement to appear in the gate |
 
 ### Reference Tracking Data (`.crux/reference-tracking/`)
 
@@ -1137,20 +1171,74 @@ Dev evals should be implementable as shell scripts (bats) or Python tests that s
 
 ### Q. Meditate Command
 
-- **User:** Run `/crux-meditate` with no arguments, verify the agent derives 3 facets from current context, creates `meditations/{yyyymmdd}-{slug}/`, writes `facets.md`, and spawns 3 parallel Level 1 agents
-- **User:** Run `/crux-meditate "performance optimization"`, verify the agent uses the provided topic to derive facets and the working directory slug reflects the topic
-- **User:** Verify each agent at depth 1 and 2 derives 3 distinct child subfocuses that are narrower than its own subfocus and non-overlapping with siblings
-- **User:** Verify each agent writes its output to the correct file path in the working directory (e.g. `branch-2-depth-3-sub-4.md`)
-- **User:** Verify parent agents poll for child output files via `ls` (not JSONL transcripts) and only aggregate after all child files exist
-- **User:** Verify each level queries relevant memories via the memory index or MCP search
-- **User:** Verify Level 3 agents do not recurse further (terminal depth) and write leaf output files
-- **User:** Verify insights consolidate back from Level 3 → Level 2 → Level 1 → Level 0 via file reads and are presented coherently
-- **User:** Verify `consolidation.md` is written to the working directory with cross-branch synthesis
-- **User:** Verify the interactive continuation menu offers: expansion directions, "Save as draft spec", and "End meditation"
-- **User:** Select "Save as draft spec", verify a draft spec outline is written to `specs/`
-- **User:** Select "End meditation", verify the session concludes cleanly
-- **User:** Run `/crux-meditate @src/file.ts`, verify file-referenced exploration derives facets from the code
-- **Dev:** Verify working directory structure contains expected files: `facets.md`, `branch-{1..3}.md`, `branch-{N}-depth-2-sub-{1..3}.md`, `branch-{N}-depth-3-sub-{1..9}.md`, and `consolidation.md`
+`/crux-meditate` is the deep-research command. It runs in one of three modes — **Research** (default), **Quick** (`--quick`), or **Ensemble** (`--ensemble`) — and every meditation produces a paired HTML + PDF report with infographics, an in-page table of contents, and a citations index. Before any subagents spawn, four mandatory user gates fire: `Q-Depth-Selection`, `Q-Cost-Acknowledgment`, the Theme Preflight question sequence (Q1–Q5), and the facet-confirmation Pattern-B flow (`Q-Confirm-1` and `Q-Confirm-2`). All outputs live under `meditations/{yyyymmdd}-{topic-slug}/`.
+
+#### Pre-spawn gates (all modes)
+
+- **User:** Run `/crux-meditate "architecting our search service for 10× growth"`, verify `Q-Depth-Selection` fires first and offers depth 1 / 2 / 3 (default 3) with the agent count for the active mode rendered into each option
+- **User:** Verify `Q-Cost-Acknowledgment` fires immediately after depth selection with mode-aware totals (`~45 agents at depth 3 in Research`, `~42 in Quick`), and offers mode swaps (`switch_to_quick`, `switch_to_research`, `switch_to_ensemble`, `switch_to_single`) plus `cancel`
+- **User:** Verify Theme Preflight runs Q1 (theme source), then conditionally Q1b / Q2 (style direction), Q3 (colour scheme), Q4 (typography), and Q5 (confirmation); picking `surprise_me` produces a deterministic non-default theme
+- **User:** Verify the depth-0 subagent escalates `Q-Confirm-1` (the three top-level facets, verbatim, with `confirm_all` / `modify_one` / `modify_multiple` / `regenerate` / `cancel`) before any branches spawn, and immediately follows with `Q-Confirm-2` (`none` / `depth_2_only` / `all_levels` for deeper confirmation)
+- **User:** Pick `regenerate` at `Q-Confirm-1`, verify the subagent re-derives a different set (capped at 3 regeneration attempts) and re-escalates
+- **User:** Run in a non-interactive context (e.g. CI), verify the meditation aborts on `Q-Cost-Acknowledgment` rather than silently defaulting to `proceed`
+
+#### Research mode (default)
+
+- **User:** Run `/crux-meditate "should we adopt event sourcing for the auth service"`, accept depth 3, verify `meditations/{yyyymmdd}-should-we-adopt-event-sourcing-for-the-auth-service/` is created with `facets.md`, `facet-registry.yml`, and `citations-index.yml` seeded after Q-Confirm-1 confirms
+- **User:** Verify the tree spawns 3 depth-1 branches, then 9 depth-2 sub-branches, then 27 depth-3 leaves, all using filename pattern `branch-{N}-depth-{D}-sub-{S}-{slug}-{yyyymmddHHMMSS}.md`
+- **User:** Verify every branch file has an inline `[memory: ...]` / `[file: ...]` / `[web: ...]` / `[chat: ...]` / `[child: ...]` citation marker per substantive claim and a populated `## Citations` section
+- **User:** Verify each of the 3 branch peer-review files is written as `branch-{N}-peer-review-{branchSlug}-{ts}.md` with substantive `## Reinforcements`, `## Contradictions`, `## Gaps`, and `## New Evidence` sections
+- **User:** Verify `consolidation.md` is written using facet titles as headings (no "Branch 1/2/3" labels) and `[research: {subfocus-slug}]` citation format (no raw `[child: branch-N-depth-D-sub-S]` markers)
+- **User:** Verify `facets.md` is updated post-consolidation with a Branch & Leaf Index linking every produced file plus a "Missing slots" enumeration
+- **User:** Verify the adversarial review and fix cycle writes `review-pre-report-{ts}-iter-{N}.md` (1 ≤ N ≤ 3) and reaches `PASS` or `PASS_WITH_ADVISORIES` before the report is generated; on `ESCALATE`, verify the report pair is NOT generated and the calling agent surfaces unresolved `MUST_FIX` findings instead
+- **User:** Verify the paired `report-{topic-slug}-{ts}.html` and `report-{topic-slug}-{ts}.pdf` are produced with the chosen `theming` payload applied (no purple-blue gradient hero, no Inter-700 default, no three-card grids), light/dark/print mode toggle, responsive nav, ≥4 distinct chart types, ≥3 infographics, ≥1 calculator with a pre-computed scenario fallback in the PDF, and a clickable Table of Contents
+- **User:** Verify `retrospective-{ts}.md` is written with concrete observations from this run (not generic praise)
+- **User:** Verify the interactive continuation menu offers discovered expansion directions, `save_spec`, and `end_meditation` — and does **not** offer "Save as HTML" / "Save as PDF" (both already exist)
+- **User:** Pick an expansion direction, verify `Q-Cost-Acknowledgment-Expansion` fires first and the new tree always re-runs `Q-Confirm-1` and `Q-Confirm-2`
+- **User:** Pick `save_spec`, verify a draft spec outline is written to the configured specs directory using the consolidation summary, Branch & Leaf Index, and confirmed top-level facets
+
+#### Quick mode (`--quick`)
+
+- **User:** Run `/crux-meditate --quick "evaluating Postgres pgvector vs Pinecone for our embeddings store"`, verify the same four pre-spawn gates fire (depth, cost, theme, facet confirmation) but the cost prompt reflects the lower Quick-mode agent count (~42 at depth 3)
+- **User:** Verify NO `facet-registry.yml`, `citations-index.yml`, `.facet-registry.lock/`, or `branch-*-peer-review-*.md` files are created
+- **User:** Verify citation gaps in branch files surface as a warn-only "Citation gaps" callout in `consolidation.md` rather than triggering child re-spawn
+- **User:** Verify the adversarial review still runs with the same 3-iteration cap, but citation-marker findings downgrade `MUST_FIX → SHOULD_FIX` and the peer-review-thoroughness dimension is skipped
+- **User:** Verify the report pair is still mandatory and follows the same anti-homogenisation rules, Universal Contrast requirements, and Required Visualization Inventory as Research mode
+
+#### Ensemble mode (`--ensemble`)
+
+- **User:** Configure `cruxMemories.meditate.modelPool` in `.crux/crux-memories.json` with at least two `{slug, label}` entries, then run `/crux-meditate --ensemble "RAG vs fine-tuning for our internal knowledge assistant"`, verify the cost prompt shows `N × per-model + 1` (the +1 is the cross-model aggregation agent)
+- **User:** Verify `meditations/{yyyymmdd}-{topic-slug}-ensemble/` is created with one `model-{label-slug}/` subdirectory per pool entry (e.g. `model-gpt-5.5/`, `model-opus-4.7/`, `model-gemini-pro-3.1/`)
+- **User:** Verify all model trees share the same confirmed facets (Q-Confirm-1 / Q-Confirm-2 run **once** at the ensemble root) and the same `theming` payload
+- **User:** Verify each model's subdirectory contains a complete meditation (its own `facets.md`, `consolidation.md`, branch files, adversarial review iterations, `retrospective-{ts}.md`, and `report-{topic-slug}-{ts}.html` / `.pdf`)
+- **User:** Verify the ensemble root contains `cross-model-synthesis.md` with mandatory sections — Convergence, Divergence, Unique Insights, Evidence Quality Comparison, Reasoning Style Comparison, Recommended Synthesis, Per-Model Report Index, Citations — plus `ensemble-report-{topic-slug}-{ts}.html` / `.pdf` with an agreement heatmap (facet × model)
+- **User:** Verify `--ensemble --quick` runs Quick-mode trees per model and still produces the same ensemble synthesis and report pair
+- **User:** Run with an empty or missing `modelPool`, verify the command aborts with a clear error pointing at `.crux/crux-memories.json`
+
+#### File-based coordination invariants (all modes)
+
+- **User:** Run `/crux-meditate @src/auth/ @config.ts`, verify file-referenced exploration derives facets from the code
+- **User:** Verify parent agents poll for child output files via `ls -1t .../{prefix-glob} | head -n 1` (not JSONL transcripts) and only aggregate after every expected file exists
+- **User:** Verify depth-3 agents do not recurse further (terminal depth) and write leaf output files
+- **Dev:** Verify the Research-mode working directory contains the expected files: `facets.md`, `facet-registry.yml`, `citations-index.yml`, `init-suggestions-{ts}.yml`, `branch-{1..3}-depth-1-sub-0-*.md`, `branch-{N}-depth-2-sub-{1..3}-*.md`, `branch-{N}-depth-3-sub-{1..9}-*.md`, `branch-{1..3}-peer-review-*.md`, `consolidation.md`, `finalisation-enhancements.yml`, `follow-up-{type}-{ts}.yml` (0–5, present when enhancements are accepted), `review-pre-report-*-iter-*.md`, `retrospective-{ts}.md`, and the paired `report-{topic-slug}-{ts}.html` + `.pdf`
+- **Dev:** Verify the Quick-mode working directory contains the same set minus `facet-registry.yml`, `citations-index.yml`, `.facet-registry.lock/`, and any peer-review files
+- **Dev:** Verify the Ensemble working directory contains `facets.md`, one `model-{label-slug}/` subdirectory per pool entry, `cross-model-synthesis.md`, and `ensemble-report-{topic-slug}-{ts}.html` + `.pdf`
+
+#### Richness levels and finalisation enhancements (K1–K10)
+
+- **User:** Verify the merged `Q-Cost-and-Richness-Acknowledgment` gate presents richness levels (`compact` / `default` / `detailed` / `exhaustive`, `default` preselected) alongside the cost/mode summary — no standalone `Q-Comprehensiveness` gate fires separately
+- **User:** Verify the richness sub-question default is the level literally named `default` (this is a named level, not shorthand for "default behaviour" — call this out clearly so users are not confused)
+- **User:** Verify the combined Pattern-B prompt presents facets, report sections, visualisation types, and additional focus areas; the focus-area opt-in offers four modes (`skip` / `additional_facet` / `report_section_only` / `additional_facet_AND_section`)
+- **User:** Verify richness is set once per invocation and locked in the expansion variant; there is no `--reset-richness` flag
+- **User:** Verify the adversarial respawn protocol triggers automatically when a confirmed init-suggestion section is missing from a branch or consolidation file
+- **User:** Verify `init-suggestions-{ts}.yml` is written to the working directory and linked from the Branch & Leaf Index in `facets.md`
+- **User:** Verify the report footer `theme:` annotation includes a `level:` field recording the chosen richness level
+- **User:** Verify `compact` level output matches today's pre-richness baseline behaviour exactly
+- **User:** Verify `Q-Finalisation-Enhancements` fires post-consolidation — after `consolidation.md` is written, before adversarial review begins
+- **User:** Verify the gate presents 0–5 multi-select; choosing none (skip-all) reproduces previous post-consolidation behaviour exactly
+- **User:** Verify a cheap accepted enhancement triggers a respawn within the ≤3 adversarial-review cap; an expensive accepted enhancement is queued by default (or spawned-now with an opt-in cost re-acknowledgment)
+- **User:** Verify `finalisation-enhancements.yml` is written to the working directory and linked from the Branch & Leaf Index in `facets.md`
+- **User:** Verify the continuation menu surfaces unchosen and queued K10 items as expansion options
 
 ---
 

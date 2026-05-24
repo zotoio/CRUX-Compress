@@ -22,11 +22,8 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 | Agent | Definition | Purpose |
 |-------|-----------|---------|
 | `crux-cursor-rule-manager` | `.cursor/agents/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
-| `integrity-expert` | `.cursor/agents/integrity-expert.md` | Code quality audits, test coverage, security, CI/CD |
-| `docs-sync-agent` | `.cursor/agents/docs-sync-agent.md` | Documentation synchronization on source changes |
 | `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, Recall, Forget, Remember, Meditate) |
-| `crux-platform-architect` | `.cursor/agents/crux-platform-architect.md` | Platform architecture, Cursor/LLM harness design, documentation, and eval strategy |
-| `crux-software-engineer` | `.cursor/agents/crux-software-engineer.md` | Core implementation — Python, shell, MCP server, hooks, skills, and evals |
+| `crux-cursor-meditation-guide` | `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive memory-informed meditation guide. Owns the Meditate persona, Research Phases A–G, Quick 6-step protocol, Adversarial Review function, Ensemble Aggregation function, and the K10 finalisation-enhancements reflection function. Spawned by `/crux-meditate` for the entire subagent tree; never user-invoked directly. |
 
 ### User Input Escalation — Subagent Protocol
 
@@ -58,7 +55,32 @@ Use when the subagent must do analysis, search, or computation before it can for
 
 Commands that invoke subagents (e.g. `/crux-dream`, `/crux-remember`, `/crux-forget`, `/crux-recall`, `/crux-meditate`) document which pattern applies to each interaction point.
 
-### Spec Execution — Agent Allocation
+</CRUX>
+
+<!--
+The block above (between <CRUX agents="always"> and </CRUX>) is the ONLY part of
+this file that is distributed to consumers. It is extracted verbatim by
+scripts/create-crux-zip.py and merged into the consumer's AGENTS.md by install.py.
+
+Anything below this comment is repository-internal — used by agents working in
+the CRUX-Compress repo itself — and MUST NOT be moved back inside the <CRUX> block.
+Consumer-facing skills, commands, rules, and hooks MUST NOT reference any of the
+repository-internal agents listed below.
+-->
+
+## Repository-Internal Agents (CRUX-Compress repo only)
+
+The following agents are used to develop and maintain the CRUX-Compress project
+itself. They are **not** distributed to consumer projects.
+
+| Agent | Definition | Purpose |
+|-------|-----------|---------|
+| `crux-platform-architect` | `.cursor/agents/crux-platform-architect.md` | Platform architecture, Cursor/LLM harness design, documentation, and eval strategy |
+| `crux-software-engineer` | `.cursor/agents/crux-software-engineer.md` | Core implementation — Python, shell, MCP server, hooks, skills, and evals |
+| `integrity-expert` | `.cursor/agents/integrity-expert.md` | Code quality audits, test coverage, security, CI/CD |
+| `docs-sync-agent` | `.cursor/agents/docs-sync-agent.md` | Documentation synchronization on source changes |
+
+### Spec Execution — Agent Allocation (CRUX-Compress repo only)
 
 When building or executing engineering specs in this repository, **always use the CRUX agents** instead of `generalPurpose`. Assign subtasks based on their nature:
 
@@ -73,6 +95,7 @@ When building or executing engineering specs in this repository, **always use th
 | Integration testing and verification | `crux-software-engineer` |
 | CRUX compression or decompression tasks | `crux-cursor-rule-manager` |
 | Memory lifecycle operations (dream, REM, recall) | `crux-cursor-memory-manager` |
+| Meditate / Research / Quick / Ensemble work | `crux-cursor-meditation-guide` |
 | Code quality audits, security reviews, CI/CD checks | `integrity-expert` |
 | Documentation sync after source changes | `docs-sync-agent` |
 

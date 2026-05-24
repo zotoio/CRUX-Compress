@@ -18,6 +18,58 @@ if str(_MCP_PKG_DIR) not in sys.path:
 
 MEMORY_TYPES = ["core", "redflag", "goal", "learning", "idea", "archived"]
 
+# ---------------------------------------------------------------------------
+# Meditation artifact helpers (used by test_q_meditate.py new assertion classes)
+# ---------------------------------------------------------------------------
+
+MEDITATION_SKILL_NAMES = [
+    "research",
+    "quick",
+    "ensemble",
+    "review",
+    "report",
+    "coordination",
+]
+
+MEDITATION_SKILL_DIRS = [
+    f"crux-skill-memory-meditation-{n}" for n in MEDITATION_SKILL_NAMES
+]
+
+
+def _read_meditation_artifact(kind: str, name: str | None = None) -> str:
+    """Read a meditation source file by kind and optional name.
+
+    kind:
+        "command"               → .cursor/commands/crux-meditate.md (raw)
+        "guide_agent"           → .cursor/agents/crux-cursor-meditation-guide.md
+        "memory_manager"        → .cursor/agents/crux-cursor-memory-manager.md
+        "skill"                 → .cursor/skills/crux-skill-memory-meditation-<name>/SKILL.md
+        "all_meditation_sources" → concatenation of command + guide_agent + all skills
+    """
+    root = _PROJECT_ROOT
+    if kind == "command":
+        p = root / ".cursor" / "commands" / "crux-meditate.md"
+        return p.read_text(encoding="utf-8") if p.exists() else ""
+    if kind == "guide_agent":
+        p = root / ".cursor" / "agents" / "crux-cursor-meditation-guide.md"
+        return p.read_text(encoding="utf-8") if p.exists() else ""
+    if kind == "memory_manager":
+        p = root / ".cursor" / "agents" / "crux-cursor-memory-manager.md"
+        return p.read_text(encoding="utf-8") if p.exists() else ""
+    if kind == "skill":
+        if not name:
+            raise ValueError("name is required for kind='skill'")
+        skill_dir = f"crux-skill-memory-meditation-{name}"
+        p = root / ".cursor" / "skills" / skill_dir / "SKILL.md"
+        return p.read_text(encoding="utf-8") if p.exists() else ""
+    if kind == "all_meditation_sources":
+        parts = [_read_meditation_artifact("command")]
+        parts.append(_read_meditation_artifact("guide_agent"))
+        for n in MEDITATION_SKILL_NAMES:
+            parts.append(_read_meditation_artifact("skill", n))
+        return "\n".join(parts)
+    raise ValueError(f"Unknown kind: {kind!r}")
+
 
 def _make_config(
     tmp_path: Path,
@@ -245,3 +297,52 @@ def write_tracker(
         encoding="utf-8",
     )
     return path
+
+
+# ---------------------------------------------------------------------------
+# Meditation working-directory fixtures (plan §5.2 / §5.3)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture()
+def sample_meditation_working_dir(tmp_path: Path) -> Path:
+    """Create a temp meditation working directory pre-populated with stub artefacts."""
+    today = date.today().strftime("%Y%m%d")
+    work_dir = tmp_path / "meditations" / f"{today}-sample-topic"
+    work_dir.mkdir(parents=True, exist_ok=True)
+    (work_dir / "facet-registry.yml").write_text("# facet registry stub\n", encoding="utf-8")
+    (work_dir / "citations-index.yml").write_text("# citations index stub\n", encoding="utf-8")
+    (work_dir / "facets.md").write_text("---\ntitle: sample-topic\n---\n", encoding="utf-8")
+    return work_dir
+
+
+@pytest.fixture()
+def sample_init_suggestions_yml(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
+    """Create an init-suggestions-{ts}.yml fixture with the canonical 4-treatment schema.
+
+    Parameterise via ``pytest.mark.parametrize`` or ``request.param`` to supply a custom
+    list of treatment strings.  Defaults to all four canonical modes.
+    """
+    treatments: list[str] = getattr(
+        request,
+        "param",
+        ["skip", "additional_facet", "report_section_only", "additional_facet_AND_section"],
+    )
+    ts = date.today().strftime("%Y%m%d%H%M%S")
+    data = {
+        "additional_focus_areas": [
+            {
+                "title": f"Focus area — {t}",
+                "treatment": t,
+                "resulting_section_id": f"section-{t.replace('_', '-')}",
+                "resulting_branch_index": None,
+                "custom_report_section_title": f"Custom section for {t}",
+            }
+            for t in treatments
+        ],
+        "confirmed_sections": [],
+        "confirmed_visualisations": [],
+    }
+    p = tmp_path / f"init-suggestions-{ts}.yml"
+    p.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False), encoding="utf-8")
+    return p

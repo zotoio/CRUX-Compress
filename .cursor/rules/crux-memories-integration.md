@@ -32,6 +32,22 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 - This is how the system tracks which memories are valuable — an `afterAgentResponse` hook automatically scans for these annotations and updates reference trackers
 - Example: "Components should use memoization with custom comparators. [memory:React.memo on list item components prevents full re-render on data changes]"
 - You do NOT need to manually invoke the reference-tracker skill — the hook handles all `.refs.yml` bookkeeping automatically
+- The annotation contract is **load-bearing**: if you do not annotate, the system silently records zero references, memory strength never grows, REM-sleep rebalancing has nothing to work with, and stale-tracker nudges will fire. Annotation is not optional decoration — it is the only signal the system has that memories are actually being used
+
+### Subagent Annotation Passthrough (CRITICAL)
+
+The `afterAgentResponse` hook scans the response text it is given. When a subagent emits `[memory:{title}]` annotations in its return-to-parent summary, those annotations live in the subagent transcript, but the user-facing reply is composed by the **parent** agent. Subagent annotations are silently lost unless the parent surfaces them.
+
+Therefore:
+
+- When you spawn a subagent and it returns text containing `[memory:{title}]` annotations, you **MUST** preserve those annotations verbatim in your reply to the user (or in your next downstream tool call to another agent that will eventually reach the user)
+- If you paraphrase a subagent's findings, copy any `[memory:…]` markers into your paraphrase alongside the statement they influenced — do not strip them
+- This applies recursively: a parent forwarding to a grand-parent must preserve annotations from any depth in the subtree
+- If a subagent surfaces a memory via natural language but forgets the literal `[memory:Title]` syntax, and you can identify the matching memory from `.crux/memory-index.yml`, add the annotation yourself in the user-facing reply
+
+### Self-check Before Responding
+
+Before returning a substantive response, ask yourself: did any memory in `.crux/memory-index.yml` (or anything I discovered via the `user-crux-memories` MCP) shape what I am about to say? If yes and the corresponding `[memory:Title]` is not in my draft reply, add it. A response that consulted memories without annotating them is a contract violation.
 
 ### Dream Nudge
 

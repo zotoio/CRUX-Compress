@@ -1,0 +1,51 @@
+---
+description: Keep production code free of spec/phase metadata and back-compat shims; capture migrations in spec-local upgrade scripts instead
+alwaysApply: true
+---
+
+# Spec Implementation Hygiene
+
+When implementing or executing engineering specs (anything under `specs/` or `.ai-ignored/executed/`), keep production code clean of coordination metadata and avoid backwards-compatibility shims. Capture any required migration logic in an executable upgrade file inside the spec directory.
+
+## Rules
+
+### 1. No spec, subtask, or phase references in code
+
+Do **not** add code comments, docstrings, log messages, error messages, or identifiers that reference spec files, subtask IDs, phase numbers, status pairs, or execution-report sections. Examples to avoid:
+
+```python
+# Per subtask-05-meditate-decomp-skills-extraction-20260517.md
+# Phase 3: rebalance trigger
+# Implements spec 20260523-meditate-richness, Subtask 04
+# TODO(spec-meditate-richness): tighten coordinator gate
+```
+
+These comments become stale the moment a spec is archived, leak ephemeral coordination metadata into long-lived code, and obscure the actual intent of the line. Comments must explain **why** the code exists — not which spec or phase authored it. The spec, its subtasks, and its status files are the durable record of authorship and rationale; production code does not need to repeat them.
+
+### 2. No backwards-compatibility shims
+
+Do **not** add adapters, wrappers, deprecated aliases, fallback branches, dual-path readers, or `v1`/`v2` parallel surfaces to preserve old behavior alongside new behavior. This repository is a single coordinated distribution — producer code, consumer code, agents, hooks, skills, evals, and docs all ship together.
+
+Replace, do not layer. When a function, file, frontmatter field, command surface, or schema changes, change every caller in the same change set and delete the old form. If you find yourself reaching for a shim, that is the signal to either:
+
+- expand the change set to cover all callers in one go, or
+- write an upgrade file (see Rule 3) so installed users can move forward without the shim.
+
+### 3. Capture migrations in a spec-local upgrade file
+
+When a spec introduces a change that requires action on an existing install — config schema updates, file moves or renames, generated-file regeneration, memory index rebuilds, hook re-registration, etc. — add an executable upgrade file inside the spec directory:
+
+- **Path**: `specs/<spec-id>/upgrade-<spec-slug>.<ext>` where `<ext>` is `.sh`, `.py`, or `.md` (markdown is allowed only if every step is a literal copy-pasteable command).
+- **Content**: idempotent steps that bring a pre-spec install up to the post-spec state. Safe to re-run. No interactive prompts unless guarded by `--yes`.
+- **Audience**: anyone running the spec's outputs against a pre-spec install (including future you, CI, and downstream consumers).
+- **Lifetime**: lives with the spec. When the spec is archived to `.ai-ignored/executed/`, the upgrade file moves with it.
+
+This file is the **option to consider for distribution**. If and when the spec ships to consumers, the upgrade script can be promoted into `install.py`, referenced from a release note, or added to the dist zip (per `zip-contents-protection.crux.mdc`). Until that promotion is explicitly requested, the upgrade file stays inside the spec directory and is not distributed.
+
+## Quick Checklist
+
+Before completing any spec subtask, verify:
+
+- [ ] No new code comments, docstrings, or strings mention a spec id, subtask id, or phase number.
+- [ ] No new shims, aliases, or `if old_format: ... else: new_format` branches were added to preserve pre-spec behavior.
+- [ ] If the change requires action on an existing install, an `upgrade-<spec-slug>.<ext>` file exists in the spec directory and is idempotent.

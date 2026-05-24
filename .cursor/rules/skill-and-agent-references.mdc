@@ -1,0 +1,93 @@
+---
+description: Reference skills, agents, and commands by their registered name (never by filesystem path), and decompose oversized commands or agents by extracting sections into skills with by-name references
+alwaysApply: true
+---
+
+# Skill and Agent References
+
+Skills, agents, and commands in Cursor are registered with the IDE/CLI **by name** — the directory name under `.cursor/skills/<name>/SKILL.md`, the file basename under `.cursor/agents/<name>.md`, and the file basename under `.cursor/commands/<name>.md`, mirrored in the `name:` frontmatter field where present. The IDE skill loader, the `Task` subagent dispatcher, the slash-command surface, and the skill resolution machinery all look up a primitive from this registered name. Filesystem paths are an implementation detail.
+
+This rule keeps every operational reference stable, portable, and resilient to file moves.
+
+## Rules
+
+### 1. Reference skills, agents, and commands by name only
+
+Always write the registered name in backticks:
+
+- Skill: `` `crux-skill-memory-extract` ``
+- Agent: `` `crux-cursor-meditation-guide` ``
+- Command: `/crux-meditate`
+
+Never embed the filesystem path in instructional or operational prose. Examples to avoid:
+
+```text
+Bad:  `.cursor/skills/crux-skill-memory-extract/SKILL.md`
+Bad:  [`.cursor/skills/foo/SKILL.md`](../skills/foo/SKILL.md)
+Bad:  Read `.cursor/agents/crux-cursor-memory-manager.md` to see how it works.
+Bad:  Load .cursor/skills/crux-skill-memory-meditation-research/SKILL.md for Research mode.
+
+Good: Use the `crux-skill-memory-extract` skill.
+Good: Spawn a `crux-cursor-memory-manager` subagent.
+Good: Load the `crux-skill-memory-meditation-research` skill for Research mode.
+```
+
+The Cursor skill loader and the `Task` tool resolve these names automatically. Paths break the moment a file moves, double the maintenance cost (path + name), add visual noise, and falsely imply the file must be opened directly when it should be loaded through the standard skill or agent mechanism.
+
+This applies to:
+
+- **Commands** under `.cursor/commands/` — refer to as `/<command-name>`
+- **Agents** under `.cursor/agents/` — refer to by `<agent-name>` in backticks
+- **Skills** under `.cursor/skills/<name>/SKILL.md` — refer to by `<skill-name>` in backticks
+- Any other Cursor primitive that is loaded by name
+
+**Hooks are different**: hooks have no separate registered name — they are invoked directly by the `command` string in `.cursor/hooks.json`. When discussing a hook in prose, refer to the script basename (e.g. `crux-session-start.py`) and let `hooks.json` own the canonical command line.
+
+### 2. Allowed exceptions for paths
+
+Paths may appear only when the path itself is the subject of the line:
+
+- A documentation table whose explicit purpose is to record file layout — for example the `Definition` column in the `AGENTS.md` agent registry that records where each agent file lives so consumers can locate it after install
+- An install, dist, or release script (`install.py`, `scripts/create-crux-zip.py`) that needs to copy files
+- A migration or upgrade script (per `spec-implementation-hygiene.mdc`) that needs to move, rename, or read files
+- Code that reads or writes the file as data (compression scripts, generators, validators, evals)
+- The `command` field inside `.cursor/hooks.json` itself
+
+In every other context — "use the X skill", "spawn the Y agent", "load the Z protocol", "the W command does …" — write the registered name only.
+
+### 3. Decompose large commands and agents into skills
+
+When a command (`.cursor/commands/<name>.md`) or agent (`.cursor/agents/<name>.md`) grows beyond about **300 lines**, extract logical sections into skills under `.cursor/skills/<skill-name>/SKILL.md` and replace the inline content with by-name references to those skills.
+
+The command or agent file should be a thin orchestrator that:
+
+1. Documents the user-facing surface (usage, arguments, modes, related commands)
+2. Documents the user input escalation pattern and any user-facing gates
+3. Names the skills and subagents that own the actual mechanics
+4. Routes work to those skills and subagents
+
+Long protocols, contracts, templates, schemas, file grammars, rendering rules, validation logic, severity classifications, and any other "how the work is done" content belong in skills. The command or agent file describes **what** runs and **when**; the skills describe **how**.
+
+A command file approaching or exceeding 1000 lines is a strong signal that mechanics have leaked into the user-facing surface. Extract them into named skills and replace each leaked section with a one-paragraph reference like:
+
+```text
+The Foo Protocol (steps 1–8, registry lock, citations index, peer review file
+spec) is owned by the `crux-skill-memory-foo` skill. The calling agent passes
+`mode`, `depth`, and `comprehensiveness` in the spawn prompt.
+```
+
+The reference paragraph should name the skill, summarise what it owns in one or two sentences, and list any required spawn-prompt fields the calling agent must supply — never restate the skill's protocol.
+
+### 4. Skills reference other skills by name too
+
+When one skill needs to invoke or hand off to another, reference the target by name, never by path. The receiving agent loads it through the normal skill mechanism. The same applies when an agent definition file lists the skills it loads — reference each skill by its registered name in backticks, with a short purpose summary, and omit the SKILL.md path.
+
+## Quick Checklist
+
+Before completing any change to a command, agent, or skill file, verify:
+
+- [ ] No `.cursor/skills/<...>/SKILL.md` or `.cursor/agents/<...>.md` paths appear in instructional prose; every reference is by name.
+- [ ] No markdown links of the form `` [`...SKILL.md`](...) `` are used for skill or agent references.
+- [ ] Skill and agent names in backticks match the directory name (skills) or file basename (agents) and the `name:` frontmatter field exactly.
+- [ ] If the file is a command or agent over ~300 lines, large mechanical sections have been extracted into skills (or a tracked plan to do so exists in the relevant spec).
+- [ ] Paths appear only in: documentation tables that document file layout, install/dist/release scripts, migration/upgrade scripts, data-processing code, or `.cursor/hooks.json`.

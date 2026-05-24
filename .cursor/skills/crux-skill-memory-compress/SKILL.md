@@ -150,13 +150,13 @@ When compressing memory bodies, follow these patterns adapted from the CRUX spec
 
 ## Integration
 
-| Component | Location | Role |
-|-----------|----------|------|
+| Component | Reference | Role |
+|-----------|-----------|------|
 | CRUX spec | `CRUX.md` | Encoding symbols, compression rules, standard blocks |
-| Rule compressor agent | `.cursor/agents/crux-cursor-rule-manager.md` | Compression patterns and methodology reference |
-| Token estimator | `.cursor/skills/crux-utils/SKILL.md` | Token counting and ratio analysis |
+| Rule compressor agent | `crux-cursor-rule-manager` | Compression patterns and methodology reference |
+| Token estimator | `crux-utils` | Token counting and ratio analysis |
 | Config | `.crux/crux-memories.json` | `compressionTarget`, `maxMemorySize`, `flags.enableMemoryCompression`, `storage.compressionSourceArchive` |
-| Memory CRUD | `.cursor/skills/crux-skill-memory-crud/SKILL.md` | Frontmatter management, file creation conventions |
+| Memory CRUD | `crux-skill-memory-crud` | Frontmatter management, file creation conventions |
 
 ## Config Reference
 

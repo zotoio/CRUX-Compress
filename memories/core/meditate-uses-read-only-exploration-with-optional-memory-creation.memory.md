@@ -5,7 +5,7 @@ description: "The meditate command performs all exploration in read-only mode (n
 type: "core"
 strength: 1
 created: 2026-04-27
-modified: 2026-04-27
+modified: 2026-05-24
 source: "spec:20260425-crux-meditate"
 tags: [meditate, safety, read-only, opt-in, separation-of-concerns, side-effects, design-pattern]
 ---
@@ -70,4 +70,4 @@ The shape is: a long read-only investigation phase, a presentation, and a single
 
 ## Source
 
-`spec-crux-meditate-20260425.md` and the `crux-cursor-memory-manager` Meditate Mode workflow. The save-as-draft-spec step is the only write in the entire flow, and it is gated behind an `AskQuestion` multi-select after the user has seen the consolidated insights. The recursive children inherit the read-only contract because the agent definition gives them no skill that produces writes during exploration.
+`spec-crux-meditate-20260425.md` and the `crux-cursor-meditation-guide` agent (decomposed from `crux-cursor-memory-manager` by the 20260517-meditate-agent-skill-decomposition spec). The save-as-draft-spec step is the only write in the entire flow, and it is gated behind an `AskQuestion` multi-select after the user has seen the consolidated insights. The recursive children inherit the read-only contract because the agent definition gives them no skill that produces writes during exploration.
