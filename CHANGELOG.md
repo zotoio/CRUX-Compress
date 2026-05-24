@@ -5,6 +5,27 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.10.3](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.3) - 2026-05-24
+
+- chore: update release manifests for v2.10.3 [skip ci] (64457a8)
+- chore(test): refresh CRUX test report and align meditate test with by-name skill refs (beffddd)
+- chore(memories): dream-extract meditate-richness spec and archive (3092a16)
+- chore(compression): clear pending-compression file (0ca8ca2)
+- chore(memories): add meditate-decomp learnings, refresh trackers, rebuild index (507707a)
+- feat(memories): harden annotation reliability and dream proposal artefacts (4c651eb)
+- docs(rules): add skill-and-agent-references rule and apply name-only references (d97c5a8)
+- chore: archive completed meditate-agent-skill-decomposition spec (98c365d)
+- docs(spec): add meditate-richness spec (239f3df)
+- docs(spec): update meditate-decomposition spec with execution artefacts (c492607)
+- chore(memories): add meditate decomposition memories and rebuild index (3897217)
+- docs: sync README, CONTRIBUTORS, docs and web for meditate decomposition (801b9bd)
+- test(meditate): expand evals for guide/skill decomposition (7841c8e)
+- feat(meditate): decompose into guide agent and meditation skills (35f7504)
+- chore: archive completed meditate-research-mode-overhaul spec (ad1da40)
+- docs: add spec-implementation-hygiene rule (e1ca253)
+- chore: ignore yarn install-state file (0519279)
+- docs: update CHANGELOG.md for v2.10.2 [skip ci] (5efcc95)
+
 ## [v2.10.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.2) - 2026-05-17
 
 - chore: update release manifests for v2.10.2 [skip ci] (473802a)
