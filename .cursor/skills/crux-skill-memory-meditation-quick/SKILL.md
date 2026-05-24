@@ -21,6 +21,7 @@ Load this skill when:
 1. Verify `flags.enableMemories` is `"true"` (abort if not)
 2. Confirm `comprehensiveness:` payload is present — abort with: "`comprehensiveness:` payload required; missing from spawn prompt — caller misconfigured" if missing
 3. Confirm `theming:` payload is present — abort with a clear error pointing at Theme Preflight if missing
+4. Confirm `modelStrategy:` payload is present — abort with: "`modelStrategy:` payload required; missing from spawn prompt — caller misconfigured" if missing
 
 ## Input Parameters (depth-0 manager, Quick mode)
 
@@ -43,8 +44,9 @@ parentSubfocus: "<parent's subfocus or null at depth 1>"
 siblingFacets: [ ... ]
 theming: { ... }                  # propagated unchanged — REQUIRED
 comprehensiveness: { ... }        # propagated unchanged — REQUIRED; abort if missing
+modelStrategy: { ... }            # propagated unchanged — REQUIRED; abort if missing
 confirmDeepFacets: "none" | "depth_2_only" | "all_levels"
-ensembleModel: "<model-slug>"     # when present, propagated unchanged
+ensembleModel: "<model-slug>"     # when present, propagated unchanged; per-spawn model: carrier for this branch's subtree
 ```
 
 ## Depth-0 Manager Workflow (Quick Mode)
@@ -84,13 +86,15 @@ The `needs_user_input` block schema is identical to the Research-mode block (see
 
 **Cost-ack re-presentation**: same rule as Research — if ANY focus-area decision is `additional_facet` OR `additional_facet_AND_section`, the calling agent fires the read-only-richness variant before this subagent resumes step 5. Only proceeds after `cost_reack_confirmed: true`.
 
+**Per-branch model assignment (`modelStrategy.mode == "per_branch"` only)**: identical to Research — after the final confirmed-branch count is known and any cost-ack re-presentation has resolved, resolve `modelStrategy.branch_assignments[]` per the policy in the `/crux-meditate` command's **Argument Handling** section (shuffle the pool with a topic+ts-derived seed; sample without replacement when `poolSize ≥ branchCount`, otherwise round-robin). The resolved assignments are surfaced in `facets.md` per the `crux-skill-memory-meditation-coordination` skill.
+
 > **CRITICAL**: `additional_focus_areas_accepted` and `additional_focus_areas_skipped` are LEGACY field names. The canonical schema uses a SINGLE `additional_focus_areas[]` array with per-item `treatment:` field. Never emit the legacy field names.
 
-Hold onto `confirmDeepFacets` and `comprehensiveness:` — propagated unchanged to every child spawn in step 5.
+Hold onto `confirmDeepFacets`, `comprehensiveness:`, and `modelStrategy:` — all propagated unchanged to every child spawn in step 5.
 
 ### Step 5 — Spawn Explorers
 
-Identical to Research except each child receives `meditateMode: "quick"`. The `maxDepth`, `theming`, `comprehensiveness` (propagated unchanged — abort if missing), `confirmDeepFacets`, and `ensembleModel` (when present) payloads are all threaded through unchanged.
+Identical to Research except each child receives `meditateMode: "quick"`. The `maxDepth`, `theming`, `comprehensiveness` (propagated unchanged — abort if missing), `modelStrategy` (propagated unchanged — abort if missing), `confirmDeepFacets`, and `ensembleModel` (when present) payloads are all threaded through unchanged. **Per-spawn `model:` dispatch is identical to Research** — see the Research skill's Step 5 for the four-case rule (none / random / per_branch / ensemble_max). For `per_branch`, the depth-0 manager looks up `modelStrategy.branch_assignments[branchNumber - 1].slug` and sets it as both the child's `model:` and its `ensembleModel` so descendants inherit.
 
 ### Step 6 — Poll for Branch Outputs
 
@@ -128,6 +132,8 @@ See the `crux-skill-memory-meditation-coordination` skill for the canonical Bran
 Same reviewer agent, same iteration cap (3), same severity classification, same Pattern-B `needs_user_input` contract (with the mandatory `context` decision-guidance), same `ESCALATE` semantics, with two relaxations:
 - (a) "missing inline citation marker" findings are downgraded `MUST_FIX → SHOULD_FIX` (consistent with Quick mode's warn-only citation rule; unresolvable markers that *do* exist in the body remain `MUST_FIX`)
 - (b) the "peer review thoroughness" review dimension is N/A
+
+**Per-spawn `model:` dispatch for the reviewer is identical to Research** — see the Research skill's Step 10. For `modelStrategy.mode == "per_branch"`, omit `model:` so the reviewer runs on the caller's model (unified evaluator); for `random` pass the resolved slug; for `none` omit; for `ensemble_max` pass `ensembleModel`.
 
 Reports are still gated on `PASS` / `PASS_WITH_ADVISORIES`; `ESCALATE` still aborts steps 11 and 12 exactly as in Research mode.
 
@@ -175,9 +181,13 @@ Each child agent at depth < `maxDepth` follows this simpler protocol.
    parentSubfocus, subfocus, subfocusSlug, subfocusIndex, siblingFacets, theming,
    comprehensiveness (propagated unchanged — MUST be present; child aborts with
    "`comprehensiveness:` payload required; missing from spawn prompt — caller
-   misconfigured" if missing), confirmDeepFacets (propagated unchanged), and
-   ensembleModel (if present — propagated unchanged; when set, pass
-   model: ensembleModel on the Task tool invocation).
+   misconfigured" if missing), modelStrategy (propagated unchanged — MUST be
+   present; child aborts with the canonical error if missing), confirmDeepFacets
+   (propagated unchanged), and ensembleModel (if present — propagated unchanged
+   from this agent's own ensembleModel; descendants of a `per_branch` branch all
+   inherit the SAME ensembleModel that was assigned at the depth-0 → depth-1
+   dispatch point). When ensembleModel is set, pass model: ensembleModel on the
+   Task tool invocation.
 
 4. While children run, do this agent's own memory-query and expansion in
    parallel (Quick mode trades depth-first rigor for elapsed-time speed).

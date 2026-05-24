@@ -45,6 +45,27 @@ All artefacts in the meditation working directory follow these filename patterns
 
 **Research-mode-only files** (noted in table above): `branch-*-findings.md` (Phase B draft), peer-review files (`branch-{N}-peer-review-*.md`), `facet-registry.yml` (global facet allocation), `citations-index.yml` (append-only citation index), `.facet-registry.lock/` (transient mkdir-mutex).
 
+## `facets.md` frontmatter — model strategy fields
+
+When the depth-0 manager writes the final `facets.md` (step 4b promotion) and refreshes it post-consolidation (step 9 Branch & Leaf Index update), include the following fields in the frontmatter to record the resolved model strategy:
+
+```yaml
+---
+# ... existing facets.md frontmatter fields (topic_slug, mode, confirmed_at_utc, etc.) ...
+model_strategy:
+  mode: "none" | "random" | "per_branch" | "ensemble_max"
+  resolved_model_slug: null | "<slug>"             # set when mode == "random"
+  resolved_model_label: null | "<label>"
+  branch_assignments: []                           # set when mode == "per_branch"
+    # - branch_index: 1
+    #   slug: "<slug>"
+    #   label: "<label>"
+  assignment_policy_note: null | "<note>"          # set when mode == "per_branch" and poolSize < branchCount
+---
+```
+
+The `model_strategy` block is read by the report skill to drive per-branch attribution annotations and footer rendering. It is also read by the calling agent's step-10 presentation to surface the model strategy alongside the rest of the meditation outputs.
+
 ## Placeholders
 
 These placeholders are defined once here; all other meditation artefacts reference these definitions:
@@ -161,6 +182,7 @@ After consolidation completes, the depth-0 manager **must update `facets.md`** b
 
     ### Branch 1 — {branch-1 facet title}
     **Subfocus**: {one-line facet description}
+    **Model**: {branch-1 model label} _(only when `modelStrategy.mode == "per_branch"`; for `random` show `model_strategy:` line under `### Index metadata` instead)_
 
     - **Depth 1 (root)**: [{branch-1-slug}](branch-1-depth-1-sub-0-{branch-1-slug}-{ts}.md)
     - **Depth 2** (3 subfocuses):
@@ -204,6 +226,7 @@ After consolidation completes, the depth-0 manager **must update `facets.md`** b
     ### Index metadata
     - **Generated**: {ISO 8601 timestamp of index update}
     - **Mode**: `research` | `quick`
+    - **Model strategy**: `none` | `random ({label})` | `per_branch (b1: {label}, b2: {label}, b3: {label}, …)` | `ensemble_max (member: {label})` _(line ALWAYS written; values reflect `modelStrategy.mode` and any resolved per-branch assignments / picked model from the depth-0 manager's in-memory `modelStrategy`)_
     - **Total files indexed**: {count}
     - **Missing slots**: {list any branch/depth/sub combinations that did not produce a file, or "none"}
 
@@ -215,6 +238,7 @@ After consolidation completes, the depth-0 manager **must update `facets.md`** b
 - Quick mode produces the same index minus per-branch "Peer review" lines and the two Research-only registry / index lines.
 - When the adversarial review verdict was `ESCALATE` the report HTML / PDF lines are omitted (no report was generated), but every `review-pre-report-*-iter-*.md` is still linked.
 - Pending coordination files (`facets-pending-*.yml` and `pending-facets-*.yml`) are **not** linked from the index; only the corresponding confirmed counterparts are linked.
+- The per-branch `**Model**:` line appears only when `modelStrategy.mode == "per_branch"`. For `mode ∈ {"none", "random", "ensemble_max"}` the per-branch model line is omitted (a single tree-wide model — or no model override — is recorded in the **Model strategy** line of "Index metadata" instead).
 
 ## Branch & Leaf Index Template (Ensemble Variant)
 

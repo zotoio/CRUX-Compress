@@ -24,6 +24,7 @@ reviewerIteration: 1 | 2 | 3         # 1-indexed, capped at 3
 workingDir: "<absolute path to the meditation working directory>"
 theming: { ... }                      # so the reviewer can flag homogenisation drift — REQUIRED
 comprehensiveness: { ... }            # so the reviewer can check level-conditional minima — REQUIRED
+modelStrategy: { ... }                # propagated unchanged by every spawn — REQUIRED (consistent with the propagation rule in the meditation-guide agent). The reviewer does not itself spawn model-specific children, but the payload is recorded in the review document for audit (e.g. "reviewer ran on caller's model because modelStrategy.mode == per_branch")
 priorReviewPath: null | "<path>"      # path to previous iteration's review document
 ```
 

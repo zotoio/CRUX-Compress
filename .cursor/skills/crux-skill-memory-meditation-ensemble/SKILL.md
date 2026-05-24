@@ -13,7 +13,12 @@ Load this skill **only** when:
 - The `crux-cursor-meditation-guide` agent is spawned with `ensembleAggregation: true`
 - You are the cross-model aggregator spawned by the calling agent's Ensemble Protocol (step 8 of the `/crux-meditate` command)
 
-**Never load this skill** in per-model tree Research or Quick mode workflows. Per-model trees use the `crux-skill-memory-meditation-research` or `crux-skill-memory-meditation-quick` skill.
+This skill is **`modelStrategy.mode == "ensemble_max"` only**. The other two pool-using strategies — `random` and `per_branch` — are single-tree variants that do NOT spawn an aggregator and do NOT produce a `cross-model-synthesis.md` or ensemble report pair. They run the standard single-tree workflow with model dispatch driven by the `modelStrategy:` payload (see the `/crux-meditate` command's **Model Strategy payload** section).
+
+**Never load this skill** in:
+- Per-model tree Research or Quick mode workflows (per-model trees use the `crux-skill-memory-meditation-research` or `crux-skill-memory-meditation-quick` skill)
+- Single-tree `random` runs (no aggregation needed — one model, one report)
+- Single-tree `per_branch` runs (no aggregation needed — one tree with per-branch model attribution recorded in `facets.md` and the standard single-tree report)
 
 ## Prerequisites
 

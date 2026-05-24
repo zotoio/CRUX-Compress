@@ -682,19 +682,35 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-meditate` | Deep research exploration of current context — Research mode (default) with citations, peer review, adversarial review, and a paired HTML + PDF report. A merged invocation gate offers richness levels `compact` / `default` / `detailed` / `exhaustive` (`default` preselected). A post-consolidation finalisation-enhancement gate (K10, multi-select 0–5) refines the report before adversarial review. |
 | `/crux-meditate "topic"` | Same for a specific theme — e.g. `/crux-meditate "should we adopt event sourcing for the auth service"` |
 | `/crux-meditate --quick "topic"` | Faster parallel fan-out (no peer review); citations still required but enforced warn-only |
-| `/crux-meditate --ensemble "topic"` | Run the meditation across multiple model families in parallel, then aggregate into a cross-model synthesis report |
+| `/crux-meditate --random-model "topic"` | Single tree, model randomly picked from `cruxMemories.meditate.modelPool`; same agent count as default |
+| `/crux-meditate --model-per-branch "topic"` | Single tree, each top-level facet branch assigned a distinct model from the pool (descendants inherit); same agent count as default; per-branch model attribution recorded in the report |
+| `/crux-meditate --ensemble "topic"` | Ensemble max — run the meditation across every model in the pool in parallel, then aggregate into a cross-model synthesis report |
 | `/crux-amnesia` | Toggle session-only amnesia mode for ambient memory usage |
 | `/crux-amnesia on\|off\|status` | Disable, restore, or inspect session memory mode without changing repo config |
 
-### Meditate: Research, Quick, and Ensemble
+### Meditate: Recursion mode and Model strategy
 
 `/crux-meditate` is the heaviest command in the suite — it spawns a recursive research tree of subagents that mine memories, files, and chat history, then delivers a paired **HTML + PDF report** under `meditations/{yyyymmdd}-{topic-slug}/` with infographics, Chart.js / D3 visualisations, an in-page table of contents, a citations index, and a mandatory adversarial review pass over every output file. Reach for it on high-stakes problems you'd otherwise spend a day researching by hand: architecture trade-offs, technology selection, strategic investments.
+
+A meditation is controlled by two orthogonal axes: **recursion mode** (Research vs Quick) and **model strategy** (how `cruxMemories.meditate.modelPool` is used, if at all).
+
+#### Recursion mode
 
 | Mode | Flag | Best for |
 |------|------|----------|
 | **Research** (default) | _none_ | Depth-first serial recursion with globally unique facets, mandatory inline citations, and branch peer review. Pick this when the output will be cited, persisted, or drive downstream work. |
 | **Quick** | `--quick` | Fast parallel fan-out (legacy shape). Same report contract and visualisation requirements, no peer review, warn-only citation enforcement. Use for breadth-first early scoping. |
-| **Ensemble** | `--ensemble` | Runs the entire meditation N times in parallel — one per model family from `cruxMemories.meditate.modelPool` — then produces a cross-model synthesis highlighting convergence, divergence, and unique insights. Combinable with `--quick`. |
+
+#### Model strategy (combinable with either recursion mode)
+
+| Strategy | Flag | Trees | Agent count | Best for |
+|----------|------|-------|-------------|----------|
+| **Single** (default) | _none_ | 1, on the caller's model | baseline | Standard runs. |
+| **Random model** | `--random-model` | 1, on a randomly-picked pool entry | same as baseline | Cheap diversity sampling across multiple invocations. |
+| **Model per branch** | `--model-per-branch` | 1, each top-level facet branch assigned a distinct pool model (descendants inherit; sampling without replacement when poolSize ≥ branchCount, otherwise round-robin) | same as baseline | Comparing how different models explore different facets without paying the full Ensemble Max cost. Peer reviewer and adversarial reviewer run on the caller's model for a unified cross-branch evaluation. |
+| **Ensemble (max)** | `--ensemble` | N parallel trees + cross-model aggregator | ~N × baseline + 1 | Maximum-confidence analysis where convergence / divergence between every pool model is the deliverable. Combinable with `--quick`. |
+
+`--random-model`, `--model-per-branch`, and `--ensemble` are mutually exclusive. The cost-and-richness gate also lets you swap between strategies in place (only the swaps satisfied by the configured `modelPool` size are offered).
 
 Before the tree spawns, four mandatory pre-spawn gates protect you from runaway cost (depth-3 Research is ~45 agents):
 

@@ -65,6 +65,7 @@ Use the meditation's **topic slug** plus a UTC timestamp captured at the moment 
 1. **Read all meditation files**: Load `consolidation.md`, `facets.md`, `facet-registry.yml` (Research mode), `citations-index.yml` (Research mode), all `branch-*-depth-*-sub-*-*.md` files, and all `branch-*-peer-review-*.md` files (Research mode) from the working directory.
 2. **Read `init-suggestions-{ts}.yml`** if it exists (honour rules below).
 3. **Read `finalisation-enhancements.yml`** if it exists and has accepted cheap entries (K10b rendering below).
+4. **Read `model_strategy` from `facets.md` frontmatter** (per the `crux-skill-memory-meditation-coordination` skill's `facets.md` frontmatter spec). The model strategy drives per-branch attribution annotations (per the **Per-Branch Model Attribution** section below) and the footer annotation.
 
 ## Anti-Homogenisation Rules
 
@@ -296,17 +297,37 @@ The HTML/PDF reports are **subject-matter documents**, not process logs. They mu
 - Cross-references use topics by name.
 - Executive summaries lead with the substantive conclusion.
 
+## Per-Branch Model Attribution (level-conditional on `model_strategy.mode`)
+
+The `model_strategy` block read from `facets.md` frontmatter drives how the report attributes findings by model:
+
+- **`mode: "none"`** — no attribution annotations; report renders exactly as it did pre-modelStrategy.
+- **`mode: "random"`** — the hero or executive-summary stat-card row includes one extra stat card or annotation: `Model: {resolved_model_label}` (one line, near the existing meta-row such as "Mode" / "Depth" / "Richness"). Per-branch sections do NOT carry per-finding model attribution because the entire tree ran on a single model.
+- **`mode: "per_branch"`** — every per-branch section heading (when `per_branch_section_depth ∈ {branch_summary, per_leaf_detail}`) includes a `[branch model: {label}]` annotation next to the facet title. Findings in those sections inherit the annotation from their containing branch section (no per-finding repetition required). When `per_branch_section_depth == "consolidation_only"` (compact richness), inline `[branch model: {label}]` markers appear adjacent to each finding inside the consolidated prose to preserve attribution. The model legend MUST appear in the hero's meta-row (e.g. as a small chip row: `Branch 1: GPT 5.5 · Branch 2: Opus 4.7 · Branch 3: Gemini Pro 3.1`) so the reader can map labels to facets without scrolling.
+- **`mode: "ensemble_max"`** — model attribution follows the ensemble report contract in the `crux-skill-memory-meditation-ensemble` skill (`[model: label]` / `[models: all]` markers, agreement heatmap, etc.). Per-tree reports under `model-{slug}/` use single-model attribution (effectively the `random` rendering pinned to that tree's model).
+
+**Citation list integration**: when per-branch attribution markers are present, the `## Citations` section adds a brief "Model attribution" subsection listing each branch's model and the count of findings attributed to it.
+
 ## Footer Annotation
 
 The footer annotation format:
 
     theme: editorial / warm_palette / serif_headings_sans_body | level: default
 
-When ≥1 finalisation enhancement was accepted and rendered via the respawn path, append:
+The `model_strategy` extension extends the footer:
 
-    theme: editorial / warm_palette / serif_headings_sans_body | level: default | finalisation-enhancements: 3 (executive_summary, risks_section, glossary)
+- **`mode: "none"`** → no model-strategy segment appended.
+- **`mode: "random"`** → append `| model_strategy: random ({resolved_model_label})`
+- **`mode: "per_branch"`** → append `| model_strategy: per_branch ({comma-separated list of "b{index}: {label}"})`. Example: `| model_strategy: per_branch (b1: GPT 5.5, b2: Opus 4.7, b3: Gemini Pro 3.1)`.
+- **`mode: "ensemble_max"`** → handled by the ensemble report contract (per-tree reports show the tree's pinned model; the cross-model synthesis report uses the ensemble footer extension in `skill:ensemble`).
 
-**Skip-all path**: when 0 finalisation enhancements were accepted, the `finalisation-enhancements:` segment MUST be omitted entirely — it must NOT be written as `finalisation-enhancements: 0`. The `level:` segment IS always written from this spec forward.
+When ≥1 finalisation enhancement was accepted and rendered via the respawn path, the existing `finalisation-enhancements:` segment is appended in the usual position. Order in the footer when all segments are present: `theme: … | level: … | model_strategy: … | finalisation-enhancements: …`.
+
+Example combined footer:
+
+    theme: editorial / warm_palette / serif_headings_sans_body | level: default | model_strategy: per_branch (b1: GPT 5.5, b2: Opus 4.7, b3: Gemini Pro 3.1) | finalisation-enhancements: 2 (executive_summary, risks_section)
+
+**Skip-all path**: when 0 finalisation enhancements were accepted, the `finalisation-enhancements:` segment MUST be omitted entirely — it must NOT be written as `finalisation-enhancements: 0`. The `level:` segment IS always written from this spec forward. The `model_strategy:` segment is written if and only if `mode ≠ "none"`.
 
 **Ensemble split**: per-tree reports' footer annotations enumerate ONLY the per-tree-sourced accepted enhancements; the cross-model synthesis report's footer enumerates ONLY the cross-model-sourced accepted enhancements.
 

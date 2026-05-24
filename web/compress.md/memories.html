@@ -812,7 +812,9 @@ promoted_from: "learning"
           <div class="memories-command-usage">
             <div class="memories-command-line"><code>/crux-meditate "topic"</code><span>Research mode (default) &mdash; depth-first recursion, peer review, mandatory citations</span></div>
             <div class="memories-command-line"><code>/crux-meditate --quick "topic"</code><span>Fast parallel fan-out for breadth-first scoping</span></div>
-            <div class="memories-command-line"><code>/crux-meditate --ensemble "topic"</code><span>Run across multiple model families, then cross-model synthesis</span></div>
+            <div class="memories-command-line"><code>/crux-meditate --random-model "topic"</code><span>Single tree, model randomly picked from <code>modelPool</code> (no extra cost)</span></div>
+            <div class="memories-command-line"><code>/crux-meditate --model-per-branch "topic"</code><span>Single tree, each top-level branch assigned a different model from the pool (no extra cost)</span></div>
+            <div class="memories-command-line"><code>/crux-meditate --ensemble "topic"</code><span>Ensemble max &mdash; run across every model in the pool in parallel, then cross-model synthesis</span></div>
             <div class="memories-command-line"><code>/crux-meditate @file @folder/</code><span>Explore referenced code architecture</span></div>
           </div>
         </div>
@@ -881,7 +883,10 @@ promoted_from: "learning"
       <h2 class="section-title">Meditate: Deep Research with Paired HTML + PDF Reports</h2>
       <p class="section-intro">Run <code>/crux-meditate "your topic"</code> to launch a recursive, memory-informed research tree that writes its outputs to <code>meditations/{yyyymmdd}-{topic-slug}/</code>. The deliverable is not a chat reply &mdash; it&rsquo;s a paired <code>report-{topic-slug}-{ts}.html</code> and <code>report-{topic-slug}-{ts}.pdf</code> with infographics, Chart.js / D3 visualisations, a clickable table of contents, a citations index, and a mandatory adversarial review pass over every output file. Reach for it on the high-stakes questions you&rsquo;d otherwise spend a day on by hand.</p>
 
-      <div class="mem-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+      <p class="section-intro" style="margin-bottom: var(--space-3); font-size: 0.95em; opacity: 0.85;">A meditation is configured on two orthogonal axes: a <strong>recursion mode</strong> (how the tree explores) and a <strong>model strategy</strong> (how <code>cruxMemories.meditate.modelPool</code> is used, if at all).</p>
+
+      <h4 style="margin: var(--space-4) 0 var(--space-2) 0; opacity: 0.85; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.05em;">Recursion mode</h4>
+      <div class="mem-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4); margin: var(--space-2) 0 var(--space-5) 0;">
         <div class="memories-feature">
           <strong>Research <span style="opacity: 0.6; font-weight: normal;">(default)</span></strong>
           <span>Depth-first serial recursion with globally unique facets, mandatory inline citations, and branch peer review at the top. Pick this when the output will be cited or drive downstream work.</span>
@@ -890,11 +895,29 @@ promoted_from: "learning"
           <strong>Quick <code style="opacity: 0.7;">--quick</code></strong>
           <span>Parallel fan-out (the legacy shape illustrated below). Same report contract, no peer review, warn-only citation enforcement. Use for early-stage breadth-first scoping.</span>
         </div>
+      </div>
+
+      <h4 style="margin: var(--space-4) 0 var(--space-2) 0; opacity: 0.85; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.05em;">Model strategy (combinable with either recursion mode)</h4>
+      <div class="mem-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4); margin: var(--space-2) 0 var(--space-6) 0;">
         <div class="memories-feature">
-          <strong>Ensemble <code style="opacity: 0.7;">--ensemble</code></strong>
-          <span>Run the entire meditation across multiple model families in parallel, then aggregate into a cross-model synthesis report highlighting convergence, divergence, and unique insights. Combinable with <code>--quick</code>.</span>
+          <strong>Single <span style="opacity: 0.6; font-weight: normal;">(default)</span></strong>
+          <span>One tree on the caller&rsquo;s model. The baseline shape and cost.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Random model <code style="opacity: 0.7;">--random-model</code></strong>
+          <span>One tree, model randomly picked from <code>modelPool</code> at the start. Same agent count as the baseline &mdash; useful for cheap diversity sampling across multiple invocations.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Model per branch <code style="opacity: 0.7;">--model-per-branch</code></strong>
+          <span>One tree, each top-level facet branch assigned a distinct model from the pool (descendants inherit). Peer reviewer and adversarial reviewer run on the caller&rsquo;s model for a unified evaluator. Same agent count as the baseline; the report carries per-branch model attribution.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Ensemble max <code style="opacity: 0.7;">--ensemble</code></strong>
+          <span>Run the entire meditation across every model in the pool in parallel, then aggregate into a cross-model synthesis report highlighting convergence, divergence, and unique insights. <code>~N&times; baseline + 1</code> agents. Combinable with <code>--quick</code>.</span>
         </div>
       </div>
+
+      <p class="section-intro" style="margin-bottom: var(--space-4); font-size: 0.9em; opacity: 0.8;"><code>--random-model</code>, <code>--model-per-branch</code>, and <code>--ensemble</code> are mutually exclusive. The cost-and-richness gate also offers in-place swaps between strategies whenever the configured <code>modelPool</code> size allows.</p>
 
       <p class="section-intro" style="margin-top: var(--space-4);">Before the tree spawns, a merged pre-spawn gate covers <strong>depth selection</strong>, <strong>cost &amp; scope acknowledgment</strong> with mode-swap options, and <strong>richness level</strong> &mdash; choose from <code>compact</code>, <code>default</code> (preselected), <code>detailed</code>, or <code>exhaustive</code> to control report depth and agent count. The depth-0 manager also produces <strong>init-time suggestions</strong> for report sections, visualisation types, and additional focus areas before branches spawn. An anti-homogenisation <strong>theme preflight</strong> and <strong>facet confirmation</strong> complete the gates. After consolidation, a <strong>finalisation-enhancement gate</strong> (multi-select 0&ndash;5 curated upgrades) refines the report before adversarial review; skipping all reproduces previous behaviour. If the adversarial review cycle can&rsquo;t reach <code>PASS</code> within three iterations, the report is not generated and you receive the iteration files plus unresolved findings instead.</p>
 
