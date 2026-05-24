@@ -22,6 +22,7 @@ Load this skill when:
 1. Verify `flags.enableMemories` is `"true"` (abort if not)
 2. Confirm `comprehensiveness:` payload is present in the spawn prompt — abort with: "`comprehensiveness:` payload required; missing from spawn prompt — caller misconfigured" if missing
 3. Confirm `theming:` payload is present — abort with a clear error pointing at Theme Preflight if missing
+4. Confirm `modelStrategy:` payload is present — abort with: "`modelStrategy:` payload required; missing from spawn prompt — caller misconfigured" if missing
 
 ## Input Parameters (depth-0 manager invocation)
 
@@ -32,10 +33,23 @@ meditateMode: "research"
 workingDir: "<absolute path to meditations/{yyyymmdd}-{topic-slug}/>"
 theming: { ... }                  # Theme Preflight payload — REQUIRED
 comprehensiveness: { ... }        # Richness payload — REQUIRED; abort if missing
+modelStrategy: { ... }            # Model strategy payload — REQUIRED; abort if missing
 confirmDeepFacets: "none" | "depth_2_only" | "all_levels"
 maxDepth: 1 | 2 | 3               # default 3
-ensembleModel: "<model-slug>"     # only when in ensemble; propagate to all children
-preConfirmedFacets: [ ... ]       # only when in ensemble — skip step 4 derivation
+ensembleModel: "<model-slug>"     # derived from modelStrategy at the depth-0 manager; carrier for per-spawn model: selection
+preConfirmedFacets: [ ... ]       # only when in ensemble_max — skip step 4 derivation
+```
+
+`modelStrategy:` payload schema (verbatim in the `/crux-meditate` command's **Model Strategy payload** section):
+
+```yaml
+modelStrategy:
+  mode: "none" | "random" | "per_branch" | "ensemble_max"
+  pool: [{slug, label}, ...]
+  resolved_model_slug: null | "<slug>"          # set when mode == "random"
+  resolved_model_label: null | "<label>"
+  branch_assignments: []                         # set in step 4b when mode == "per_branch"
+  assignment_policy_note: null | "<note>"
 ```
 
 ## Input Parameters (child Research agent, depth 1–3)
@@ -53,8 +67,9 @@ parentSubfocus: "<parent's subfocus or null at depth 1>"
 siblingFacets: [ ... ]
 theming: { ... }                  # propagated unchanged — REQUIRED
 comprehensiveness: { ... }        # propagated unchanged — REQUIRED; abort if missing
+modelStrategy: { ... }            # propagated unchanged — REQUIRED; abort if missing
 confirmDeepFacets: "none" | "depth_2_only" | "all_levels"
-ensembleModel: "<model-slug>"     # when present, propagated unchanged
+ensembleModel: "<model-slug>"     # when present, propagated unchanged; used as the per-spawn model: value for this branch's subtree
 ```
 
 ## Depth-0 Manager Workflow (steps 1–13)
@@ -183,6 +198,19 @@ needs_user_input:
 
 **Cost-ack re-presentation**: if ANY focus-area decision is `additional_facet` OR `additional_facet_AND_section`, the calling agent (not this subagent) fires the read-only-richness variant of `Q-Cost-and-Richness-Acknowledgment` BEFORE this subagent resumes step 5. This subagent only proceeds to step 5 after the calling agent confirms re-acknowledgment (passed as `cost_reack_confirmed: true` in the resume payload). If the user cancels at re-presentation, abort: do NOT write `init-suggestions-{ts}.yml` and do NOT spawn children.
 
+**Per-branch model assignment (`modelStrategy.mode == "per_branch"` only)**: after the final confirmed-branch count `B` is known (3 + any accepted `additional_facet` / `additional_facet_AND_section` opt-ins) AND after any cost-ack re-presentation has resolved, resolve `modelStrategy.branch_assignments[]` per the policy in the `/crux-meditate` command's **Argument Handling** section:
+
+1. Compute `B = len(confirmed_facets)` (after `additional_facet` reconciliation).
+2. Let `P = len(modelStrategy.pool)`.
+3. Deterministically shuffle the pool with seed = SHA-256 of `"{topic_slug}-{first-pending-facets-ts}"` truncated to 32 bits (reproducible within a run; varies across runs).
+4. If `P ≥ B`: `branch_assignments[i] = shuffled_pool[i]` for `i ∈ [0, B-1]` (each branch gets a distinct model).
+5. If `P < B`: `branch_assignments[i] = shuffled_pool[i mod P]` for `i ∈ [0, B-1]` (round-robin; some models repeat); set `modelStrategy.assignment_policy_note = "per_branch model strategy: poolSize={P} < branchCount={B}; rounded-robin assignments may repeat"`.
+6. Each entry: `{branch_index: i+1, slug: pool[k].slug, label: pool[k].label}`.
+
+This update to `modelStrategy` is **in-memory only** for the depth-0 manager — it's a derived field used to drive per-spawn `model:` dispatch in step 5. The resolved assignments are also surfaced in `facets.md` per the `crux-skill-memory-meditation-coordination` skill so the report can attribute findings by branch.
+
+For `modelStrategy.mode ∈ {"none", "random", "ensemble_max"}`, leave `branch_assignments` empty — those modes do not use per-branch dispatch.
+
 **Write `init-suggestions-{ts}.yml`**: write to `meditations/{yyyymmdd}-{topic-slug}/init-suggestions-{ts}.yml`. Schema:
 
 ```yaml
@@ -244,7 +272,15 @@ Hold onto the `confirmDeepFacets` enum value and the `comprehensiveness:` payloa
 
 ### Step 5 — Spawn Explorers
 
-Only after step 4b has completed (facets confirmed, `init-suggestions-{ts}.yml` written, cost-reack resolved if any additional facets were accepted): Launch one background `crux-cursor-meditation-guide` subagent in Meditate mode per **confirmed** facet (3 + any accepted `additional_facet` / `additional_facet_AND_section` focus areas), all in parallel. When `ensembleModel` is present in the spawn prompt, pass `model: ensembleModel` on each Task tool invocation so the child runs on the designated model family. Each receives:
+Only after step 4b has completed (facets confirmed, `init-suggestions-{ts}.yml` written, `modelStrategy.branch_assignments` resolved for `mode: "per_branch"`, cost-reack resolved if any additional facets were accepted): Launch one background `crux-cursor-meditation-guide` subagent in Meditate mode per **confirmed** facet (3 + any accepted `additional_facet` / `additional_facet_AND_section` focus areas), all in parallel.
+
+**Per-spawn `model:` dispatch** (driven by `modelStrategy.mode`):
+- `mode: "none"` → omit `model:` from the Task invocation; do not set `ensembleModel` on the child.
+- `mode: "random"` → pass `model: modelStrategy.resolved_model_slug`; set `ensembleModel: modelStrategy.resolved_model_slug` on the child so descendants inherit.
+- `mode: "per_branch"` → pass `model: modelStrategy.branch_assignments[branchNumber - 1].slug`; set `ensembleModel: modelStrategy.branch_assignments[branchNumber - 1].slug` on the child so all descendants of THIS branch use the same model.
+- `mode: "ensemble_max"` → this depth-0 manager is itself one of N per-tree managers spawned by the calling agent's Ensemble Protocol; its incoming `modelStrategy` is pinned to `mode: "random"` for the assigned pool model — handle as `random`.
+
+Each child receives:
 - `meditateMode`: `"research"`
 - `meditateDepth`: 1
 - `maxDepth`: the value from the calling agent's Depth Selection (1, 2, or 3; default 3)
@@ -257,8 +293,9 @@ Only after step 4b has completed (facets confirmed, `init-suggestions-{ts}.yml` 
 - `siblingFacets`: the other branches' **confirmed** facet descriptions
 - `theming`: the Theme Preflight payload, passed through unchanged
 - `comprehensiveness`: the comprehensiveness payload, passed through **unchanged** — **MUST be present; subagent aborts with "`comprehensiveness:` payload required; missing from spawn prompt — caller misconfigured" if missing**
+- `modelStrategy`: the model strategy payload, passed through **unchanged** — **MUST be present; subagent aborts with the canonical error if missing**
 - `confirmDeepFacets`: the enum value from the combined confirmation (`none` | `depth_2_only` | `all_levels`) — propagated unchanged to every deeper child
-- `ensembleModel`: the model slug from the spawn prompt, if present (propagated unchanged to every deeper child)
+- `ensembleModel`: per the per-spawn `model:` dispatch rules above (propagated unchanged to every deeper child)
 
 ### Step 6 — Poll for Branch Outputs
 
@@ -268,7 +305,14 @@ Wait for one depth-1 file per branch using prefix-glob polling — `branch-1-dep
 
 ### Step 7 — Branch Peer Review (Research mode only)
 
-Spawn 3 `crux-cursor-meditation-guide` peer-review agents in parallel — one per branch. When `ensembleModel` is present, pass `model: ensembleModel` on each Task tool invocation. Each is assigned a different `peerReviewForBranch` (1, 2, or 3) and reads the other two branches' final depth-1 files plus its own branch's file, then writes `branch-{N}-peer-review-{branchSlug}-{ts}.md` per the **Peer review file spec** below. Poll for all three peer-review files via prefix-glob `branch-{N}-peer-review-*.md` (one per branch) before proceeding to consolidation.
+Spawn 3 `crux-cursor-meditation-guide` peer-review agents in parallel — one per branch. Per-spawn `model:` dispatch:
+
+- `modelStrategy.mode == "none"` → omit `model:`.
+- `modelStrategy.mode == "random"` → pass `model: modelStrategy.resolved_model_slug` (entire tree on one model, so peer reviewers also).
+- `modelStrategy.mode == "per_branch"` → **omit `model:`** so the peer reviewer runs on the caller's model. Per-branch dispatch is intentionally NOT applied to peer reviewers because they compare branches against each other; using a single unified model keeps the cross-branch evaluation fair (the peer reviewer is a cross-branch evaluator, not a within-branch worker).
+- `modelStrategy.mode == "ensemble_max"` → pass `model: ensembleModel` (this depth-0 manager's pinned per-tree model).
+
+Each is assigned a different `peerReviewForBranch` (1, 2, or 3) and reads the other two branches' final depth-1 files plus its own branch's file, then writes `branch-{N}-peer-review-{branchSlug}-{ts}.md` per the **Peer review file spec** below. Poll for all three peer-review files via prefix-glob `branch-{N}-peer-review-*.md` (one per branch) before proceeding to consolidation.
 
 ### Step 8 — Consolidate + K10c Reflection
 
@@ -408,7 +452,14 @@ Glob the working directory for actual filenames (`branch-*-depth-*-sub-*-*.md`, 
 
 ### Step 10 — Adversarial Review and Fix Cycle
 
-Spawn a **fresh** `crux-cursor-meditation-guide` subagent in **Adversarial Review** function per the canonical spec in the `crux-skill-memory-meditation-review` skill. When `ensembleModel` is present, pass `model: ensembleModel`. Pass `meditateMode`, `reviewerIteration` (1-indexed, capped at 3), `workingDir`, `theming`, `comprehensiveness`, and `priorReviewPath` (null on first iteration). Iterate up to **3 times** until verdict is `PASS` or `PASS_WITH_ADVISORIES`. Bubble Pattern-B escalations up to the calling agent.
+Spawn a **fresh** `crux-cursor-meditation-guide` subagent in **Adversarial Review** function per the canonical spec in the `crux-skill-memory-meditation-review` skill. Per-spawn `model:` dispatch (adversarial reviewer is the final unified evaluator across the entire tree):
+
+- `modelStrategy.mode == "none"` → omit `model:`.
+- `modelStrategy.mode == "random"` → pass `model: modelStrategy.resolved_model_slug`.
+- `modelStrategy.mode == "per_branch"` → **omit `model:`** so the reviewer runs on the caller's model. The reviewer audits all branches together; a single unified model preserves consistent severity classification across branches that were explored by different models.
+- `modelStrategy.mode == "ensemble_max"` → pass `model: ensembleModel` (this depth-0 manager's pinned per-tree model).
+
+Pass `meditateMode`, `reviewerIteration` (1-indexed, capped at 3), `workingDir`, `theming`, `comprehensiveness`, `modelStrategy`, and `priorReviewPath` (null on first iteration). Iterate up to **3 times** until verdict is `PASS` or `PASS_WITH_ADVISORIES`. Bubble Pattern-B escalations up to the calling agent.
 
 If the loop reaches iteration 3 with `MUST_FIX` findings still unresolved, the verdict is `ESCALATE`: **abort steps 11 and 12** and proceed to step 13 with unresolved findings.
 
@@ -499,9 +550,13 @@ Phase D — Spawn 3 children at depth+1 in parallel (only when meditateDepth < m
   child subfocuses registered by this parent), theming (propagated unchanged),
   comprehensiveness (propagated unchanged — MUST be present; child aborts
   with "`comprehensiveness:` payload required; missing from spawn prompt —
-  caller misconfigured" if missing), confirmDeepFacets (propagated unchanged),
-  ensembleModel (if present — propagated unchanged; when set, pass
-  model: ensembleModel on the Task tool invocation)
+  caller misconfigured" if missing), modelStrategy (propagated unchanged —
+  MUST be present; child aborts with the canonical error if missing),
+  confirmDeepFacets (propagated unchanged), ensembleModel (if present —
+  propagated unchanged from this agent's own ensembleModel; descendants
+  of a `per_branch` branch all inherit the SAME ensembleModel that was
+  assigned at the depth-0 → depth-1 dispatch point). When ensembleModel
+  is set, pass model: ensembleModel on the Task tool invocation.
 
 Phase E — Wait for child files via prefix-glob:
   branch-{N}-depth-{D+1}-sub-{S}-*.md (one per child sibling-index S ∈ {1,2,3})
