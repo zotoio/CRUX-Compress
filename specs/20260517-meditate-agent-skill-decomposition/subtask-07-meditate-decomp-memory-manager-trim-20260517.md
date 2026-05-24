@@ -81,7 +81,7 @@ that apply to all lifecycle modes).
 - Remember:
   `.cursor/agents/crux-cursor-memory-manager.md` is a source file —
   edit directly. If a `.crux.md` / `.crux.mdc` mirror exists for
-  it (none today), subtask 10 regenerates it.
+  it (none today), subtask 11 regenerates it.
 
 ## Testing Strategy
 **IMPORTANT**: Do NOT trigger global test suites during parallel execution.
@@ -91,18 +91,29 @@ that apply to all lifecycle modes).
   test.
 
 ## Execution Notes
-*(to be filled by executing agent)*
 
 ### Agent Session Info
-- Agent: [Not yet assigned]
-- Started: [Not yet started]
-- Completed: [Not yet completed]
+- Agent: crux-software-engineer
+- Started: 2026-05-24T06:00:00Z
+- Completed: 2026-05-24T06:05:00Z
 
 ### Work Log
-[Agent adds notes here during execution]
+1. Read `.cursor/agents/crux-cursor-memory-manager.md` (1392 lines pre-trim) to map exact section boundaries.
+2. Confirmed Meditate Mode section: lines 279–1162 (header through blank line before Forget Mode).
+3. Confirmed Forget Mode: lines 1163–1191 — preserved verbatim.
+4. Confirmed Ensemble Aggregation Mode section: lines 1192–1353 (header through blank line before `## Agent Scoping Rules`).
+5. Executed atomic Python script performing 3 replacements in-memory:
+   - Deleted both expertise bullets (lines 57–58): `**Meditate**` and `**Ensemble Aggregation**`.
+   - Replaced Meditate Mode section (lines 279–1162) with pointer paragraph `### Meditate Mode — moved`.
+   - Replaced Ensemble Aggregation Mode section (lines 1192–1353) with pointer paragraph `### Ensemble Aggregation Mode — moved`.
+6. File written: 352 lines (target ~360; 1040 lines removed).
+7. Verified: `rg -n "meditat|crux-meditate"` returns exactly 2 matches (lines 279 and 312 — both pointer paragraphs).
+8. Verified: No forbidden content survives (`Phases A–G`, `Quick 6-step`, `additional_focus_areas`, `Adversarial Review`, invocation table, etc.).
+9. Verified: Forget Mode preserved verbatim at lines 281–308 of trimmed file.
+10. `ReadLints` clean — no linter errors.
 
 ### Blockers Encountered
-[Any blockers or issues]
+None.
 
 ### Files Modified
-[List of files changed]
+- `.cursor/agents/crux-cursor-memory-manager.md` — trimmed from 1392 to 352 lines; Meditate Mode and Ensemble Aggregation Mode sections replaced with pointer paragraphs; two expertise bullets deleted.

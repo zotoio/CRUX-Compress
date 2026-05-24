@@ -1,0 +1,38 @@
+schema_version: 1
+subtask_id: "11"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-cursor-rule-manager"
+model: "claude-4.6-opus-high-thinking"
+token_budget: 200000
+state: "completed"
+started_at: "2026-05-24T06:32:00Z"
+last_heartbeat: "2026-05-24T06:33:00Z"
+completed_at: "2026-05-24T06:33:00Z"
+checklist:
+  - id: "D01"
+    text: "Modified sources audited for existing maintained .crux.md or .crux.mdc mirrors"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/subtask-11-meditate-decomp-crux-compression-20260517.md"
+  - id: "D02"
+    text: "AGENTS.crux.md explicitly treated as non-maintained and not generated"
+    done: true
+    evidence_path: null
+  - id: "D03"
+    text: "Required maintained mirrors regenerated or explicitly skipped with justification"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/subtask-11-meditate-decomp-crux-compression-20260517.md"
+  - id: "D04"
+    text: "Regenerated mirrors preserve banner, checksum, ratio, and directive intent"
+    done: true
+    evidence_path: null
+  - id: "D05"
+    text: "No new .crux.md or .crux.mdc mirror coverage introduced"
+    done: true
+    evidence_path: null
+artifacts:
+  - "specs/20260517-meditate-agent-skill-decomposition/subtask-11-meditate-decomp-crux-compression-20260517.md#execution-notes"
+errors: []
+notes: |
+  Audit complete. 10 maintained rule mirrors enumerated; all checksums match (zero regens needed).
+  AGENTS.crux.md confirmed non-existent. No rule source files were modified by upstream subtasks S04-S10.
+extra: {}

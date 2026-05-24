@@ -2,52 +2,88 @@ schema_version: 1
 subtask_id: "01"
 feature: "meditate-agent-skill-decomposition"
 assigned_agent: "crux-platform-architect"
-model: "unassigned"
+model: "host-default"
 token_budget: 200000
-state: "pending"
+state: "completed"
+started_at: "2026-05-17T11:58:35Z"
+last_heartbeat: "2026-05-17T12:10:09Z"
+completed_at: "2026-05-17T12:10:09Z"
+git_sha: "b4fc33b0c034866bb60b7fe7b03be9e0c7a18bbf"
 checklist:
   - id: "D01"
     text: "Create `meditate-frozen-contract-20260517.md` inside this spec"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md"
   - id: "D02"
     text: "**Modes inventory**: Research (default), `--quick`, `--ensemble`,"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#1-modes-inventory"
   - id: "D03"
     text: "**Calling-agent gates** verbatim or near-verbatim text:"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#2-calling-agent-gates-verbatim-or-near-verbatim"
   - id: "D04"
     text: "**Pattern A vs Pattern B** boundaries: which prompts run before"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#3-pattern-a-vs-pattern-b-boundaries"
   - id: "D05"
     text: "**Subagent contracts** (today on `crux-cursor-memory-manager`):"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#4-subagent-contracts-currently-on-crux-cursor-memory-manager"
   - id: "D06"
     text: "**Coordination conventions**: artefact filename table"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#5-coordination-conventions"
   - id: "D07"
     text: "**Mandatory report contract**: paired HTML + PDF, anti-homogenisation"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#6-mandatory-report-contract"
   - id: "D08"
     text: "**Continuation menu** (steps 9–12 calling-agent): verify report"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#7-continuation-menu--calling-agent-steps-912"
   - id: "D09"
     text: "**Cross-repo touchpoints**: `/crux-amnesia` explicit-command"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#9-cross-repo-touchpoints"
   - id: "D10"
     text: "**Source-of-truth map**: line ranges (or section headings) in the"
-    done: false
-    evidence_path: null
-artifacts: []
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md#10-source-of-truth-map"
+artifacts:
+  - path: "specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md"
+    kind: "created"
+    note: "1441-line authoritative freeze document covering modes, gates, patterns, subagent contracts, coordination conventions, mandatory report contract, continuation menu, cross-repo touchpoints, and complete source-of-truth line-range map."
+  - path: "specs/20260517-meditate-agent-skill-decomposition/spec-meditate-agent-skill-decomposition-20260517.md"
+    kind: "modified"
+    note: "Added 'Frozen contract reference' subsection to Execution Notes so later subtasks can find the freeze doc."
+  - path: "specs/20260517-meditate-agent-skill-decomposition/subtask-01-meditate-decomp-contract-capture-20260517.md"
+    kind: "modified"
+    note: "Ticked all 10 deliverables + 4 DoD items; filled in execution notes (agent, started/completed, work log, files modified)."
 errors: []
 notes: |
-  Pending — execution has not yet started.
-extra: {}
+  Subtask 01 complete — all 10 deliverables and 4 Definition-of-Done items
+  satisfied. Freeze document at
+  `specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md`
+  (1441 lines, no linter errors) is the canonical contract for the
+  meditate-agent-skill-decomposition spec. Captured against git SHA
+  `b4fc33b0c034866bb60b7fe7b03be9e0c7a18bbf`. Every contract item is
+  back-traceable to a current source line range or section heading via
+  Section 10 (Source-of-Truth Map). Token usage stayed well within the
+  200000 budget (subtask is markdown-only).
+extra:
+  freeze_doc_lines: 1441
+  source_command_lines: 1493
+  source_agent_lines: 946
+  read_only_subtask: true
+  judge:
+    verdict: "verified"
+    at: "2026-05-17T12:13:35Z"
+    notes: >-
+      Independently verified the freeze document exists, is substantive, covers
+      all required modes, gates, Pattern A/B boundaries, subagent contracts,
+      coordination/report/continuation/cross-repo topics, and includes a
+      current source-of-truth map. Spec index Execution Notes reference the
+      freeze document, markdown diagnostics are clean, and token_budget records
+      the resolved 200000 value without budget overrun.
+    fix_list: []

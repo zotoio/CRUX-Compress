@@ -2,36 +2,62 @@ schema_version: 1
 subtask_id: "06"
 feature: "meditate-agent-skill-decomposition"
 assigned_agent: "crux-software-engineer"
-model: "unassigned"
+model: "claude-sonnet-4-6"
 token_budget: 200000
-state: "pending"
+state: "completed"
+started_at: "2026-05-24T05:55:00.000Z"
+completed_at: "2026-05-24T06:20:00.000Z"
 checklist:
   - id: "D01"
     text: "Rewrite `.cursor/commands/crux-meditate.md` so that it contains"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
   - id: "D02"
     text: "Remove from the file any executable persona content that was"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
   - id: "D03"
     text: "Update every reference to `crux-cursor-memory-manager` (in the"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
   - id: "D04"
     text: "Preserve the workspace rule that **tree subagents NEVER call"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
   - id: "D05"
     text: "Verify line-count reduction is meaningful (target: >=50%"
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
   - id: "D06"
     text: "Run `python -m py_compile` is **not** applicable; instead"
-    done: false
-    evidence_path: null
-artifacts: []
+    done: true
+    evidence_path: ".cursor/commands/crux-meditate.md"
+  - id: "D07"
+    text: "Add deprecation banner to top of Meditate Mode section in crux-cursor-memory-manager.md"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
+  - id: "D08"
+    text: "Update spec status — S06 completed, aggregate_progress +1"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/status.yml"
+artifacts:
+  - path: ".cursor/commands/crux-meditate.md"
+    description: "Refactored thin-coordinator command (1020 lines, down from 2142 = 52% reduction)"
+  - path: ".cursor/agents/crux-cursor-memory-manager.md"
+    description: "Deprecation banner added at top of Meditate Mode section (line 279)"
 errors: []
 notes: |
-  Pending — execution has not yet started.
+  Execution complete. Key outcomes:
+  - crux-meditate.md refactored from 2142 to 1020 lines (52% reduction, exceeds >=50% target).
+  - Line count is above the 650-line architecture budget due to verbatim retention requirements.
+    The post-richness verbatim sections (Facet Confirmation 349 lines + Cost & Scope Ack 151 lines
+    + Ensemble mode 141 lines) alone account for 641 lines; the 650-line budget was computed against
+    the pre-richness 1493-line command. Both Design §4.2 budget note and spec requirement preserved.
+  - spawn target updated to crux-cursor-meditation-guide throughout.
+  - All 6 skill paths referenced in pointer paragraphs.
+  - comprehensiveness: invariant present in all spawn signatures.
+  - Q-Cost-and-Richness-Acknowledgment + Q-Finalisation-Enhancements + combined Pattern-B 5-sub-Q
+    askQuestion + Comprehensiveness payload all retained verbatim on command.
+  - Only crux-cursor-memory-manager reference in file is Related section non-Meditate pointer.
+  - Deprecation banner added to memory-manager line 279 per D02 of spec.
 extra: {}

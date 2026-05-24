@@ -2,56 +2,65 @@ schema_version: 1
 subtask_id: "07"
 feature: "meditate-agent-skill-decomposition"
 assigned_agent: "crux-software-engineer"
-model: "unassigned"
+model: "claude-sonnet-4-6"
 token_budget: 200000
-state: "pending"
+state: "completed"
+started_at: 2026-05-24T06:00:00Z
+last_heartbeat: 2026-05-24T06:05:00Z
+completed_at: 2026-05-24T06:05:00Z
+git_sha: null
+agent_session_id: null
 checklist:
   - id: "D01"
-    text: "For each section listed in subtask 02's \"memory-manager trim"
-    done: false
-    evidence_path: null
+    text: "For each section listed in subtask 02's \"memory-manager trim plan\", delete the section content and replace it with a pointer paragraph"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D02"
     text: "**Phases A–G research** — removed; pointer added."
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D03"
     text: "**Quick 6-step protocol** — removed; pointer added."
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D04"
     text: "**Ensemble Aggregation sub-mode** — removed; pointer added."
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D05"
     text: "**Adversarial Review sub-mode** — removed; pointer added."
-    done: false
-    evidence_path: null
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D06"
-    text: "**Meditate-only invocation rows** in the agent's invocation"
-    done: false
-    evidence_path: null
+    text: "**Meditate-only invocation rows** in the agent's invocation table — removed"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D07"
-    text: "**Meditate-only sections of the `Skills You Use` table** —"
-    done: false
-    evidence_path: null
+    text: "**Meditate-only sections of the `Skills You Use` table** — retained only non-Meditate rows"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D08"
-    text: "**Examples and prompts** that are Meditate-only — removed; if"
-    done: false
-    evidence_path: null
+    text: "**Examples and prompts** that are Meditate-only — removed"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D09"
-    text: "**Front-matter, persona prologue, generic `needs_user_input`"
-    done: false
-    evidence_path: null
+    text: "**Front-matter, persona prologue, generic `needs_user_input` envelope schema, Dream / REM / Recall / Remember / Forget sections** — preserved untouched."
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D10"
-    text: "Verify that the memory-manager file is still a complete,"
-    done: false
-    evidence_path: null
+    text: "Verify that the memory-manager file is still a complete, self-consistent agent definition for its remaining lifecycle modes (Dream / REM / Recall / Remember / Forget)."
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
   - id: "D11"
-    text: "Verify the file no longer contains substrings:"
-    done: false
-    evidence_path: null
-artifacts: []
+    text: "Verify the file no longer contains substrings: `Phases A–G research`, `Quick 6-step`, `Ensemble Aggregation` as a memory-manager mode, `Adversarial Review` as a memory-manager mode"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-memory-manager.md"
+artifacts:
+  - path: ".cursor/agents/crux-cursor-memory-manager.md"
+    description: "Trimmed memory-manager agent — 352 lines (down from 1392). Meditate Mode and Ensemble Aggregation Mode sections replaced with pointer paragraphs. Two expertise bullets deleted. Forget Mode preserved verbatim at lines 281–308."
 errors: []
 notes: |
-  Pending — execution has not yet started.
+  Completed successfully. File trimmed from 1392 to 352 lines (1040 lines removed).
+  rg for "meditat|crux-meditate" returns exactly 2 matches — both pointer paragraphs.
+  ReadLints clean. Forget Mode preserved verbatim.
 extra: {}

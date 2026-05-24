@@ -2,40 +2,71 @@ schema_version: 1
 subtask_id: "08"
 feature: "meditate-agent-skill-decomposition"
 assigned_agent: "crux-software-engineer"
-model: "unassigned"
+model: "claude-sonnet-4-6"
 token_budget: 200000
-state: "pending"
+state: "completed"
 checklist:
   - id: "D01"
-    text: "**`evals/test_q_meditate.py`** updated:"
-    done: false
-    evidence_path: null
+    text: "**`evals/test_q_meditate.py`** updated: spawn re-target + K8 narrowing + 12 new classes"
+    done: true
+    evidence_path: "evals/test_q_meditate.py"
   - id: "D02"
-    text: "**`evals/test_p_amnesia.py`** updated:"
-    done: false
-    evidence_path: null
+    text: "**`evals/test_p_amnesia.py`** verified: no changes required (amnesia tests reference command name, not spawn target)"
+    done: true
+    evidence_path: "evals/test_p_amnesia.py"
   - id: "D03"
-    text: "**`evals/sdk/tests/q-meditate.test.ts`** updated:"
-    done: false
-    evidence_path: null
+    text: "**`evals/sdk/tests/q-meditate.test.ts`** updated: spawn re-target + resolver widening + 4 new describe blocks (26 new it tests)"
+    done: true
+    evidence_path: "evals/sdk/tests/q-meditate.test.ts"
   - id: "D04"
-    text: "**`evals/conftest.py`** updated:"
-    done: false
-    evidence_path: null
+    text: "**`evals/conftest.py`** updated: _read_meditation_artifact helper + 2 fixtures"
+    done: true
+    evidence_path: "evals/conftest.py"
   - id: "D05"
-    text: "**`evals/USER_EVAL_CHECKLISTS.md`** and **`evals/sdk/README.md`**"
-    done: false
-    evidence_path: null
+    text: "**`evals/USER_EVAL_CHECKLISTS.md`** and **`evals/sdk/README.md`** updated"
+    done: true
+    evidence_path: "evals/USER_EVAL_CHECKLISTS.md"
   - id: "D06"
-    text: "Run the **specific** test suites locally to confirm green:"
-    done: false
+    text: "pytest evals/test_q_meditate.py evals/test_p_amnesia.py: 353/353 passed"
+    done: true
     evidence_path: null
   - id: "D07"
-    text: "If any pre-existing test failure is unrelated, capture it as"
-    done: false
+    text: "Deviations from plan documented in Execution Notes (D1-D6); all format-change adaptations justified"
+    done: true
     evidence_path: null
-artifacts: []
+  - id: "D08"
+    text: "vitest: 48 passed / 6 skipped (SDK_EVAL_SKIP_EXPENSIVE) / 0 failed"
+    done: true
+    evidence_path: null
+artifacts:
+  - path: "evals/test_q_meditate.py"
+    description: "Updated: spawn re-target, K8 narrowing, resolver widening, 12 new test classes"
+  - path: "evals/test_p_amnesia.py"
+    description: "Verified verbatim: no changes needed (amnesia refs command name only)"
+  - path: "evals/sdk/tests/q-meditate.test.ts"
+    description: "Updated: spawn re-target, resolver widening, 4 new structural describe blocks"
+  - path: "evals/conftest.py"
+    description: "Updated: _read_meditation_artifact helper + sample_meditation_working_dir + sample_init_suggestions_yml"
+  - path: "evals/USER_EVAL_CHECKLISTS.md"
+    description: "Updated: Q1 spawn row re-targeted, 5 new expected-outcome rows, Key Files table extended"
+  - path: "evals/sdk/README.md"
+    description: "Updated: Test Categories row for Q:Meditate, helper resolution paragraph"
 errors: []
 notes: |
-  Pending — execution has not yet started.
+  Completed 2026-05-24. All 353 pytest tests pass; 48/54 vitest tests pass (6 SDK_EVAL_SKIP_EXPENSIVE skips as designed).
+  ReadLints clean on all 5 modified eval files.
+
+  Key metrics:
+  - New pytest classes: 12 (target ≥10)
+  - New TS describe blocks: 4 (target 4)
+  - New negative assertions (pytest): ≥25 unique
+  - New negative assertions (TS): 6 unique
+  - Grand total new negatives: ≥31 (target ≥28)
+  - Resolver-widening cases (Python): 6 classes (target 6)
+  - Resolver-widening cases (TS): 3 describe blocks (target 3)
+  - K8 list narrowing: applied (removed 4 decomp-legitimate paths)
+  - Spawn-target re-target: 1 Python method + 1 TS it block
+
+  Deviations: 6 documented deviations from plan due to actual post-S06/S07 content
+  format differences (see Execution Notes in subtask brief for details).
 extra: {}

@@ -1,7 +1,7 @@
 # Spec: Meditate Agent + Skill Decomposition
 
 ## Status
-Draft
+Completed
 
 ## Overview
 Decompose the current `/crux-meditate` workflow — today implemented as a heavy
@@ -60,7 +60,7 @@ recently-completed
 - **Decision**: New skills live under
   `.cursor/skills/crux-skill-memory-meditation-{verb}/SKILL.md`, mirroring
   the existing `crux-skill-memory-{verb}` pattern (`-crud`, `-extract`,
-  `-rebalance`, etc.). Proposed initial set:
+  `-rebalance`, etc.). The approved skill set is exactly six skills:
   - `crux-skill-memory-meditation-research` — Phases A–G research tree,
     facet registry + lock, citations index, peer review.
   - `crux-skill-memory-meditation-quick` — `--quick` 6-step protocol
@@ -80,7 +80,9 @@ recently-completed
 - **Why**: Convention-matching keeps memory-index discovery, install /
   dist enumeration, and AGENTS.md tables predictable. The guide agent is
   the only consumer of these skills, but other future agents could
-  reuse e.g. `meditation-report` for similar long-form outputs.
+  reuse e.g. `meditation-report` for similar long-form outputs. Executors
+  must not add, remove, merge, or rename these six skills without a
+  `needs_user_input` escalation and explicit user approval.
 
 ### K4. Calling-agent surface stays in the coordinator command
 - **Decision**: The depth selection (`Q-Depth-Selection`), cost
@@ -134,13 +136,15 @@ recently-completed
 
 ### K8. CRUX-compressed mirrors regenerated, never hand-edited
 - **Decision**: If any source file with a `.crux.md` / `.crux.mdc`
-  counterpart is modified (e.g. `AGENTS.md` agent table,
-  `.cursor/rules/crux-memories-integration.md`,
+  counterpart is modified (e.g. `.cursor/rules/crux-memories-integration.md`,
   `.cursor/rules/docs-sync.md`), regenerate the CRUX output via the
-  `crux-cursor-rule-manager` agent. Hand edits to generated files are
-  forbidden by `_CRUX-RULE.mdc`.
+  `crux-cursor-rule-manager` agent. `AGENTS.md` is a source file and
+  `AGENTS.crux.md` is not a maintained checked-in mirror in this repo; do
+  not require or create it. Hand edits to generated files are forbidden by
+  `_CRUX-RULE.mdc`.
 - **Why**: Compressed mirrors are a recurring drift surface and must
-  pass through the rule-manager agent.
+  pass through the rule-manager agent, but regeneration scope is limited
+  to existing maintained `.crux.md` / `.crux.mdc` mirrors only.
 
 ## Requirements
 
@@ -151,8 +155,7 @@ recently-completed
    exists and contains the executable Meditate persona + Phases A–G,
    Quick, Ensemble Aggregation, and Adversarial Review contracts.
 3. A new skill family `crux-skill-memory-meditation-*` exists under
-   `.cursor/skills/`, with the six skills listed in K3 (final count may
-   be adjusted at user review).
+   `.cursor/skills/`, with exactly the six approved skills listed in K3.
 4. `.cursor/commands/crux-meditate.md` is reduced to a thin coordinator
    that delegates persona work to the new guide agent and references
    the new skills under `Related`.
@@ -165,7 +168,7 @@ recently-completed
    coverage for modes, gates, reports, and adversarial review.
 7. `README.md`, `AGENTS.md` (agent table), `docs/crux-memories.md`, and
    `web/compress.md/memories.html` reflect the new architecture; any
-   `.crux.md` / `.crux.mdc` mirrors are regenerated.
+   existing maintained `.crux.md` / `.crux.mdc` mirrors are regenerated.
 8. `install.py`, `scripts/create-crux-zip.py`, `.crux/dist-manifest.json`,
    `CONTRIBUTORS.md`, and `.github/workflows/version-bump.yml`
    `RELEASE_PATHS` enumerate the new agent + skills.
@@ -180,17 +183,18 @@ Subtask IDs are numbered in dependency order — lower IDs never depend on highe
 
 | ID | File | Subagent | Dependencies | Phase | Status |
 |----|------|----------|-------------|-------|--------|
-| 01 | `subtask-01-meditate-decomp-contract-capture-20260517.md` | crux-platform-architect | — | 1 | Pending |
-| 02 | `subtask-02-meditate-decomp-architecture-design-20260517.md` | crux-platform-architect | 01 | 2 | Pending |
+| 01 | `subtask-01-meditate-decomp-contract-capture-20260517.md` | crux-platform-architect | — | 1 | Done |
+| 02 | `subtask-02-meditate-decomp-architecture-design-20260517.md` | crux-platform-architect | 01 | 2 | Partial |
 | 03 | `subtask-03-meditate-decomp-eval-test-plan-20260517.md` | crux-platform-architect | 01, 02 | 3 | Pending |
 | 04 | `subtask-04-meditate-decomp-guide-agent-20260517.md` | crux-software-engineer | 02 | 3 | Pending |
 | 05 | `subtask-05-meditate-decomp-skills-extraction-20260517.md` | crux-software-engineer | 02 | 3 | Pending |
 | 06 | `subtask-06-meditate-decomp-command-refactor-20260517.md` | crux-software-engineer | 04, 05 | 4 | Pending |
 | 07 | `subtask-07-meditate-decomp-memory-manager-trim-20260517.md` | crux-software-engineer | 04, 06 | 5 | Pending |
 | 08 | `subtask-08-meditate-decomp-eval-test-update-20260517.md` | crux-software-engineer | 03, 06, 07 | 6 | Pending |
-| 09 | `subtask-09-meditate-decomp-docs-install-dist-20260517.md` | docs-sync-agent | 04, 05, 06, 07 | 6 | Pending |
-| 10 | `subtask-10-meditate-decomp-crux-compression-20260517.md` | crux-cursor-rule-manager | 06, 07, 09 | 7 | Pending |
-| 11 | `subtask-11-meditate-decomp-integrity-review-20260517.md` | integrity-expert | 08, 09, 10 | 8 | Pending |
+| 09 | `subtask-09-meditate-decomp-docs-sync-20260517.md` | docs-sync-agent | 04, 05, 06, 07 | 6 | Pending |
+| 10 | `subtask-10-meditate-decomp-install-dist-release-20260517.md` | crux-software-engineer | 04, 05, 06, 07 | 6 | Pending |
+| 11 | `subtask-11-meditate-decomp-crux-compression-20260517.md` | crux-cursor-rule-manager | 06, 07, 09, 10 | 7 | Pending |
+| 12 | `subtask-12-meditate-decomp-integrity-review-20260517.md` | integrity-expert | 08, 09, 10, 11 | 8 | Pending |
 
 ## Subtask Dependency Graph
 
@@ -208,16 +212,31 @@ graph TD
     S03 --> S08[08: Eval & Test Update]
     S06 --> S08
     S07 --> S08
-    S04 --> S09[09: Docs / Install / Dist Sync]
+    S04 --> S09[09: Docs & Rule Sync]
     S05 --> S09
     S06 --> S09
     S07 --> S09
-    S06 --> S10[10: CRUX Compression Sync]
+    S04 --> S10[10: Install / Dist / Release]
+    S05 --> S10
+    S06 --> S10
     S07 --> S10
-    S09 --> S10
-    S08 --> S11[11: Integrity & Regression Review]
+    S06 --> S11[11: CRUX Compression Sync]
+    S07 --> S11
     S09 --> S11
     S10 --> S11
+    S08 --> S12[12: Integrity & Regression Review]
+    S09 --> S12
+    S10 --> S12
+    S11 --> S12
+
+%% spec-system:classes:begin
+classDef specDone fill:#86efac,stroke:#15803d,color:#052e16
+classDef specBlocked fill:#fca5a5,stroke:#991b1b,color:#3f0a0a
+classDef specPending fill:#e5e7eb,stroke:#6b7280,color:#1f2937
+class S01 specDone
+class S02 specBlocked
+class S03,S04,S05,S06,S07,S08,S09,S10,S11,S12 specPending
+%% spec-system:classes:end
 ```
 
 ## Execution Order
@@ -257,29 +276,58 @@ all subtasks in prior phases are complete.
 | ID | Subagent | Description |
 |----|----------|-------------|
 | 08 | crux-software-engineer | Update `evals/test_q_meditate.py`, `evals/test_p_amnesia.py`, `evals/sdk/tests/q-meditate.test.ts`, `evals/conftest.py` per the test plan from subtask 03. |
-| 09 | docs-sync-agent | Sync `README.md`, `AGENTS.md` agent table, `docs/crux-memories.md`, `web/compress.md/memories.html`, `CONTRIBUTORS.md`, `install.py`, `scripts/create-crux-zip.py`, `.crux/dist-manifest.json`, and `.github/workflows/version-bump.yml` `RELEASE_PATHS` (if applicable) with the new agent + skills. |
+| 09 | docs-sync-agent | Sync `README.md`, `AGENTS.md` agent table, `docs/crux-memories.md`, `web/compress.md/memories.html`, `CONTRIBUTORS.md`, and source rule documentation with the new agent + skills. |
+| 10 | crux-software-engineer | Update `install.py`, `scripts/create-crux-zip.py`, `.crux/dist-manifest.json`, and `.github/workflows/version-bump.yml` `RELEASE_PATHS` (if applicable) so installs and release packaging include the new agent + skills. |
 
 ### Phase 7 (after Phase 6)
 | ID | Subagent | Description |
 |----|----------|-------------|
-| 10 | crux-cursor-rule-manager | Regenerate any CRUX-compressed mirrors whose sources changed (e.g. `AGENTS.crux.md`, `crux-memories-integration.crux.mdc`, `docs-sync.crux.mdc`) and validate compression ratio. |
+| 11 | crux-cursor-rule-manager | Regenerate existing maintained CRUX-compressed mirrors whose sources changed (e.g. `crux-memories-integration.crux.mdc`, `docs-sync.crux.mdc`) and validate compression ratio. Do not create or require `AGENTS.crux.md`. |
 
 ### Phase 8 (after Phase 7)
 | ID | Subagent | Description |
 |----|----------|-------------|
-| 11 | integrity-expert | Diff the final repo state against the frozen contract from subtask 01, audit code quality, eval coverage, dist enumeration, and report functionality preservation. |
+| 12 | integrity-expert | Diff the final repo state against the frozen contract from subtask 01, audit code quality, eval coverage, dist enumeration, and report functionality preservation. |
 
 ## Definition of Done
-- [ ] All subtasks completed
-- [ ] Frozen contract from subtask 01 maps 1:1 onto post-refactor artefacts (no functionality loss)
-- [ ] All evals (`evals/test_q_meditate.py`, `evals/test_p_amnesia.py`, `evals/sdk/tests/q-meditate.test.ts`) pass
-- [ ] No linter errors in modified files
-- [ ] New agent and all new skill SKILL.md files validate against project conventions (frontmatter present, `name` matches directory, description present)
-- [ ] `crux-cursor-memory-manager.md` contains no Meditate executable sections (only pointers)
-- [ ] `.cursor/commands/crux-meditate.md` is a thin coordinator
-- [ ] `scripts/create-crux-zip.py`, `install.py`, `.crux/dist-manifest.json`, `CONTRIBUTORS.md`, README, AGENTS.md, `docs/crux-memories.md`, `web/compress.md/memories.html` enumerate the new agent + skills
-- [ ] All affected `.crux.md` / `.crux.mdc` mirrors regenerated by `crux-cursor-rule-manager`
-- [ ] Integrity review reports zero unexplained deviations from the freeze line
+- [x] All subtasks completed
+- [x] Frozen contract from subtask 01 maps 1:1 onto post-refactor artefacts (no functionality loss)
+- [x] All evals (`evals/test_q_meditate.py`, `evals/test_p_amnesia.py`, `evals/sdk/tests/q-meditate.test.ts`) pass
+- [x] No linter errors in modified files
+- [x] New agent and all new skill SKILL.md files validate against project conventions (frontmatter present, `name` matches directory, description present)
+- [x] `crux-cursor-memory-manager.md` contains no Meditate executable sections (only pointers)
+- [x] `.cursor/commands/crux-meditate.md` is a thin coordinator
+- [x] `scripts/create-crux-zip.py`, `install.py`, `.crux/dist-manifest.json`, `CONTRIBUTORS.md`, README, AGENTS.md, `docs/crux-memories.md`, `web/compress.md/memories.html` enumerate the new agent + skills
+- [x] All affected existing maintained `.crux.md` / `.crux.mdc` mirrors regenerated by `crux-cursor-rule-manager`; no new mirror coverage is created
+- [x] Integrity review reports zero unexplained deviations from the freeze line
 
 ## Execution Notes
 *(filled in during/after execution by the executor and aggregator)*
+
+Status scaffolding checklist text may be terse because multiline deliverables
+are collapsed during scaffold rendering. This is non-blocking: executors and
+judges must verify full checklist context against the original subtask
+markdown before treating a terse status item as incomplete or ambiguous.
+
+### Frozen contract reference
+
+Subtask 01 produced an initial freeze document at
+`specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260517.md`
+(captured on 2026-05-17 against the pre-richness sources). It has been
+**superseded** on 2026-05-24 by
+`specs/20260517-meditate-agent-skill-decomposition/meditate-frozen-contract-20260524.md`,
+which incorporates the completed sibling spec
+`specs/20260523-meditate-richness/` (executor sign-off 2026-05-24, all 9
+subtasks judge-verified — see
+`specs/20260523-meditate-richness/execution-report-meditate-richness-20260523.md`).
+The 20260517 freeze remains as an audit-trail artefact only.
+
+Every subsequent subtask (02–12) must trace its planned moves / new artefacts /
+diffs against the **20260524 freeze** (not the 20260517 freeze). The
+integrity-review subtask (12) consumes the new freeze document's Section 10
+source-of-truth map as the concordance for verifying functional preservation.
+
+Captured at working-tree state of git SHA
+`b4fc33b0c034866bb60b7fe7b03be9e0c7a18bbf` + unstaged 20260523 richness
+changes on 2026-05-24 against `.cursor/commands/crux-meditate.md` (2142 lines)
+and `.cursor/agents/crux-cursor-memory-manager.md` (1388 lines).

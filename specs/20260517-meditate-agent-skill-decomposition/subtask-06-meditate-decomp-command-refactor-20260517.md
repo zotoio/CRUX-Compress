@@ -110,18 +110,43 @@ contract must be preserved exactly per the freeze document
   executable sections.
 
 ## Execution Notes
-*(to be filled by executing agent)*
 
 ### Agent Session Info
-- Agent: [Not yet assigned]
-- Started: [Not yet started]
-- Completed: [Not yet completed]
+- Agent: crux-software-engineer (claude-sonnet-4-6)
+- Started: 2026-05-24T05:55:00Z
+- Completed: 2026-05-24T06:20:00Z
 
 ### Work Log
-[Agent adds notes here during execution]
+
+1. Read subtask brief, frozen contract (20260524), architecture design §4 (coordinator command shape, budget projection §4.2, spawn signatures §4.3).
+2. Read all 6 S05 skill SKILL.md files to confirm they exist and cover the content being removed from the command.
+3. Read the existing `.cursor/agents/crux-cursor-meditation-guide.md` (created by S04) to confirm the new spawn target.
+4. Audited the full 2142-line crux-meditate.md identifying the 10 sections to shrink to pointers vs the verbatim retained sections.
+5. Wrote the refactored crux-meditate.md (1020 lines, ~52% reduction):
+   - Changed spawn target in Instructions to `crux-cursor-meditation-guide`
+   - Anti-Homogenisation Rules block replaced with pointer to `skill:report`
+   - Coordination Conventions → 5-line pointer to `skill:coordination`
+   - Research mode steps 1–8 → 10-line pointer to `skill:research`
+   - Quick mode steps 1–8 → 8-line pointer to `skill:quick`
+   - Ensemble Protocol updated (`crux-cursor-memory-manager` → `crux-cursor-meditation-guide`, added `comprehensiveness:` REQUIRED annotation)
+   - Branch & Leaf Index template → 5-line pointer to `skill:coordination`
+   - K10b Per-Cheap-Type Rendering Contract → pointer to `skill:report`
+   - K10 Ensemble Respawn Targeting + Ensemble layered cadence → pointer to `skill:ensemble`
+   - Adversarial Review → 4-line summary + pointer to `skill:review` + `skill:report`
+   - Subject-Matter Focus → pointer to `skill:report`
+   - Process Retrospective → pointer to `skill:coordination`
+   - Report Generation → pointer to `skill:report`
+   - Ensemble Aggregation Report → pointer to `skill:ensemble` + `skill:report`
+   - Related section rewritten to reference `crux-cursor-meditation-guide` + all 6 skills + Memory Manager for non-Meditate workflows
+6. Added deprecation banner to `crux-cursor-memory-manager.md` at line 279 (top of Meditate Mode section).
+7. Updated S06 status pair (yml + md) to completed.
+8. Updated spec status.yml: S06 state=completed, aggregate_progress completed +1 → 6, appended rebuild event.
 
 ### Blockers Encountered
-[Any blockers or issues]
+
+**Line count target discrepancy**: Architecture design §4.2 projected ~650 lines; actual refactored result is 1020 lines. Root cause: the 650-line budget was computed against the pre-richness 1493-line command. The richness spec (20260523) added 649 lines to the command (2142 total), and the verbatim retention requirements in the user's task spec preserve all the large calling-agent sections (Facet Confirmation 349 lines, Cost & Scope Ack 151 lines, Ensemble Protocol 141 lines). These three sections alone total 641 lines, leaving minimal room for the pointer sections. The 1020-line result still represents a 52% reduction (exceeds the ">50%" target in the original subtask brief).
 
 ### Files Modified
-[List of files changed]
+
+1. `.cursor/commands/crux-meditate.md` — Refactored thin-coordinator command (2142 → 1020 lines, 52% reduction)
+2. `.cursor/agents/crux-cursor-memory-manager.md` — Deprecation banner added at top of Meditate Mode section (line 279)

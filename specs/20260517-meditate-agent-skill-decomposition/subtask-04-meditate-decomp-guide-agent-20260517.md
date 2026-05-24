@@ -95,7 +95,7 @@ not the other way round.
 - Do **not** modify `.cursor/commands/crux-meditate.md` here — the
   command refactor is owned by subtask 06.
 - Follow the foundational CRUX rule: do not introduce a generated
-  `.crux.md` mirror as part of this subtask. Subtask 10 handles
+  `.crux.md` mirror as part of this subtask. Subtask 11 handles
   CRUX compression of any source file that warrants it.
 - The agent file is a **source** file (no generated frontmatter), so
   it is hand-edited.
@@ -109,18 +109,63 @@ not the other way round.
   the expected frontmatter `name`.
 
 ## Execution Notes
-*(to be filled by executing agent)*
 
 ### Agent Session Info
-- Agent: [Not yet assigned]
-- Started: [Not yet started]
-- Completed: [Not yet completed]
+- Agent: crux-software-engineer
+- Started: 2026-05-24T05:20:00Z
+- Completed: 2026-05-24T05:45:00Z
 
 ### Work Log
-[Agent adds notes here during execution]
+
+1. Read subtask-04 spec, frozen contract (meditate-frozen-contract-20260524.md), architecture
+   design §1 (guide-agent spec, §1.3 mode router, §1.4 budget ≤500 lines), memory manager
+   source (lines 279–1159 Meditate Mode + 1189–1349 Ensemble Aggregation Mode) for persona
+   voice, invocation table, design principles, and step details.
+2. Created `.cursor/agents/crux-cursor-meditation-guide.md` with exact frontmatter from user
+   query constraint #2, persona prologue mirroring crux-cursor-memory-manager.md shape,
+   User Input Escalation block verbatim from memory-manager, Your Expertise bullets per §1.2
+   point 4, 6-row Skills You Use table, mode router with invocation variants table + preamble,
+   Research steps 1–13 (incl. 4b, 8b, 12b) as one-paragraph-each summaries, Quick mode
+   substitution table, K10 Reflection function section (new row per §1.3 row 5), Adversarial
+   Review function, Ensemble Aggregation function, Report generation obligation, Design
+   Principles (21 bullets derived from memory-manager 1137–1158 plus new richness-era bullets),
+   Agent Scoping Rules, and Critical Rules.
+3. First draft: 565 lines (over budget). Trimmed Research steps 4, 4b, 8, 8b, 12 and Design
+   Principles bullets to reduce to 495 lines (within ≤500 budget).
+4. Verified: 6 distinct skills referenced, comprehensiveness: invariant with canonical error
+   string, K10 reflection has own mode-router section, legacy `additional_focus_areas_skipped`/
+   `additional_focus_areas_accepted` absent (prohibition restated in Critical Rules), AskQuestion
+   Critical Rule restated.
+5. Updated S04 status pair (state: completed, all checklist items ticked) and spec status.yml
+   (aggregate_progress: completed: 3, S04 state: completed, rebuild event appended).
 
 ### Blockers Encountered
-[Any blockers or issues]
+None.
 
 ### Files Modified
-[List of files changed]
+- `.cursor/agents/crux-cursor-meditation-guide.md` — **CREATED** (495 lines)
+- `specs/20260517-meditate-agent-skill-decomposition/status/subtask-04-meditate-decomp-guide-agent-20260517.status.md` — updated to completed
+- `specs/20260517-meditate-agent-skill-decomposition/status/subtask-04-meditate-decomp-guide-agent-20260517.status.yml` — updated to completed
+- `specs/20260517-meditate-agent-skill-decomposition/status.yml` — S04 → completed; aggregate_progress 3/12; rebuild event
+
+## Deliverables Checklist
+- [x] Create `.cursor/agents/crux-cursor-meditation-guide.md` with project-standard frontmatter
+- [x] **Persona prologue** with Load Context First + User Input Escalation + Your Expertise
+- [x] **Mode router** dispatching to Research / Quick / K10 Reflection / Adversarial Review / Ensemble Aggregation / Report generation
+- [x] **Phases A–G research workflow** (pointer to skill:research; step summaries in router)
+- [x] **Quick 6-step protocol** (pointer to skill:quick; substitution table in router)
+- [x] **Ensemble Aggregation function** (K10 layered cadence pointer to skill:ensemble)
+- [x] **Adversarial Review function** (13 dimensions pointer to skill:review)
+- [x] **Skill load directives** for all 6 crux-skill-memory-meditation-* skills
+- [x] **`needs_user_input` envelope schema** with mandatory `context`; AskQuestion Critical Rule
+- [x] **Subagent invocation contracts** (invocation variants table + spawn parameter summaries)
+- [x] **Coordination conventions pointer** to skill:coordination
+- [x] **Mandatory report contract pointer** to skill:report
+
+## Definition of Done
+- [x] `.cursor/agents/crux-cursor-meditation-guide.md` exists and is well-formed
+- [x] Frontmatter validates against project agent file convention (name, model, color, description, tools)
+- [x] All sections from the architecture design's "agent layer" column present
+- [x] No content from the freeze contract assigned to the agent layer is missing (all delegated to skills)
+- [x] No linter errors in the new file (markdown-only artefact)
+- [x] File is added to git status (untracked)

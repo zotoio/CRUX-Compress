@@ -2,60 +2,69 @@ schema_version: 1
 subtask_id: "04"
 feature: "meditate-agent-skill-decomposition"
 assigned_agent: "crux-software-engineer"
-model: "unassigned"
+model: "claude-sonnet-4-6"
 token_budget: 200000
-state: "pending"
+state: "completed"
+started_at: "2026-05-24T05:20:00Z"
+last_heartbeat: "2026-05-24T05:45:00Z"
+completed_at: "2026-05-24T05:45:00Z"
 checklist:
   - id: "D01"
-    text: "Create `.cursor/agents/crux-cursor-meditation-guide.md` with"
-    done: false
-    evidence_path: null
+    text: "Create `.cursor/agents/crux-cursor-meditation-guide.md` with project-standard frontmatter"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D02"
-    text: "**Persona prologue** (\"You are the CRUX Meditation Guide…\")"
-    done: false
-    evidence_path: null
+    text: "Persona prologue with Load Context First, User Input Escalation, Your Expertise"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D03"
-    text: "**Mode router**: dispatches inbound `Task` invocations to"
-    done: false
-    evidence_path: null
+    text: "Mode router with 8-row invocation table, theming/comprehensiveness abort rules"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D04"
-    text: "**Phases A–G research workflow** (Research mode default,"
-    done: false
-    evidence_path: null
+    text: "Phases A–G research workflow pointer + steps 1–13 incl. 4b + 8b"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D05"
-    text: "**Quick 6-step protocol** (`--quick`), warn-only citations,"
-    done: false
-    evidence_path: null
+    text: "Quick 6-step protocol pointer + Quick substitution table"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D06"
-    text: "**Ensemble Aggregation sub-mode**: aggregator reads all"
-    done: false
-    evidence_path: null
+    text: "Ensemble Aggregation function with K10 layered cadence pointer to skill:ensemble"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D07"
-    text: "**Adversarial Review sub-mode**: 11 dimensions, severities"
-    done: false
-    evidence_path: null
+    text: "Adversarial Review function with 13 dimensions pointer, Dim 13 respawn_required"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D08"
-    text: "**Skill load directives**: every sub-mode that maps to a new"
-    done: false
-    evidence_path: null
+    text: "Skill load directives for all 6 crux-skill-memory-meditation-* skills"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D09"
-    text: "**`needs_user_input` envelope schema** documented with the"
-    done: false
-    evidence_path: null
+    text: "needs_user_input schema with mandatory context; AskQuestion Critical Rule"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D10"
-    text: "**Subagent invocation contracts** that the agent itself"
-    done: false
-    evidence_path: null
+    text: "Subagent invocation contracts with invocation variants table"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D11"
-    text: "**Coordination conventions pointer**: file-naming table,"
-    done: false
-    evidence_path: null
+    text: "Coordination conventions pointer to skill:coordination (18-row filename grammar)"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
   - id: "D12"
-    text: "**Mandatory report contract pointer / inline**: paired HTML +"
-    done: false
-    evidence_path: null
-artifacts: []
+    text: "Mandatory report contract pointer to skill:report (HTML+PDF, K10b, Universal Contrast)"
+    done: true
+    evidence_path: ".cursor/agents/crux-cursor-meditation-guide.md"
+artifacts:
+  - path: ".cursor/agents/crux-cursor-meditation-guide.md"
+    type: "agent"
+    description: "New meditation guide agent, 495 lines (≤500 budget)"
 errors: []
 notes: |
-  Pending — execution has not yet started.
+  Completed 2026-05-24. Agent file created at 495 lines — within budget. All 6 skills
+  referenced. comprehensiveness: invariant documented with canonical error string. K10
+  reflection function has its own mode-router section. Legacy additional_focus_areas_*
+  names absent. AskQuestion prohibition restated as Critical Rule.
 extra: {}

@@ -1,0 +1,57 @@
+schema_version: 1
+subtask_id: "12"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "integrity-expert"
+model: "claude-sonnet-4-6"
+token_budget: 200000
+state: "completed"
+started_at: "2026-05-24T06:41:00Z"
+last_heartbeat: "2026-05-24T06:45:00Z"
+completed_at: "2026-05-24T06:45:00Z"
+checklist:
+  - id: "D01"
+    text: "Functional preservation audited against the frozen contract"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+  - id: "D02"
+    text: "Pattern A and Pattern B boundaries verified"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+  - id: "D03"
+    text: "Targeted meditate and amnesia pytest runs completed"
+    done: true
+    evidence_path: "evals/test_q_meditate.py"
+  - id: "D04"
+    text: "SDK eval compile or equivalent spot-check completed where available"
+    done: true
+    evidence_path: "evals/sdk/tests/q-meditate.test.ts"
+  - id: "D05"
+    text: "Distribution and install enumeration verified for the agent and exactly six skills"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+  - id: "D06"
+    text: "CRUX mirror state verified with no AGENTS.crux.md requirement and no new mirror coverage"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+  - id: "D07"
+    text: "Code quality and markdown checks completed where available"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+  - id: "D08"
+    text: "Spec status reflects all 12 subtasks and terse status items are checked against source markdown"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/status.yml"
+  - id: "D09"
+    text: "Integrity findings report produced"
+    done: true
+    evidence_path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+artifacts:
+  - path: "specs/20260517-meditate-agent-skill-decomposition/integrity-report-meditate-decomp-20260524.md"
+    description: "Full integrity & regression audit report — verdict PASS_WITH_ADVISORIES; 0 BLOCKERs, 0 WARNINGs, 2 OBSERVATIONs"
+errors: []
+notes: |
+  Completed. Verdict: PASS_WITH_ADVISORIES.
+  Pytest: 353/353 green. Vitest: 48 passed / 6 skipped / 0 failed.
+  41/41 freeze-contract items PRESENT. 5×7 dist matrix PASS. 10 CRUX mirrors CURRENT.
+  No BLOCKERs. No WARNINGs. 2 benign OBSERVATIONs (no action required).
+extra: {}
