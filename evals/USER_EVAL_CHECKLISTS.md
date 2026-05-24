@@ -447,7 +447,9 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
-| 3 | The agent spawns a `crux-cursor-memory-manager` subagent in Meditate mode | A subagent is invoked |
+| 3 | The agent spawns a `crux-cursor-meditation-guide` subagent | A subagent is invoked (visible in chat or agent logs) |
+| 3 | The spawned subagent loads `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` (or `meditation-quick` in Quick mode) before executing the workflow | Agent output mentions the skill or the Read tool log shows the skill path |
+| 3 | If the user accepts the default Research mode at the Cost-and-Richness gate, the agent runs through Phases A–G; if the user switches to Quick via `switch_to_quick`, the agent runs the 6-step protocol | Mode routing is correctly applied based on user's richness-gate response |
 | 4 | The agent derives 3 distinct exploration facets from the current conversation context | Output shows 3 labelled facets (e.g. theme, topic, intent) derived from step 2 |
 | 4 | 3 parallel Level 1 agents are spawned, one per facet | Agent spawning visible in chat or agent logs |
 | 5 | Each Level 1 agent queries memories relevant to its facet | Evidence of memory index or MCP search in agent output |
@@ -482,9 +484,11 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
 | 3 | The agent derives 3 facets from the provided topic text | Facets are clearly related to "caching strategies" |
+| 3 | The `Q-Cost-and-Richness-Acknowledgment` gate fires before depth-0 spawn: 4 richness levels visible (`compact`, `default`, `detailed`, `exhaustive`); `default` preselected | User sees the merged cost+richness gate with 4 options before the exploration begins |
 | 4 | All three recursion levels execute to completion | Evidence of Level 1, Level 2, and Level 3 agents running |
 | 5 | Consolidated insights reference relevant existing memories | At least one memory is cited in the output |
 | 5 | Cross-branch connections and emergent themes are highlighted | Output explicitly identifies patterns or connections across the 3 branches |
+| 5 | After consolidation completes, the `Q-Finalisation-Enhancements` multi-select gate fires (0–5 options); selecting 0 reproduces today's behaviour and proceeds to adversarial review | Enhancement gate is presented before adversarial review begins |
 | 6 | A draft spec outline is written to `specs/` | File exists under `specs/` with a recognizable name derived from the topic |
 
 **Pass/Fail**: PASS if the topic drives facet derivation, all levels recurse, and "Save as draft spec" produces a file. FAIL if facets are unrelated to the topic, recursion stalls, or the spec save fails.
@@ -511,6 +515,7 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 
 | Step | Expected | Pass Criteria |
 |------|----------|---------------|
+| 2 | The **Theme Preflight Q1b repo-scan** fires when `@`/file references are present | A preliminary repo-scan step is visible before facet derivation proceeds |
 | 3 | The agent examines the referenced code to derive facets | Facets relate to architecture, patterns, or purpose of the referenced code |
 | 4 | Recursive exploration queries memories relevant to the code's domain | Memory queries are contextually appropriate |
 | 5 | Session concludes cleanly with no errors | No crashes or orphaned subagents |
@@ -867,12 +872,19 @@ These apply to all scenarios unless overridden by a specific scenario's prerequi
 | `.crux/reference-tracking/*.refs.yml` | Per-memory reference trackers |
 | `memories/{type}/*.memory.md` | Memory files (uncompressed) |
 | `memories/{type}/*.memory.crux.md` | Memory files (compressed) |
-| `.cursor/agents/crux-cursor-memory-manager.md` | Agent definition (Cursor) |
+| `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent (Dream, REM, Recall, Remember, Forget) |
+| `.cursor/agents/crux-cursor-meditation-guide.md` | Meditation guide agent — owns Meditate persona, Research Phases A–G, Quick 6-step protocol, 13-dim adversarial review, K10 ensemble aggregation |
 | `.cursor/commands/crux-dream.md` | Dream command definition (Cursor) |
 | `.cursor/commands/crux-recall.md` | Recall command definition (Cursor) |
 | `.cursor/commands/crux-forget.md` | Forget command definition (Cursor) |
 | `.cursor/commands/crux-remember.md` | Remember command definition (Cursor) |
 | `.cursor/commands/crux-meditate.md` | Meditate command definition (Cursor) |
+| `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` | Research-mode Phases A–G protocol |
+| `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` | Quick-mode 6-step protocol |
+| `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` | Ensemble Aggregation function |
+| `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` | 13-dimension adversarial review |
+| `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` | Paired HTML+PDF report generation |
+| `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` | File-based coordination (18-row filename grammar) |
 | `.cursor/hooks/crux-session-start.py` | Session start hook |
 | `.cursor/skills/crux-skill-memory-index/scripts/post-dream.py` | Post-dream index rebuild |
 

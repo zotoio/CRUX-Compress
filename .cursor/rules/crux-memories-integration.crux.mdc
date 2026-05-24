@@ -27,6 +27,11 @@ alwaysApply: true
  discover: read idx→load likely matches(title|desc|tags);
  MCP→semantic search ≻ idx scan;
  ⊛annotate: [memory:{title}] inline near influenced stmt!;
+ ⊛annotate=load-bearing: ¬annotate→0refs ∧ ¬strength ∧ ¬REM signal ∧ stale-nudge;
+ ⊛passthrough: subagent [memory:T]→parent MUST preserve verbatim in user-facing reply;
+ ¬strip; recursive(any depth); paraphrase→copy [memory:…] alongside;
+ subagent omits literal syntax but mem identifiable via idx→parent adds annotation;
+ ⊛self-check: pre-respond→mem influenced ∧ ¬annotated→add;
  afterAgentResponse hook→auto .refs.yml tracking; ¬manual ref-tracker skill;
  post-spec→suggest /crux-dream}
 

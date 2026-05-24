@@ -679,10 +679,31 @@ Agent-scoped memories live under `memories/agents/{agent-id}/` and are isolated 
 | `/crux-remember` | Interactively create a new ad-hoc memory |
 | `/crux-remember "insight"` | Create a memory from provided text |
 | `/crux-remember "insight" --type learning` | Create with a specific type |
-| `/crux-meditate` | Recursive memory-informed exploration of current context via file-based agent coordination |
-| `/crux-meditate "topic"` | Explore a specific theme — 3-level deep, 3-way fan-out at each level, outputs to `meditations/` |
+| `/crux-meditate` | Deep research exploration of current context — Research mode (default) with citations, peer review, adversarial review, and a paired HTML + PDF report. A merged invocation gate offers richness levels `compact` / `default` / `detailed` / `exhaustive` (`default` preselected). A post-consolidation finalisation-enhancement gate (K10, multi-select 0–5) refines the report before adversarial review. |
+| `/crux-meditate "topic"` | Same for a specific theme — e.g. `/crux-meditate "should we adopt event sourcing for the auth service"` |
+| `/crux-meditate --quick "topic"` | Faster parallel fan-out (no peer review); citations still required but enforced warn-only |
+| `/crux-meditate --ensemble "topic"` | Run the meditation across multiple model families in parallel, then aggregate into a cross-model synthesis report |
 | `/crux-amnesia` | Toggle session-only amnesia mode for ambient memory usage |
 | `/crux-amnesia on\|off\|status` | Disable, restore, or inspect session memory mode without changing repo config |
+
+### Meditate: Research, Quick, and Ensemble
+
+`/crux-meditate` is the heaviest command in the suite — it spawns a recursive research tree of subagents that mine memories, files, and chat history, then delivers a paired **HTML + PDF report** under `meditations/{yyyymmdd}-{topic-slug}/` with infographics, Chart.js / D3 visualisations, an in-page table of contents, a citations index, and a mandatory adversarial review pass over every output file. Reach for it on high-stakes problems you'd otherwise spend a day researching by hand: architecture trade-offs, technology selection, strategic investments.
+
+| Mode | Flag | Best for |
+|------|------|----------|
+| **Research** (default) | _none_ | Depth-first serial recursion with globally unique facets, mandatory inline citations, and branch peer review. Pick this when the output will be cited, persisted, or drive downstream work. |
+| **Quick** | `--quick` | Fast parallel fan-out (legacy shape). Same report contract and visualisation requirements, no peer review, warn-only citation enforcement. Use for breadth-first early scoping. |
+| **Ensemble** | `--ensemble` | Runs the entire meditation N times in parallel — one per model family from `cruxMemories.meditate.modelPool` — then produces a cross-model synthesis highlighting convergence, divergence, and unique insights. Combinable with `--quick`. |
+
+Before the tree spawns, four mandatory pre-spawn gates protect you from runaway cost (depth-3 Research is ~45 agents):
+
+1. **Depth Selection** (`Q-Depth-Selection`) — 1 / 2 / 3, default 3.
+2. **Cost & Scope Acknowledgment** (`Q-Cost-Acknowledgment`) — surfaces the agent count for the selected mode and lets you swap to Quick or Ensemble, or cancel.
+3. **Theme Preflight** (Q1–Q5) — anti-homogenisation styling questions so every report feels deliberately different from the default AI look.
+4. **Facet Confirmation** (`Q-Confirm-1` and `Q-Confirm-2`) — you approve the three top-level facets before any branches spawn, and opt in to deep-facet confirmation if desired.
+
+If the adversarial review can't reach `PASS` in ≤3 iterations, the report is not generated and you receive the review iterations plus a structured summary of unresolved findings instead.
 
 ### Session-Only Memory Override
 
@@ -700,6 +721,19 @@ Six specialized skills power the memory system:
 | `crux-skill-memory-compress` | CRUX-compress memory file bodies with adaptive sizing |
 | `crux-skill-memory-index` | Build a prioritised memory index from all memory files |
 | `crux-skill-memory-reference-tracker` | Track memory references in agent output and sync strength counters |
+
+### Meditation Skills
+
+Six dedicated skills power the `crux-cursor-meditation-guide` agent:
+
+| Skill | Purpose |
+|-------|---------|
+| `crux-skill-memory-meditation-research` | Research-mode Phases A–G depth-first recursion protocol |
+| `crux-skill-memory-meditation-quick` | Quick-mode 6-step parallel fan-out protocol |
+| `crux-skill-memory-meditation-ensemble` | Ensemble Aggregation cross-model synthesis |
+| `crux-skill-memory-meditation-review` | 13-dimension adversarial review-and-fix cycle |
+| `crux-skill-memory-meditation-report` | Mandatory paired HTML+PDF report generation |
+| `crux-skill-memory-meditation-coordination` | File-based coordination primitives and artefact filename grammar |
 
 ### Type Transitions and Reference Tracking
 
@@ -791,6 +825,7 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.cursor/hooks/crux-session-start.py`        | Session start hook                                                            |
 | `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
 | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
+| `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive meditation research guide (spawned by `/crux-meditate`)       |
 | `.cursor/commands/crux-compress.md`          | Compression command                                                           |
 | `.cursor/commands/crux-dream.md`             | Memory extraction command                                                     |
 | `.cursor/commands/crux-recall.md`            | Memory retrieval command                                                      |
@@ -940,6 +975,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
 | Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
+| Meditation Guide    | `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive meditation research agent |
 | Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
 | Recall Command      | `.cursor/commands/crux-recall.md`            | Memory query command           |
 | Forget Command      | `.cursor/commands/crux-forget.md`            | Memory removal interface       |

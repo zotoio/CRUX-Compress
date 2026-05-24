@@ -1,0 +1,51 @@
+schema_version: 1
+subtask_id: "10"
+feature: "meditate-agent-skill-decomposition"
+assigned_agent: "crux-software-engineer"
+model: "claude-sonnet-4-6"
+token_budget: 200000
+state: "completed"
+started_at: "2026-05-24T06:07:00Z"
+completed_at: "2026-05-24T06:09:26Z"
+checklist:
+  - id: "D01"
+    text: "install.py enumerates the new guide agent and six approved meditation skills"
+    done: true
+    evidence_path: "install.py"
+  - id: "D02"
+    text: "scripts/create-crux-zip.py DIST_FILES includes the new guide agent and exactly six skill paths"
+    done: true
+    evidence_path: "scripts/create-crux-zip.py"
+  - id: "D03"
+    text: ".crux/dist-manifest.json regenerated or updated to match dist file enumeration"
+    done: true
+    evidence_path: ".crux/dist-manifest.json"
+  - id: "D04"
+    text: ".github/workflows/version-bump.yml release paths cover the new shipped paths where applicable"
+    done: true
+    evidence_path: ".github/workflows/version-bump.yml"
+  - id: "D05"
+    text: "Source rule files updated only if they directly reference meditate agent architecture"
+    done: true
+    evidence_path: null
+  - id: "D06"
+    text: "No generated .crux.md or .crux.mdc files are hand-edited"
+    done: true
+    evidence_path: null
+  - id: "D07"
+    text: "Targeted parse checks for install.py and create-crux-zip.py recorded"
+    done: true
+    evidence_path: null
+artifacts:
+  - path: "install.py"
+    description: "Added crux-cursor-meditation-guide.md to MEMORY_FILE_PREFIXES; added agent + 6 skill paths to fallback list"
+  - path: "scripts/create-crux-zip.py"
+    description: "Added 7 new paths to DIST_FILES (agent + 6 meditation skills)"
+  - path: ".crux/dist-manifest.json"
+    description: "Updated with 7 new paths matching DIST_FILES"
+errors: []
+notes: |
+  version-bump.yml uses prefix matching derived from dist-manifest.json (no hand-edit needed).
+  CONTRIBUTORS.md from S09 does NOT yet have the new entries — S09 state is still pending.
+  Coordination warning raised in subtask brief Execution Notes.
+extra: {}

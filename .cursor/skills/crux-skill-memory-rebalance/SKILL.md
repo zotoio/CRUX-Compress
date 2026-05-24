@@ -572,13 +572,13 @@ When a memory transitions between types, follow this exact procedure:
 
 ## Integration
 
-| Component | Location | Role |
-|-----------|----------|------|
+| Component | Reference | Role |
+|-----------|-----------|------|
 | Config | `.crux/crux-memories.json` | `typeTransitions`, `demoteAfterDaysUnreferenced`, `archiveAfterDaysUnreferenced`, `referenceTracking`, `storage` |
-| Memory CRUD | `.cursor/skills/crux-skill-memory-crud/SKILL.md` | Frontmatter updates, file moves, type transitions |
-| Reference Tracker | `.cursor/skills/crux-skill-memory-reference-tracker/SKILL.md` | Tracker file format, strength sync, cleanup |
-| Memory Compress | `.cursor/skills/crux-skill-memory-compress/SKILL.md` | Compressed file handling during moves |
-| Memory Index | `.cursor/skills/crux-skill-memory-index/SKILL.md` | Index rebuild in Step 15 after all changes applied |
+| Memory CRUD | `crux-skill-memory-crud` | Frontmatter updates, file moves, type transitions |
+| Reference Tracker | `crux-skill-memory-reference-tracker` | Tracker file format, strength sync, cleanup |
+| Memory Compress | `crux-skill-memory-compress` | Compressed file handling during moves |
+| Memory Index | `crux-skill-memory-index` | Index rebuild in Step 15 after all changes applied |
 
 ## Error Handling
 

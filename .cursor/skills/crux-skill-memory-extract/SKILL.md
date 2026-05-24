@@ -328,10 +328,10 @@ In `--yolo` mode:
 
 ## Integration
 
-| Component | Location | Role |
-|-----------|----------|------|
-| Memory CRUD | `.cursor/skills/crux-skill-memory-crud/SKILL.md` | Actual memory file creation after user accepts candidates |
-| Reference tracker | `.cursor/skills/crux-skill-memory-reference-tracker/SKILL.md` | Existing reference data used during comparison |
+| Component | Reference | Role |
+|-----------|-----------|------|
+| Memory CRUD | `crux-skill-memory-crud` | Actual memory file creation after user accepts candidates |
+| Reference tracker | `crux-skill-memory-reference-tracker` | Existing reference data used during comparison |
 | Config | `.crux/crux-memories.json` | All dream config settings |
 | Memory index | `.crux/memory-index.yml` | Quick lookup of existing memories for comparison |
 

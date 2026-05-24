@@ -5,7 +5,7 @@ description: "The meditate workflow's gap analysis phase compares recalled memor
 type: "learning"
 strength: 1
 created: 2026-04-27
-modified: 2026-04-27
+modified: 2026-05-24
 source: "spec:20260425-crux-meditate"
 tags: [meditate, gap-analysis, research, focus, design-pattern, exploration]
 ---
@@ -68,4 +68,4 @@ The pattern: do not let prior knowledge silently shape research. Surface the gap
 
 ## Source
 
-`spec-crux-meditate-20260425.md` and the recursive exploration protocol in `crux-cursor-memory-manager` Meditate Mode (steps "Query memories" → "Expand" → "Craft queries"). The "craft queries" step is where gap analysis becomes explicit refined queries that drive deeper recursion.
+`spec-crux-meditate-20260425.md` and the recursive exploration protocol in `crux-cursor-meditation-guide` (owned by the `crux-skill-memory-meditation-research` skill, steps "Query memories" → "Expand" → "Craft queries"). The "craft queries" step is where gap analysis becomes explicit refined queries that drive deeper recursion.

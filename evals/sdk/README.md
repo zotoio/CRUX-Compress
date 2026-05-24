@@ -72,6 +72,7 @@ evals/sdk/
 | J: Recall | J1-J4 | No-args contextual, query search, spec filtering, direct file display |
 | P: Amnesia | P1-P3 | Toggle on/off, explicit commands during amnesia, subagent inheritance |
 | O: Remember | O1-O2 | Interactive creation, one-shot with type flag, index rebuilding |
+| Q: Meditate | Q1-Q3 + Structural (K2/K9/K10) + Decomp (Guide/Skills/Command/MM-Trim) | Facet derivation; subagent spawning identity (`crux-cursor-meditation-guide` post-decomp); structural pinning of merged cost-and-richness gate, finalisation-enhancements gate, respawn protocol, ensemble layered cadence, guide-agent + six-skill presence, trimmed memory-manager negative assertions |
 
 ## How It Works
 
@@ -90,6 +91,8 @@ evals/sdk/
 3. Use `collectRun()` to capture agent output
 4. Use `assertOutputContains()` / `assertOutputExcludes()` for pattern matching
 5. Use `hasSubagentCall()` to verify subagent spawning
+
+**Structural Meditate tests** use `readCommandFile()` / `readAgentFile()` / `readSkillFile(name)` (dual-resolver: prefer post-decomp guide-agent + skills when present; fall back to `.cursor/commands/crux-meditate.md` + `.cursor/agents/crux-cursor-memory-manager.md` for pre-S04 working trees). The `readMemoryManagerFile()` helper always reads the memory-manager directly (not via dual-resolver) so post-trim negative assertions target the correct file.
 
 Example:
 

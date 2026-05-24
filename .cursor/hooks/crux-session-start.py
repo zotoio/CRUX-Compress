@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 PENDING_FILE = Path(".crux/pending-compression.json")
@@ -73,6 +74,93 @@ def _read_pending_index_rebuild() -> str | None:
     )
 
 
+def _read_stale_refs_nudge() -> str | None:
+    """Warn when no .refs.yml tracker has been updated within the threshold window.
+
+    This catches the silent-failure case where memories are enabled but agents are
+    not annotating their output with [memory:Title] markers, which means the
+    `afterAgentResponse` hook has nothing to record and reference tracking
+    effectively stops without any visible signal.
+    """
+    if not MEMORIES_CONFIG.is_file():
+        return None
+
+    try:
+        cfg = json.loads(MEMORIES_CONFIG.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+    enable_memories = None
+    for flag in cfg.get("flags", []):
+        if "enableMemories" in flag:
+            enable_memories = flag["enableMemories"]
+            break
+
+    if enable_memories != "true":
+        return None
+
+    rt_cfg = cfg.get("cruxMemories", {}).get("referenceTracking", {})
+    if not rt_cfg.get("enabled", True):
+        return None
+
+    threshold_days = rt_cfg.get("warnIfStaleAfterDays")
+    if threshold_days is None:
+        return None
+
+    try:
+        threshold_days = int(threshold_days)
+    except (TypeError, ValueError):
+        return None
+    if threshold_days <= 0:
+        return None
+
+    tracking_dir = Path(rt_cfg.get("trackingDir", ".crux/reference-tracking"))
+    if not tracking_dir.is_dir():
+        return None
+
+    tracker_files = [p for p in tracking_dir.glob("*.refs.yml") if p.is_file()]
+
+    now = datetime.now(timezone.utc).timestamp()
+    threshold_seconds = threshold_days * 86400
+
+    if not tracker_files:
+        newest_age_days: float | None = None
+    else:
+        newest_mtime = max(p.stat().st_mtime for p in tracker_files)
+        newest_age_days = (now - newest_mtime) / 86400
+        if (now - newest_mtime) < threshold_seconds:
+            return None
+
+    if newest_age_days is None:
+        body = (
+            f"No memory reference trackers exist in {tracking_dir}/.\n"
+            "This means no agent has emitted a [memory:Title] annotation that the "
+            "afterAgentResponse hook could resolve against the memory index.\n"
+        )
+    else:
+        body = (
+            f"The most recent memory reference tracker in {tracking_dir}/ was updated "
+            f"{newest_age_days:.1f} days ago (threshold: {threshold_days} days).\n"
+            "This usually means agents are not annotating their output with "
+            "[memory:Title] markers, so the afterAgentResponse hook has nothing to "
+            "record.\n"
+        )
+
+    return (
+        "[CRUX Memory Reference Tracking Stale]\n\n"
+        f"{body}\n"
+        "Likely causes:\n"
+        "  - Agents are not discovering memories (no MCP `memory-search` calls, no "
+        "reads of `.crux/memory-index.yml`).\n"
+        "  - Agents discover memories but forget the `[memory:Exact Title]` "
+        "annotation contract in `.cursor/rules/crux-memories-integration.md`.\n"
+        "  - Subagents annotate but the parent agent strips or paraphrases away "
+        "the markers before they reach the user-facing reply.\n\n"
+        "Action: review the integration rule's Output Annotation and Subagent "
+        "Annotation Passthrough sections, then proceed."
+    )
+
+
 def _read_memory_nudge() -> str | None:
     if not MEMORIES_CONFIG.is_file():
         return None
@@ -123,6 +211,10 @@ def main() -> None:
     rebuild = _read_pending_index_rebuild()
     if rebuild:
         parts.append(rebuild)
+
+    stale_refs = _read_stale_refs_nudge()
+    if stale_refs:
+        parts.append(stale_refs)
 
     nudge = _read_memory_nudge()
     if nudge:

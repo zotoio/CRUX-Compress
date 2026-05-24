@@ -31,6 +31,7 @@ DIST_FILES = [
     ".cursor/hooks.json",
     ".cursor/agents/crux-cursor-rule-manager.md",
     ".cursor/agents/crux-cursor-memory-manager.md",
+    ".cursor/agents/crux-cursor-meditation-guide.md",
     ".cursor/commands/crux-compress.md",
     ".cursor/commands/crux-amnesia.md",
     ".cursor/commands/crux-dream.md",
@@ -53,6 +54,12 @@ DIST_FILES = [
     ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
     ".cursor/skills/crux-skill-memory-rebalance/SKILL.md",
     ".cursor/skills/crux-skill-memory-reference-tracker/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
 ]
 
 

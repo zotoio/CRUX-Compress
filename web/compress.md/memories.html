@@ -807,11 +807,12 @@ promoted_from: "learning"
         <div class="memories-command">
           <div class="memories-command-header">
             <code class="memories-command-name">/crux-meditate</code>
-            <span class="memories-command-desc">Recursive exploration</span>
+            <span class="memories-command-desc">Deep research &mdash; paired HTML + PDF report</span>
           </div>
           <div class="memories-command-usage">
-            <div class="memories-command-line"><code>/crux-meditate</code><span>Explore facets from current context via file-based agent tree</span></div>
-            <div class="memories-command-line"><code>/crux-meditate "topic"</code><span>3-level deep, 3-way fan-out exploration to meditations/</span></div>
+            <div class="memories-command-line"><code>/crux-meditate "topic"</code><span>Research mode (default) &mdash; depth-first recursion, peer review, mandatory citations</span></div>
+            <div class="memories-command-line"><code>/crux-meditate --quick "topic"</code><span>Fast parallel fan-out for breadth-first scoping</span></div>
+            <div class="memories-command-line"><code>/crux-meditate --ensemble "topic"</code><span>Run across multiple model families, then cross-model synthesis</span></div>
             <div class="memories-command-line"><code>/crux-meditate @file @folder/</code><span>Explore referenced code architecture</span></div>
           </div>
         </div>
@@ -837,6 +838,17 @@ promoted_from: "learning"
         <div class="memories-skill"><code>memory-compress</code><span>CRUX-compress memory bodies</span></div>
         <div class="memories-skill"><code>memory-index</code><span>Build prioritised index</span></div>
         <div class="memories-skill"><code>memory-reference-tracker</code><span>Track usage, sync strength</span></div>
+      </div>
+
+      <h3 class="memories-subsection-title">Meditation Agent &amp; 6 Skills</h3>
+      <p class="memories-subsection-intro"><code>/crux-meditate</code> spawns <code>crux-cursor-meditation-guide</code> as the dedicated recursive research orchestrator. Six additional skills power the meditation tree.</p>
+      <div class="memories-skills">
+        <div class="memories-skill"><code>meditation-research</code><span>Research Phases A&ndash;G recursion</span></div>
+        <div class="memories-skill"><code>meditation-quick</code><span>Quick parallel fan-out</span></div>
+        <div class="memories-skill"><code>meditation-ensemble</code><span>Ensemble cross-model synthesis</span></div>
+        <div class="memories-skill"><code>meditation-review</code><span>Adversarial review cycle</span></div>
+        <div class="memories-skill"><code>meditation-report</code><span>HTML+PDF report generation</span></div>
+        <div class="memories-skill"><code>meditation-coordination</code><span>File coordination primitives</span></div>
       </div>
 
       <h3 class="memories-subsection-title">Key Features</h3>
@@ -866,11 +878,30 @@ promoted_from: "learning"
        ═══════════════════════════════════════════ -->
   <section class="section mem-section mem-section--alt">
     <div class="section-content">
-      <h2 class="section-title">Meditate: Recursive Exploration</h2>
-      <p class="section-intro">Run <code>/crux-meditate</code> to launch a 3-level recursive, memory-informed exploration with 3-way fan-out at every level. The agent derives facets from your context and writes them to a shared working directory in <code>meditations/</code>. Parallel agents each explore a distinct subfocus, write their discoveries to markdown files, derive 3 narrower child subfocuses, and recurse deeper. Parent agents poll for child output files and aggregate insights back up into a final <code>consolidation.md</code>.</p>
+      <h2 class="section-title">Meditate: Deep Research with Paired HTML + PDF Reports</h2>
+      <p class="section-intro">Run <code>/crux-meditate "your topic"</code> to launch a recursive, memory-informed research tree that writes its outputs to <code>meditations/{yyyymmdd}-{topic-slug}/</code>. The deliverable is not a chat reply &mdash; it&rsquo;s a paired <code>report-{topic-slug}-{ts}.html</code> and <code>report-{topic-slug}-{ts}.pdf</code> with infographics, Chart.js / D3 visualisations, a clickable table of contents, a citations index, and a mandatory adversarial review pass over every output file. Reach for it on the high-stakes questions you&rsquo;d otherwise spend a day on by hand.</p>
+
+      <div class="mem-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+        <div class="memories-feature">
+          <strong>Research <span style="opacity: 0.6; font-weight: normal;">(default)</span></strong>
+          <span>Depth-first serial recursion with globally unique facets, mandatory inline citations, and branch peer review at the top. Pick this when the output will be cited or drive downstream work.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Quick <code style="opacity: 0.7;">--quick</code></strong>
+          <span>Parallel fan-out (the legacy shape illustrated below). Same report contract, no peer review, warn-only citation enforcement. Use for early-stage breadth-first scoping.</span>
+        </div>
+        <div class="memories-feature">
+          <strong>Ensemble <code style="opacity: 0.7;">--ensemble</code></strong>
+          <span>Run the entire meditation across multiple model families in parallel, then aggregate into a cross-model synthesis report highlighting convergence, divergence, and unique insights. Combinable with <code>--quick</code>.</span>
+        </div>
+      </div>
+
+      <p class="section-intro" style="margin-top: var(--space-4);">Before the tree spawns, a merged pre-spawn gate covers <strong>depth selection</strong>, <strong>cost &amp; scope acknowledgment</strong> with mode-swap options, and <strong>richness level</strong> &mdash; choose from <code>compact</code>, <code>default</code> (preselected), <code>detailed</code>, or <code>exhaustive</code> to control report depth and agent count. The depth-0 manager also produces <strong>init-time suggestions</strong> for report sections, visualisation types, and additional focus areas before branches spawn. An anti-homogenisation <strong>theme preflight</strong> and <strong>facet confirmation</strong> complete the gates. After consolidation, a <strong>finalisation-enhancement gate</strong> (multi-select 0&ndash;5 curated upgrades) refines the report before adversarial review; skipping all reproduces previous behaviour. If the adversarial review cycle can&rsquo;t reach <code>PASS</code> within three iterations, the report is not generated and you receive the iteration files plus unresolved findings instead.</p>
+
+      <p class="section-intro" style="margin-top: var(--space-4); font-size: 0.95em; opacity: 0.85;">The diagram below shows the <strong>Quick-mode</strong> parallel fan-out tree (the legacy shape, still in use under <code>--quick</code>). Research mode runs the same three top-level branches but recurses depth-first &mdash; each depth&rsquo;s findings drive the next depth&rsquo;s facet derivation &mdash; and adds a peer-review pass across the three branches before consolidation.</p>
 
       <div class="mem-diagram-wrap">
-        <svg viewBox="0 0 900 780" class="mem-svg" role="img" aria-label="Meditate Architecture Diagram — 3-level recursive exploration with file-based coordination">
+        <svg viewBox="0 0 900 780" class="mem-svg" role="img" aria-label="Meditate Architecture Diagram — Quick-mode 3-level parallel fan-out with file-based coordination (Research mode uses depth-first serial recursion with peer review)">
           <defs>
             <marker id="med-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4915a"/>

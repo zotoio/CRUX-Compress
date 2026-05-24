@@ -5,7 +5,7 @@ description: "The meditate synthesis phase combines recalled memories with fresh
 type: "redflag"
 strength: 1
 created: 2026-04-27
-modified: 2026-04-27
+modified: 2026-05-24
 source: "spec:20260425-crux-meditate"
 tags: [meditate, synthesis, hallucination, provenance, attribution, safety, anti-pattern]
 ---
@@ -79,4 +79,4 @@ The discipline is the same: provenance-aware claims, explicit "inferred" labels,
 
 ## Source
 
-`spec-crux-meditate-20260425.md` and the `crux-cursor-memory-manager` Meditate Mode design principles ("open-minded: cast a wide net, unexpected connections are the goal"). The principle that creates value is exactly the principle that creates risk; the mitigation is structural, not motivational.
+`spec-crux-meditate-20260425.md` and the `crux-cursor-meditation-guide` agent design principles (specifically the `crux-skill-memory-meditation-research` skill's synthesis protocol). The principle that creates value is exactly the principle that creates risk; the mitigation is structural, not motivational.
