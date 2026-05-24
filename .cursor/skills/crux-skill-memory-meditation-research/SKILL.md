@@ -89,7 +89,7 @@ Seed an empty `facet-registry.yml` and an empty `citations-index.yml` in the wor
 - `proposed_visualisations` (**5–10 items**): candidate visualisation types from the existing Chart.js / D3 / infographic catalogue with `id`, `type`, `rationale`, `what_it_would_show`, `source_signals`.
 - `additional_focus_areas` (**0–5 items**; often 0): each with `id`, `title`, `rationale`, `source_signals`, `recommended_treatment` set as one of `skip` / `additional_facet` / `report_section_only` / `additional_facet_AND_section` (default recommendation = `report_section_only` unless evidence justifies promoting to a facet).
 
-Then run the **Combined Pattern-B flow** (canonical in `.cursor/commands/crux-meditate.md`):
+Then run the **Combined Pattern-B flow** (canonical in the `/crux-meditate` command):
 
 1. Write a draft to `facets-pending-{ts}.yml`. Schema is **extended** to mirror all 4 blocks: `facets` (3 items), `sections` (3–8 items), `visualisations` (5–10 items), `additional_focus_areas` (0–5 items with `recommended_treatment`), plus `parent_context_summary`.
 2. Escalate via Pattern B: return a combined `needs_user_input` block. **Do NOT call `AskQuestion` yourself — this is the calling agent's responsibility.**
@@ -264,7 +264,7 @@ Only after step 4b has completed (facets confirmed, `init-suggestions-{ts}.yml` 
 
 Wait for one depth-1 file per branch using prefix-glob polling — `branch-1-depth-1-sub-0-*.md`, `branch-2-depth-1-sub-0-*.md`, `branch-3-depth-1-sub-0-*.md`. Resolve the latest match per branch with `ls -1t <workingDir>/<glob> 2>/dev/null | head -n 1`. Use short intervals (10–30s); do not read JSONL transcripts. All three branch files must exist before proceeding. If any branch glob has been pending for more than 5 minutes AND `.facet-registry.lock/` exists, log a warning and `rmdir` the stale lock so children can proceed (see **Facet registry protocol** for the orphan-recovery rule).
 
-**Deep-confirmation hook (when `confirmDeepFacets ≠ none`)**: the same poll loop **also** globs `pending-facets-*.yml` in the working directory. When one (or several) appears, batch them into a single `needs_user_input` block (one entry per pending file, using the same confirm/modify/regenerate option set as Q-Confirm-1) and escalate to the calling agent via Pattern B. When resumed with the user's decisions, write the corresponding `confirmed-facets-{path-id}-{ts}.yml` for each (mirroring the pending file's path-id and `{ts}`), then resume the branch-output poll. See the **Deep confirmation flow** in `.cursor/commands/crux-meditate.md` for the full pending/confirmed schema and the per-child `confirmed` / `modified` / `regenerate` decision semantics (regenerations capped at 3 per child).
+**Deep-confirmation hook (when `confirmDeepFacets ≠ none`)**: the same poll loop **also** globs `pending-facets-*.yml` in the working directory. When one (or several) appears, batch them into a single `needs_user_input` block (one entry per pending file, using the same confirm/modify/regenerate option set as Q-Confirm-1) and escalate to the calling agent via Pattern B. When resumed with the user's decisions, write the corresponding `confirmed-facets-{path-id}-{ts}.yml` for each (mirroring the pending file's path-id and `{ts}`), then resume the branch-output poll. See the **Deep confirmation flow** in the `/crux-meditate` command for the full pending/confirmed schema and the per-child `confirmed` / `modified` / `regenerate` decision semantics (regenerations capped at 3 per child).
 
 ### Step 7 — Branch Peer Review (Research mode only)
 
@@ -272,7 +272,7 @@ Spawn 3 `crux-cursor-meditation-guide` peer-review agents in parallel — one pe
 
 ### Step 8 — Consolidate + K10c Reflection
 
-Read all branch files (all depths) **plus** all peer-review files **plus** `citations-index.yml`. Synthesize into `consolidation.md` following the **Subject-Matter Focus** rule in `.cursor/commands/crux-meditate.md` — use facet titles as section headings (never "Branch 1/2/3"), translate `[child: branch-N-depth-D-sub-S]` citations to `[research: {subfocus-slug}]` format, and never reference branches, depths, leaf agents, or other process concepts. Structure:
+Read all branch files (all depths) **plus** all peer-review files **plus** `citations-index.yml`. Synthesize into `consolidation.md` following the **Subject-Matter Focus** rule in the `/crux-meditate` command — use facet titles as section headings (never "Branch 1/2/3"), translate `[child: branch-N-depth-D-sub-S]` citations to `[research: {subfocus-slug}]` format, and never reference branches, depths, leaf agents, or other process concepts. Structure:
 - Key discoveries organized by facet theme (using the confirmed facet titles as section headings)
 - Cross-cutting connections and emergent themes (referencing topics by name, not by branch number)
 - Contradictions identified during quality review (presenting the substance, not "surfaced by peer review")
@@ -404,11 +404,11 @@ After processing all accepted items, proceed to step 9.
 
 ### Step 9 — Update `facets.md` with the Branch & Leaf Index
 
-Glob the working directory for actual filenames (`branch-*-depth-*-sub-*-*.md`, `branch-*-peer-review-*.md`, every `review-pre-report-*-iter-*.md` discovered, every `confirmed-facets-*.yml` discovered, the latest `report-{topic-slug}-*.html` / `report-{topic-slug}-*.pdf` pair if any). Append a Branch & Leaf Index section to `facets.md` per the canonical format in `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md`. Use relative paths. Enumerate missing slots explicitly.
+Glob the working directory for actual filenames (`branch-*-depth-*-sub-*-*.md`, `branch-*-peer-review-*.md`, every `review-pre-report-*-iter-*.md` discovered, every `confirmed-facets-*.yml` discovered, the latest `report-{topic-slug}-*.html` / `report-{topic-slug}-*.pdf` pair if any). Append a Branch & Leaf Index section to `facets.md` per the canonical format in the `crux-skill-memory-meditation-coordination` skill. Use relative paths. Enumerate missing slots explicitly.
 
 ### Step 10 — Adversarial Review and Fix Cycle
 
-Spawn a **fresh** `crux-cursor-meditation-guide` subagent in **Adversarial Review** function per the canonical spec in `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md`. When `ensembleModel` is present, pass `model: ensembleModel`. Pass `meditateMode`, `reviewerIteration` (1-indexed, capped at 3), `workingDir`, `theming`, `comprehensiveness`, and `priorReviewPath` (null on first iteration). Iterate up to **3 times** until verdict is `PASS` or `PASS_WITH_ADVISORIES`. Bubble Pattern-B escalations up to the calling agent.
+Spawn a **fresh** `crux-cursor-meditation-guide` subagent in **Adversarial Review** function per the canonical spec in the `crux-skill-memory-meditation-review` skill. When `ensembleModel` is present, pass `model: ensembleModel`. Pass `meditateMode`, `reviewerIteration` (1-indexed, capped at 3), `workingDir`, `theming`, `comprehensiveness`, and `priorReviewPath` (null on first iteration). Iterate up to **3 times** until verdict is `PASS` or `PASS_WITH_ADVISORIES`. Bubble Pattern-B escalations up to the calling agent.
 
 If the loop reaches iteration 3 with `MUST_FIX` findings still unresolved, the verdict is `ESCALATE`: **abort steps 11 and 12** and proceed to step 13 with unresolved findings.
 
@@ -418,7 +418,7 @@ Only when the verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`: re-glob
 
 ### Step 12 — Generate the Mandatory Report (HTML + PDF)
 
-Only when the verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`; **skip entirely on `ESCALATE`**. Read the report skill: `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md`. Follow the full Report Generation contract verbatim. Key obligations:
+Only when the verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`; **skip entirely on `ESCALATE`**. Load the `crux-skill-memory-meditation-report` skill. Follow the full Report Generation contract verbatim. Key obligations:
 - Read all meditation files: `consolidation.md`, `facets.md`, `facet-registry.yml`, `citations-index.yml`, every `branch-*-depth-*-sub-*-*.md`, every `branch-*-peer-review-*.md`.
 - Honour the `comprehensiveness:` payload for all level-driven decisions.
 - Apply `theming` payload to every visual decision; **never default to the homogenised AI look**.
@@ -428,7 +428,7 @@ Only when the verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`; **skip 
 
 ### Step 12b — Write Process Retrospective
 
-Write `retrospective-{ts}.md` **always**, including on `ESCALATE`. Follow the **Process Retrospective** section in `.cursor/commands/crux-meditate.md` for the required sections. Use the same `{ts}` as the report pair when one was generated, or capture a fresh UTC timestamp on `ESCALATE`. Update `facets.md`'s Branch & Leaf Index to include the retrospective link under "Top-level artifacts".
+Write `retrospective-{ts}.md` **always**, including on `ESCALATE`. Follow the **Process Retrospective** section in the `/crux-meditate` command for the required sections. Use the same `{ts}` as the report pair when one was generated, or capture a fresh UTC timestamp on `ESCALATE`. Update `facets.md`'s Branch & Leaf Index to include the retrospective link under "Top-level artifacts".
 
 ### Step 13 — Return to Calling Agent
 
@@ -473,8 +473,8 @@ Phase C — Derive 3 child subfocuses from actual findings:
        identify THIS agent (the parent that derived the proposed children).
        Schema: path block (branch, parent_depth, parent_sub_index, parent_slug),
        timestamp_utc, proposed_children[{sub_index, slug, subfocus, rationale}],
-       status: "pending". See the canonical Deep confirmation flow in
-       .cursor/commands/crux-meditate.md for the full schema.
+       status: "pending". See the canonical Deep confirmation flow in the
+       /crux-meditate command for the full schema.
     2. Poll for the matching confirmed-facets-branch-{N}-depth-{D}-sub-{S}-{ts}.yml
        using prefix-glob with the same branch/depth/sub segment and the {ts} from
        the pending file.
@@ -668,11 +668,11 @@ timestamp_utc: "{yyyymmddHHMMSS}"
 | Consolidation inputs | `branch-*` files + `branch-*-peer-review-*` files + `citations-index.yml` |
 | Coordination files | `facet-registry.yml`, `citations-index.yml`, `.facet-registry.lock/` (transient) |
 
-For the Quick column, see `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md`.
+For the Quick column, see the `crux-skill-memory-meditation-quick` skill.
 
 ## Cross-Skill References
 
-- `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` — filename grammar (incl. `init-suggestions-{ts}.yml`, `finalisation-enhancements.yml` rows), prefix-glob polling rule, Branch & Leaf Index template
-- `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` — adversarial review contract (step 10); bundles cheap accepted enhancements into iter 1 respawn payload
-- `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` — report generation contract (step 12); consumes `comprehensiveness`, `init-suggestions-{ts}.yml`, `finalisation-enhancements.yml`
-- `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` — Quick column of differences table + shared output schema reference
+- `crux-skill-memory-meditation-coordination` — filename grammar (incl. `init-suggestions-{ts}.yml`, `finalisation-enhancements.yml` rows), prefix-glob polling rule, Branch & Leaf Index template
+- `crux-skill-memory-meditation-review` — adversarial review contract (step 10); bundles cheap accepted enhancements into iter 1 respawn payload
+- `crux-skill-memory-meditation-report` — report generation contract (step 12); consumes `comprehensiveness`, `init-suggestions-{ts}.yml`, `finalisation-enhancements.yml`
+- `crux-skill-memory-meditation-quick` — Quick column of differences table + shared output schema reference

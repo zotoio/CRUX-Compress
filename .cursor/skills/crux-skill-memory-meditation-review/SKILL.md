@@ -84,9 +84,9 @@ Severity: `MUST_FIX` (in-place rewrite — does NOT trigger respawn). The review
 Specifically:
 - For each `confirmed_sections[i]`: a section with that exact title must exist in the rendered HTML, AND its body must be non-empty (>1 paragraph or >100 words; a heading-only stub counts as missing). Auto-resolved=true means an accepted finalisation enhancement (cheap, respawned) has overlapping title — flag the section as auto-resolved AND verify the enhancement-driven section appears.
 - For each `confirmed_visualisations[i]`: a visualisation of that exact type must be rendered with non-empty data (a container with no data series counts as missing).
-- For each `finalisation-enhancements.yml.candidates[i]` with `accepted: true, treatment: respawn`: a section / chart / infographic / etc. matching the type's rendering contract (see the **K10b Per-Cheap-Type Rendering Contract** in `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md`) must appear in the report at its contractual location.
+- For each `finalisation-enhancements.yml.candidates[i]` with `accepted: true, treatment: respawn`: a section / chart / infographic / etc. matching the type's rendering contract (see the **K10b Per-Cheap-Type Rendering Contract** in the `crux-skill-memory-meditation-report` skill) must appear in the report at its contractual location.
 
-**Ensemble layered audit**: at ensemble, audit each accepted enhancement against the correct report — per-tree-sourced enhancements (from candidates with `source: "tree:{model-subdir}"`) are audited against the per-tree report; cross-model-sourced enhancements (from candidates with `source: "cross_model"`) are audited against the cross-model synthesis report. A missing accepted enhancement in the wrong report is NOT a finding; it is a finding only when the **K10 Ensemble Respawn Targeting** rule says it should be in that report (see `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md`).
+**Ensemble layered audit**: at ensemble, audit each accepted enhancement against the correct report — per-tree-sourced enhancements (from candidates with `source: "tree:{model-subdir}"`) are audited against the per-tree report; cross-model-sourced enhancements (from candidates with `source: "cross_model"`) are audited against the cross-model synthesis report. A missing accepted enhancement in the wrong report is NOT a finding; it is a finding only when the **K10 Ensemble Respawn Targeting** rule says it should be in that report (see the `crux-skill-memory-meditation-ensemble` skill).
 
 Severity: `MUST_FIX` AND `respawn_required: true` — bypasses standard in-place fix flow per the **Report-Skill Respawn Protocol** below.
 
@@ -271,6 +271,6 @@ Filename: `review-pre-report-{yyyymmddHHMMSS}-iter-{N}.md` (one per iteration, w
 
 ## Cross-Skill References
 
-- `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` — consumer of the respawn payload constructed by this skill; the resume-handler protocol and per-cheap-type processing order live there
-- `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` — review-iteration filename row (`review-pre-report-{ts}-iter-{N}.md`); Branch & Leaf Index links review iterations
-- `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` — K10 Ensemble Respawn Targeting rule (per-tree vs cross-model targeting) used by Dim 13 ensemble layered audit
+- `crux-skill-memory-meditation-report` — consumer of the respawn payload constructed by this skill; the resume-handler protocol and per-cheap-type processing order live there
+- `crux-skill-memory-meditation-coordination` — review-iteration filename row (`review-pre-report-{ts}-iter-{N}.md`); Branch & Leaf Index links review iterations
+- `crux-skill-memory-meditation-ensemble` — K10 Ensemble Respawn Targeting rule (per-tree vs cross-model targeting) used by Dim 13 ensemble layered audit

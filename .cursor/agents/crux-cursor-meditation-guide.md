@@ -99,17 +99,17 @@ Respawn Protocol and the `respawn_reasons` list-typed payload schema.
 
 ## Skills You Use
 
-Always read the relevant skill file before invoking its operations. Skills are loaded on demand —
-**never** pre-loaded.
+Always load the relevant skill by name before invoking its operations. Skills are loaded on demand —
+**never** pre-loaded. The IDE's skill loader resolves each skill from its registered name.
 
-| Skill | Location | Use For |
-|-------|----------|---------|
-| `crux-skill-memory-meditation-research` | `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` | Research-mode Phases A–G recursion, depth-0 manager steps 1–13 (incl. step 4b + step 8b), K10c single-model reflection, init-suggestions write |
-| `crux-skill-memory-meditation-quick` | `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` | Quick-mode 6-step parallel fan-out, Quick depth-0 manager, Quick K10c reflection (same rubric, warn-only citation regime at all 4 richness levels) |
-| `crux-skill-memory-meditation-ensemble` | `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` | Cross-model synthesis, K10 layered cadence (steps 3b–3f), ensemble report generation, Ensemble Respawn Targeting by `source` provenance |
-| `crux-skill-memory-meditation-review` | `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` | 13-dimension adversarial review, severity classification, MUST_FIX `needs_user_input` with mandatory `context`, Report-Skill Respawn Protocol payload authoring |
-| `crux-skill-memory-meditation-report` | `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` | Mandatory paired HTML+PDF, Comprehensiveness Level Mapping (12×4), K10b Per-Cheap-Type Rendering Contract, Report-Skill Respawn Protocol resume-handler |
-| `crux-skill-memory-meditation-coordination` | `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` | Artefact filename grammar (18 rows), placeholders, prefix-glob polling rule, retrospective template, Branch & Leaf Index template |
+| Skill | Use For |
+|-------|---------|
+| `crux-skill-memory-meditation-research` | Research-mode Phases A–G recursion, depth-0 manager steps 1–13 (incl. step 4b + step 8b), K10c single-model reflection, init-suggestions write |
+| `crux-skill-memory-meditation-quick` | Quick-mode 6-step parallel fan-out, Quick depth-0 manager, Quick K10c reflection (same rubric, warn-only citation regime at all 4 richness levels) |
+| `crux-skill-memory-meditation-ensemble` | Cross-model synthesis, K10 layered cadence (steps 3b–3f), ensemble report generation, Ensemble Respawn Targeting by `source` provenance |
+| `crux-skill-memory-meditation-review` | 13-dimension adversarial review, severity classification, MUST_FIX `needs_user_input` with mandatory `context`, Report-Skill Respawn Protocol payload authoring |
+| `crux-skill-memory-meditation-report` | Mandatory paired HTML+PDF, Comprehensiveness Level Mapping (12×4), K10b Per-Cheap-Type Rendering Contract, Report-Skill Respawn Protocol resume-handler |
+| `crux-skill-memory-meditation-coordination` | Artefact filename grammar (18 rows), placeholders, prefix-glob polling rule, retrospective template, Branch & Leaf Index template |
 
 ### Meditate Mode — `/crux-meditate`
 
@@ -132,8 +132,8 @@ to drive downstream changes). Propagate `meditateMode` unchanged to every child 
 
 **Theming payload — CRITICAL (Pattern A)**: Pre-collected by the calling agent before this agent
 is spawned. If the `theming` payload is missing from the spawn prompt, **abort with a clear
-error** pointing the calling agent at the Theme Preflight section of
-`.cursor/commands/crux-meditate.md`. Propagate unchanged to every child spawn.
+error** pointing the calling agent at the Theme Preflight section of the `/crux-meditate`
+command. Propagate unchanged to every child spawn.
 
 **Comprehensiveness payload — CRITICAL (Pattern A)**: Pre-collected at the merged
 `Q-Cost-and-Richness-Acknowledgment` gate (Sub-Q1: `compact` / `default` / `detailed` /

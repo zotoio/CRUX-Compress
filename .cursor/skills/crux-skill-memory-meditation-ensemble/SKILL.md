@@ -11,9 +11,9 @@ Implements the Ensemble Aggregation function: cross-model synthesis after N inde
 
 Load this skill **only** when:
 - The `crux-cursor-meditation-guide` agent is spawned with `ensembleAggregation: true`
-- You are the cross-model aggregator spawned by the calling agent's Ensemble Protocol (step 8 in `.cursor/commands/crux-meditate.md`)
+- You are the cross-model aggregator spawned by the calling agent's Ensemble Protocol (step 8 of the `/crux-meditate` command)
 
-**Never load this skill** in per-model tree Research or Quick mode workflows. Per-model trees use `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` or `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md`.
+**Never load this skill** in per-model tree Research or Quick mode workflows. Per-model trees use the `crux-skill-memory-meditation-research` or `crux-skill-memory-meditation-quick` skill.
 
 ## Prerequisites
 
@@ -286,7 +286,7 @@ Called after the calling agent resolves the gate and passes back `finalisation_e
 
 ### Step 4 — Generate the Ensemble Report (HTML + PDF)
 
-Follow the same mandatory report contract as single-model reports (per `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md`) with the ensemble-specific additions below. Key differences from single-model reports:
+Follow the same mandatory report contract as single-model reports (per the `crux-skill-memory-meditation-report` skill) with the ensemble-specific additions below. Key differences from single-model reports:
 - The hero/executive summary leads with the cross-model verdict (what's convergent, what's contested)
 - Per-facet sections show model comparisons side-by-side rather than a single narrative
 - The agreement heatmap (facet × model matrix) is the signature visualization
@@ -302,7 +302,7 @@ Return the ensemble working directory path, the `cross-model-synthesis.md` path,
 
 ## Ensemble-Specific Structural Elements (Report Additions)
 
-The ensemble report layers these elements **on top of** the standard mandatory minimums from `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md`:
+The ensemble report layers these elements **on top of** the standard mandatory minimums from the `crux-skill-memory-meditation-report` skill:
 
 - **Model comparison hero**: instead of a single stat-card row, show N model cards side-by-side, each with that model's headline finding and a convergence/divergence indicator
 - **Per-facet comparison cards**: for each confirmed facet, show each model's key conclusion in parallel columns/cards with `[model: label]` attribution and a visual convergence indicator (green = all agree, amber = partial agreement, red = disagreement)
@@ -340,7 +340,7 @@ When an accepted enhancement was sourced from a per-tree candidate vs a cross-mo
 
 ## Cross-Skill References
 
-- `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` — mandatory report contract for ensemble HTML+PDF generation and per-tree respawns
-- `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` — ensemble working-directory layout + per-tree `finalisation-enhancements.yml` filename row + root `finalisation-enhancements.yml` filename row
-- `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` — per-tree depth-0 manager writes `{model-subdir}/finalisation-enhancements.yml` before returning to aggregator; this skill reads those files in step 3b
-- `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` — same per-tree write in Quick-mode ensemble trees
+- `crux-skill-memory-meditation-report` — mandatory report contract for ensemble HTML+PDF generation and per-tree respawns
+- `crux-skill-memory-meditation-coordination` — ensemble working-directory layout + per-tree `finalisation-enhancements.yml` filename row + root `finalisation-enhancements.yml` filename row
+- `crux-skill-memory-meditation-research` — per-tree depth-0 manager writes `{model-subdir}/finalisation-enhancements.yml` before returning to aggregator; this skill reads those files in step 3b
+- `crux-skill-memory-meditation-quick` — same per-tree write in Quick-mode ensemble trees

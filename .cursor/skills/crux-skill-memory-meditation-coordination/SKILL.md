@@ -266,8 +266,8 @@ Per-model subdirectories follow the standard single-model **Coordination Convent
 ## Cross-Skill References
 
 This skill is the **leaf utility** — all five other meditation skills reference it:
-- `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` — filename grammar for `init-suggestions-{ts}.yml`, Phase B draft files, `facet-registry.yml`, `citations-index.yml`, peer review files; polling loop; lock semantics
-- `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` — filename grammar for branch outputs, polling loop
-- `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` — ensemble working-directory layout; per-tree `finalisation-enhancements.yml` filename row; root `finalisation-enhancements.yml` filename row
-- `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` — review-iteration filename row; Branch & Leaf Index links review iterations
-- `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` — report filename grammar (never hard-code `report.html`/`report.pdf`); fresh-timestamp respawn rule; prefix-glob latest-wins
+- `crux-skill-memory-meditation-research` — filename grammar for `init-suggestions-{ts}.yml`, Phase B draft files, `facet-registry.yml`, `citations-index.yml`, peer review files; polling loop; lock semantics
+- `crux-skill-memory-meditation-quick` — filename grammar for branch outputs, polling loop
+- `crux-skill-memory-meditation-ensemble` — ensemble working-directory layout; per-tree `finalisation-enhancements.yml` filename row; root `finalisation-enhancements.yml` filename row
+- `crux-skill-memory-meditation-review` — review-iteration filename row; Branch & Leaf Index links review iterations
+- `crux-skill-memory-meditation-report` — report filename grammar (never hard-code `report.html`/`report.pdf`); fresh-timestamp respawn rule; prefix-glob latest-wins

@@ -24,7 +24,7 @@ Load this skill when:
 
 ## Input Parameters (depth-0 manager, Quick mode)
 
-Same shape as the Research depth-0 manager parameters (see `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md`) with `meditateMode: "quick"`. The only parameter differences are:
+Same shape as the Research depth-0 manager parameters (see the `crux-skill-memory-meditation-research` skill) with `meditateMode: "quick"`. The only parameter differences are:
 - No `facet-registry.yml` operations (Quick mode skips global registry)
 - No `citations-index.yml` initialization (Quick mode does not maintain this file)
 
@@ -67,14 +67,14 @@ Quick mode does not use `facet-registry.yml`, `citations-index.yml`, or `.facet-
 
 Derive the three facets AND draft suggestions payload (proposed_sections 3–8 items, proposed_visualisations 5–10 items, additional_focus_areas 0–5 items) as in Research. Facet descriptions are NOT required to carry citation backing at this stage; per-branch `## Citations` requirements still apply to every child output. Run the **identical combined Pattern-B flow** (write extended `facets-pending-{ts}.yml` with all 4 blocks, escalate via combined `needs_user_input` block, resume with all 5 sub-question answers). Quick mode skips the `facet-registry.yml` append; the rest is identical including the `source_signals` discipline on every draft suggestion item.
 
-The `needs_user_input` block schema is identical to the Research-mode block (see `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` Step 4 for the full schema). Do NOT call `AskQuestion` — this is the calling agent's responsibility.
+The `needs_user_input` block schema is identical to the Research-mode block (see the `crux-skill-memory-meditation-research` skill, Step 4, for the full schema). Do NOT call `AskQuestion` — this is the calling agent's responsibility.
 
 ### Step 4b — Resume-handler: apply confirmed payload, write `init-suggestions-{ts}.yml`, reconcile additional focus areas
 
 **Identical to Research** with these Quick-specific differences:
 - `facet-registry.yml` operations are skipped (Quick mode only)
 - `facets.md` append still happens (the confirmed facet descriptions, citations, parent-context summary, and explicit partitioning statement)
-- `init-suggestions-{ts}.yml` is written with the same schema (see `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` for the full schema)
+- `init-suggestions-{ts}.yml` is written with the same schema (see the `crux-skill-memory-meditation-research` skill for the full schema)
 
 **4-mode additional-focus-area reconciliation**: same as Research — canonical `additional_focus_areas[]` array with per-item `treatment:` field:
 - `skip` → record with `treatment: "skip"`, no facet, no section
@@ -106,7 +106,7 @@ Consolidate from the branch files only at all depths that ran (per `maxDepth`). 
 
 **K10c in-pass reflection runs identically in Quick mode** — same rubric, same scoring, same 5-candidate selection, same `finalisation-enhancements.yml` write. The only difference from Research is the set of inputs (no peer-review files, no `citations-index.yml`).
 
-The `finalisation-enhancements.yml` schema is identical to Research except `mode: "quick"`. See `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` for the full schema and K10c rubric.
+The `finalisation-enhancements.yml` schema is identical to Research except `mode: "quick"`. See the `crux-skill-memory-meditation-research` skill for the full schema and K10c rubric.
 
 **Do NOT return to the calling agent yet** — step 8b (K10b resume-handler) fires after the calling agent resolves `Q-Finalisation-Enhancements`, then steps 9–13 follow.
 
@@ -121,7 +121,7 @@ Append the Branch & Leaf Index per the same format used in Research mode, with t
 - No Research-only `facet-registry.yml` / `citations-index.yml` lines under "Top-level artifacts"
 - Everything else (per-branch sections, depth-2/3 leaves, top-level `consolidation.md` + report pair + review iterations + confirmed-facets entries, missing-slots enumeration, index metadata) is identical
 
-See `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` for the canonical Branch & Leaf Index template.
+See the `crux-skill-memory-meditation-coordination` skill for the canonical Branch & Leaf Index template.
 
 ### Step 10 — Adversarial Review and Fix Cycle (NOT SKIPPED)
 
@@ -131,7 +131,7 @@ Same reviewer agent, same iteration cap (3), same severity classification, same 
 
 Reports are still gated on `PASS` / `PASS_WITH_ADVISORIES`; `ESCALATE` still aborts steps 11 and 12 exactly as in Research mode.
 
-See `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` for the full review contract.
+See the `crux-skill-memory-meditation-review` skill for the full review contract.
 
 ### Step 11 — Re-run Branch & Leaf Index (NOT SKIPPED)
 
@@ -139,7 +139,7 @@ Identical to Research: refresh `facets.md`'s Branch & Leaf Index after the revie
 
 ### Step 12 — Generate the Mandatory Report (HTML + PDF)
 
-Identical to Research per the fully-documented contract in `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md`. The same theming, anti-homogenisation, Universal Contrast, light/dark, responsive-nav, PDF high-contrast print theme, clickable TOC, headless-Chrome render, filename-pairing rules, content-minimum requirements (level-driven per `comprehensiveness`), graceful PDF-degradation contracts, Report Comprehensiveness — No Information Loss contract, and Option Comparison Research mode all apply unchanged in Quick mode. Only runs when verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`; never runs on `ESCALATE`.
+Identical to Research per the fully-documented contract in the `crux-skill-memory-meditation-report` skill. The same theming, anti-homogenisation, Universal Contrast, light/dark, responsive-nav, PDF high-contrast print theme, clickable TOC, headless-Chrome render, filename-pairing rules, content-minimum requirements (level-driven per `comprehensiveness`), graceful PDF-degradation contracts, Report Comprehensiveness — No Information Loss contract, and Option Comparison Research mode all apply unchanged in Quick mode. Only runs when verdict from step 10 was `PASS` or `PASS_WITH_ADVISORIES`; never runs on `ESCALATE`.
 
 ### Step 12b — Write Process Retrospective (NOT SKIPPED)
 
@@ -164,7 +164,7 @@ Each child agent at depth < `maxDepth` follows this simpler protocol.
    depth 1, OR all_levels at depth 1 or depth 2):
      - Write pending-facets-branch-{N}-depth-{D}-sub-{S}-{ts}.yml with the
        proposed 3 children (same schema as Research-mode Phase C; see the
-       canonical Deep confirmation flow in .cursor/commands/crux-meditate.md).
+       canonical Deep confirmation flow in the /crux-meditate command).
      - Poll for the matching confirmed-facets-...-{ts}.yml.
      - Apply per-child decisions (confirmed / modified / regenerate;
        regenerations capped at 3 per child).
@@ -196,7 +196,7 @@ Each child agent at depth < `maxDepth` follows this simpler protocol.
 
 ## Output File Format (Quick branch files)
 
-Identical frontmatter to Research branch files except `mode: "quick"`. See `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` for the full frontmatter schema.
+Identical frontmatter to Research branch files except `mode: "quick"`. See the `crux-skill-memory-meditation-research` skill for the full frontmatter schema.
 
 Body sections (mandatory in Quick mode):
 - `## Subfocus Rationale` — why this narrowing was chosen
@@ -228,11 +228,11 @@ Quick mode does NOT maintain `citations-index.yml` — citation tracking is per-
 | Consolidation inputs | `branch-*` files only |
 | Coordination files | `facets.md` only |
 
-For the Research column, see `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md`.
+For the Research column, see the `crux-skill-memory-meditation-research` skill.
 
 ## Cross-Skill References
 
-- `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` — filename grammar, polling rules, Branch & Leaf Index template
-- `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` — adversarial review contract (step 10); Quick relaxations applied
-- `.cursor/skills/crux-skill-memory-meditation-report/SKILL.md` — report generation contract (step 12)
-- `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` — Research column of differences table + shared output schema reference + K10c rubric (same rubric; Quick uses warn-only citation regime)
+- `crux-skill-memory-meditation-coordination` — filename grammar, polling rules, Branch & Leaf Index template
+- `crux-skill-memory-meditation-review` — adversarial review contract (step 10); Quick relaxations applied
+- `crux-skill-memory-meditation-report` — report generation contract (step 12)
+- `crux-skill-memory-meditation-research` — Research column of differences table + shared output schema reference + K10c rubric (same rubric; Quick uses warn-only citation regime)

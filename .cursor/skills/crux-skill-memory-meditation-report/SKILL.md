@@ -337,8 +337,8 @@ If either check fails, regenerate the missing artifact before presenting results
 
 ## Cross-Skill References
 
-- `.cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md` — report filename grammar (never hard-code); fresh-timestamp respawn rule; prefix-glob latest-wins
-- `.cursor/skills/crux-skill-memory-meditation-review/SKILL.md` — authors the Dim 13 respawn payload that this skill consumes as a resume-handler
-- `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` — ensemble report extras (model comparison hero, agreement heatmap, etc.) layer on top of this skill's mandatory minimums; ensemble per-tree vs cross-model respawn targeting
-- `.cursor/skills/crux-skill-memory-meditation-research/SKILL.md` — source of `init-suggestions-{ts}.yml` (Research write side)
-- `.cursor/skills/crux-skill-memory-meditation-quick/SKILL.md` — source of `init-suggestions-{ts}.yml` (Quick write side)
+- `crux-skill-memory-meditation-coordination` — report filename grammar (never hard-code); fresh-timestamp respawn rule; prefix-glob latest-wins
+- `crux-skill-memory-meditation-review` — authors the Dim 13 respawn payload that this skill consumes as a resume-handler
+- `crux-skill-memory-meditation-ensemble` — ensemble report extras (model comparison hero, agreement heatmap, etc.) layer on top of this skill's mandatory minimums; ensemble per-tree vs cross-model respawn targeting
+- `crux-skill-memory-meditation-research` — source of `init-suggestions-{ts}.yml` (Research write side)
+- `crux-skill-memory-meditation-quick` — source of `init-suggestions-{ts}.yml` (Quick write side)

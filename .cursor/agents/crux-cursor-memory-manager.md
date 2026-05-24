@@ -57,16 +57,16 @@ When the parent resumes you with answers, they will be in the format: `answers: 
 
 ## Skills You Use
 
-| Skill | Location | Use For |
-|-------|----------|---------|
-| `crux-skill-memory-extract` | `.cursor/skills/crux-skill-memory-extract/SKILL.md` | Dream extraction — analysing artifacts, comparing with existing memories, ranking candidates |
-| `crux-skill-memory-crud` | `.cursor/skills/crux-skill-memory-crud/SKILL.md` | All memory file operations — create, read, update, delete, validate |
-| `crux-skill-memory-rebalance` | `.cursor/skills/crux-skill-memory-rebalance/SKILL.md` | REM sleep — promote, demote, archive, consolidate, strength sync |
-| `crux-skill-memory-compress` | `.cursor/skills/crux-skill-memory-compress/SKILL.md` | CRUX compression and decompression of memory bodies |
-| `crux-skill-memory-reference-tracker` | `.cursor/skills/crux-skill-memory-reference-tracker/SKILL.md` | Recording references, syncing strength, cleanup, rule promotion flags |
-| `crux-skill-memory-index` | `.cursor/skills/crux-skill-memory-index/SKILL.md` | Rebuilding the prioritised memory index after changes |
+| Skill | Use For |
+|-------|---------|
+| `crux-skill-memory-extract` | Dream extraction — analysing artifacts, comparing with existing memories, ranking candidates |
+| `crux-skill-memory-crud` | All memory file operations — create, read, update, delete, validate |
+| `crux-skill-memory-rebalance` | REM sleep — promote, demote, archive, consolidate, strength sync |
+| `crux-skill-memory-compress` | CRUX compression and decompression of memory bodies |
+| `crux-skill-memory-reference-tracker` | Recording references, syncing strength, cleanup, rule promotion flags |
+| `crux-skill-memory-index` | Rebuilding the prioritised memory index after changes |
 
-Always read the relevant skill file before invoking its operations.
+Always load the relevant skill by name before invoking its operations; the IDE's skill loader resolves it automatically.
 
 ## Operating Modes
 
@@ -276,7 +276,7 @@ Create ad-hoc memories outside of spec execution workflows. These memories parti
 
 ### Meditate Mode — moved
 
-The `/crux-meditate` workflow now lives in the dedicated `crux-cursor-meditation-guide` agent (`.cursor/agents/crux-cursor-meditation-guide.md`) and the six `crux-skill-memory-meditation-*` skills (research, quick, ensemble, review, report, coordination). The coordinator command `.cursor/commands/crux-meditate.md` retains the calling-agent gates (Depth Selection, Q-Cost-and-Richness-Acknowledgment, Theme Preflight, combined Pattern-B 5-sub-question facet/init-suggestions/focus-area confirmation, Q-Finalisation-Enhancements) and the post-tree continuation menu. This agent's Memory Manager scope is **lifecycle only**: Dream, REM Sleep, Recall, Remember, and Forget. Meditate is no longer one of its responsibilities.
+The `/crux-meditate` workflow now lives in the dedicated `crux-cursor-meditation-guide` agent and the six `crux-skill-memory-meditation-*` skills (research, quick, ensemble, review, report, coordination). The coordinator command `/crux-meditate` retains the calling-agent gates (Depth Selection, Q-Cost-and-Richness-Acknowledgment, Theme Preflight, combined Pattern-B 5-sub-question facet/init-suggestions/focus-area confirmation, Q-Finalisation-Enhancements) and the post-tree continuation menu. This agent's Memory Manager scope is **lifecycle only**: Dream, REM Sleep, Recall, Remember, and Forget. Meditate is no longer one of its responsibilities.
 
 ### Forget Mode — `/crux-forget`
 
@@ -309,7 +309,7 @@ Remove one or more memories from the corpus.
 
 ### Ensemble Aggregation Mode — moved
 
-Cross-model synthesis is now owned by `crux-cursor-meditation-guide` in its Ensemble Aggregation function. See `.cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md` for the verbatim 5-step workflow + K10 layered cadence (steps 3b–3f for per-tree finalisation-enhancements.yml reads and cross-model reflection) + Respawn Targeting rule + spawn parameters + report extras.
+Cross-model synthesis is now owned by `crux-cursor-meditation-guide` in its Ensemble Aggregation function. See the `crux-skill-memory-meditation-ensemble` skill for the verbatim 5-step workflow + K10 layered cadence (steps 3b–3f for per-tree finalisation-enhancements.yml reads and cross-model reflection) + Respawn Targeting rule + spawn parameters + report extras.
 
 ## Agent Scoping Rules
 
