@@ -1512,8 +1512,8 @@
       }
     },
     "2.10.1": {
-      "date": "2026-05-10",
-      "commit": "03d41d1513b707e8c1ee27d8dd2eaadda25c9736",
+      "date": "2026-05-24",
+      "commit": "b4fc33b0c034866bb60b7fe7b03be9e0c7a18bbf",
       "files": {
         "CRUX.md": {
           "checksum": "c0db983f3023397672d74c14956bc6747d4c6c985df30b5825fbf1dc13a44015",
@@ -1536,8 +1536,8 @@
           "size": 20525
         },
         ".cursor/agents/crux-cursor-memory-manager.md": {
-          "checksum": "d6426c714ce0b8ceaeb88ef0c2e3d0abf5126a03f6d1716e9e71f4046568a69d",
-          "size": 37434
+          "checksum": "38c7a923744970af9d1d47c451b740711c57ed10017a20e40e2e87c27e8625b0",
+          "size": 153672
         },
         ".cursor/commands/crux-compress.md": {
           "checksum": "82e5fa9360a461a6e5a32a4084aac330c78dd3253d91458309c60fde8a09bea0",
@@ -1556,8 +1556,8 @@
           "size": 3158
         },
         ".cursor/commands/crux-meditate.md": {
-          "checksum": "1d456c9f6180e5dd51276edb0f00618e505023be6ea42702173c5d5bac327c2c",
-          "size": 8842
+          "checksum": "66e2e1a69d2de674f0adb250f0d8493405b6a7571f8d791784a7bc9271710881",
+          "size": 199526
         },
         ".cursor/commands/crux-recall.md": {
           "checksum": "e004e50d64d4419771498c427ca17ed2136af94d1665b16f3d2fb7b1a06dfa72",
@@ -1628,8 +1628,8 @@
           "size": 9944
         },
         "AGENTS.md": {
-          "checksum": "d5e44c9cb8a580acff30a649f202a157adb116de9d177a88b3335525b2744532",
-          "size": 6341
+          "checksum": "c6376e18a14702f5188835387438bd38b9b79467245adb0e4484988efc29670a",
+          "size": 7175
         }
       }
     }

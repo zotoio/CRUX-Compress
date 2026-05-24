@@ -57,6 +57,7 @@ NON_INTERACTIVE = False
 
 MEMORY_FILE_PREFIXES = (
     ".cursor/agents/crux-cursor-memory-manager.md",
+    ".cursor/agents/crux-cursor-meditation-guide.md",
     ".cursor/commands/crux-dream.md",
     ".cursor/commands/crux-meditate.md",
     ".cursor/commands/crux-recall.md",
@@ -396,6 +397,17 @@ DEPRECATED_FILES = [
     ".crux/update.sh",
 ]
 
+# Internal CRUX-Compress development agents — used inside the CRUX-Compress repo
+# itself but NEVER distributed to consumer projects. Listed here so any consumer
+# that happens to have one of these files (e.g. from a manual copy, a forked
+# install, or an experimental pre-release) gets it cleaned up on update.
+INTERNAL_AGENT_FILES = [
+    ".cursor/agents/crux-platform-architect.md",
+    ".cursor/agents/crux-software-engineer.md",
+    ".cursor/agents/integrity-expert.md",
+    ".cursor/agents/docs-sync-agent.md",
+]
+
 DEPRECATED_HOOK_COMMANDS = {
     "bash .cursor/hooks/detect-crux-changes.sh",
     ".cursor/hooks/detect-crux-changes.sh",
@@ -425,6 +437,38 @@ def cleanup_deprecated_files() -> None:
 
     if removed:
         log_success(f"Cleaned up {removed} deprecated file(s) from previous versions")
+
+
+def cleanup_internal_agents() -> None:
+    """Remove CRUX-Compress repo-internal agents from consumer installations.
+
+    These agents (crux-platform-architect, crux-software-engineer, integrity-expert,
+    docs-sync-agent) are used only inside the CRUX-Compress repo itself. They are
+    not part of the distribution and have no value in consumer projects. Removing
+    them here is a no-op for normal installs but cleans up any consumer that has
+    them from a manual copy or an older / forked install.
+    """
+    removed = 0
+    for filepath in INTERNAL_AGENT_FILES:
+        p = Path(filepath)
+        if p.is_file():
+            p.unlink()
+            removed += 1
+            log_verbose(f"Removed internal agent: {filepath}")
+
+    agents_dir = Path(".cursor/agents")
+    if agents_dir.is_dir() and not any(agents_dir.iterdir()):
+        try:
+            agents_dir.rmdir()
+            log_verbose(f"Removed empty directory: {agents_dir}")
+        except OSError:
+            pass
+
+    if removed:
+        log_success(
+            f"Cleaned up {removed} CRUX-Compress internal agent(s) "
+            "(not intended for consumer projects)"
+        )
 
 
 def cleanup_deprecated_hooks() -> None:
@@ -495,6 +539,7 @@ def get_release_files(version: str) -> list[str]:
         ".cursor/hooks.json",
         ".cursor/agents/crux-cursor-rule-manager.md",
         ".cursor/agents/crux-cursor-memory-manager.md",
+        ".cursor/agents/crux-cursor-meditation-guide.md",
         ".cursor/commands/crux-compress.md",
         ".cursor/commands/crux-dream.md",
         ".cursor/commands/crux-recall.md",
@@ -509,6 +554,12 @@ def get_release_files(version: str) -> list[str]:
         ".cursor/rules/crux-memories-integration.crux.mdc",
         ".cursor/skills/crux-utils/SKILL.md",
         ".cursor/skills/crux-utils/scripts/crux-utils.py",
+        ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
+        ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
+        ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
+        ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
+        ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
+        ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
     ]
 
 
@@ -1264,6 +1315,7 @@ def main() -> None:
     install_from_staging(staging_dir, install_memories=install_memories)
     shutil.rmtree(staging_dir.parent, ignore_errors=True)
     cleanup_deprecated_files()
+    cleanup_internal_agents()
     cleanup_deprecated_hooks()
     download_update_script()
 
