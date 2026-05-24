@@ -1619,7 +1619,14 @@ class TestMeditationGuideAgent:
         content = _read_meditation_guide_agent_file()
         if not content:
             return
-        assert ".cursor/skills/crux-skill-memory-meditation-" in content
+        assert "Skill Delegation" in content, (
+            "Guide agent must document skill delegation in a dedicated section"
+        )
+        assert "`crux-skill-memory-meditation-" in content, (
+            "Guide agent must reference meditation skills by name in backticks "
+            "(per skill-and-agent-references.mdc — paths are forbidden in "
+            "instructional prose)"
+        )
 
     def test_no_memory_manager_executable_sections(self):
         """Guide agent must not implement memory-manager lifecycle modes.
