@@ -105,7 +105,8 @@
       "indicateInOutput": true,
       "indicatorFormat": "[memory:{title}]",
       "promotionToRuleThreshold": 30,
-      "maxReferencesStored": 10
+      "maxReferencesStored": 10,
+      "warnIfStaleAfterDays": 7
     },
 
     "scopeRanking": ["base", "agents", "shared"],

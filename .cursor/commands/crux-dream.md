@@ -24,6 +24,8 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 
 **Candidate visibility**: The subagent MUST return its ranked candidates (or REM recommendations) **and the full analysis that produced them** in its final response. This includes: verification results, diff analysis summary, artifact examination findings, comparison results against existing memories, and the ranked candidates with full rationale. The parent agent displays all of this, then asks the user for decisions using `AskQuestion` — never before the full analysis is displayed.
 
+**Proposal artefacts — CRITICAL**: For spec-name invocations, the parent agent MUST instruct the subagent to write its full analysis to `<spec-dir>/memory-proposals/dream-analysis-<yyyymmdd>.md` (create the `memory-proposals/` directory if absent). This serves two purposes: (1) it gives the parent a reliable channel to read the complete analysis when the Task tool's response body strips long content, and (2) it leaves a durable proposal artefact alongside the spec for audit. The subagent's `<response>` body need only return the path to the written file plus a short status; the parent reads the file directly to relay content to the user. The `memory-proposals/` directory and its contents move with the spec when it is archived. For `--rem` invocations there is no spec directory; the subagent writes to `.crux/memory-proposals/rem-analysis-<yyyymmddHHMM>.md` instead.
+
 **User decisions**: Whenever user approval is needed (accepting candidates, applying REM changes, archiving), use the `AskQuestion` tool in the **parent agent** (not the subagent) to present structured multiple-choice options instead of free-text prompts. This ensures clean, single-click interaction.
 
 ### Argument Handling
@@ -42,13 +44,13 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 3. Reads all spec artifacts (subtask files, execution reports, work logs, diffs)
 4. Extracts candidate facts — learnings, red flags, goals, ideas, core patterns
 5. Compares candidates against existing memories for novelty and conflicts
-6. Subagent returns its **complete analysis and ranked candidates** in its response — the parent agent receives this because the subagent runs in the foreground
-7. **Parent displays the full subagent response** verbatim to the user — do not summarize or omit any part of the analysis
+6. Subagent writes its **complete analysis and ranked candidates** to `<spec-dir>/memory-proposals/dream-analysis-<yyyymmdd>.md` and returns the path
+7. **Parent reads the proposal file and displays its content** verbatim to the user — do not summarize or omit any part of the analysis
 8. Parent agent uses the `AskQuestion` tool to collect the user's accept/skip decision with structured options (e.g. "Accept all", "Select individually", "Skip all") and whether to archive the spec directory
 9. Parent resumes the subagent with the user's decisions; subagent creates accepted memories via `crux-skill-memory-crud`
-10. Writes a dream summary to the spec directory
+10. Writes a dream summary to the spec directory (the proposal file is retained alongside it as an audit artefact)
 11. Rebuilds the memory index
-12. Archives the spec directory if the user opted in
+12. Archives the spec directory if the user opted in (the `memory-proposals/` directory moves with it)
 
 #### REM Sleep (`--rem`)
 
@@ -57,8 +59,8 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 3. Detects conflicts between existing memories
 4. Evaluates promotions, demotions, archival, and consolidation candidates
 5. Detects uncompressed memories for CRUX compression (when `enableMemoryCompression` is enabled)
-6. Subagent returns its **complete analysis and recommendations** in its response — the parent agent receives this because the subagent runs in the foreground
-7. **Parent displays the full subagent response** verbatim to the user; parent agent then uses the `AskQuestion` tool to collect the user's approval decision with structured options (e.g. "Apply all", "Select individually", "Skip all") — conflicts always require individual resolution
+6. Subagent writes its **complete analysis and recommendations** to `.crux/memory-proposals/rem-analysis-<yyyymmddHHMM>.md` and returns the path
+7. **Parent reads the proposal file and displays its content** verbatim to the user; parent agent then uses the `AskQuestion` tool to collect the user's approval decision with structured options (e.g. "Apply all", "Select individually", "Skip all") — conflicts always require individual resolution
 8. Parent resumes the subagent with the user's decisions; subagent applies confirmed changes (including compression via `crux-skill-memory-compress`)
 9. Writes a REM summary
 10. Rebuilds the memory index
