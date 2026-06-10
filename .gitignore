@@ -54,6 +54,7 @@ __pycache__/
 dist/
 build/
 out/
+graphify-out/
 
 # Meditation runtime artifacts
 meditations/
