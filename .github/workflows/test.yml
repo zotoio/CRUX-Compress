@@ -55,13 +55,13 @@ jobs:
             "AGENTS.crux.md"
             ".crux/crux.json"
             ".cursor/hooks.json"
-            ".cursor/agents/crux-cursor-rule-manager.md"
-            ".cursor/commands/crux-compress.md"
+            ".cursor/agents/crux/crux-cursor-rule-manager.md"
+            ".cursor/commands/crux/crux-compress.md"
             ".cursor/hooks/crux-detect-changes.py"
             ".cursor/hooks/crux-session-start.py"
-            ".cursor/rules/_CRUX-RULE.mdc"
-            ".cursor/skills/crux-utils/SKILL.md"
-            ".cursor/skills/crux-utils/scripts/crux-utils.py"
+            ".cursor/rules/crux/_CRUX-RULE.mdc"
+            ".cursor/skills/crux/crux-utils/SKILL.md"
+            ".cursor/skills/crux/crux-utils/scripts/crux-utils.py"
           )
           
           for file in "${REQUIRED_FILES[@]}"; do
