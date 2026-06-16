@@ -1,12 +1,16 @@
 ---
-generated: 2026-06-16 22:45
-sourceChecksum: "1264892754"
+generated: 2026-06-17 00:00
+sourceChecksum: "1817139228"
 cruxLevel: 25
-beforeTokens: 12907
-afterTokens: 2386
-reducedBy: 82%
+beforeTokens: 13066
+afterTokens: 2491
+reducedBy: 81%
+confidence: 94%
 note: includes agent bootstrap instructions not present in source
 ---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
 
 # CRUX Compress Installer
 
@@ -156,6 +160,11 @@ M.MCP{module=crux_mcp_server;cfg=~/.cursor/mcp.json;
 Λ.setup_memories{cfg∃→skip;¬→create DEFAULT_MEMORIES_CONFIG;
  mkdir [memories/,memories/agents/,.crux/reference-tracking/]}
 Λ.show_completion_report{banner;backup→revert paths(crux/ layout);
+ show_reference_update_guidance→{
+  tell user/agent: upd repo files w/ legacy CRUX primitive paths;
+  old=.cursor/[agents,commands,rules,skills]/*;
+  new=.cursor/[agents,commands,rules,skills]/crux/*;
+  .cursor/hooks/* paths unchanged(hooks.json executes directly)};
  next=[hooks.json,crux:true,/crux-compress ALL,.crux/update.py]}
 
 Γ.main{parse_args»clear»banner»check_not_in_crux_repo»
@@ -171,7 +180,8 @@ M.MCP{module=crux_mcp_server;cfg=~/.cursor/mcp.json;
  download_update_script»
  --with-memories→setup_memories»
  --with-mcp-server→setup_mcp»
- show_completion_report}
+ show_completion_report(show_reference_update_guidance=
+  bool(installed_version))}
 
 Γ.bootstrap_upgrade{Φ.lang_fallback;
  python{∃update.py→run --backup;¬→curl|python3 -};
