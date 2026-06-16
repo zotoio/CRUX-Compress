@@ -24,7 +24,32 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
-DIST_FILES = [
+CRUX_PRIMITIVE_SUBDIR = "crux"
+CURSOR_PRIMITIVE_DIRS = {"agents", "commands", "rules", "skills"}
+
+
+def to_crux_primitive_path(rel_path: str) -> str:
+    parts = Path(rel_path).parts
+    if len(parts) >= 3 and parts[0] == ".cursor" and parts[1] in CURSOR_PRIMITIVE_DIRS:
+        if parts[2] == CRUX_PRIMITIVE_SUBDIR:
+            return rel_path
+        return str(Path(parts[0], parts[1], CRUX_PRIMITIVE_SUBDIR, *parts[2:]))
+    return rel_path
+
+
+def from_crux_primitive_path(rel_path: str) -> str:
+    parts = Path(rel_path).parts
+    if (
+        len(parts) >= 4
+        and parts[0] == ".cursor"
+        and parts[1] in CURSOR_PRIMITIVE_DIRS
+        and parts[2] == CRUX_PRIMITIVE_SUBDIR
+    ):
+        return str(Path(parts[0], parts[1], *parts[3:]))
+    return rel_path
+
+
+SOURCE_DIST_FILES = [
     "CRUX.md",
     "install.crux.md",
     ".crux/crux.json",
@@ -62,6 +87,8 @@ DIST_FILES = [
     ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
 ]
 
+DIST_FILES = [to_crux_primitive_path(path) for path in SOURCE_DIST_FILES]
+
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -96,7 +123,7 @@ def update_release_manifest(project_root: Path, version: str) -> None:
     all_release_files = DIST_FILES + ["AGENTS.md"]
 
     for rel in all_release_files:
-        src = project_root / rel
+        src = project_root / from_crux_primitive_path(rel)
         if src.is_file():
             checksum = sha256_file(src)
             size = src.stat().st_size
@@ -189,7 +216,7 @@ def main() -> None:
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         print("Packaging files...")
         for rel in DIST_FILES:
-            src = project_root / rel
+            src = project_root / from_crux_primitive_path(rel)
             if src.is_file():
                 zf.write(src, rel)
 

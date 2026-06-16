@@ -18,13 +18,13 @@ Builds a prioritised index of all memory files by scanning the configured memory
 
 ```bash
 # Rebuild the index (uses default config path)
-python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py
+python .cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py
 
 # Rebuild with a custom config path
-python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py --config path/to/config.json
+python .cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py --config path/to/config.json
 
 # Post-dream rebuild (checks enableMemories flag, then rebuilds)
-python .cursor/skills/crux-skill-memory-index/scripts/post-dream.py
+python .cursor/skills/crux/crux-skill-memory-index/scripts/post-dream.py
 ```
 
 ### Post-Dream Rebuild

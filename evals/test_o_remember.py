@@ -140,7 +140,7 @@ class TestRememberConfigIntegration:
 
         data = json.loads(real_config.read_text(encoding="utf-8"))
         remember = data["cruxMemories"]["commands"]["remember"]
-        assert remember["file"] == ".cursor/commands/crux-remember.md"
+        assert remember["file"] == ".cursor/commands/crux/crux-remember.md"
 
     def test_remember_command_default(self):
         real_config = Path(__file__).resolve().parent.parent / ".crux" / "crux-memories.json"

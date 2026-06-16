@@ -91,6 +91,8 @@ class TestRequiredFunctions:
         "preview_installation", "get_checksum", "confirm",
         "show_completion_report", "download_update_script", "download_and_stage",
         "merge_hooks_json", "upsert_agents_crux_block",
+        "to_crux_primitive_path", "from_crux_primitive_path",
+        "migrate_primitive_layout",
     ]
 
     def test_all_functions_defined(self):
@@ -327,6 +329,82 @@ class TestChecksum:
         assert mod.get_checksum(str(tmp_path / "a.txt")) != mod.get_checksum(str(tmp_path / "b.txt"))
 
 
+# ── CRUX primitive layout migration ──
+
+
+class TestCruxPrimitiveLayout:
+    def test_maps_commands_to_crux_subdir(self):
+        mod = _load_install()
+        assert (
+            mod.to_crux_primitive_path(".cursor/commands/crux-compress.md")
+            == ".cursor/commands/crux/crux-compress.md"
+        )
+
+    def test_maps_skills_to_crux_subdir(self):
+        mod = _load_install()
+        assert (
+            mod.to_crux_primitive_path(".cursor/skills/crux-utils/scripts/crux-utils.py")
+            == ".cursor/skills/crux/crux-utils/scripts/crux-utils.py"
+        )
+
+    def test_reverse_maps_crux_subdir_to_source_path(self):
+        mod = _load_install()
+        assert (
+            mod.from_crux_primitive_path(".cursor/agents/crux/crux-cursor-rule-manager.md")
+            == ".cursor/agents/crux-cursor-rule-manager.md"
+        )
+
+    def test_migrates_legacy_primitives(self, tmp_path: Path):
+        mod = _load_install()
+        legacy_command = tmp_path / ".cursor" / "commands" / "crux-compress.md"
+        legacy_skill = tmp_path / ".cursor" / "skills" / "crux-utils" / "scripts" / "crux-utils.py"
+        legacy_command.parent.mkdir(parents=True)
+        legacy_skill.parent.mkdir(parents=True)
+        legacy_command.write_text("command", encoding="utf-8")
+        legacy_skill.write_text("skill", encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.migrate_primitive_layout()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert not legacy_command.exists()
+        assert not legacy_skill.exists()
+        assert (tmp_path / ".cursor" / "commands" / "crux" / "crux-compress.md").read_text(
+            encoding="utf-8"
+        ) == "command"
+        assert (
+            tmp_path
+            / ".cursor"
+            / "skills"
+            / "crux"
+            / "crux-utils"
+            / "scripts"
+            / "crux-utils.py"
+        ).read_text(encoding="utf-8") == "skill"
+
+    def test_migration_does_not_overwrite_conflicting_new_file(self, tmp_path: Path):
+        mod = _load_install()
+        legacy = tmp_path / ".cursor" / "commands" / "crux-compress.md"
+        target = tmp_path / ".cursor" / "commands" / "crux" / "crux-compress.md"
+        legacy.parent.mkdir(parents=True)
+        target.parent.mkdir(parents=True)
+        legacy.write_text("legacy edit", encoding="utf-8")
+        target.write_text("new edit", encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.migrate_primitive_layout()
+        finally:
+            os.chdir(orig_cwd)
+
+        assert legacy.read_text(encoding="utf-8") == "legacy edit"
+        assert target.read_text(encoding="utf-8") == "new edit"
+
+
 # ── Preview ──
 
 
@@ -530,7 +608,7 @@ class TestSetupMemories:
         config = tmp_path / ".crux" / "crux-memories.json"
         data = json.loads(config.read_text(encoding="utf-8"))
         amnesia = data["cruxMemories"]["commands"]["amnesia"]
-        assert amnesia["file"] == ".cursor/commands/crux-amnesia.md"
+        assert amnesia["file"] == ".cursor/commands/crux/crux-amnesia.md"
         assert amnesia["default"] == "/crux-amnesia"
 
 

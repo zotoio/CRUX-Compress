@@ -157,7 +157,7 @@ class TestMeditateConfigPresence:
 
         data = json.loads(real_config.read_text(encoding="utf-8"))
         meditate = data["cruxMemories"]["commands"]["meditate"]
-        assert meditate["file"] == ".cursor/commands/crux-meditate.md"
+        assert meditate["file"] == ".cursor/commands/crux/crux-meditate.md"
 
     def test_meditate_command_default(self):
         real_config = Path(__file__).resolve().parent.parent / ".crux" / "crux-memories.json"
@@ -840,12 +840,12 @@ class TestMeditateNoNewDistFilesK8:
     def _get_dist_files(self) -> list[str]:
         repo_root = Path(__file__).resolve().parent.parent
         zip_script = repo_root / "scripts" / "create-crux-zip.py"
-        content = zip_script.read_text(encoding="utf-8")
-        match = re.search(r"DIST_FILES\s*=\s*\[(.*?)\]", content, re.DOTALL)
-        if not match:
-            return []
-        raw = match.group(1)
-        return [s.strip().strip('"').strip("'") for s in raw.splitlines() if s.strip().strip(",").strip()]
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("create_crux_zip", str(zip_script))
+        mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        return list(mod.DIST_FILES)
 
     def _get_memory_file_prefixes(self) -> list[str]:
         repo_root = Path(__file__).resolve().parent.parent
@@ -2454,24 +2454,24 @@ class TestMeditateDecompDistFilesPresent:
     """
 
     DECOMP_DIST_PATHS = [
-        ".cursor/agents/crux-cursor-meditation-guide.md",
-        ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
+        ".cursor/agents/crux/crux-cursor-meditation-guide.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-research/SKILL.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-quick/SKILL.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-ensemble/SKILL.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-review/SKILL.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-report/SKILL.md",
+        ".cursor/skills/crux/crux-skill-memory-meditation-coordination/SKILL.md",
     ]
 
     def _get_dist_files(self) -> list[str]:
         repo_root = Path(__file__).resolve().parent.parent
         zip_script = repo_root / "scripts" / "create-crux-zip.py"
-        content = zip_script.read_text(encoding="utf-8")
-        match = re.search(r"DIST_FILES\s*=\s*\[(.*?)\]", content, re.DOTALL)
-        if not match:
-            return []
-        raw = match.group(1)
-        return [s.strip().strip('"').strip("'") for s in raw.splitlines() if s.strip().strip(",").strip()]
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("create_crux_zip", str(zip_script))
+        mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        return list(mod.DIST_FILES)
 
     def _get_memory_file_prefixes(self) -> list[str]:
         repo_root = Path(__file__).resolve().parent.parent
@@ -2489,19 +2489,19 @@ class TestMeditateDecompDistFilesPresent:
 
     def test_dist_files_includes_meditation_guide_agent(self):
         dist_files = self._get_dist_files()
-        assert any(".cursor/agents/crux-cursor-meditation-guide.md" in f for f in dist_files), (
+        assert any(".cursor/agents/crux/crux-cursor-meditation-guide.md" in f for f in dist_files), (
             "DIST_FILES must include crux-cursor-meditation-guide.md"
         )
 
     def test_dist_files_includes_all_six_skills(self):
         dist_files = self._get_dist_files()
         for skill_path in (
-            ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
-            ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
-            ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
-            ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
-            ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
-            ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-research/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-quick/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-ensemble/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-review/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-report/SKILL.md",
+            ".cursor/skills/crux/crux-skill-memory-meditation-coordination/SKILL.md",
         ):
             assert any(skill_path in f for f in dist_files), (
                 f"DIST_FILES must include '{skill_path}'"

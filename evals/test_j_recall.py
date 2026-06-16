@@ -41,7 +41,7 @@ class TestRecallConfigPresence:
 
         data = json.loads(real_config.read_text(encoding="utf-8"))
         recall = data["cruxMemories"]["commands"]["recall"]
-        assert recall["file"] == ".cursor/commands/crux-recall.md"
+        assert recall["file"] == ".cursor/commands/crux/crux-recall.md"
 
     def test_recall_command_default(self):
         real_config = Path(__file__).resolve().parent.parent / ".crux" / "crux-memories.json"

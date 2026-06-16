@@ -48,7 +48,7 @@ class TestAmnesiaConfigPresence:
 
         data = json.loads(real_config.read_text(encoding="utf-8"))
         amnesia = data["cruxMemories"]["commands"]["amnesia"]
-        assert amnesia["file"] == ".cursor/commands/crux-amnesia.md"
+        assert amnesia["file"] == ".cursor/commands/crux/crux-amnesia.md"
 
     def test_amnesia_command_default(self):
         real_config = Path(__file__).resolve().parent.parent / ".crux" / "crux-memories.json"

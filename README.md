@@ -21,11 +21,11 @@
 - [CRUX Components](#crux-components)
   - [1. `CRUX.md` - The Specification](#1-cruxmd---the-specification-project-root)
   - [2. `AGENTS.md` - Agent Awareness](#2-crux-block-in-agentsmd-project-root)
-  - [3. `_CRUX-RULE.mdc` - Always-Applied Rule](#3-_crux-rulemdc---always-applied-rule-cursorrules)
-  - [4. `crux-cursor-rule-manager.md` - The Subagent](#4-crux-cursor-rule-managermd---the-subagent-cursoragents)
-  - [5. `crux-compress.md` - The Command](#5-crux-compressmd---the-command-cursorcommands)
+  - [3. `_CRUX-RULE.mdc` - Always-Applied Rule](#3-_crux-rulemdc---always-applied-rule-cursorrulescrux)
+  - [4. `crux-cursor-rule-manager.md` - The Subagent](#4-crux-cursor-rule-managermd---the-subagent-cursoragentscrux)
+  - [5. `crux-compress.md` - The Command](#5-crux-compressmd---the-command-cursorcommandscrux)
   - [6. `crux-detect-changes.py` - The Hook](#6-crux-detect-changespy---the-hook-cursorhooks)
-  - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill-cursorskills)
+  - [7. `crux-utils` - The Skill](#7-crux-utils---the-skill-cursorskillscrux)
 - [Memories](#memories)
   - [Enabling Memories](#enabling-memories)
   - [Memory Commands](#memory-commands)
@@ -292,10 +292,10 @@ The installer creates/updates these files in your project:
 | `.cursor/hooks.json`                         | Hook configuration       |
 | `.cursor/hooks/crux-detect-changes.py`       | File change detection    |
 | `.cursor/hooks/crux-session-start.py`        | Session start hook       |
-| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent     |
-| `.cursor/commands/crux-compress.md`          | Compression command      |
-| `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule      |
-| `.cursor/skills/crux-utils/`                 | Utility skill            |
+| `.cursor/agents/crux/crux-cursor-rule-manager.md` | Compression subagent     |
+| `.cursor/commands/crux/crux-compress.md`          | Compression command      |
+| `.cursor/rules/crux/_CRUX-RULE.mdc`               | Always-applied rule      |
+| `.cursor/skills/crux/crux-utils/`                 | Utility skill            |
 
 
 ### Upgrading
@@ -312,7 +312,7 @@ python3 .crux/update.py --backup
 curl -fsSL https://raw.githubusercontent.com/zotoio/CRUX-Compress/main/install.py | python3 - --backup
 ```
 
-The upgrade process automatically removes stale files from older versions (e.g., renamed hooks and skills) and cleans deprecated commands from `hooks.json`.
+The upgrade process automatically migrates existing CRUX primitives into `.cursor/<type>/crux/`, removes stale files from older versions (e.g., renamed hooks and skills), and cleans deprecated commands from `hooks.json`.
 
 ## System Architecture
 
@@ -323,9 +323,9 @@ flowchart TB
     subgraph "CRUX System Architecture"
         CRUX["CRUX.md<br/>(Specification)<br/>READONLY"]
         AGENTS["AGENTS.md<br/><CRUX> block<br/>(High-visibility notice)"]
-        RULE["_CRUX-RULE.mdc<br/>(Always-Applied Rule)<br/>.cursor/rules/"]
-        MANAGER["crux-cursor-rule-manager.md<br/>(Subagent - ΣCRUX)<br/>.cursor/agents/"]
-        COMMAND["crux-compress.md<br/>(Cursor Command)<br/>.cursor/commands/"]
+        RULE["_CRUX-RULE.mdc<br/>(Always-Applied Rule)<br/>.cursor/rules/crux/"]
+        MANAGER["crux-cursor-rule-manager.md<br/>(Subagent - ΣCRUX)<br/>.cursor/agents/crux/"]
+        COMMAND["crux-compress.md<br/>(Cursor Command)<br/>.cursor/commands/crux/"]
         HOOK["crux-detect-changes.py<br/>(File Edit Hook)<br/>.cursor/hooks/"]
         
         AGENTS -->|"References"| CRUX
@@ -395,7 +395,7 @@ flowchart TB
 - Use CRUX content instead of loading original source files
 - Keep CRUX files synchronized when sources change
 
-### 3. `_CRUX-RULE.mdc` - Always-Applied Rule (`.cursor/rules/`)
+### 3. `_CRUX-RULE.mdc` - Always-Applied Rule (`.cursor/rules/crux/`)
 
 **Purpose**: A Cursor rule that is always loaded into context, providing agents with instructions for handling CRUX notation.
 
@@ -411,7 +411,7 @@ flowchart TB
 - Always interpret, understand and adhere to the meaning compressed in CRUX notation
 - When asked to compress a markdown rule file, delegate to the `crux-cursor-rule-manager` subagent
 
-### 4. `crux-cursor-rule-manager.md` - The Subagent (`.cursor/agents/`)
+### 4. `crux-cursor-rule-manager.md` - The Subagent (`.cursor/agents/crux/`)
 
 **Purpose**: A specialized AI subagent (ΣCRUX) that performs compression and decompression tasks.
 
@@ -454,7 +454,7 @@ alwaysApply: true
 > Generated file - do not edit!
 ```
 
-### 5. `crux-compress.md` - The Command (`.cursor/commands/`)
+### 5. `crux-compress.md` - The Command (`.cursor/commands/crux/`)
 
 **Purpose**: A Cursor command that orchestrates CRUX compression tasks.
 
@@ -588,7 +588,7 @@ The `compression-level` plugin is the reference default plugin. It enforces comp
 - Avoids manual tracking of modified files
 - Works with the `/crux-compress` command workflow
 
-### 7. `crux-utils` - The Skill (`.cursor/skills/`)
+### 7. `crux-utils` - The Skill (`.cursor/skills/crux/`)
 
 **Purpose**: Multi-purpose utility for CRUX compression workflows.
 
@@ -620,7 +620,7 @@ The `compression-level` plugin is the reference default plugin. It enforces comp
 - CRUX-aware (counts special Unicode symbols)
 - Used by `crux-cursor-rule-manager` for frontmatter metrics
 
-See `.cursor/skills/crux-utils/SKILL.md` for detailed usage.
+See `.cursor/skills/crux/crux-utils/SKILL.md` for detailed usage.
 
 ## Memories
 
@@ -839,19 +839,19 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.cursor/hooks/crux-detect-changes.py`       | File change detection hook                                                    |
 | `.cursor/hooks/crux-detect-memory-changes.py` | Memory change detection hook                                                 |
 | `.cursor/hooks/crux-session-start.py`        | Session start hook                                                            |
-| `.cursor/agents/crux-cursor-rule-manager.md` | Compression subagent                                                          |
-| `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
-| `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive meditation research guide (spawned by `/crux-meditate`)       |
-| `.cursor/commands/crux-compress.md`          | Compression command                                                           |
-| `.cursor/commands/crux-dream.md`             | Memory extraction command                                                     |
-| `.cursor/commands/crux-recall.md`            | Memory retrieval command                                                      |
-| `.cursor/commands/crux-forget.md`            | Memory removal command                                                        |
-| `.cursor/commands/crux-remember.md`          | Ad-hoc memory creation command                                                |
-| `.cursor/commands/crux-meditate.md`          | Recursive exploration command                                                  |
-| `.cursor/rules/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
-| `.cursor/rules/crux-memories-integration.crux.mdc` | Memory integration rule                                                 |
-| `.cursor/skills/crux-utils/`                 | Utility skill (token estimation, checksums)                                   |
-| `.cursor/skills/crux-skill-memory-*/`        | Memory skills (CRUD, compress, extract, index, rebalance, reference tracking) |
+| `.cursor/agents/crux/crux-cursor-rule-manager.md` | Compression subagent                                                          |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
+| `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Recursive meditation research guide (spawned by `/crux-meditate`)       |
+| `.cursor/commands/crux/crux-compress.md`          | Compression command                                                           |
+| `.cursor/commands/crux/crux-dream.md`             | Memory extraction command                                                     |
+| `.cursor/commands/crux/crux-recall.md`            | Memory retrieval command                                                      |
+| `.cursor/commands/crux/crux-forget.md`            | Memory removal command                                                        |
+| `.cursor/commands/crux/crux-remember.md`          | Ad-hoc memory creation command                                                |
+| `.cursor/commands/crux/crux-meditate.md`          | Recursive exploration command                                                  |
+| `.cursor/rules/crux/_CRUX-RULE.mdc`               | Always-applied rule                                                           |
+| `.cursor/rules/crux/crux-memories-integration.crux.mdc` | Memory integration rule                                                 |
+| `.cursor/skills/crux/crux-utils/`                 | Utility skill (token estimation, checksums)                                   |
+| `.cursor/skills/crux/crux-skill-memory-*/`        | Memory skills (CRUD, compress, extract, index, rebalance, reference tracking) |
 
 
 Then:
@@ -973,14 +973,14 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Agent Notice        | `AGENTS.md` (CRUX block)                     | High-visibility awareness      |
 | Version Metadata    | `.crux/crux.json`                            | Installed CRUX version         |
 | Release Manifest    | `.crux/crux-release-files.json`              | File checksums for backup      |
-| Always-Applied Rule | `.cursor/rules/_CRUX-RULE.mdc`               | Runtime instructions           |
-| Subagent            | `.cursor/agents/crux-cursor-rule-manager.md` | Compression executor           |
-| Compress Command    | `.cursor/commands/crux-compress.md`          | Compression interface          |
+| Always-Applied Rule | `.cursor/rules/crux/_CRUX-RULE.mdc`          | Runtime instructions           |
+| Subagent            | `.cursor/agents/crux/crux-cursor-rule-manager.md` | Compression executor      |
+| Compress Command    | `.cursor/commands/crux/crux-compress.md`     | Compression interface          |
 | Test Command        | `.cursor/commands/crux-test.md`              | LLM feature testing            |
 | Hook                | `.cursor/hooks/crux-detect-changes.py`       | Auto-detect file changes       |
 | Session Hook        | `.cursor/hooks/crux-session-start.py`        | Show pending compressions      |
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
-| Utility Skill       | `.cursor/skills/crux-utils/`                 | Token estimation, checksums    |
+| Utility Skill       | `.cursor/skills/crux/crux-utils/`            | Token estimation, checksums    |
 | Install Script      | `install.py`                                 | Curl-pipe installer (Python)   |
 | Zip Builder         | `scripts/create-crux-zip.py`                 | Build distribution zip         |
 | Tests               | `evals/*.py`                                 | Pytest test suite              |
@@ -990,15 +990,15 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Plugin Spec         | `.crux/plugins/compression-level.md`         | Default compression-level plugin spec |
 | Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
-| Memory Manager      | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle agent       |
-| Meditation Guide    | `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive meditation research agent |
-| Dream Command       | `.cursor/commands/crux-dream.md`             | Memory extraction command      |
-| Recall Command      | `.cursor/commands/crux-recall.md`            | Memory query command           |
-| Forget Command      | `.cursor/commands/crux-forget.md`            | Memory removal interface       |
-| Remember Command    | `.cursor/commands/crux-remember.md`          | Ad-hoc memory creation         |
-| Meditate Command    | `.cursor/commands/crux-meditate.md`          | Recursive memory exploration   |
+| Memory Manager      | `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle agent   |
+| Meditation Guide    | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Recursive meditation research agent |
+| Dream Command       | `.cursor/commands/crux/crux-dream.md`        | Memory extraction command      |
+| Recall Command      | `.cursor/commands/crux/crux-recall.md`       | Memory query command           |
+| Forget Command      | `.cursor/commands/crux/crux-forget.md`       | Memory removal interface       |
+| Remember Command    | `.cursor/commands/crux/crux-remember.md`     | Ad-hoc memory creation         |
+| Meditate Command    | `.cursor/commands/crux/crux-meditate.md`     | Recursive memory exploration   |
 | MCP Server          | `crux_mcp_server/`                           | Semantic memory search server (standalone zip) |
-| Memory Skills       | `.cursor/skills/crux-skill-memory-*/`        | Memory operation skills        |
+| Memory Skills       | `.cursor/skills/crux/crux-skill-memory-*/`   | Memory operation skills        |
 | Memory Storage      | `memories/`                                  | Memory file storage            |
 | Eval Tests          | `evals/`                                     | Python-based eval test suite   |
 
