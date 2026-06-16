@@ -1247,6 +1247,7 @@ def setup_memories() -> bool:
 def show_completion_report(
     version: str, backup_zip: str,
     with_memories: bool = False, with_mcp_server: bool = False,
+    show_reference_update_guidance: bool = False,
 ) -> None:
     print()
     print(f"{GREEN}{'=' * 43}{NC}")
@@ -1283,6 +1284,14 @@ def show_completion_report(
         print(f"{CYAN}MCP Server:{NC}")
         print(f"  Installed to {MCP_DEFAULT_INSTALL_DIR}")
         print(f"  Configured in {MCP_USER_CONFIG_FILE}")
+        print()
+
+    if show_reference_update_guidance:
+        print(f"{CYAN}Repository references:{NC}")
+        print("  Agent/user action: update repo files that still mention old CRUX primitive paths.")
+        print("  Old: .cursor/agents/*, .cursor/commands/*, .cursor/rules/*, .cursor/skills/*")
+        print("  New: .cursor/agents/crux/*, .cursor/commands/crux/*, .cursor/rules/crux/*, .cursor/skills/crux/*")
+        print("  Hook script paths stay in .cursor/hooks/ because hooks.json executes them directly.")
         print()
 
     step = 1
@@ -1447,6 +1456,7 @@ def main() -> None:
     show_completion_report(
         latest_version, backup_zip,
         with_memories=with_memories, with_mcp_server=with_mcp_server,
+        show_reference_update_guidance=bool(installed_version),
     )
 
 

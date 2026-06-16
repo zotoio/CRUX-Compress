@@ -487,6 +487,32 @@ class TestPreview:
         assert "CREATE" in out
 
 
+# ── Completion report ──
+
+
+class TestCompletionReport:
+    def test_upgrade_mentions_primitive_reference_updates(self, capsys):
+        mod = _load_install()
+        mod.show_completion_report(
+            "2.11.1",
+            "",
+            show_reference_update_guidance=True,
+        )
+
+        out = capsys.readouterr().out
+        assert "Repository references" in out
+        assert "old CRUX primitive paths" in out
+        assert ".cursor/agents/crux/*" in out
+        assert "Hook script paths stay in .cursor/hooks/" in out
+
+    def test_fresh_install_omits_primitive_reference_updates(self, capsys):
+        mod = _load_install()
+        mod.show_completion_report("2.11.1", "")
+
+        out = capsys.readouterr().out
+        assert "old CRUX primitive paths" not in out
+
+
 # ── Memory scaffolding (--with-memories) ──
 
 
