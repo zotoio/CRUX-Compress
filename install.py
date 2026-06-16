@@ -547,8 +547,11 @@ def cleanup_internal_agents() -> None:
             try:
                 agents_dir.rmdir()
                 log_verbose(f"Removed empty directory: {agents_dir}")
-            except OSError:
-                pass
+            except OSError as exc:
+                log_verbose(
+                    f"Skipping directory cleanup for {agents_dir}: {exc} "
+                    "(non-fatal during internal agent cleanup)"
+                )
 
     if removed:
         log_success(
