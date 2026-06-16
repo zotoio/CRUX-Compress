@@ -1,9 +1,9 @@
 ---
 generated: 2026-06-17 00:00
-sourceChecksum: "1817139228"
+sourceChecksum: "1456234472"
 cruxLevel: 25
-beforeTokens: 13066
-afterTokens: 2491
+beforeTokens: 13109
+afterTokens: 2496
 reducedBy: 81%
 confidence: 94%
 note: includes agent bootstrap instructions not present in source
