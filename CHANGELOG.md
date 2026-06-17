@@ -5,6 +5,19 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.11.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.2) - 2026-06-17
+
+- chore: update release manifests for v2.11.2 [skip ci] (ff82b11)
+- fix: tell updaters to rewrite legacy primitive refs (054b322)
+- fix: update install.crux.md checksum after rebase (33e0954)
+- chore: regenerate install.crux.md from updated install.py (750b44f)
+- Potential fix for pull request finding 'Empty except' (b3ae31c)
+- fix: validate crux subdir zip paths (d7882b1)
+- feat: install CRUX primitives under crux subdirs (ab69e8c)
+- chore: regenerate zip-contents-protection CRUX mirrors after source update (21b13e1)
+- chore: regenerate install.crux.md from updated install.py (0e453fa)
+- docs: update CHANGELOG.md for v2.10.4 [skip ci] (90d88f0)
+
 ## [v2.10.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.10.4) - 2026-05-24
 
 - chore: update release manifests for v2.10.4 [skip ci] (6a9d10c)
