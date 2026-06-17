@@ -263,21 +263,21 @@ Version bumps only occur when these files change. The file list is read from `.c
 | `.crux/crux.json` | Version metadata |
 | `.crux/crux-release-files.json` | Release manifest with checksums |
 | `.cursor/hooks.json` | Hook configuration |
-| `.cursor/agents/crux-cursor-rule-manager.md` | Rule manager agent definition |
-| `.cursor/agents/crux-cursor-memory-manager.md` | Memory manager agent definition |
-| `.cursor/agents/crux-cursor-meditation-guide.md` | Meditation guide agent definition |
-| `.cursor/commands/crux-compress.md` | Compression command |
-| `.cursor/commands/crux-dream.md` | Dream extraction command |
-| `.cursor/commands/crux-recall.md` | Memory query command |
-| `.cursor/commands/crux-forget.md` | Memory forget command |
-| `.cursor/commands/crux-remember.md` | Ad-hoc memory creation command |
-| `.cursor/commands/crux-meditate.md` | Recursive exploration command |
+| `.cursor/agents/crux/crux-cursor-rule-manager.md` | Rule manager agent definition |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory manager agent definition |
+| `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Meditation guide agent definition |
+| `.cursor/commands/crux/crux-compress.md` | Compression command |
+| `.cursor/commands/crux/crux-dream.md` | Dream extraction command |
+| `.cursor/commands/crux/crux-recall.md` | Memory query command |
+| `.cursor/commands/crux/crux-forget.md` | Memory forget command |
+| `.cursor/commands/crux/crux-remember.md` | Ad-hoc memory creation command |
+| `.cursor/commands/crux/crux-meditate.md` | Recursive exploration command |
 | `.cursor/hooks/crux-detect-changes.py` | File change detection hook |
 | `.cursor/hooks/crux-session-start.py` | Session start hook |
-| `.cursor/rules/_CRUX-RULE.mdc` | Always-applied rule |
-| `.cursor/rules/crux-memories-integration.crux.mdc` | Memory integration rule |
-| `.cursor/skills/crux-utils/**` | Utility skill |
-| `.cursor/skills/crux-skill-memory-*/**` | Memory skills (CRUD, compress, extract, index, rebalance, reference-tracker) |
+| `.cursor/rules/crux/_CRUX-RULE.mdc` | Always-applied rule |
+| `.cursor/rules/crux/crux-memories-integration.crux.mdc` | Memory integration rule |
+| `.cursor/skills/crux/crux-utils/**` | Utility skill |
+| `.cursor/skills/crux/crux-skill-memory-*/**` | Memory skills (CRUD, compress, extract, index, rebalance, reference-tracker) |
 
 Changes to other files (README, tests, examples, scripts) do **not** trigger releases.
 
@@ -287,20 +287,20 @@ Memory tooling (agent, commands, skills, rule) is included in the distribution z
 
 | Path | Distributed? | Purpose |
 |------|:---:|---------|
-| `.cursor/agents/crux-cursor-memory-manager.md` | Yes | Memory lifecycle agent definition |
-| `.cursor/agents/crux-cursor-meditation-guide.md` | Yes | Meditation guide agent definition |
-| `.cursor/commands/crux-dream.md` | Yes | Dream extraction command |
-| `.cursor/commands/crux-recall.md` | Yes | Memory query command |
-| `.cursor/commands/crux-forget.md` | Yes | Memory forget command |
-| `.cursor/commands/crux-remember.md` | Yes | Ad-hoc memory creation command |
-| `.cursor/commands/crux-meditate.md` | Yes | Recursive exploration command |
-| `.cursor/skills/crux-skill-memory-*/` | Yes | Memory skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
-| `.cursor/skills/crux-skill-memory-meditation-research/` | Yes | Research-mode Phases A–G recursion skill |
-| `.cursor/skills/crux-skill-memory-meditation-quick/` | Yes | Quick-mode parallel fan-out skill |
-| `.cursor/skills/crux-skill-memory-meditation-ensemble/` | Yes | Ensemble Aggregation skill |
-| `.cursor/skills/crux-skill-memory-meditation-review/` | Yes | Adversarial review skill |
-| `.cursor/skills/crux-skill-memory-meditation-report/` | Yes | HTML+PDF report generation skill |
-| `.cursor/skills/crux-skill-memory-meditation-coordination/` | Yes | File coordination primitives skill |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Yes | Memory lifecycle agent definition |
+| `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Yes | Meditation guide agent definition |
+| `.cursor/commands/crux/crux-dream.md` | Yes | Dream extraction command |
+| `.cursor/commands/crux/crux-recall.md` | Yes | Memory query command |
+| `.cursor/commands/crux/crux-forget.md` | Yes | Memory forget command |
+| `.cursor/commands/crux/crux-remember.md` | Yes | Ad-hoc memory creation command |
+| `.cursor/commands/crux/crux-meditate.md` | Yes | Recursive exploration command |
+| `.cursor/skills/crux/crux-skill-memory-*/` | Yes | Memory skills (CRUD, extract, rebalance, compress, index, reference-tracker) |
+| `.cursor/skills/crux/crux-skill-memory-meditation-research/` | Yes | Research-mode Phases A–G recursion skill |
+| `.cursor/skills/crux/crux-skill-memory-meditation-quick/` | Yes | Quick-mode parallel fan-out skill |
+| `.cursor/skills/crux/crux-skill-memory-meditation-ensemble/` | Yes | Ensemble Aggregation skill |
+| `.cursor/skills/crux/crux-skill-memory-meditation-review/` | Yes | Adversarial review skill |
+| `.cursor/skills/crux/crux-skill-memory-meditation-report/` | Yes | HTML+PDF report generation skill |
+| `.cursor/skills/crux/crux-skill-memory-meditation-coordination/` | Yes | File coordination primitives skill |
 | `.cursor/rules/crux-memories-integration.crux.mdc` | Yes | Memory integration rule |
 | `.crux/crux-memories.json` | No | Memory system configuration and feature flags (created by `--with-memories`) |
 | `.crux/memory-index.yml` | No | Prioritised memory index for agent discovery |

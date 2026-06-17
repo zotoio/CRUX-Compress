@@ -69,7 +69,7 @@ def _read_pending_index_rebuild() -> str | None:
         "[CRUX Memory Index Stale]\n\n"
         f"The memory index needs rebuilding — {count} memory file(s) changed since the last rebuild:\n"
         f"{file_list}\n"
-        "Run: `python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py`\n"
+        "Run: `python .cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py`\n"
         "to rebuild, then delete `.crux/pending-index-rebuild.json`."
     )
 

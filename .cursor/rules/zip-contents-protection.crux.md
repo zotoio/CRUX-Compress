@@ -1,10 +1,10 @@
 ---
-generated: 2026-04-04 10:30
-sourceChecksum: "3371193391"
+generated: 2026-06-16 23:09
+sourceChecksum: "3229855324"
 cruxLevel: 25
-beforeTokens: 525
-afterTokens: 323
-reducedBy: 38%
+beforeTokens: 917
+afterTokens: 432
+reducedBy: 53%
 confidence: 95%
 crux: true
 ---
@@ -16,29 +16,40 @@ crux: true
 
 ```crux
 ⟦CRUX:zip-contents-protection.md
-P.⊛{¬auto-add to scripts/create-crux-zip.py w/o explicit user request!}
+P.⊛{¬auto-Δ scripts/create-crux-zip.py w/o user req!}
 
-Κ{script=scripts/create-crux-zip.py→dist pkg;
- affects=[installs,ver bumps,dist size]}
+Κ{script=scripts/create-crux-zip.py→dist;
+ manifest=.crux/dist-manifest.json}
 
-P.never{auto-add when creating:
- .cursor/rules/*.mdc|.cursor/skills/*/|scripts/*.py|any files}
+P.never{auto-add: .cursor/rules/*.mdc|.cursor/skills/*/|
+ scripts/*.py|any files}
 
-P.only{Δ zip when user says:
- "add X to dist zip"|"include X in release"|"modify zip contents"}
+P.only{Δ zip: user says
+ "add to dist zip"|"include in release"|"modify zip contents"}
 
-Λ.add{w/ permission→
- 1.Δ scripts/create-crux-zip.py +path;
- 2.Δ .github/workflows/version-bump.yml RELEASE_PATHS;
- 3.Δ CONTRIBUTORS.md table;
- 4.warn: +file→ver bump}
+Λ.add{w/ perm→1.Δ script +path;
+ 2.run script→manifest records path;
+ 3.Δ CONTRIBUTORS.md; 4.warn: +→ver bump}
 
-M.zip{
- CRUX.md;.crux/crux.json;AGENTS.crux.md←AGENTS.md;
- .cursor/[hooks.json,agents/crux-cursor-rule-manager.md,
- commands/crux-compress.md,hooks/[crux-detect-changes.py,crux-session-start.py],
- rules/_CRUX-RULE.mdc,skills/crux-utils/[SKILL.md,scripts/crux-utils.py]]}
+M.zip{CRUX.md;install.crux.md;AGENTS.crux.md←AGENTS.md;
+ .crux/[crux.json,crux-release-files.json];
+ .cursor/[hooks.json,
+  agents/crux/crux-cursor-[rule-manager,memory-manager,
+   meditation-guide].md,
+  commands/crux/crux-[compress,amnesia,dream,forget,
+   meditate,recall,remember].md,
+  hooks/crux-[detect-changes,detect-memory-changes,
+   session-start].py,
+  rules/crux/[_CRUX-RULE.mdc,
+   crux-memories-integration.crux.mdc],
+  skills/crux/[crux-utils/[SKILL.md,scripts/crux-utils.py],
+   crux-skill-memory-[crud,compress,extract,index,
+    rebalance,reference-tracker]/SKILL.md,
+   crux-skill-memory-index/scripts/[memory-index.py,
+    post-dream.py],
+   crux-skill-memory-meditation-[research,quick,ensemble,
+    review,report,coordination]/SKILL.md]]}
 
-Ω{dist=minimal;+files→[↑size,?conflicts,↑updates,↑maint]}
+Ω{dist=minimal;+→[↑size,?conflicts,↑updates,↑maint]}
 ⟧
 ```

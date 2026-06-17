@@ -542,7 +542,7 @@ After all changes are applied, write a summary to `{archiveDir}/rem-{yyyymmdd}.m
 After all changes are applied and the REM summary is written, rebuild the memory index to reflect the current state of the corpus:
 
 ```bash
-python .cursor/skills/crux-skill-memory-index/scripts/memory-index.py
+python .cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py
 ```
 
 This is **mandatory** — skipping this step leaves the index stale, which causes downstream agents (Recall, Dream, session-start hooks) to reference moved, deleted, or renamed files. If the script fails, report the error but do not abort — the REM summary and applied changes are still valid.

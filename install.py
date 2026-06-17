@@ -55,18 +55,98 @@ NC = "\033[0m"
 VERBOSE = False
 NON_INTERACTIVE = False
 
-MEMORY_FILE_PREFIXES = (
+CRUX_PRIMITIVE_SUBDIR = "crux"
+CURSOR_PRIMITIVE_DIRS = {"agents", "commands", "rules", "skills"}
+
+
+def to_crux_primitive_path(rel_path: str) -> str:
+    """Return the installed path for a Cursor primitive."""
+    parts = Path(rel_path).parts
+    if len(parts) >= 3 and parts[0] == ".cursor" and parts[1] in CURSOR_PRIMITIVE_DIRS:
+        if parts[2] == CRUX_PRIMITIVE_SUBDIR:
+            return rel_path
+        return str(Path(parts[0], parts[1], CRUX_PRIMITIVE_SUBDIR, *parts[2:]))
+    return rel_path
+
+
+def from_crux_primitive_path(rel_path: str) -> str:
+    """Return the repository source path for a staged Cursor primitive."""
+    parts = Path(rel_path).parts
+    if (
+        len(parts) >= 4
+        and parts[0] == ".cursor"
+        and parts[1] in CURSOR_PRIMITIVE_DIRS
+        and parts[2] == CRUX_PRIMITIVE_SUBDIR
+    ):
+        return str(Path(parts[0], parts[1], *parts[3:]))
+    return rel_path
+
+
+SOURCE_RELEASE_FILES = [
+    "CRUX.md", "install.crux.md", ".crux/crux.json",
+    ".cursor/hooks.json",
+    ".cursor/agents/crux-cursor-rule-manager.md",
     ".cursor/agents/crux-cursor-memory-manager.md",
     ".cursor/agents/crux-cursor-meditation-guide.md",
+    ".cursor/commands/crux-compress.md",
     ".cursor/commands/crux-dream.md",
-    ".cursor/commands/crux-meditate.md",
     ".cursor/commands/crux-recall.md",
     ".cursor/commands/crux-remember.md",
+    ".cursor/commands/crux-meditate.md",
     ".cursor/commands/crux-forget.md",
     ".cursor/commands/crux-amnesia.md",
+    ".cursor/hooks/crux-detect-changes.py",
+    ".cursor/hooks/crux-detect-memory-changes.py",
+    ".cursor/hooks/crux-session-start.py",
+    ".cursor/rules/_CRUX-RULE.mdc",
+    ".cursor/rules/crux-memories-integration.crux.mdc",
+    ".cursor/skills/crux-utils/SKILL.md",
+    ".cursor/skills/crux-utils/scripts/crux-utils.py",
+    ".cursor/skills/crux-skill-memory-crud/SKILL.md",
+    ".cursor/skills/crux-skill-memory-compress/SKILL.md",
+    ".cursor/skills/crux-skill-memory-extract/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/SKILL.md",
+    ".cursor/skills/crux-skill-memory-index/scripts/memory-index.py",
+    ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
+    ".cursor/skills/crux-skill-memory-rebalance/SKILL.md",
+    ".cursor/skills/crux-skill-memory-reference-tracker/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
+    ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
+]
+
+RELEASE_FILES = [to_crux_primitive_path(path) for path in SOURCE_RELEASE_FILES]
+LEGACY_TO_CRUX_PRIMITIVE_PATHS = {
+    source: dest
+    for source, dest in zip(SOURCE_RELEASE_FILES, RELEASE_FILES)
+    if source != dest
+}
+
+MEMORY_FILE_PREFIXES = (
+    ".cursor/agents/crux-cursor-memory-manager.md",
+    ".cursor/agents/crux/crux-cursor-memory-manager.md",
+    ".cursor/agents/crux-cursor-meditation-guide.md",
+    ".cursor/agents/crux/crux-cursor-meditation-guide.md",
+    ".cursor/commands/crux-dream.md",
+    ".cursor/commands/crux/crux-dream.md",
+    ".cursor/commands/crux-meditate.md",
+    ".cursor/commands/crux/crux-meditate.md",
+    ".cursor/commands/crux-recall.md",
+    ".cursor/commands/crux/crux-recall.md",
+    ".cursor/commands/crux-remember.md",
+    ".cursor/commands/crux/crux-remember.md",
+    ".cursor/commands/crux-forget.md",
+    ".cursor/commands/crux/crux-forget.md",
+    ".cursor/commands/crux-amnesia.md",
+    ".cursor/commands/crux/crux-amnesia.md",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/rules/crux-memories-integration.crux.mdc",
+    ".cursor/rules/crux/crux-memories-integration.crux.mdc",
     ".cursor/skills/crux-skill-memory-",
+    ".cursor/skills/crux/crux-skill-memory-",
 )
 
 
@@ -230,6 +310,12 @@ def load_known_checksums() -> dict[str, set[str]]:
             cksum = meta.get("checksum", "")
             if cksum:
                 known.setdefault(filepath, set()).add(cksum)
+                crux_path = to_crux_primitive_path(filepath)
+                if crux_path != filepath:
+                    known.setdefault(crux_path, set()).add(cksum)
+                source_path = from_crux_primitive_path(filepath)
+                if source_path != filepath:
+                    known.setdefault(source_path, set()).add(cksum)
     return known
 
 
@@ -271,15 +357,11 @@ def create_backup_zip() -> str:
 
     log("Creating backup...")
 
-    standard_files = [
-        "CRUX.md", "AGENTS.md", "install.crux.md",
-        ".crux/crux.json", ".crux/crux-release-files.json",
-        ".cursor/hooks.json", ".cursor/agents/crux-cursor-rule-manager.md",
-        ".cursor/commands/crux-compress.md",
-        ".cursor/hooks/crux-detect-changes.py", ".cursor/hooks/crux-session-start.py",
-        ".cursor/rules/_CRUX-RULE.mdc",
-        ".cursor/skills/crux-utils/SKILL.md", ".cursor/skills/crux-utils/scripts/crux-utils.py",
-    ]
+    standard_files = list(dict.fromkeys(
+        ["AGENTS.md", ".crux/crux-release-files.json"]
+        + SOURCE_RELEASE_FILES
+        + RELEASE_FILES
+    ))
 
     files_to_backup: list[str] = []
     for f in standard_files:
@@ -403,9 +485,13 @@ DEPRECATED_FILES = [
 # install, or an experimental pre-release) gets it cleaned up on update.
 INTERNAL_AGENT_FILES = [
     ".cursor/agents/crux-platform-architect.md",
+    ".cursor/agents/crux/crux-platform-architect.md",
     ".cursor/agents/crux-software-engineer.md",
+    ".cursor/agents/crux/crux-software-engineer.md",
     ".cursor/agents/integrity-expert.md",
+    ".cursor/agents/crux/integrity-expert.md",
     ".cursor/agents/docs-sync-agent.md",
+    ".cursor/agents/crux/docs-sync-agent.md",
 ]
 
 DEPRECATED_HOOK_COMMANDS = {
@@ -456,19 +542,74 @@ def cleanup_internal_agents() -> None:
             removed += 1
             log_verbose(f"Removed internal agent: {filepath}")
 
-    agents_dir = Path(".cursor/agents")
-    if agents_dir.is_dir() and not any(agents_dir.iterdir()):
-        try:
-            agents_dir.rmdir()
-            log_verbose(f"Removed empty directory: {agents_dir}")
-        except OSError:
-            pass
+    for agents_dir in (Path(".cursor/agents/crux"), Path(".cursor/agents")):
+        if agents_dir.is_dir() and not any(agents_dir.iterdir()):
+            try:
+                agents_dir.rmdir()
+                log_verbose(f"Removed empty directory: {agents_dir}")
+            except OSError as exc:
+                log_verbose(
+                    f"Skipping directory cleanup for {agents_dir}: {exc} "
+                    "(non-fatal during internal agent cleanup)"
+                )
 
     if removed:
         log_success(
             f"Cleaned up {removed} CRUX-Compress internal agent(s) "
             "(not intended for consumer projects)"
         )
+
+
+def remove_empty_parent_dirs(start: Path, stop: Path = Path(".cursor")) -> None:
+    parent = start
+    while parent != Path(".") and parent != stop and parent.is_dir():
+        try:
+            parent.rmdir()
+            log_verbose(f"Removed empty directory: {parent}")
+            parent = parent.parent
+        except OSError:
+            break
+
+
+def migrate_primitive_layout(install_memories: bool = False) -> None:
+    """Move previously installed CRUX primitives into .cursor/<type>/crux/."""
+    moved = removed = conflicts = 0
+
+    for legacy, target in sorted(LEGACY_TO_CRUX_PRIMITIVE_PATHS.items()):
+        if is_memory_file(legacy) and not install_memories:
+            continue
+
+        legacy_path = Path(legacy)
+        target_path = Path(target)
+        if not legacy_path.is_file():
+            continue
+
+        if target_path.is_file():
+            if get_checksum(str(legacy_path)) == get_checksum(str(target_path)):
+                legacy_path.unlink()
+                removed += 1
+                log_verbose(f"Removed duplicate legacy primitive: {legacy}")
+                remove_empty_parent_dirs(legacy_path.parent)
+            else:
+                conflicts += 1
+                log_warn(
+                    "Leaving legacy CRUX primitive in place because the new "
+                    f"path already exists: {legacy} -> {target}"
+                )
+            continue
+
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(legacy_path), str(target_path))
+        moved += 1
+        log_verbose(f"Migrated CRUX primitive: {legacy} -> {target}")
+        remove_empty_parent_dirs(legacy_path.parent)
+
+    if moved or removed:
+        log_success(
+            f"Migrated CRUX primitive layout ({moved} moved, {removed} duplicate legacy file(s) removed)"
+        )
+    if conflicts:
+        log_warn(f"{conflicts} legacy CRUX primitive file(s) need manual review")
 
 
 def cleanup_deprecated_hooks() -> None:
@@ -534,43 +675,19 @@ def get_release_files(version: str) -> list[str]:
                 log_verbose(f"Failed to parse dist manifest from {url}: {exc}")
 
     log_warn("Could not fetch dist manifest, using built-in fallback list")
-    return [
-        "CRUX.md", "install.crux.md", ".crux/crux.json",
-        ".cursor/hooks.json",
-        ".cursor/agents/crux-cursor-rule-manager.md",
-        ".cursor/agents/crux-cursor-memory-manager.md",
-        ".cursor/agents/crux-cursor-meditation-guide.md",
-        ".cursor/commands/crux-compress.md",
-        ".cursor/commands/crux-dream.md",
-        ".cursor/commands/crux-recall.md",
-        ".cursor/commands/crux-remember.md",
-        ".cursor/commands/crux-meditate.md",
-        ".cursor/commands/crux-forget.md",
-        ".cursor/commands/crux-amnesia.md",
-        ".cursor/hooks/crux-detect-changes.py",
-        ".cursor/hooks/crux-detect-memory-changes.py",
-        ".cursor/hooks/crux-session-start.py",
-        ".cursor/rules/_CRUX-RULE.mdc",
-        ".cursor/rules/crux-memories-integration.crux.mdc",
-        ".cursor/skills/crux-utils/SKILL.md",
-        ".cursor/skills/crux-utils/scripts/crux-utils.py",
-        ".cursor/skills/crux-skill-memory-meditation-research/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-quick/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-ensemble/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-review/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-report/SKILL.md",
-        ".cursor/skills/crux-skill-memory-meditation-coordination/SKILL.md",
-    ]
+    return RELEASE_FILES
 
 
 def _download_one(cdn_base: str, rel_path: str, target_dir: Path) -> tuple[str, bool]:
     """Download a single file from CDN. Returns (path, success)."""
     dest = target_dir / rel_path
     dest.parent.mkdir(parents=True, exist_ok=True)
-    data = http_get(f"{cdn_base}/{rel_path}")
-    if data:
-        dest.write_bytes(data)
-        return rel_path, True
+    source_candidates = list(dict.fromkeys([rel_path, from_crux_primitive_path(rel_path)]))
+    for source_path in source_candidates:
+        data = http_get(f"{cdn_base}/{source_path}")
+        if data:
+            dest.write_bytes(data)
+            return rel_path, True
     return rel_path, False
 
 
@@ -773,9 +890,9 @@ def install_from_staging(staging_dir: Path, install_memories: bool = False) -> N
         upsert_agents_crux_block("AGENTS.crux.md")
 
     for script in [
-        ".cursor/skills/crux-utils/scripts/crux-utils.py",
-        ".cursor/skills/crux-skill-memory-index/scripts/memory-index.py",
-        ".cursor/skills/crux-skill-memory-index/scripts/post-dream.py",
+        ".cursor/skills/crux/crux-utils/scripts/crux-utils.py",
+        ".cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py",
+        ".cursor/skills/crux/crux-skill-memory-index/scripts/post-dream.py",
     ]:
         p = Path(script)
         if p.is_file():
@@ -834,32 +951,32 @@ DEFAULT_MEMORIES_CONFIG = {
         "unitOfWork": "spec",
         "commands": {
             "dream": {
-                "file": ".cursor/commands/crux-dream.md",
+                "file": ".cursor/commands/crux/crux-dream.md",
                 "default": "/crux-dream",
                 "description": "Post-execution memory extraction and consolidation",
             },
             "recall": {
-                "file": ".cursor/commands/crux-recall.md",
+                "file": ".cursor/commands/crux/crux-recall.md",
                 "default": "/crux-recall",
                 "description": "Decompress and view memories in chat",
             },
             "remember": {
-                "file": ".cursor/commands/crux-remember.md",
+                "file": ".cursor/commands/crux/crux-remember.md",
                 "default": "/crux-remember",
                 "description": "Create ad-hoc memories outside of spec workflows",
             },
             "meditate": {
-                "file": ".cursor/commands/crux-meditate.md",
+                "file": ".cursor/commands/crux/crux-meditate.md",
                 "default": "/crux-meditate",
                 "description": "Recursive memory-informed exploration and insight synthesis",
             },
             "forget": {
-                "file": ".cursor/commands/crux-forget.md",
+                "file": ".cursor/commands/crux/crux-forget.md",
                 "default": "/crux-forget",
                 "description": "Remove incorrect or unwanted memories",
             },
             "amnesia": {
-                "file": ".cursor/commands/crux-amnesia.md",
+                "file": ".cursor/commands/crux/crux-amnesia.md",
                 "default": "/crux-amnesia",
                 "description": "Toggle session-scoped ambient memory usage",
             },
@@ -1130,6 +1247,7 @@ def setup_memories() -> bool:
 def show_completion_report(
     version: str, backup_zip: str,
     with_memories: bool = False, with_mcp_server: bool = False,
+    show_reference_update_guidance: bool = False,
 ) -> None:
     print()
     print(f"{GREEN}{'=' * 43}{NC}")
@@ -1145,12 +1263,12 @@ def show_completion_report(
         print()
         print("To revert this update:")
         print(f"  {CYAN}# Remove installed CRUX files{NC}")
-        print("  rm -rf .crux .cursor/agents/crux-cursor-rule-manager.md \\")
-        print("         .cursor/commands/crux-compress.md \\")
+        print("  rm -rf .crux .cursor/agents/crux/crux-cursor-rule-manager.md \\")
+        print("         .cursor/commands/crux/crux-compress.md \\")
         print("         .cursor/hooks/crux-detect-changes.py \\")
         print("         .cursor/hooks/crux-session-start.py \\")
-        print("         .cursor/rules/_CRUX-RULE.mdc \\")
-        print("         .cursor/skills/crux-utils CRUX.md install.crux.md")
+        print("         .cursor/rules/crux/_CRUX-RULE.mdc \\")
+        print("         .cursor/skills/crux/crux-utils CRUX.md install.crux.md")
         print()
         print(f"  {CYAN}# Restore from backup{NC}")
         print(f"  unzip -o '{backup_zip}'")
@@ -1166,6 +1284,14 @@ def show_completion_report(
         print(f"{CYAN}MCP Server:{NC}")
         print(f"  Installed to {MCP_DEFAULT_INSTALL_DIR}")
         print(f"  Configured in {MCP_USER_CONFIG_FILE}")
+        print()
+
+    if show_reference_update_guidance:
+        print(f"{CYAN}Repository references:{NC}")
+        print("  Agent/user action: update repo files that still mention old CRUX primitive paths.")
+        print("  Old: .cursor/agents/*, .cursor/commands/*, .cursor/rules/*, .cursor/skills/*")
+        print("  New: .cursor/agents/crux/*, .cursor/commands/crux/*, .cursor/rules/crux/*, .cursor/skills/crux/*")
+        print("  Hook script paths stay in .cursor/hooks/ because hooks.json executes them directly.")
         print()
 
     step = 1
@@ -1296,6 +1422,8 @@ def main() -> None:
     known_checksums = load_known_checksums() if installed_version else {}
 
     staging_dir = download_and_stage(latest_version)
+    if installed_version:
+        migrate_primitive_layout(install_memories=install_memories)
     locally_modified = preview_installation(
         staging_dir, VERBOSE, known_checksums, install_memories=install_memories,
     )
@@ -1328,6 +1456,7 @@ def main() -> None:
     show_completion_report(
         latest_version, backup_zip,
         with_memories=with_memories, with_mcp_server=with_mcp_server,
+        show_reference_update_guidance=bool(installed_version),
     )
 
 

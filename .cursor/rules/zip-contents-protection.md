@@ -30,7 +30,7 @@ The file `scripts/create-crux-zip.py` defines the exact contents of the CRUX Com
 
 ### When adding files to the zip (with explicit permission):
 1. Update `scripts/create-crux-zip.py` with the new file/directory
-2. Update `.github/workflows/version-bump.yml` RELEASE_PATHS to include the new path
+2. Run `scripts/create-crux-zip.py` so `.crux/dist-manifest.json` records the new path
 3. Update the "Release-Relevant Files" table in `CONTRIBUTORS.md`
 4. Inform the user that adding files will trigger a version bump on next commit
 
@@ -40,16 +40,42 @@ These are the ONLY files that should be in the distribution:
 
 ```
 CRUX.md
+install.crux.md
 .crux/crux.json
 AGENTS.crux.md (extracted from AGENTS.md)
 .cursor/hooks.json
-.cursor/agents/crux-cursor-rule-manager.md
-.cursor/commands/crux-compress.md
+.cursor/agents/crux/crux-cursor-rule-manager.md
+.cursor/agents/crux/crux-cursor-memory-manager.md
+.cursor/agents/crux/crux-cursor-meditation-guide.md
+.cursor/commands/crux/crux-compress.md
+.cursor/commands/crux/crux-amnesia.md
+.cursor/commands/crux/crux-dream.md
+.cursor/commands/crux/crux-forget.md
+.cursor/commands/crux/crux-meditate.md
+.cursor/commands/crux/crux-recall.md
+.cursor/commands/crux/crux-remember.md
 .cursor/hooks/crux-detect-changes.py
+.cursor/hooks/crux-detect-memory-changes.py
 .cursor/hooks/crux-session-start.py
-.cursor/rules/_CRUX-RULE.mdc
-.cursor/skills/crux-utils/SKILL.md
-.cursor/skills/crux-utils/scripts/crux-utils.py
+.cursor/rules/crux/_CRUX-RULE.mdc
+.cursor/rules/crux/crux-memories-integration.crux.mdc
+.cursor/skills/crux/crux-utils/SKILL.md
+.cursor/skills/crux/crux-utils/scripts/crux-utils.py
+.cursor/skills/crux/crux-skill-memory-crud/SKILL.md
+.cursor/skills/crux/crux-skill-memory-compress/SKILL.md
+.cursor/skills/crux/crux-skill-memory-extract/SKILL.md
+.cursor/skills/crux/crux-skill-memory-index/SKILL.md
+.cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py
+.cursor/skills/crux/crux-skill-memory-index/scripts/post-dream.py
+.cursor/skills/crux/crux-skill-memory-rebalance/SKILL.md
+.cursor/skills/crux/crux-skill-memory-reference-tracker/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-research/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-quick/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-ensemble/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-review/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-report/SKILL.md
+.cursor/skills/crux/crux-skill-memory-meditation-coordination/SKILL.md
+.crux/crux-release-files.json
 ```
 
 ## Rationale

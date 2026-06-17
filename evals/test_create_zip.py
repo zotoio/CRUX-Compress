@@ -73,20 +73,20 @@ class TestZipContents:
         assert any(".cursor/hooks.json" in n for n in zip_names)
 
     def test_contains_rule_manager(self, zip_names: list[str]):
-        assert any("crux-cursor-rule-manager.md" in n for n in zip_names)
+        assert ".cursor/agents/crux/crux-cursor-rule-manager.md" in zip_names
 
     def test_contains_crux_compress_command(self, zip_names: list[str]):
-        assert any("crux-compress.md" in n for n in zip_names)
+        assert ".cursor/commands/crux/crux-compress.md" in zip_names
 
     def test_contains_detect_changes_hook(self, zip_names: list[str]):
         assert any("crux-detect-changes.py" in n for n in zip_names)
 
     def test_contains_crux_rule(self, zip_names: list[str]):
-        assert any("_CRUX-RULE.mdc" in n for n in zip_names)
+        assert ".cursor/rules/crux/_CRUX-RULE.mdc" in zip_names
 
     def test_contains_crux_utils_skill(self, zip_names: list[str]):
-        assert any("crux-utils/SKILL.md" in n for n in zip_names)
-        assert any("crux-utils.py" in n for n in zip_names)
+        assert ".cursor/skills/crux/crux-utils/SKILL.md" in zip_names
+        assert ".cursor/skills/crux/crux-utils/scripts/crux-utils.py" in zip_names
 
 
 class TestZipIntegrity:

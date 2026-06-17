@@ -29,32 +29,32 @@
 
     "commands": {
       "dream": {
-        "file": ".cursor/commands/crux-dream.md",
+        "file": ".cursor/commands/crux/crux-dream.md",
         "default": "/crux-dream",
         "description": "Post-execution memory extraction and consolidation"
       },
       "recall": {
-        "file": ".cursor/commands/crux-recall.md",
+        "file": ".cursor/commands/crux/crux-recall.md",
         "default": "/crux-recall",
         "description": "Decompress, view, and visualize memories"
       },
       "remember": {
-        "file": ".cursor/commands/crux-remember.md",
+        "file": ".cursor/commands/crux/crux-remember.md",
         "default": "/crux-remember",
         "description": "Create ad-hoc memories outside of spec workflows"
       },
       "meditate": {
-        "file": ".cursor/commands/crux-meditate.md",
+        "file": ".cursor/commands/crux/crux-meditate.md",
         "default": "/crux-meditate",
         "description": "Recursive memory-informed exploration and insight synthesis"
       },
       "forget": {
-        "file": ".cursor/commands/crux-forget.md",
+        "file": ".cursor/commands/crux/crux-forget.md",
         "default": "/crux-forget",
         "description": "Remove incorrect or unwanted memories"
       },
       "amnesia": {
-        "file": ".cursor/commands/crux-amnesia.md",
+        "file": ".cursor/commands/crux/crux-amnesia.md",
         "default": "/crux-amnesia",
         "description": "Toggle session-scoped ambient memory usage"
       }

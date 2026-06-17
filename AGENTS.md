@@ -21,9 +21,9 @@ This repository uses CRUX notation for semantic compression. **If not already lo
 
 | Agent | Definition | Purpose |
 |-------|-----------|---------|
-| `crux-cursor-rule-manager` | `.cursor/agents/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
-| `crux-cursor-memory-manager` | `.cursor/agents/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, Recall, Forget, Remember, Meditate) |
-| `crux-cursor-meditation-guide` | `.cursor/agents/crux-cursor-meditation-guide.md` | Recursive memory-informed meditation guide. Owns the Meditate persona, Research Phases A–G, Quick 6-step protocol, Adversarial Review function, Ensemble Aggregation function, and the K10 finalisation-enhancements reflection function. Spawned by `/crux-meditate` for the entire subagent tree; never user-invoked directly. |
+| `crux-cursor-rule-manager` | `.cursor/agents/crux/crux-cursor-rule-manager.md` | CRUX compression, decompression, and validation |
+| `crux-cursor-memory-manager` | `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle management (dream, REM sleep, Recall, Forget, Remember, Meditate) |
+| `crux-cursor-meditation-guide` | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Recursive memory-informed meditation guide. Owns the Meditate persona, Research Phases A–G, Quick 6-step protocol, Adversarial Review function, Ensemble Aggregation function, and the K10 finalisation-enhancements reflection function. Spawned by `/crux-meditate` for the entire subagent tree; never user-invoked directly. |
 
 ### User Input Escalation — Subagent Protocol
 

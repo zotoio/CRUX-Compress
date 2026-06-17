@@ -49,7 +49,7 @@ Each command points to a definition file. Defaults ship with CRUX; consumers can
 
 ### Agent: `crux-cursor-memory-manager`
 
-Commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`) spawn a `crux-cursor-memory-manager` subagent. `/crux-meditate` spawns `crux-cursor-meditation-guide` instead — a dedicated recursive research orchestrator (see below). `/crux-amnesia` is different: it is a lightweight chat-session instruction toggle that does not mutate files and instead tells the current agent and ordinary-work subagents to suppress ambient memory usage. The memory manager agent definition is provided by CRUX and lives at `.cursor/agents/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
+Commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`) spawn a `crux-cursor-memory-manager` subagent. `/crux-meditate` spawns `crux-cursor-meditation-guide` instead — a dedicated recursive research orchestrator (see below). `/crux-amnesia` is different: it is a lightweight chat-session instruction toggle that does not mutate files and instead tells the current agent and ordinary-work subagents to suppress ambient memory usage. The memory manager agent definition is provided by CRUX and lives at `.cursor/agents/crux/crux-cursor-memory-manager.md` (Cursor) or equivalent per platform.
 
 **Agent definition frontmatter:**
 
@@ -86,7 +86,7 @@ repository: https://github.com/zotoio/CRUX-Compress
 
 | Platform | Agent definition location |
 |---|---|
-| Cursor | `.cursor/agents/crux-cursor-memory-manager.md` |
+| Cursor | `.cursor/agents/crux/crux-cursor-memory-manager.md` |
 | Claude Code | Inline in command definitions (`.claude/commands/crux-dream.md`, `.claude/commands/crux-forget.md` etc.) — Claude Code does not have a separate agent concept |
 | Generic | Embedded in the `crux-memory-server` or shell script preamble |
 
@@ -259,10 +259,10 @@ The core memory engine is identical across platforms. Only the wiring layer diff
 
 | Capability | Cursor | Claude Code | Generic / Other |
 |---|---|---|---|
-| Agent rules | `.cursor/rules/*.mdc` | `CLAUDE.md` / `.claude/settings.json` | `memories/MEMORIES_AGENT_RULE.md` |
-| Commands | `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, `/crux-meditate`, `/crux-amnesia` → `.cursor/commands/crux-*.md` | `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, `/crux-meditate`, `/crux-amnesia` → `.claude/commands/crux-*.md` | `crux-dream`, `crux-recall`, `crux-forget`, `crux-remember`, `crux-meditate`, `crux-amnesia` → shell scripts or MCP calls |
+| Agent rules | `.cursor/rules/crux/*.mdc` | `CLAUDE.md` / `.claude/settings.json` | `memories/MEMORIES_AGENT_RULE.md` |
+| Commands | `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, `/crux-meditate`, `/crux-amnesia` → `.cursor/commands/crux/crux-*.md` | `/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`, `/crux-meditate`, `/crux-amnesia` → `.claude/commands/crux-*.md` | `crux-dream`, `crux-recall`, `crux-forget`, `crux-remember`, `crux-meditate`, `crux-amnesia` → shell scripts or MCP calls |
 | Session hooks | `.cursor/hooks/*.sh` | `.claude/hooks/session-start.sh` | Git hook or manual |
-| Skills/tools | `.cursor/skills/*/SKILL.md` | Tool use via MCP or inline prompts | MCP tools or scripts |
+| Skills/tools | `.cursor/skills/crux/*/SKILL.md` | Tool use via MCP or inline prompts | MCP tools or scripts |
 | Memory discovery (default) | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files | Read `.crux/memory-index.yml`, load matching `*.memory.md` files |
 | MCP integration (optional) | Cursor MCP config in `.cursor/` | `.mcp.json` or `claude mcp add` | MCP server config |
 | Command trigger | `/crux-dream` in chat | `/crux-dream` or `claude -p "run crux-dream"` | `./crux-dream.sh` or MCP call |
@@ -299,32 +299,32 @@ The core memory engine is identical across platforms. Only the wiring layer diff
 
     "commands": {
       "dream": {
-        "file": ".cursor/commands/crux-dream.md",
+        "file": ".cursor/commands/crux/crux-dream.md",
         "default": "/crux-dream",
         "description": "Post-execution memory extraction and consolidation"
       },
       "recall": {
-        "file": ".cursor/commands/crux-recall.md",
+        "file": ".cursor/commands/crux/crux-recall.md",
         "default": "/crux-recall",
         "description": "Decompress and view memories in chat"
       },
       "forget": {
-        "file": ".cursor/commands/crux-forget.md",
+        "file": ".cursor/commands/crux/crux-forget.md",
         "default": "/crux-forget",
         "description": "Remove incorrect or unwanted memories"
       },
       "remember": {
-        "file": ".cursor/commands/crux-remember.md",
+        "file": ".cursor/commands/crux/crux-remember.md",
         "default": "/crux-remember",
         "description": "Create ad-hoc memories outside of spec workflows"
       },
       "amnesia": {
-        "file": ".cursor/commands/crux-amnesia.md",
+        "file": ".cursor/commands/crux/crux-amnesia.md",
         "default": "/crux-amnesia",
         "description": "Toggle session-scoped ambient memory usage"
       },
       "meditate": {
-        "file": ".cursor/commands/crux-meditate.md",
+        "file": ".cursor/commands/crux/crux-meditate.md",
         "default": "/crux-meditate",
         "description": "Recursive memory-informed exploration through agent inception"
       }
@@ -733,7 +733,7 @@ Regardless of platform, the agent rule must convey:
 
 ### 3a. Cursor Wiring
 
-**A. Rule:** `.cursor/rules/crux-memories-integration.mdc`
+**A. Rule:** `.cursor/rules/crux/crux-memories-integration.mdc`
 
 Standard Cursor rule file (`.mdc`) containing the agent rule content above. Automatically loaded by Cursor when the repo is opened.
 
@@ -751,7 +751,7 @@ Add a clause that:
 
 **D. Commands:** Pointed to by `commands.dream.file`, `commands.recall.file`, `commands.forget.file`, `commands.remember.file`, `commands.meditate.file`, and `commands.amnesia.file` in config.
 
-Defaults to `.cursor/commands/crux-dream.md`, `.cursor/commands/crux-recall.md`, `.cursor/commands/crux-forget.md`, `.cursor/commands/crux-remember.md`, `.cursor/commands/crux-meditate.md`, and `.cursor/commands/crux-amnesia.md`. The first five invoke CRUX memory workflows, while `/crux-amnesia` sets a chat-session-only override that suppresses ambient memory use without changing repo config. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
+Defaults to `.cursor/commands/crux/crux-dream.md`, `.cursor/commands/crux/crux-recall.md`, `.cursor/commands/crux/crux-forget.md`, `.cursor/commands/crux/crux-remember.md`, `.cursor/commands/crux/crux-meditate.md`, and `.cursor/commands/crux/crux-amnesia.md`. The first five invoke CRUX memory workflows, while `/crux-amnesia` sets a chat-session-only override that suppresses ambient memory use without changing repo config. Consumers can override by pointing `file` at their own command definitions (e.g. `.cursor/commands/my-dream.md`) to wrap additional project-specific logic.
 
 **E. MCP (optional):** Install the standalone MCP memory server via `--with-mcp-server` (see [Reference Local stdio Server](#reference-local-stdio-server)). This configures user-level `~/.cursor/mcp.json` for semantic memory search across all projects. Without MCP, agents use the index file (`.crux/memory-index.yml`) for discovery — no additional setup required.
 
@@ -884,7 +884,7 @@ The `"platform"` key in config controls which wiring conventions CRUX expects wh
 
 | Value | Effect |
 |---|---|
-| `"cursor"` | Commands default to `.cursor/commands/crux-dream.md` etc. Expects `.cursor/rules/`, `.cursor/hooks/`, `.cursor/mcp.json` |
+| `"cursor"` | Commands default to `.cursor/commands/crux/crux-dream.md` etc. Expects `.cursor/rules/`, `.cursor/hooks/`, `.cursor/mcp.json` |
 | `"claude-code"` | Commands default to `.claude/commands/crux-dream.md` etc. Expects `CLAUDE.md` or `.claude/`, `.mcp.json` |
 | `"generic"` | Commands default to shell scripts (`crux-dream`, `crux-recall`, `crux-forget`, `crux-remember`, `crux-meditate`). Expects `memories/MEMORIES_AGENT_RULE.md`, manual MCP config |
 

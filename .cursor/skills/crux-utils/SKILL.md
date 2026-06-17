@@ -11,16 +11,16 @@ Multi-purpose utility for CRUX compression workflows. Provides deterministic too
 
 ```bash
 # Token count estimation
-python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count <file>
+python3 .cursor/skills/crux/crux-utils/scripts/crux-utils.py --token-count <file>
 
 # Compare source vs CRUX (ratio mode, default target 25%)
-python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux>
+python3 .cursor/skills/crux/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux>
 
 # Compare with custom target (e.g. 40%)
-python3 .cursor/skills/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux> --target 40
+python3 .cursor/skills/crux/crux-utils/scripts/crux-utils.py --token-count --ratio <source> <crux> --target 40
 
 # Get checksum for sourceChecksum frontmatter
-python3 .cursor/skills/crux-utils/scripts/crux-utils.py --cksum <file>
+python3 .cursor/skills/crux/crux-utils/scripts/crux-utils.py --cksum <file>
 ```
 
 ## Modes
