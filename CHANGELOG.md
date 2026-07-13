@@ -5,6 +5,14 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.11.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.4) - 2026-07-13
+
+- chore: update release manifests for v2.11.4 [skip ci] (e0ff68e)
+- docs: fix analysis markdown whitespace (cea2dcb)
+- docs: consolidate Meditate vNext analysis (ccbb4e5)
+- docs: update CHANGELOG.md for v2.11.2 [skip ci] (63669c7)
+- analysis: add context-token reduction report for skills/commands/agents (734b9dc)
+
 ## [v2.11.2](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.2) - 2026-06-17
 
 - chore: update release manifests for v2.11.2 [skip ci] (ff82b11)
