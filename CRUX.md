@@ -1,10 +1,10 @@
 ---
 name: crux-compression-specification
-version: 2.11.2
+version: 2.11.4
 description: Semantic compressor for markdown, code, and images. Converts source files to CRUX notation achieving 5-10x token reduction while preserving all actionable information in a form LLMs understand.
 readonly: true
 ---
-# CRUX Compression Specification v2.11.2
+# CRUX Compression Specification v2.11.4
 
 A semantic compression notation for reducing markdown rules, code files, and images to a configurable target percentage (default ≤25%) of original token count while preserving all actionable information.
 
