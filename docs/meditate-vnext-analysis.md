@@ -1,8 +1,8 @@
 # Meditate vNext: Deformation-Grounded Architecture Analysis
 
-**Status:** Architecture analysis  
-**Scope:** Consolidated design context for a future `/crux-meditate` revision  
-**Decision posture:** Facts, hypotheses, and unknowns are separated explicitly  
+**Status:** Architecture analysis
+**Scope:** Consolidated design context for a future `/crux-meditate` revision
+**Decision posture:** Facts, hypotheses, and unknowns are separated explicitly
 **Analysis mode:** Architecture synthesis plus adversarial review using isolated
 same-family contexts; agreement between those contexts is not treated as
 cross-model evidence
