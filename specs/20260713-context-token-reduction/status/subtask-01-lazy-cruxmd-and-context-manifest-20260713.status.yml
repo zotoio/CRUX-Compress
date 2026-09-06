@@ -1,0 +1,187 @@
+schema_version: 1
+subtask_id: "01"
+feature: context-token-reduction
+assigned_agent: crux-platform-architect
+model: composer-2-fast
+token_budget: 200000
+state: completed
+checklist:
+  - id: D01
+    text: '**D01** — Update `AGENTS.md` `<CRUX agents="always">` block:'
+    done: true
+    evidence_path: null
+  - id: D02
+    text: "**D02** — Document the `context_manifest` schema in AGENTS.md:"
+    done: true
+    evidence_path: null
+  - id: D03
+    text: "**D03** — Strip the unconditional `Read CRUX.md` block from:"
+    done: true
+    evidence_path: null
+  - id: D04
+    text: "**D04** — In `.cursor/agents/crux-cursor-memory-manager.md` and `.cursor/agents/crux-cursor-meditation-guide.md`, replace the unconditional `Read CRUX.md` block with:"
+    done: true
+    evidence_path: null
+  - id: D05
+    text: '**D05** — Keep the unconditional `Read CRUX.md` line in `.cursor/agents/crux-cursor-rule-manager.md` unchanged. Add one sentence noting the manifest contract: "If your task prompt includes `context_manifest.crux_md === "loaded"`, skip the re-read."'
+    done: true
+    evidence_path: null
+  - id: D06
+    text: '**D06** — In every agent file above, insert a short "Honor `context_manifest`" section immediately after the load-context block:'
+    done: true
+    evidence_path: null
+  - id: D07
+    text: "**D07** — Update the `Available Agents` table in `AGENTS.md` **only if** wording touches CRUX-load behavior. Do not add new agents in this subtask (Subtask 05 owns that)."
+    done: true
+    evidence_path: null
+  - id: D08
+    text: "**D08** — Record the exact tokens saved per agent file (before/after `Read CRUX.md` block removed) in this subtask's status file `notes` — use `.cursor/skills/crux-utils/` for the estimation."
+    done: true
+    evidence_path: null
+artifacts:
+  - path: AGENTS.md
+    kind: modified
+    note: "Rewrote CRUX preamble + rule #1 for lazy loading; added context_manifest subagent-prelude section inside the shipped <CRUX> block."
+  - path: .cursor/agents/crux-platform-architect.md
+    kind: modified
+    note: Removed unconditional CRUX.md read; added conditional two-liner + Honor context_manifest block; updated 'When Invoked' step 2.
+  - path: .cursor/agents/crux-software-engineer.md
+    kind: modified
+    note: Removed unconditional CRUX.md read; added conditional two-liner + Honor context_manifest block.
+  - path: .cursor/agents/integrity-expert.md
+    kind: modified
+    note: Replaced soft AGENTS.md + CRUX.md read with conditional two-liner + Honor context_manifest block; updated 'When Invoked' step 2.
+  - path: .cursor/agents/docs-sync-agent.md
+    kind: modified
+    note: Added conditional two-liner + Honor context_manifest block (no unconditional read existed to remove).
+  - path: .cursor/agents/crux-cursor-meditation-guide.md
+    kind: modified
+    note: Replaced unconditional CRUX.md read with compressed-memory-conditional wording; wrapped .crux/crux-memories.json read with manifest-honoring caveat; added Honor context_manifest block.
+  - path: .cursor/agents/crux-cursor-rule-manager.md
+    kind: modified
+    note: Kept unconditional CRUX.md load; appended manifest-contract sentence; added Honor context_manifest block documenting unconditional-in-absence exception.
+  - path: specs/20260713-context-token-reduction/subtask-01-lazy-cruxmd-and-context-manifest-20260713.md
+    kind: modified
+    note: Ticked deliverables + DoD; filled Execution Notes / Work Log / Files Modified.
+errors: []
+notes: |
+  ## D08 Token Estimation (crux-utils --token-count)
+
+  Baseline CRUX.md load cost (avoided per subagent spawn when the manifest marks it loaded or the
+  agent's task does not touch CRUX notation): **7,341 tokens**.
+
+  ### Per-file token deltas (before edits → after edits)
+
+  | File | Before | After | Δ (agent-file growth) |
+  |------|-------:|------:|----------------------:|
+  | AGENTS.md                                          | 1,916  | 2,820  | +904  |
+  | .cursor/agents/crux-platform-architect.md          | 1,592  | 1,762  | +170  |
+  | .cursor/agents/crux-software-engineer.md           | 1,434  | 1,543  | +109  |
+  | .cursor/agents/integrity-expert.md                 | 1,612  | 1,799  | +187  |
+  | .cursor/agents/docs-sync-agent.md                  |   857  | 1,019  | +162  |
+  | .cursor/agents/crux-cursor-meditation-guide.md     | 10,745 | 10,922 | +177  |
+  | .cursor/agents/crux-cursor-rule-manager.md         | 5,175  | 5,342  | +167  |
+
+  Agent-file growth totals +1,876 tokens across 7 files (of which +904 lives in AGENTS.md and is
+  amortised across every subagent spawn because AGENTS.md is always-applied).
+
+  ### Net per-spawn savings
+
+  The primary saving is CRUX.md load elimination for spawns whose task does not touch CRUX
+  notation (or whose parent asserts crux_md: "loaded" in the manifest). Per subagent:
+
+  | Agent | CRUX.md load skipped? | Prose growth | Net per-spawn Δ (tokens) |
+  |-------|-----------------------|-------------:|-------------------------:|
+  | crux-platform-architect  | Yes (conditional)     | +170 | -7,171 |
+  | crux-software-engineer   | Yes (conditional)     | +109 | -7,232 |
+  | integrity-expert         | Yes (conditional)     | +187 | -7,154 |
+  | docs-sync-agent          | Yes (already lazy)    | +162 | ~0 baseline; -7,179 when manifest sets crux_md: "loaded" |
+  | crux-cursor-meditation-guide | Yes (conditional) | +177 | -7,164 when meditation body isn't CRUX-notated |
+  | crux-cursor-rule-manager | No (unconditional)    | +167 | 0 baseline; -7,174 when manifest sets crux_md: "loaded" |
+
+  For a typical spec-execution scenario where the parent orchestrator spawns 4–8 subagents that
+  do NOT touch CRUX notation, expected savings per spec run: **~30,000–60,000 tokens**.
+  AGENTS.md growth (+904 tokens) is a one-time cost per session, not per-spawn.
+
+  ## DoD Verification Evidence
+
+  - **DoD01** — `python3 scripts/create-crux-zip.py /tmp/crux-dryrun` → exit 0; AGENTS.crux.md
+    produced (8,641 bytes); no warnings; <CRUX>...</CRUX> extraction succeeded. Side-effect writes
+    to .crux/crux-release-files.json and .crux/dist-manifest.json reverted via git checkout.
+  - **DoD02** — `rg -c "Before doing ANY work" .cursor/agents/` returns 2 matches:
+    crux-cursor-rule-manager.md (kept per D05) + crux-cursor-memory-manager.md (owned by S05;
+    explicitly excluded from this subtask). Testing-Strategy prediction of "drop to 1" holds
+    conditional on S05 executing later.
+  - **DoD03** — Every edited agent file contains both a `### Honor context_manifest` heading and
+    the conditional CRUX-load wording (verified via `rg -n "context_manifest"` sweep).
+  - **DoD04** — `rg -n "context_manifest" .cursor/agents/ AGENTS.md` returns matches in AGENTS.md
+    (7 lines) plus every edited agent file. Verified.
+  - **DoD05** — `ReadLints` on all 7 edited files → No linter errors found.
+  - **DoD06** — Fallback rule ("stanza absent → today's behavior") preserves semantic equivalence
+    for consumers whose parent agent does not pass a manifest. <CRUX> block edits are additive
+    protocol documentation; shipped AGENTS.crux.md extracts cleanly.
+
+  ## Notes on D07
+  Available Agents table wording in AGENTS.md only describes agent purpose (compression, memory
+  lifecycle, meditation) — no row references CRUX-load behavior. Per spec ("only if wording
+  touches CRUX-load behavior"), no change required.
+
+  ## Notes on stale checklist text
+  The D04 row in this .status.yml file was generated from an earlier draft that mentioned both
+  crux-cursor-memory-manager.md and crux-cursor-meditation-guide.md. The authoritative subtask
+  markdown explicitly forbids editing memory-manager (Subtask 05 owns that split + shim). This
+  execution followed the authoritative subtask markdown; memory-manager was NOT edited.
+extra:
+  judge:
+    verdict: verified
+    at: "2026-07-13T07:25:00.000Z"
+    notes: |
+      Independent Mode-1 verification of S01 (lazy CRUX.md + context_manifest).
+
+      D01 — CONFIRMED: AGENTS.md preamble retargeted to interpret in-context CRUX rules;
+      foundational rule #1 says load CRUX.md only when work touches CRUX notation.
+      Numbering 1–8 preserved.
+
+      D02 — CONFIRMED: `### context_manifest — Subagent Prelude` inside shipped <CRUX> block
+      with schema (agents_md, crux_md, memory_config.path/loaded/flags, extras), sentinel
+      probe, and absence fallback. DoD01 re-run: create-crux-zip.py emitted AGENTS.crux.md
+      (8,641 bytes); <CRUX> extraction succeeded.
+
+      D03 — CONFIRMED: platform-architect, software-engineer, integrity-expert use the
+      standardised conditional two-liner; docs-sync-agent got additive conditional + honor
+      block (no prior unconditional Read to remove).
+
+      D04 — CONFIRMED against authoritative subtask markdown (meditation-guide only):
+      compressed-memory-conditional CRUX wording present; honor block present.
+      memory-manager NOT in working-tree diff (git status clean for that path) — S05 owns it.
+      Note: status.yml checklist D04 text is stale (still names memory-manager); execution
+      correctly followed the subtask markdown carve-out.
+
+      D05 — CONFIRMED: rule-manager keeps "Before doing ANY work… read CRUX.md"; skip sentence
+      for context_manifest.crux_md === "loaded" present; honor block documents
+      unconditional-in-absence exception.
+
+      D06 — CONFIRMED: Honor context_manifest section immediately after load-context in all
+      six edited agent files (architect, engineer, integrity, docs-sync, meditation-guide,
+      rule-manager).
+
+      D07 — CONFIRMED: Available Agents table unchanged (purpose-only wording; no CRUX-load
+      behavior to retarget). No new agents added.
+
+      D08 — CONFIRMED: token savings tables present in notes (CRUX.md baseline 7,341;
+      per-file deltas; net per-spawn estimates).
+
+      DoD02 rg evidence (judge re-ran): `rg -c "Before doing ANY work" .cursor/agents/` →
+      rule-manager:1 + memory-manager:1. In-scope agents (D03–D05) have zero unconditional
+      matches except rule-manager as required. Residual memory-manager match is the explicit
+      S05 deferral documented in Implementation Notes / Testing Strategy.
+
+      DoD03/DoD04 rg evidence (judge re-ran): `rg -n "context_manifest" .cursor/agents/ AGENTS.md`
+      matches AGENTS.md + all six edited agents. memory-manager correctly absent.
+
+      DoD05 — ReadLints clean on AGENTS.md + six edited agents.
+      DoD06 — Fallback rule preserves consumer behavior without a parent-passed manifest.
+    fix_list: []
+last_heartbeat: 2026-07-13T07:25:00.000Z
+started_at: 2026-07-13T07:11:42.158Z
+completed_at: 2026-07-13T07:18:37.880Z

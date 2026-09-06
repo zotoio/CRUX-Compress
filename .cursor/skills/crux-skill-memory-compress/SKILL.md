@@ -11,16 +11,9 @@ Applies CRUX compression to memory file bodies, enforces size caps, archives ori
 
 Before any operation:
 
-1. **Read config**: Load `.crux/crux-memories.json` and extract:
-   - `flags.enableMemoryCompression` — must be `"true"` or abort with message
-   - `cruxMemories.compressionTarget` — target percentage (default `33`)
-   - `cruxMemories.sizeUnit` — unit for size thresholds: `"lines"` or `"bytes"` (default `"lines"`)
-   - `cruxMemories.compressionMinLines` — minimum file size in lines before compression is considered (default `500`)
-   - `cruxMemories.maxMemorySize` — hard cap in configured sizeUnit (default `1000` lines)
-   - `cruxMemories.storage.compressionSourceArchive` — archive path (default `.ai-ignored/memories/sources`)
-   - `cruxMemories.storage.memoriesDir` — where memories live (default `memories`)
-2. **Load CRUX spec**: Read `CRUX.md` from project root for encoding symbols and compression rules
-3. **Guard check**: If `flags.enableMemoryCompression` is not `"true"`, refuse all operations and inform the caller that memory compression is disabled
+1. **Read config**: Load `.crux/crux-memories.json`. This skill needs `flags.enableMemoryCompression`, `cruxMemories.compressionTarget`, `sizeUnit`, `compressionMinLines`, `maxMemorySize`, `maxConsolidatedSize`, and `storage.compressionSourceArchive` / `memoriesDir`. Defaults and full key descriptions live in `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative).
+2. **Load CRUX spec**: Read `CRUX.md` from project root for encoding symbols and compression rules.
+3. **Guard check**: If `flags.enableMemoryCompression` is not `"true"`, refuse all operations and inform the caller that memory compression is disabled.
 
 ## Operations
 
@@ -46,16 +39,7 @@ Compress a single memory file's body using CRUX notation.
 7. Archive the original (see [Source Archival](#3-source-archival))
 8. Write compressed output as `{slug}.memory.crux.md` in the same directory
 9. Delete the original `.memory.md` from the working directory (it has been archived in step 7)
-10. Add compression metadata to frontmatter of the output file:
-   ```yaml
-   compressed: true
-   compressionTarget: 33
-   beforeTokens: <original body tokens>
-   afterTokens: <compressed body tokens>
-   reducedBy: <percentage>
-   compressedDate: <YYYY-MM-DD>
-   sourceArchive: <path to archived original>
-   ```
+10. Add compression metadata to the output frontmatter: `compressed: true`, `compressionTarget`, `beforeTokens`, `afterTokens`, `reducedBy`, `compressedDate`, `sourceArchive` (see Output format below for a filled example).
 
 **Output format** (`{slug}.memory.crux.md`):
 
@@ -76,7 +60,7 @@ sourceArchive: .ai-ignored/memories/sources/20260404/react-memo-list-rendering.m
 ⟧
 ```
 
-**Key difference from rule compression**: Memory compression has a `maxMemorySize` hard cap (in lines by default) that may require compressing beyond the `compressionTarget` ratio. Rule compression only targets a percentage — memory compression targets a percentage AND an absolute size limit.
+Unlike rule compression (percentage-only), memory compression also enforces `maxMemorySize` in `sizeUnit` — the loop in step 6 may push past `compressionTarget` when the absolute cap requires it.
 
 ### 2. Decompress
 
@@ -92,9 +76,7 @@ Restore a compressed memory for editing.
 4. Write the result as `{slug}.memory.md` (rename from `.memory.crux.md` to `.memory.md`)
 5. Delete the `.memory.crux.md` file
 
-**Decompression style**: Expand CRUX notation to terse natural language. Do not inflate back to original verbosity — aim for compact, readable content that preserves all semantic meaning. This matches the Recall display style.
-
-**Source recovery**: If the original exists in the source archive (check `sourceArchive` frontmatter field), offer to restore the exact original instead of decompressing.
+Expand CRUX to terse natural language (matches Recall display) — preserve meaning, don't reinflate to the original verbosity. If `sourceArchive` in frontmatter points at a surviving original, offer to restore that exact file instead of decompressing.
 
 ### 3. Source Archival
 
@@ -148,29 +130,7 @@ When compressing memory bodies, follow these patterns adapted from the CRUX spec
 - For warning memories (redflags), compress to condition → consequence patterns
 - Reference the `crux-cursor-rule-manager` agent definition for full compression methodology
 
-## Integration
-
-| Component | Reference | Role |
-|-----------|-----------|------|
-| CRUX spec | `CRUX.md` | Encoding symbols, compression rules, standard blocks |
-| Rule compressor agent | `crux-cursor-rule-manager` | Compression patterns and methodology reference |
-| Token estimator | `crux-utils` | Token counting and ratio analysis |
-| Config | `.crux/crux-memories.json` | `compressionTarget`, `maxMemorySize`, `flags.enableMemoryCompression`, `storage.compressionSourceArchive` |
-| Memory CRUD | `crux-skill-memory-crud` | Frontmatter management, file creation conventions |
-
-## Config Reference
-
-All config values come from `.crux/crux-memories.json`:
-
-| Key | Type | Default | Purpose |
-|-----|------|---------|---------|
-| `flags.enableMemoryCompression` | string | `"false"` | Feature gate — must be `"true"` to operate |
-| `cruxMemories.compressionTarget` | number | `33` | Target compressed size as % of original |
-| `cruxMemories.sizeUnit` | string | `"lines"` | Unit for size thresholds — `"lines"` or `"bytes"` |
-| `cruxMemories.compressionMinLines` | number | `500` | Minimum file size in lines before compression is considered; files below this are left uncompressed |
-| `cruxMemories.maxMemorySize` | number | `1000` | Hard cap on compressed output in lines (default) for standalone memories |
-| `cruxMemories.maxConsolidatedSize` | number | `2000` | Hard cap on compressed output in lines (default) for consolidated memories; used instead of `maxMemorySize` when the file has `consolidation_topic` frontmatter |
-| `cruxMemories.storage.compressionSourceArchive` | string | `.ai-ignored/memories/sources` | Base path for archived originals |
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.
 
 ## Error Handling
 

@@ -1,0 +1,13 @@
+{
+  "loadable": ".cursor/agents/crux-memory-recall.md",
+  "sot": ".cursor/agents/crux-memory-recall.source.mdx",
+  "wave": 2,
+  "plaintext": true,
+  "must_preserve": [
+    "Recall",
+    "--total",
+    "canvas",
+    "Pattern B",
+    "/crux-recall"
+  ]
+}

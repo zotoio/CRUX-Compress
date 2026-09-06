@@ -5,19 +5,15 @@ version: 1.1
 repository: https://github.com/zotoio/CRUX-Compress
 ---
 
-# Foundational CRUX Rules (MUST FOLLOW)
-If not already loaded in context, load `CRUX.md` and `AGENTS.md` from the project root.
+# CRUX Rules
 
-## When you encounter CRUX notation, use the 'CRUX Rule Compression Specification' in `CRUX.md` to help you understand and adhere to the rules or intents it contains. 
+Load `AGENTS.md` if not in context — its `<CRUX>` block has the foundational rules and agent registry. Load `CRUX.md` only when compressing, decompressing, authoring, or validating CRUX notation.
 
 ## CRUX Decompression - CRITICAL
 Always interpret, understand and adhere to the meaning compressed in CRUX notation! NEVER forget this.
 
 ## Path Construction - CRITICAL
 When constructing paths, URIs, or tool calls from CRUX references, preserve the literal path, filename, and extension exactly as they exist in the repository.
-
-## CRUX Compression - CRITICAL
-When asked to compress a markdown rule file, delegate this to the `crux-cursor-rule-manager` subagent that adheres to this spec. 
 
 ## CRUX Compressed File Protection - CRITICAL
 NEVER edit files that are CRUX compression output. These are:

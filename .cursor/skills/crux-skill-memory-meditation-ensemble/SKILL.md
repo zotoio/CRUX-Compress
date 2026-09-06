@@ -32,9 +32,9 @@ This skill is **`modelStrategy.mode == "ensemble_max"` only**. The other two poo
 ensembleAggregation: true
 ensembleWorkingDir: "<absolute path to the ensemble root directory>"
 modelSubdirs: 
-  - slug: "gpt-5.5-medium"
-    label: "GPT 5.5"
-    subdirPath: "<absolute path to model-gpt-5.5/>"
+  - slug: "gpt-5.6-sol-max"
+    label: "GPT 5.6 Sol"
+    subdirPath: "<absolute path to model-gpt-5.6-sol/>"
   # ... one entry per model
 confirmedFacets: 
   - index: 1
@@ -74,12 +74,12 @@ ensemble_mode: true
 meditate_mode: "research" | "quick"
 model_count: {N}
 models:
-  - slug: "gpt-5.5-medium"
-    label: "GPT 5.5"
-    subdir: "model-gpt-5.5"
-  - slug: "claude-opus-4-7-thinking-xhigh"
-    label: "Opus 4.7"
-    subdir: "model-opus-4.7"
+  - slug: "gpt-5.6-sol-max"
+    label: "GPT 5.6 Sol"
+    subdir: "model-gpt-5.6-sol"
+  - slug: "claude-opus-5-thinking-high"
+    label: "Opus 5"
+    subdir: "model-opus-5"
   - slug: "gemini-3.1-pro"
     label: "Gemini Pro 3.1"
     subdir: "model-gemini-pro-3.1"
@@ -142,9 +142,9 @@ timestamp_utc: "{yyyymmddHHMMSS}"
 
 ## Per-Model Report Index
 {Links to each model's individual report and consolidation for drill-down:
- - [GPT 5.5 Report (HTML)](model-gpt-5.5/report-{topic-slug}-{ts}.html)
- - [GPT 5.5 Report (PDF)](model-gpt-5.5/report-{topic-slug}-{ts}.pdf)
- - [GPT 5.5 Consolidation](model-gpt-5.5/consolidation.md)
+ - [GPT 5.6 Sol Report (HTML)](model-gpt-5.6-sol/report-{topic-slug}-{ts}.html)
+ - [GPT 5.6 Sol Report (PDF)](model-gpt-5.6-sol/report-{topic-slug}-{ts}.pdf)
+ - [GPT 5.6 Sol Consolidation](model-gpt-5.6-sol/consolidation.md)
  - ... (one group per model)}
 
 ## Citations
@@ -164,7 +164,7 @@ generated_utc: "{utc-timestamp}"
 topic_slug: "{topic-slug}"
 mode: "research"      # or "quick"
 ensemble: true
-source_tree: "{model-subdir}"   # e.g. "gpt-5.5-medium", "claude-opus-4-6", etc.
+source_tree: "{model-subdir}"   # e.g. "gpt-5.6-sol-max", "claude-opus-5", etc.
 rubric: { impact_score_max: 10, insight_value_score_max: 10, minimum_impact_threshold: 6, weights: { impact: 1.0, insight_value: 1.0 }, formula: "product" }
 degradation_reason: null | "..."
 ---
@@ -239,7 +239,7 @@ union_candidates:
     impact_score: {N}
     insight_value_score: {N}
     composite_score: {N}
-    source: "cross_model"   # or "tree:{model-subdir}" e.g. "tree:gpt-5.5-medium"
+    source: "cross_model"   # or "tree:{model-subdir}" e.g. "tree:gpt-5.6-sol-max"
     source_signals: [...]
     payload: { ... }
     accepted: null
@@ -321,7 +321,7 @@ The ensemble report layers these elements **on top of** the standard mandatory m
 - **Citation Venn diagram** (recommended): overlap visualization showing which citations were shared vs. model-unique
 - **Confidence radar**: per-facet confidence scores from each model, overlaid on a single radar chart
 
-**Model attribution citation format**: All findings in the ensemble report carry `[model: {label}]` citation markers (e.g. `[model: GPT 5.5]`, `[model: Opus 4.7]`). These appear alongside standard citation markers (`[memory: ...]`, `[file: ...]`, etc.) and are listed in the `## Citations` section with backlinks. When a finding is convergent (all models agree), use `[models: all]` as a shorthand.
+**Model attribution citation format**: All findings in the ensemble report carry `[model: {label}]` citation markers (e.g. `[model: GPT 5.6 Sol]`, `[model: Opus 5]`). These appear alongside standard citation markers (`[memory: ...]`, `[file: ...]`, etc.) and are listed in the `## Citations` section with backlinks. When a finding is convergent (all models agree), use `[models: all]` as a shorthand.
 
 ## K10 Ensemble Respawn Targeting
 

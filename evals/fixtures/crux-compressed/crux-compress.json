@@ -1,0 +1,15 @@
+{
+  "loadable": ".cursor/commands/crux-compress.md",
+  "sot": ".cursor/commands/crux-compress.source.mdx",
+  "wave": 1,
+  "must_preserve": [
+    "Source-Type Dispatch",
+    "Primitive registration model",
+    ".source.mdx",
+    "SKILL.mdx",
+    "compress-prompts",
+    "cruxLevel",
+    "sourceChecksum",
+    "confidence"
+  ]
+}

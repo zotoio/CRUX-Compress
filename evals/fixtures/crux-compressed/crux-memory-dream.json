@@ -1,0 +1,14 @@
+{
+  "loadable": ".cursor/agents/crux-memory-dream.md",
+  "sot": ".cursor/agents/crux-memory-dream.source.mdx",
+  "wave": 2,
+  "plaintext": true,
+  "must_preserve": [
+    "Dream",
+    "extraction",
+    "conflict",
+    "parent-driven",
+    "/crux-dream",
+    "crux-skill-memory-extract"
+  ]
+}

@@ -43,6 +43,19 @@ def _resolve_target_file(*candidates: str) -> Path:
     )
 
 
+
+def _read_meditate_sot_or_loadable() -> str:
+    """Prefer crux-meditate.source.mdx SoT; fall back to loadable .md."""
+    root = Path(__file__).resolve().parent.parent
+    for rel in (
+        ".cursor/commands/crux-meditate.source.mdx",
+        ".cursor/commands/crux-meditate.md",
+    ):
+        f = root / rel
+        if f.exists():
+            return f.read_text(encoding="utf-8")
+    return ""
+
 def _read_command_file() -> str:
     """Read the coordinator command file (post-decomp: concatenates command + all meditation skills).
 
@@ -58,23 +71,31 @@ def _read_command_file() -> str:
     """
     repo_root = Path(__file__).resolve().parent.parent
     parts: list[str] = []
-    cmd = repo_root / ".cursor" / "commands" / "crux-meditate.md"
-    if cmd.exists():
-        parts.append(cmd.read_text(encoding="utf-8"))
+    # Prefer editable SoT when present (registration_model: .source.mdx → loadable .md)
+    for cmd_rel in (
+        ".cursor/commands/crux-meditate.source.mdx",
+        ".cursor/commands/crux-meditate.md",
+    ):
+        cmd = repo_root / cmd_rel
+        if cmd.exists():
+            parts.append(cmd.read_text(encoding="utf-8"))
+            break
     for skill_name in ("coordination", "report", "review", "research", "quick", "ensemble"):
-        p = (
+        skill_base = (
             repo_root
             / ".cursor"
             / "skills"
             / f"crux-skill-memory-meditation-{skill_name}"
-            / "SKILL.md"
         )
-        if p.exists():
-            parts.append(p.read_text(encoding="utf-8"))
+        for skill_file in ("SKILL.mdx", "SKILL.md"):
+            p = skill_base / skill_file
+            if p.exists():
+                parts.append(p.read_text(encoding="utf-8"))
+                break
     if parts:
         return "\n".join(parts)
     raise FileNotFoundError(
-        "Neither .cursor/commands/crux-meditate.md nor any meditation skill files exist"
+        "Neither crux-meditate SoT/loadable nor any meditation skill files exist"
     )
 
 
@@ -105,8 +126,9 @@ def _read_agent_file() -> str:
         )
         if p.exists():
             parts.append(p.read_text(encoding="utf-8"))
-    # Then the agent file (guide agent preferred; fall back to memory-manager)
+    # Then the agent file (guide SoT preferred; then loadable; fall back to memory-manager)
     for agent_path in (
+        ".cursor/agents/crux-cursor-meditation-guide.source.mdx",
         ".cursor/agents/crux-cursor-meditation-guide.md",
         ".cursor/agents/crux-cursor-memory-manager.md",
     ):
@@ -179,12 +201,7 @@ class TestMeditateCommandDefinition:
     """The meditate command file defines the 3-facet, 3-level recursive flow."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_has_usage_section(self):
         content = self._read_cmd()
@@ -207,12 +224,7 @@ class TestMeditateFacetStructure:
     """Meditate derives 3 distinct exploration facets."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_documents_three_facets(self):
         content = self._read_cmd()
@@ -234,12 +246,7 @@ class TestMeditateRecursiveDepth:
     """Meditate uses configurable recursive depth (1-3 levels, default 3) with depth tracking."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_documents_three_levels(self):
         content = self._read_cmd()
@@ -276,12 +283,7 @@ class TestMeditateMemoryQuerying:
     """Each recursion level queries memories relevant to its facet."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_queries_memories(self):
         content = self._read_cmd()
@@ -300,12 +302,7 @@ class TestMeditateConsolidation:
     """Insights consolidate from deepest level back to root."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_documents_consolidation(self):
         content = self._read_cmd()
@@ -324,12 +321,7 @@ class TestMeditateContinuationMenu:
     """After meditate, an interactive menu offers expansion or save options."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_offers_expansion_options(self):
         content = self._read_cmd()
@@ -352,12 +344,7 @@ class TestMeditateAgentSpawning:
     """Meditate command spawns crux-cursor-meditation-guide subagent (post-S04 re-target)."""
 
     def _read_cmd(self) -> str:
-        cmd_file = (
-            Path(__file__).resolve().parent.parent / ".cursor" / "commands" / "crux-meditate.md"
-        )
-        if not cmd_file.exists():
-            return ""
-        return cmd_file.read_text(encoding="utf-8")
+        return _read_meditate_sot_or_loadable()
 
     def test_spawns_meditation_guide(self):
         content = self._read_cmd()
@@ -1499,7 +1486,7 @@ class TestMeditationGuideAgent:
         content = _read_meditation_guide_agent_file()
         if not content:
             return
-        assert "model: claude-opus-4-6" in content
+        assert "model: claude-opus-5" in content
 
     def test_frontmatter_description_contains_meditation(self):
         content = _read_meditation_guide_agent_file()

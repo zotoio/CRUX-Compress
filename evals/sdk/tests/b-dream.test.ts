@@ -87,7 +87,7 @@ describe("B: Dream", () => {
     beforeAll(async () => {
       const b1Agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
       const run = await sendWithRetry(b1Agent, "/crux-dream");
@@ -131,7 +131,7 @@ describe("B: Dream", () => {
     beforeAll(async () => {
       const b2Agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
       const run = await sendWithRetry(
@@ -206,7 +206,7 @@ describe("B: Dream", () => {
     beforeAll(async () => {
       const b3Agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
       const run = await sendWithRetry(
