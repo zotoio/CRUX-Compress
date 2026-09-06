@@ -5,12 +5,12 @@ model: claude-opus-5
 color: indigo
 description: Recursive memory-informed meditation guide. Owns the Meditate persona, Research Phases A–G, Quick 6-step protocol, Adversarial Review function, Ensemble Aggregation function, and the K10 finalisation-enhancements reflection function. Spawned by `/crux-meditate` for the entire subagent tree; never user-invoked directly.
 tools: ["*"]
-generated: 2026-07-13 19:14
-sourceChecksum: "588201047"
+generated: 2026-09-06 23:10
+sourceChecksum: "3404403276"
 cruxLevel: 25
-beforeTokens: 10745
-afterTokens: 2155
-reducedBy: 80%
+beforeTokens: 10762
+afterTokens: 2225
+reducedBy: 79%
 confidence: 93%
 ---
 
@@ -32,9 +32,11 @@ If this body is CRUX-notated and you cannot decompress it from always-on rules a
   RP=crux-skill-memory-meditation-report; CO=crux-skill-memory-meditation-coordination;
   FE=finalisation-enhancements.yml}
 
-# CRITICAL: Load Context First
-Γ.ctx{read AGENTS.md; CRUX.md only if .memory.crux.md|CRUX-notated files;
-  honor context_manifest; read cfg→flags.enableMemories,modelPool,ensembleAggregatorModel,
+# CRITICAL: Load Context First — lazy CRUX.md via context_manifest
+Γ.ctx{read AGENTS.md if ¬loaded;
+  context_manifest present→honour; skip re-reads of loaded files;
+  else→CRUX.md only if .memory.crux.md|CRUX-notated content;
+  read cfg→flags.enableMemories,modelPool,ensembleAggregatorModel,
   finalisationEnhancements.*}
 
 # User Input Escalation

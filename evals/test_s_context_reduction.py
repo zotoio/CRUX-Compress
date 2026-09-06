@@ -196,6 +196,11 @@ class TestLazyCruxEnforcement:
             "crux-software-engineer",
             "integrity-expert",
             "docs-sync-agent",
+            "crux-memory-dream",
+            "crux-memory-rem",
+            "crux-memory-recall",
+            "crux-memory-remember",
+            "crux-memory-forget",
         ],
     )
     def test_plaintext_agent_no_unconditional_crux_load(self, stem: str):
@@ -217,11 +222,6 @@ class TestLazyCruxEnforcement:
         "stem",
         [
             "crux-cursor-meditation-guide",
-            "crux-memory-dream",
-            "crux-memory-rem",
-            "crux-memory-recall",
-            "crux-memory-remember",
-            "crux-memory-forget",
         ],
     )
     def test_compressed_agent_sot_no_unconditional_crux_load(self, stem: str):
@@ -245,6 +245,11 @@ class TestLazyCruxEnforcement:
             "crux-software-engineer",
             "integrity-expert",
             "docs-sync-agent",
+            "crux-memory-dream",
+            "crux-memory-rem",
+            "crux-memory-recall",
+            "crux-memory-remember",
+            "crux-memory-forget",
         ],
     )
     def test_plaintext_agent_has_conditional_crux_load(self, stem: str):
@@ -271,11 +276,6 @@ class TestLazyCruxEnforcement:
         "stem",
         [
             "crux-cursor-meditation-guide",
-            "crux-memory-dream",
-            "crux-memory-rem",
-            "crux-memory-recall",
-            "crux-memory-remember",
-            "crux-memory-forget",
         ],
     )
     def test_compressed_agent_has_context_manifest_marker(self, stem: str):
@@ -296,11 +296,6 @@ class TestLazyCruxEnforcement:
             ("crux-compress", "command"),
             ("crux-meditate", "command"),
             ("crux-cursor-meditation-guide", "agent"),
-            ("crux-memory-dream", "agent"),
-            ("crux-memory-rem", "agent"),
-            ("crux-memory-recall", "agent"),
-            ("crux-memory-remember", "agent"),
-            ("crux-memory-forget", "agent"),
         ],
     )
     def test_crux_loadable_has_kd11_bootstrap(self, stem: str, kind: str):
@@ -645,6 +640,64 @@ class TestMemoryManagerSplit:
             )
 
 
+@pytest.mark.context_reduction_smoke
+class TestDistPackaging:
+    """Dist/install must ship thin memory agents and shared dependencies."""
+
+    _REQUIRED_DIST_PATHS = [
+        ".cursor/agents/crux-memory-dream.md",
+        ".cursor/agents/crux-memory-rem.md",
+        ".cursor/agents/crux-memory-recall.md",
+        ".cursor/agents/crux-memory-remember.md",
+        ".cursor/agents/crux-memory-forget.md",
+        ".cursor/agents/templates/recall-canvas.tsx.md",
+        ".cursor/skills/_memory-shared.md",
+        ".cursor/commands/templates/compress-prompts.md",
+    ]
+
+    def _load_dist_files(self) -> list[str]:
+        import importlib.util
+
+        zip_script = _PROJECT_ROOT / "scripts" / "create-crux-zip.py"
+        spec = importlib.util.spec_from_file_location("create_crux_zip", str(zip_script))
+        mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        return list(mod.SOURCE_DIST_FILES)
+
+    def test_create_crux_zip_lists_memory_dependencies(self):
+        dist_files = self._load_dist_files()
+        missing = [p for p in self._REQUIRED_DIST_PATHS if p not in dist_files]
+        assert not missing, (
+            "scripts/create-crux-zip.py SOURCE_DIST_FILES is missing required paths:\n"
+            + "\n".join(f"  {p}" for p in missing)
+        )
+
+    def test_install_release_files_lists_memory_dependencies(self):
+        install_py = (_PROJECT_ROOT / "install.py").read_text(encoding="utf-8")
+        missing = [p for p in self._REQUIRED_DIST_PATHS if p not in install_py]
+        assert not missing, (
+            "install.py SOURCE_RELEASE_FILES is missing required paths:\n"
+            + "\n".join(f"  {p}" for p in missing)
+        )
+
+    def test_dist_manifest_matches_create_crux_zip(self):
+        manifest_path = _PROJECT_ROOT / ".crux" / "dist-manifest.json"
+        assert manifest_path.exists(), ".crux/dist-manifest.json missing"
+        manifest_files = json.loads(manifest_path.read_text(encoding="utf-8")).get("files", [])
+        import importlib.util
+
+        zip_script = _PROJECT_ROOT / "scripts" / "create-crux-zip.py"
+        spec = importlib.util.spec_from_file_location("create_crux_zip", str(zip_script))
+        mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        expected = set(mod.DIST_FILES)
+        assert set(manifest_files) == expected, (
+            "dist-manifest.json files list diverges from create-crux-zip.py DIST_FILES"
+        )
+
+
 # ---------------------------------------------------------------------------
 # D05 — Compressed-primitive semantic parity
 # ---------------------------------------------------------------------------
@@ -689,10 +742,12 @@ class TestCompressedPrimitiveParity:
         )
 
     def test_compressed_loadables_have_crux_block(self):
-        """Every Wave 1+2 loadable .md must contain a ⟦CRUX: block."""
+        """Every compressed (non-plaintext) Wave 1+2 loadable .md must contain a ⟦CRUX: block."""
         fixtures = self._get_fixtures()
         not_compressed: list[str] = []
         for fx in fixtures:
+            if fx.get("plaintext"):
+                continue
             path = _PROJECT_ROOT / fx["loadable"]
             if not path.exists():
                 not_compressed.append(f"{fx['loadable']} (file missing)")
@@ -704,6 +759,28 @@ class TestCompressedPrimitiveParity:
             "The following Wave 1+2 loadable files are missing a ⟦CRUX: block "
             "(not yet compressed or compression was reverted):\n"
             + "\n".join(f"  {f}" for f in not_compressed)
+        )
+
+    def test_plaintext_wave2_loadables_are_not_crux_compressed(self):
+        """Wave 2 thin agents ship as plaintext — AGENTS.md aborts CRUX when reduction is insignificant."""
+        fixtures = self._get_fixtures()
+        violations: list[str] = []
+        for fx in fixtures:
+            if not fx.get("plaintext"):
+                continue
+            path = _PROJECT_ROOT / fx["loadable"]
+            if not path.exists():
+                violations.append(f"{fx['loadable']} (file missing)")
+                continue
+            content = path.read_text(encoding="utf-8")
+            if "⟦CRUX:" in content:
+                violations.append(fx["loadable"])
+            fm = _parse_frontmatter(path)
+            if fm and fm.get("generated"):
+                violations.append(f"{fx['loadable']} (still has generated CRUX frontmatter)")
+        assert not violations, (
+            "Plaintext thin-agent loadables must not be CRUX-compressed:\n"
+            + "\n".join(f"  {v}" for v in violations)
         )
 
     def test_compressed_loadables_have_sot(self):
@@ -750,8 +827,8 @@ class TestCompressedPrimitiveParity:
                 failures.append(f"{fx['loadable']}: file not found")
                 continue
             content = path.read_text(encoding="utf-8")
-            if "⟦CRUX:" not in content:
-                continue  # Not yet compressed; skip silently
+            if fx.get("plaintext") or "⟦CRUX:" not in content:
+                continue  # Plaintext loadables are not CRUX-compressed
             fm = _parse_frontmatter(path)
             if not fm:
                 failures.append(f"{fx['loadable']}: no frontmatter")
@@ -805,6 +882,8 @@ class TestCompressedPrimitiveParityLLM:
         if not fixture_path.exists():
             pytest.skip(f"Fixture {fixture_name}.json not found")
         fx = json.loads(fixture_path.read_text(encoding="utf-8"))
+        if fx.get("plaintext"):
+            pytest.skip(f"{fixture_name} is a plaintext loadable (not CRUX-compressed)")
         sot_path = _PROJECT_ROOT / fx["sot"]
         loadable_path = _PROJECT_ROOT / fx["loadable"]
         if not sot_path.exists() or not loadable_path.exists():

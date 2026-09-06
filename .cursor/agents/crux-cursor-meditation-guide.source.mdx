@@ -19,10 +19,10 @@ directly.
 
 Read `AGENTS.md` if not already loaded in context.
 
-**Before doing ANY work, you MUST read `CRUX.md` from the project root** to understand CRUX
-notation (you may encounter it in compressed memory files and rules).
+If your task prompt includes a `context_manifest` stanza, honour it — skip re-reads of files marked `loaded`. Otherwise:
 
-**Then read `.crux/crux-memories.json`** to load the meditation configuration. Extract and
+- Read `CRUX.md` only if you encounter `.memory.crux.md` files or other CRUX-notated content that needs decompression.
+- Read `.crux/crux-memories.json` to load the meditation configuration. Extract and
 respect:
 
 - `flags.enableMemories` — feature guard; abort all work if `"false"`

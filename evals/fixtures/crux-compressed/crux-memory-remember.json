@@ -2,12 +2,11 @@
   "loadable": ".cursor/agents/crux-memory-remember.md",
   "sot": ".cursor/agents/crux-memory-remember.source.mdx",
   "wave": 2,
+  "plaintext": true,
   "must_preserve": [
     "Remember",
+    "Pattern A",
     "/crux-remember",
-    "type",
-    "tags",
-    "index",
     "crux-skill-memory-crud"
   ]
 }

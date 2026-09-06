@@ -39,6 +39,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from conftest import try_invoke_llm_result
+
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _FIXTURES = _PROJECT_ROOT / "tests" / "fixtures"
 _CRUX_UTILS = _PROJECT_ROOT / ".cursor" / "skills" / "crux-utils" / "scripts" / "crux-utils.py"
@@ -212,8 +214,7 @@ class TestDecompressionUnderstanding:
         crux_path = _FIXTURES / "sample-rule.crux.md"
         if not crux_path.exists():
             pytest.skip("sample-rule.crux.md not present")
-        # Replace None with real LLM invocation result when wiring CRUX_LLM_EVAL=1 path
-        llm_result: dict | None = None  # e.g. invoke_crux_rule_manager(crux_path.read_text())
+        llm_result = try_invoke_llm_result(key="decompression")
         crux_llm_eval(llm_result, min_confidence=0.80)
 
 
@@ -452,8 +453,7 @@ class TestSemanticValidation:
         crux_path = _FIXTURES / "sample-rule.crux.md"
         if not crux_path.exists():
             pytest.skip("sample-rule.crux.md not present; run /crux-compress first")
-        # Replace None with real LLM invocation result when wiring CRUX_LLM_EVAL=1 path
-        llm_result: dict | None = None  # e.g. validate_with_crux_rule_manager(crux_path)
+        llm_result = try_invoke_llm_result(key="semantic-validation")
         crux_llm_eval(llm_result, min_confidence=0.80)
 
 

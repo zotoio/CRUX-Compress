@@ -412,6 +412,36 @@ def crux_llm_eval():
     return _evaluate
 
 
+def try_invoke_llm_result(*, key: str = "default") -> dict | None:
+    """Return a structured LLM harness result when injected via env; else None.
+
+    Injection (optional live runs)::
+
+        CRUX_LLM_RESULT_FILE=/path/to/results.json
+        CRUX_LLM_RESULT_JSON='{"confidence":0.9,"passed":true,"notes":"..."}'
+    """
+    import json
+    import os
+    from pathlib import Path
+
+    raw = os.environ.get("CRUX_LLM_RESULT_JSON", "").strip()
+    path_str = os.environ.get("CRUX_LLM_RESULT_FILE", "").strip()
+    payload: object | None = None
+    if raw:
+        payload = json.loads(raw)
+    elif path_str:
+        payload = json.loads(Path(path_str).read_text(encoding="utf-8"))
+    if payload is None:
+        return None
+    if isinstance(payload, dict) and {"confidence", "passed"} <= payload.keys():
+        return payload
+    if isinstance(payload, dict) and key in payload and isinstance(payload[key], dict):
+        return payload[key]
+    if isinstance(payload, dict) and "default" in payload and isinstance(payload["default"], dict):
+        return payload["default"]
+    return None
+
+
 @pytest.fixture()
 def sample_init_suggestions_yml(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
     """Create an init-suggestions-{ts}.yml fixture with the canonical 4-treatment schema.

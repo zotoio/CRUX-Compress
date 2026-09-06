@@ -88,6 +88,25 @@ class TestZipContents:
         assert ".cursor/skills/crux/crux-utils/SKILL.md" in zip_names
         assert ".cursor/skills/crux/crux-utils/scripts/crux-utils.py" in zip_names
 
+    def test_contains_thin_memory_agents(self, zip_names: list[str]):
+        for agent in (
+            "crux-memory-dream",
+            "crux-memory-rem",
+            "crux-memory-recall",
+            "crux-memory-remember",
+            "crux-memory-forget",
+        ):
+            assert f".cursor/agents/crux/{agent}.md" in zip_names
+
+    def test_contains_memory_shared_surface(self, zip_names: list[str]):
+        assert ".cursor/skills/crux/_memory-shared.md" in zip_names
+
+    def test_contains_recall_canvas_template(self, zip_names: list[str]):
+        assert ".cursor/agents/crux/templates/recall-canvas.tsx.md" in zip_names
+
+    def test_contains_compress_prompts_template(self, zip_names: list[str]):
+        assert ".cursor/commands/crux/templates/compress-prompts.md" in zip_names
+
 
 class TestZipIntegrity:
     def test_agents_crux_md_has_crux_block(self, tmp_path: Path):

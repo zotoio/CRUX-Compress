@@ -2,12 +2,12 @@
   "loadable": ".cursor/agents/crux-memory-rem.md",
   "sot": ".cursor/agents/crux-memory-rem.source.mdx",
   "wave": 2,
+  "plaintext": true,
   "must_preserve": [
-    "REM Sleep",
+    "REM",
     "rebalance",
-    "promotions",
-    "demotions",
-    "archival",
+    "parent-driven",
+    "/crux-dream --rem",
     "crux-skill-memory-rebalance"
   ]
 }
