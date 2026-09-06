@@ -1,10 +1,10 @@
 ---
-generated: 2026-07-13 19:40
-sourceChecksum: "2429874930"
+generated: 2026-09-06 23:12
+sourceChecksum: "3131920083"
 cruxLevel: 25
 beforeTokens: 25499
-afterTokens: 5478
-reducedBy: 79%
+afterTokens: 5495
+reducedBy: 78%
 confidence: 92%
 ---
 
@@ -241,7 +241,7 @@ If this body is CRUX-notated and you cannot decompress it from always-on rules a
     4.Theme Preflight(shared)
     5.create meditations/{slug}-ensemble/
     6.derive+confirm facets ONCE(caller model;shared)→extract confirmed facets
-    7.spawn N trees parallel: each→model-{label-slug}/ subdir;
+    7.spawn N trees parallel: each→model-{label-slug}/ subdir(e.g. model-gpt-5.6-sol,model-opus-5,model-gemini-pro-3.1);
       model:slug on Task; pass preConfirmedFacets+confirmDeepFacets+shared theming/comprehensiveness
     8.poll N completions; deep-confirm hook polls all N subdirs
     9.spawn cross-model aggregator(ensembleAggregatorModel|caller model):

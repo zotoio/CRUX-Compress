@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-cursor-memory-manager
-model: claude-opus-4-6
+model: claude-opus-5
 description: DEPRECATED dispatcher — prefer the mode-scoped crux-memory-* thin agents. Retained temporarily so pre-upgrade consumer installs continue to resolve the name. Removed after one minor release once the thin agents ship in the dist zip.
 ---
 <!-- DEPRECATED dispatcher — prefer crux-memory-* thin agents. Do not add new behavior here; extend the appropriate thin agent. Remove after one minor release once thin agents ship in dist. -->

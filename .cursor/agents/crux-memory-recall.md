@@ -1,10 +1,10 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-memory-recall
-model: claude-opus-4-6
+model: claude-opus-5
 description: Recall-mode memory query and display for CRUX. Reads memory files (decompressing CRUX bodies on the fly), formats them as human-readable output, and — when invoked with `--total` — generates an interactive Canvas visualisation. Read-only.
 generated: 2026-07-13 19:14
-sourceChecksum: "3970449236"
+sourceChecksum: "2976070681"
 cruxLevel: 25
 beforeTokens: 950
 afterTokens: 486

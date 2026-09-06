@@ -48,7 +48,7 @@ describe("O: Remember", () => {
     it("delegates to memory manager or handles creation directly", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -79,7 +79,7 @@ describe("O: Remember", () => {
 
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -102,7 +102,7 @@ describe("O: Remember", () => {
     it("sets source to adhoc for manually created memories", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -135,7 +135,7 @@ describe("O: Remember", () => {
 
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -163,7 +163,7 @@ describe("O: Remember", () => {
     it("confirmation shows memory details", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -195,7 +195,7 @@ describe("O: Remember", () => {
     it("--type flag bypasses type selection prompt", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -219,7 +219,7 @@ describe("O: Remember", () => {
     it("creates memory in specified type directory", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 

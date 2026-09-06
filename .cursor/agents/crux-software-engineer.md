@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-software-engineer
-model: claude-sonnet-4-6
+model: claude-sonnet-5
 description: Core software engineer for CRUX-Compress implementation. Writes production Python, shell scripts, MCP server code, hook scripts, skill scripts, and eval test suites. Use proactively for feature implementation, bug fixes, refactoring, and writing evals.
 ---
 

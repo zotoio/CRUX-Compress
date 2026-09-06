@@ -128,7 +128,7 @@ describe("R: Forget", () => {
 
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 
@@ -192,7 +192,7 @@ describe("R: Forget", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 

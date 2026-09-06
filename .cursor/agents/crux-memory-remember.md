@@ -1,10 +1,10 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-memory-remember
-model: claude-opus-4-6
+model: claude-opus-5
 description: Remember-mode ad-hoc memory creation for CRUX. Creates a new memory file from parent-collected content/type/tags/description, rebuilds the index, and returns the created memory's metadata for parent display.
 generated: 2026-07-13 19:14
-sourceChecksum: "563643068"
+sourceChecksum: "3283010185"
 cruxLevel: 25
 beforeTokens: 875
 afterTokens: 439

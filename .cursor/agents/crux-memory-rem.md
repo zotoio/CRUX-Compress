@@ -1,10 +1,10 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-memory-rem
-model: claude-opus-4-6
+model: claude-opus-5
 description: REM Sleep memory rebalancer for CRUX. Scans the full memory corpus, verifies consistency, detects conflicts, and recommends promotions, demotions, archival, consolidation, and compression for parent-driven approval.
 generated: 2026-07-13 19:14
-sourceChecksum: "2056132159"
+sourceChecksum: "3655020394"
 cruxLevel: 25
 beforeTokens: 1084
 afterTokens: 593

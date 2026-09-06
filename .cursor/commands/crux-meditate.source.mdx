@@ -846,7 +846,7 @@ When `modelStrategy.mode ∈ {"random", "per_branch"}`, the meditation runs as a
 6. **Derive and confirm facets (once, shared)**: Spawn a **single** `crux-cursor-meditation-guide` subagent using the **caller's own model** (not from the pool). This subagent runs only steps 1–4 of the standard workflow (feature guard, create working dir, initialize coordination files, derive + confirm facets via Pattern B). The `workingDir` for this temporary subagent is the ensemble root directory. After facet confirmation completes (Q-Confirm-1 + Q-Confirm-2), extract the confirmed facets and `confirmDeepFacets` value from the subagent's response. The per-model subdirectories are created in the next step.
 
 7. **Spawn N model-specific meditation trees in parallel**: For each entry `{slug, label}` in `modelPool`:
-   - Create subdirectory `{ensembleWorkingDir}/model-{label-slug}/` (where `label-slug` is the kebab-case version of the label, e.g. `model-gpt-5.5`, `model-opus-4.7`, `model-gemini-pro-3.1`).
+   - Create subdirectory `{ensembleWorkingDir}/model-{label-slug}/` (where `label-slug` is the kebab-case version of the label, e.g. `model-gpt-5.6-sol`, `model-opus-5`, `model-gemini-pro-3.1`).
    - Spawn a `crux-cursor-meditation-guide` subagent with **`model: slug`** on the Task tool invocation. Pass:
      - `meditateMode`: the active mode (`"research"` or `"quick"`)
      - `maxDepth`: the user's depth selection from Q-Depth-Selection (shared across all model trees)

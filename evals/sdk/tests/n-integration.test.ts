@@ -100,7 +100,7 @@ describe.skipIf(skipExpensive)("N: Cross-Platform Integration", () => {
 
     agent = Agent.create({
       apiKey: getApiKey(),
-      model: { id: "composer-2" },
+      model: { id: "composer-2.5" },
       local: { cwd: ws.root },
     });
   }, 60_000);

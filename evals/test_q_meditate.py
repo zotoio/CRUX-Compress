@@ -1486,7 +1486,7 @@ class TestMeditationGuideAgent:
         content = _read_meditation_guide_agent_file()
         if not content:
             return
-        assert "model: claude-opus-4-6" in content
+        assert "model: claude-opus-5" in content
 
     def test_frontmatter_description_contains_meditation(self):
         content = _read_meditation_guide_agent_file()

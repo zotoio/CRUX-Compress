@@ -57,7 +57,7 @@ Commands (`/crux-dream`, `/crux-recall`, `/crux-forget`, `/crux-remember`) spawn
 ---
 name: crux-cursor-memory-manager
 description: Memory lifecycle manager for CRUX. Handles dream extraction, REM sleep rebalancing, conflict detection, compression, and Recall decompression.
-model: claude-4.5-opus-high-thinking
+model: claude-opus-5
 repository: https://github.com/zotoio/CRUX-Compress
 ---
 ```
@@ -1208,7 +1208,7 @@ Dev evals should be implementable as shell scripts (bats) or Python tests that s
 #### Ensemble mode (`--ensemble`)
 
 - **User:** Configure `cruxMemories.meditate.modelPool` in `.crux/crux-memories.json` with at least two `{slug, label}` entries, then run `/crux-meditate --ensemble "RAG vs fine-tuning for our internal knowledge assistant"`, verify the cost prompt shows `N × per-model + 1` (the +1 is the cross-model aggregation agent)
-- **User:** Verify `meditations/{yyyymmdd}-{topic-slug}-ensemble/` is created with one `model-{label-slug}/` subdirectory per pool entry (e.g. `model-gpt-5.5/`, `model-opus-4.7/`, `model-gemini-pro-3.1/`)
+- **User:** Verify `meditations/{yyyymmdd}-{topic-slug}-ensemble/` is created with one `model-{label-slug}/` subdirectory per pool entry (e.g. `model-gpt-5.6-sol/`, `model-opus-5/`, `model-gemini-pro-3.1/`)
 - **User:** Verify all model trees share the same confirmed facets (Q-Confirm-1 / Q-Confirm-2 run **once** at the ensemble root) and the same `theming` payload
 - **User:** Verify each model's subdirectory contains a complete meditation (its own `facets.md`, `consolidation.md`, branch files, adversarial review iterations, `retrospective-{ts}.md`, and `report-{topic-slug}-{ts}.html` / `.pdf`)
 - **User:** Verify the ensemble root contains `cross-model-synthesis.md` with mandatory sections — Convergence, Divergence, Unique Insights, Evidence Quality Comparison, Reasoning Style Comparison, Recommended Synthesis, Per-Model Report Index, Citations — plus `ensemble-report-{topic-slug}-{ts}.html` / `.pdf` with an agreement heatmap (facet × model)

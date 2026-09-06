@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-cursor-rule-manager
-model: claude-opus-4-6
+model: claude-opus-5
 description: Semantic compressor for Cursor rule files in .cursor/rules/. Converts markdown rules to CRUX notation achieving 5-10x token reduction while preserving all actionable information.
 is_background: true
 ---

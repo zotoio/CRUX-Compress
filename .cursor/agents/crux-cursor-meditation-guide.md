@@ -1,12 +1,12 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-cursor-meditation-guide
-model: claude-opus-4-6
+model: claude-opus-5
 color: indigo
 description: Recursive memory-informed meditation guide. Owns the Meditate persona, Research Phases A–G, Quick 6-step protocol, Adversarial Review function, Ensemble Aggregation function, and the K10 finalisation-enhancements reflection function. Spawned by `/crux-meditate` for the entire subagent tree; never user-invoked directly.
 tools: ["*"]
 generated: 2026-07-13 19:14
-sourceChecksum: "2785181265"
+sourceChecksum: "588201047"
 cruxLevel: 25
 beforeTokens: 10745
 afterTokens: 2155

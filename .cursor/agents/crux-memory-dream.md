@@ -1,10 +1,10 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-memory-dream
-model: claude-opus-4-6
+model: claude-opus-5
 description: Dream-mode memory extraction for CRUX. Analyses a completed unit of work, ranks candidate memories, detects conflicts and resolved bugs, and returns a full proposal for parent-driven accept/skip decisions.
 generated: 2026-07-13 19:14
-sourceChecksum: "1687650872"
+sourceChecksum: "1203521705"
 cruxLevel: 25
 beforeTokens: 1245
 afterTokens: 637
