@@ -292,11 +292,19 @@ class TestRecallAgentSpawning:
 
     def test_spawns_memory_manager(self):
         content = self._read_cmd()
-        assert "crux-cursor-memory-manager" in content
+        assert (
+            "crux-cursor-memory-manager" in content
+            or "crux-memory-recall" in content
+        ), "Recall must spawn crux-memory-recall (or legacy crux-cursor-memory-manager)"
 
     def test_recall_mode(self):
         content = self._read_cmd()
-        assert "recall mode" in content.lower() or "Recall mode" in content
+        lower = content.lower()
+        assert (
+            "recall mode" in lower
+            or "Recall mode" in content
+            or "crux-memory-recall" in content
+        ), "Recall command must reference Recall mode or spawn crux-memory-recall"
 
 
 class TestForgetConfigPresence:

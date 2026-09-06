@@ -47,6 +47,15 @@ pip install -r evals/requirements.txt
 pip install -e ./crux_mcp_server
 ```
 
+### Authoring Agents and Commands
+
+When writing new agents or commands under `.cursor/agents/` or `.cursor/commands/`:
+
+- **Lazy-CRUX loading**: Do not unconditionally instruct agents to `Read CRUX.md` unless the agent's primary function involves CRUX notation. Use a conditional instruction (e.g. "If the task involves CRUX notation, read `CRUX.md`").
+- **`context_manifest` honor block**: Include a `context_manifest` stanza near the top of each agent's load prompt. This prevents redundant re-reads of `AGENTS.md`, `CRUX.md`, and `.crux/crux-memories.json` when a parent agent has already loaded them. Example pattern: check for a `context_manifest` in the task prompt; if a file is marked `loaded`, do not re-read it.
+- **Mode-scoped agents**: Each memory operation (`dream`, `rem`, `recall`, `remember`, `forget`) now has its own thin agent. Spawn the appropriate `crux-memory-<mode>` agent directly instead of routing through the deprecated `crux-cursor-memory-manager` dispatcher.
+- **Source vs loadable**: Agent and command files follow the `<name>.source.mdx` (editable SoT) / `<name>.md` (Cursor-loadable, CRUX-compressed body) convention. Edit the `.source.mdx` and regenerate the `.md` loadable via `/crux-compress`.
+
 ## Testing
 
 CRUX Compress uses [pytest](https://docs.pytest.org/) for all tests.
@@ -108,6 +117,8 @@ tests/fixtures/                     # Shared test fixture files
 | `test_m_config_validation.py` | Config validation | Memory configuration validation |
 | `test_n_plugin_registry.py` | Plugin registry | Schema validation, `enabledByDefault` semantics |
 | `test_q_meditate.py` | Meditate command | Meditation guide agent, skill delegation, mode gates |
+| `test_r_crux_command_suite.py` | `/crux-test` / `run_crux_command_suite.py` | Pytest command-suite shim (deterministic + optional `llm_driven` scenarios) |
+| `test_s_context_reduction.py` | Context token reduction | Lazy-CRUX enforcement, `context_manifest` honor, thin-agent split, `/crux-test` shim, compressed-primitive parity |
 | `evals/sdk/tests/q-meditate.test.ts` | Meditate SDK | TypeScript SDK eval for meditate command |
 
 ### Running Tests
@@ -264,7 +275,12 @@ Version bumps only occur when these files change. The file list is read from `.c
 | `.crux/crux-release-files.json` | Release manifest with checksums |
 | `.cursor/hooks.json` | Hook configuration |
 | `.cursor/agents/crux/crux-cursor-rule-manager.md` | Rule manager agent definition |
-| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory manager agent definition |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory manager dispatcher (deprecated — see thin agents) |
+| `.cursor/agents/crux/crux-memory-dream.md` | Dream mode agent |
+| `.cursor/agents/crux/crux-memory-rem.md` | REM Sleep mode agent |
+| `.cursor/agents/crux/crux-memory-recall.md` | Recall mode agent |
+| `.cursor/agents/crux/crux-memory-remember.md` | Remember mode agent |
+| `.cursor/agents/crux/crux-memory-forget.md` | Forget mode agent |
 | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Meditation guide agent definition |
 | `.cursor/commands/crux/crux-compress.md` | Compression command |
 | `.cursor/commands/crux/crux-dream.md` | Dream extraction command |
@@ -287,7 +303,13 @@ Memory tooling (agent, commands, skills, rule) is included in the distribution z
 
 | Path | Distributed? | Purpose |
 |------|:---:|---------|
-| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Yes | Memory lifecycle agent definition |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Yes | Memory lifecycle dispatcher (deprecated — thin agents below) |
+| `.cursor/agents/crux/crux-memory-dream.md` | Pending dist update | Dream mode agent |
+| `.cursor/agents/crux/crux-memory-rem.md` | Pending dist update | REM Sleep mode agent |
+| `.cursor/agents/crux/crux-memory-recall.md` | Pending dist update | Recall mode agent |
+| `.cursor/agents/crux/crux-memory-remember.md` | Pending dist update | Remember mode agent |
+| `.cursor/agents/crux/crux-memory-forget.md` | Pending dist update | Forget mode agent |
+| `.cursor/agents/crux/templates/recall-canvas.tsx.md` | Pending dist update | Canvas structural template (Recall `--total`) |
 | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Yes | Meditation guide agent definition |
 | `.cursor/commands/crux/crux-dream.md` | Yes | Dream extraction command |
 | `.cursor/commands/crux/crux-recall.md` | Yes | Memory query command |

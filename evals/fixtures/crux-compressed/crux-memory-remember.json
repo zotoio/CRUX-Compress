@@ -1,0 +1,13 @@
+{
+  "loadable": ".cursor/agents/crux-memory-remember.md",
+  "sot": ".cursor/agents/crux-memory-remember.source.mdx",
+  "wave": 2,
+  "must_preserve": [
+    "Remember",
+    "/crux-remember",
+    "type",
+    "tags",
+    "index",
+    "crux-skill-memory-crud"
+  ]
+}

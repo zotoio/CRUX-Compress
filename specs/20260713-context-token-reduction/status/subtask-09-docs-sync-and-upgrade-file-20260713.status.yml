@@ -1,0 +1,91 @@
+schema_version: 1
+subtask_id: "09"
+feature: context-token-reduction
+assigned_agent: crux-software-engineer
+model: composer-2-fast
+token_budget: 200000
+state: completed
+started_at: '2026-07-13T09:40:32Z'
+last_heartbeat: '2026-07-13T09:56:30Z'
+completed_at: '2026-07-13T09:54:07Z'
+git_sha: 7f81a121f9906dba980d8d293e6f6225b4c95ad8
+checklist:
+  - id: D01
+    text: "**D01** — Aggregate upgrade script `specs/20260713-context-token-reduction/upgrade-context-token-reduction.sh`:"
+    done: true
+    evidence_path: specs/20260713-context-token-reduction/upgrade-context-token-reduction.sh
+  - id: D02
+    text: "**D02** — Update `README.md`:"
+    done: true
+    evidence_path: README.md
+  - id: D03
+    text: "**D03** — Update `CONTRIBUTORS.md`:"
+    done: true
+    evidence_path: CONTRIBUTORS.md
+  - id: D04
+    text: "**D04** — Update `web/compress.md/` (or its landing content) if it enumerates agents, commands, or the memory surface. Keep changes surgical."
+    done: true
+    evidence_path: web/compress.md/memories.html
+  - id: D05
+    text: "**D05** — Produce a `Dist manifest additions — awaiting user approval` section in the execution report:"
+    done: true
+    evidence_path: specs/20260713-context-token-reduction/execution-report-context-token-reduction-20260713.md
+  - id: D06
+    text: "**D06** — Version bump note:"
+    done: true
+    evidence_path: specs/20260713-context-token-reduction/execution-report-context-token-reduction-20260713.md
+  - id: D07
+    text: "**D07** — Final execution-report file `specs/20260713-context-token-reduction/execution-report-context-token-reduction-20260713.md`:"
+    done: true
+    evidence_path: specs/20260713-context-token-reduction/execution-report-context-token-reduction-20260713.md
+artifacts:
+  - path: specs/20260713-context-token-reduction/upgrade-context-token-reduction.sh
+    kind: created
+    note: Idempotent upgrade script, bash -n clean, dry-run verified
+  - path: specs/20260713-context-token-reduction/execution-report-context-token-reduction-20260713.md
+    kind: created
+    note: Final execution report with D05 dist additions, D06 version bump note
+  - path: README.md
+    kind: modified
+    note: Context token reduction note, thin agents, /crux-test pytest-shim docs (DoD02 fix)
+  - path: CONTRIBUTORS.md
+    kind: modified
+    note: test_r + test_s suite rows, thin agents, agent authoring guide
+  - path: web/compress.md/memories.html
+    kind: modified
+    note: Architecture SVG updated from monolithic memory-manager to mode-scoped thin agents label
+errors: []
+notes: |
+  ## Judge Mode 1 re-verify (post DoD02 remediation)
+
+  - Prior DoD02 gap closed: README file-locations row is "Pytest command-suite shim";
+    section retitled "Command Suite Testing (`/crux-test`)" documenting
+    `evals/test_r_crux_command_suite.py` / `scripts/run_crux_command_suite.py`.
+  - Repo-wide scan: zero hits for "LLM Feature Testing", "CRUX-TEST-REPORT.md",
+    or "comprehensive LLM-driven tests".
+  - D01–D07 and DoD01–DoD07 independently re-confirmed on disk.
+
+  ## Prior remediation notes (retained)
+
+  - README/CONTRIBUTORS `/crux-test` sync applied by assigned subagent
+  - create-crux-zip.py and .crux/crux.json untouched
+extra:
+  judge:
+    verdict: verified
+    at: '2026-07-13T09:56:30Z'
+    notes: |
+      Re-verify after DoD02 fix: all D01–D07 and DoD01–DoD07 confirmed.
+      Upgrade script bash -n clean; dry-run (no --yes) exits 0 with planned actions.
+      README `/crux-test` now documents pytest shim; no orphan prose LLM surface.
+      CONTRIBUTORS reflects test_r shim, context_manifest, thin agents.
+      web/compress.md/memories.html labels mode-scoped agents.
+      Execution report has dist-manifest awaiting-approval, version-bump note,
+      deferred compressions, token table, upgrade instructions.
+      git shows create-crux-zip.py and .crux/crux.json unmodified by this worktree.
+      No CI link-checker present; linked targets resolve on disk.
+      fix_list empty.
+      onStop exit 2 is aggregate-owned (spec-root status.yml DOD01–DOD11
+      unchecked) — not this subtask pair; S09 checklist fully done and
+      self-consistent. Outside Mode 1 write scope (aggregator-owned).
+      [memory:CRUX Compressed File Protection]
+    fix_list: []

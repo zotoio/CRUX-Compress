@@ -12,23 +12,14 @@ Analyses execution artifacts from a completed unit of work, compares candidates 
 Use this skill when:
 - A unit of work (e.g. spec) has completed execution and you want to extract memories from it
 - The `/crux-dream` command is invoked for a specific completed work item
-- The `crux-cursor-memory-manager` agent orchestrates a dream workflow
+- The `crux-memory-dream` agent orchestrates a dream workflow
 
 ## Prerequisites
 
 Before any operation:
 
-1. **Read config**: Load `.crux/crux-memories.json` and extract:
-   - `flags.enableMemories` — must be `"true"` or abort with message
-   - `cruxMemories.unitOfWork` — the type of work item (e.g. `spec`, `task`)
-   - `cruxMemories.dream.maxCandidateFacts` — max candidates to present (default `5`)
-   - `cruxMemories.dream.maxUnrelatedChanges` — threshold for aborting on noisy diffs (default `50`)
-   - `cruxMemories.dream.stateFile` — execution state filename (default `_execution-state.yml`)
-   - `cruxMemories.dream.workDir` — directory containing units of work (default `specs`)
-   - `cruxMemories.storage.memoriesDir` — base memory directory (default `memories`)
-   - `cruxMemories.storage.agentMemoriesDir` — agent-scoped memory directory (default `memories/agents`)
-   - `cruxMemories.typePriority` — valid types in priority order
-2. **Guard check**: If `flags.enableMemories` is not `"true"`, refuse all operations and inform the caller that memories are disabled
+1. **Read config**: Load `.crux/crux-memories.json`. This skill needs `flags.enableMemories`, `cruxMemories.unitOfWork`, `cruxMemories.dream.*` (`maxCandidateFacts`, `maxUnrelatedChanges`, `stateFile`, `workDir`), `cruxMemories.storage.memoriesDir` / `agentMemoriesDir`, and `cruxMemories.typePriority`. Defaults and full key descriptions live in `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative).
+2. **Guard check**: If `flags.enableMemories` is not `"true"`, refuse all operations and inform the caller that memories are disabled.
 
 ## Operations
 
@@ -237,15 +228,7 @@ evidence: "The diff shows refactoring of X to use the recommended approach descr
 recommendation: "forget"      # always "forget" — user decides
 ```
 
-**Field descriptions**:
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `memory_path` | Yes | Path to the existing redflag memory file |
-| `title` | Yes | Title from the redflag memory's frontmatter |
-| `confidence` | Yes | `"likely"` or `"possibly"` — how strong the evidence is that the bug was fixed |
-| `evidence` | Yes | Specific evidence from the diff, subtask outcomes, or code changes that suggests the bug was resolved |
-| `recommendation` | Yes | Always `"forget"` — resolved bugs should be deleted, but the user confirms |
+All fields are required. `confidence` is `likely` or `possibly`; `recommendation` is always `forget` (user decides).
 
 ## Candidate Fact Format
 
@@ -264,24 +247,11 @@ related_memories: []             # existing memories on similar topics
 source: "20260401-component-library"  # work item identifier
 ```
 
-**Field descriptions**:
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `rank` | Yes | Position in the ranked list (1 = highest value) |
-| `type` | Yes | Assigned memory type (`core`, `redflag`, `goal`, `learning`, `idea`) |
-| `title` | Yes | Instructive title conveying the key insight — should be actionable at a glance |
-| `description` | Yes | Self-contained summary with enough detail to act on without additional context |
-| `tags` | Yes | Lowercase tags for categorization and search |
-| `scope` | Yes | Target scope: `"base"` or `"agents/{agent-id}"` |
-| `rationale` | Yes | Why this candidate was selected — what evidence supports it and why it is valuable |
-| `conflicts` | No | List of conflict reports if the candidate contradicts existing memories |
-| `related_memories` | No | Paths to existing memories on similar topics (for near-duplicates or related content) |
-| `source` | Yes | Identifier of the originating work item (slug from the work directory name) |
+All fields required except `conflicts` and `related_memories`. `type` must be one of the `typePriority` values (never `archived`). `scope` is `"base"` or `"agents/{agent-id}"`. `source` mirrors the work-directory slug.
 
 ## Response Format
 
-This skill follows **Pattern B (work first, then escalate)** — you perform analysis and ranking first, then return results for the calling agent to present to the user. Do NOT call `AskQuestion` — the calling agent (or its parent) handles all user interaction. Include the following structure in your response:
+This skill follows **Pattern B** — perform analysis and ranking first, then return results for the calling agent to present. Do NOT call `AskQuestion`; the calling agent handles all user interaction (see `.cursor/skills/_memory-shared.md#user-input-escalation`). Include the following structure in your response:
 
 ```
 Analysing {unitOfWork} "{work-item-id}"...
@@ -326,34 +296,9 @@ In `--yolo` mode:
 - Auto-forget redflags classified as "likely" resolved
 - Present "possibly" resolved redflags for user confirmation (insufficient confidence for auto-deletion)
 
-## Integration
-
-| Component | Reference | Role |
-|-----------|-----------|------|
-| Memory CRUD | `crux-skill-memory-crud` | Actual memory file creation after user accepts candidates |
-| Reference tracker | `crux-skill-memory-reference-tracker` | Existing reference data used during comparison |
-| Config | `.crux/crux-memories.json` | All dream config settings |
-| Memory index | `.crux/memory-index.yml` | Quick lookup of existing memories for comparison |
-
 After the user accepts candidates (all or individually), delegate to `crux-skill-memory-crud` for actual file creation. Pass the candidate's `type`, `title`, `description`, `tags`, `source`, and scope (agent-id if agent-scoped) directly to the CRUD skill's Create operation.
 
 After the user confirms resolved bugs for deletion, delegate to `crux-skill-memory-crud` Delete operation. The memory file and its reference tracker are both removed.
-
-## Config Reference
-
-All config values come from `.crux/crux-memories.json`:
-
-| Key | Type | Default | Purpose |
-|-----|------|---------|---------|
-| `flags.enableMemories` | string | `"false"` | Feature gate — must be `"true"` to operate |
-| `cruxMemories.unitOfWork` | string | `"spec"` | Type of work item to look for (e.g. `spec`, `task`) |
-| `cruxMemories.dream.maxCandidateFacts` | integer | `5` | Maximum number of candidates to present |
-| `cruxMemories.dream.maxUnrelatedChanges` | integer | `50` | Changed file count threshold before warning |
-| `cruxMemories.dream.stateFile` | string | `"_execution-state.yml"` | Execution state filename within work item directory |
-| `cruxMemories.dream.workDir` | string | `"specs"` | Directory containing units of work |
-| `cruxMemories.storage.memoriesDir` | string | `"memories"` | Base memory directory |
-| `cruxMemories.storage.agentMemoriesDir` | string | `"memories/agents"` | Agent-scoped memory directory |
-| `cruxMemories.typePriority` | list | `[core, redflag, goal, learning, idea, archived]` | Valid types in priority order |
 
 ## Error Handling
 
@@ -368,13 +313,4 @@ All config values come from `.crux/crux-memories.json`:
 | Conflict detected with existing memory | Present conflict report, require user resolution (never auto-resolve) |
 | Config file missing or malformed | Report error with path and expected structure |
 
-## What This Skill Does NOT Do
-
-- Does not create memory files — delegates to `crux-skill-memory-crud` after user approval
-- Does not delete memory files — proposes resolved bugs for user confirmation, delegates deletion to `crux-skill-memory-crud`
-- Does not modify existing memories — only proposes new candidates, flags conflicts, or identifies resolved bugs for user resolution
-- Does not handle REM sleep workflows (consolidation, promotion, demotion) — that is `crux-skill-memory-rebalance`
-- Does not compress memories — that is `crux-skill-memory-compress`
-- Does not build the memory index — that is `crux-skill-memory-index`
-- Does not write dream summaries — that is the orchestrating agent's responsibility
-- Does not archive work item directories — that is the orchestrating agent's responsibility
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.

@@ -36,23 +36,42 @@ MEDITATION_SKILL_DIRS = [
 ]
 
 
+def _prefer_sot(*candidates: Path) -> Path | None:
+    """Prefer editable SoT (`.source.mdx` / `SKILL.mdx`) over generated loadable when present.
+
+    Registration model: commands/agents edit `<name>.source.mdx` and ship compressed
+    `<name>.md`; skills edit `SKILL.mdx` → compressed `SKILL.md`. Prose-contract evals
+    must assert against SoT, not the CRUX loadable body.
+    """
+    for p in candidates:
+        if p.exists():
+            return p
+    return None
+
+
 def _read_meditation_artifact(kind: str, name: str | None = None) -> str:
     """Read a meditation source file by kind and optional name.
 
     kind:
-        "command"               → .cursor/commands/crux-meditate.md (raw)
-        "guide_agent"           → .cursor/agents/crux-cursor-meditation-guide.md
+        "command"               → crux-meditate.source.mdx (preferred) or crux-meditate.md
+        "guide_agent"           → crux-cursor-meditation-guide.source.mdx (preferred) or .md
         "memory_manager"        → .cursor/agents/crux-cursor-memory-manager.md
-        "skill"                 → .cursor/skills/crux-skill-memory-meditation-<name>/SKILL.md
+        "skill"                 → SKILL.mdx (preferred) or SKILL.md under meditation skill dir
         "all_meditation_sources" → concatenation of command + guide_agent + all skills
     """
     root = _PROJECT_ROOT
     if kind == "command":
-        p = root / ".cursor" / "commands" / "crux-meditate.md"
-        return p.read_text(encoding="utf-8") if p.exists() else ""
+        p = _prefer_sot(
+            root / ".cursor" / "commands" / "crux-meditate.source.mdx",
+            root / ".cursor" / "commands" / "crux-meditate.md",
+        )
+        return p.read_text(encoding="utf-8") if p else ""
     if kind == "guide_agent":
-        p = root / ".cursor" / "agents" / "crux-cursor-meditation-guide.md"
-        return p.read_text(encoding="utf-8") if p.exists() else ""
+        p = _prefer_sot(
+            root / ".cursor" / "agents" / "crux-cursor-meditation-guide.source.mdx",
+            root / ".cursor" / "agents" / "crux-cursor-meditation-guide.md",
+        )
+        return p.read_text(encoding="utf-8") if p else ""
     if kind == "memory_manager":
         p = root / ".cursor" / "agents" / "crux-cursor-memory-manager.md"
         return p.read_text(encoding="utf-8") if p.exists() else ""
@@ -60,8 +79,9 @@ def _read_meditation_artifact(kind: str, name: str | None = None) -> str:
         if not name:
             raise ValueError("name is required for kind='skill'")
         skill_dir = f"crux-skill-memory-meditation-{name}"
-        p = root / ".cursor" / "skills" / skill_dir / "SKILL.md"
-        return p.read_text(encoding="utf-8") if p.exists() else ""
+        base = root / ".cursor" / "skills" / skill_dir
+        p = _prefer_sot(base / "SKILL.mdx", base / "SKILL.md")
+        return p.read_text(encoding="utf-8") if p else ""
     if kind == "all_meditation_sources":
         parts = [_read_meditation_artifact("command")]
         parts.append(_read_meditation_artifact("guide_agent"))
@@ -314,6 +334,82 @@ def sample_meditation_working_dir(tmp_path: Path) -> Path:
     (work_dir / "citations-index.yml").write_text("# citations index stub\n", encoding="utf-8")
     (work_dir / "facets.md").write_text("---\ntitle: sample-topic\n---\n", encoding="utf-8")
     return work_dir
+
+
+@pytest.fixture()
+def crux_llm_eval():
+    """Fixture for LLM-driven CRUX validation assertions.
+
+    Provides an assertion callable suitable for ``@pytest.mark.llm_driven`` tests.
+
+    Skip path (CI default):
+        When the ``CRUX_LLM_EVAL`` environment variable is not set, every call to
+        the returned callable immediately skips the test with a clear message that
+        explains how to enable live assertions.  This ensures the test never
+        silently passes without LLM involvement.
+
+    Assertion path (when CRUX_LLM_EVAL=1):
+        Call the fixture with a structured result dict returned by a real LLM
+        invocation (e.g. via crux-cursor-rule-manager).  The callable enforces:
+          - ``result["confidence"]`` is a float in [0.0, 1.0] and >= min_confidence
+          - ``result["passed"]`` is True
+
+    Expected result shape::
+
+        {
+            "confidence": 0.87,   # 0.0–1.0 float; ≥ min_confidence required
+            "passed": True,       # overall pass/fail from LLM
+            "notes": "...",       # free-form explanation from LLM (optional)
+        }
+
+    Usage in a test::
+
+        def test_llm_validates_crux(self, crux_llm_eval):
+            # Replace None with your actual LLM invocation result
+            llm_result = None  # e.g. invoke_crux_cursor_rule_manager(crux_content)
+            crux_llm_eval(llm_result, min_confidence=0.80)
+
+    To wire the live LLM path: set ``CRUX_LLM_EVAL=1``, replace the ``None``
+    placeholder in each test with a real LLM call, and pass its returned dict here.
+    """
+    import os
+
+    llm_enabled = os.environ.get("CRUX_LLM_EVAL", "").lower() in ("1", "true", "yes")
+
+    def _evaluate(result: dict | None, *, min_confidence: float = 0.80) -> None:
+        """Assert on a structured LLM result, or skip when LLM is not available.
+
+        Args:
+            result: Structured LLM result dict (see fixture docstring), or None.
+                    When None and CRUX_LLM_EVAL=1, the test fails with an actionable
+                    message prompting the caller to wire up the live LLM call.
+            min_confidence: Minimum acceptable confidence (default 0.80).
+        """
+        if not llm_enabled:
+            pytest.skip(
+                "LLM eval disabled; set CRUX_LLM_EVAL=1 to activate live model assertions "
+                f"(confidence >= {min_confidence:.0%} required). "
+                "Wire up LLM invocation by replacing the None placeholder in each test."
+            )
+        if result is None:
+            pytest.fail(
+                "CRUX_LLM_EVAL=1 is set but no LLM result was provided. "
+                "Replace the None placeholder with a real LLM invocation that returns "
+                '{"confidence": float, "passed": bool, "notes": str}.'
+            )
+        if not isinstance(result, dict):
+            pytest.fail(f"crux_llm_eval expected a dict, got {type(result).__name__}: {result!r}")
+        confidence = float(result.get("confidence", 0))
+        assert confidence >= min_confidence, (
+            f"LLM confidence {confidence:.0%} is below threshold {min_confidence:.0%}. "
+            f"Notes: {result.get('notes', 'none provided')}"
+        )
+        assert result.get("passed", False), (
+            f"LLM validation did not pass (confidence={confidence:.0%}). "
+            f"Notes: {result.get('notes', 'none provided')}"
+        )
+
+    return _evaluate
 
 
 @pytest.fixture()

@@ -1,0 +1,14 @@
+{
+  "loadable": ".cursor/commands/crux-meditate.md",
+  "sot": ".cursor/commands/crux-meditate.source.mdx",
+  "wave": 1,
+  "must_preserve": [
+    "Research",
+    "Quick",
+    "Ensemble",
+    "Adversarial Review",
+    "Pattern A",
+    "Pattern B",
+    "crux-cursor-meditation-guide"
+  ]
+}

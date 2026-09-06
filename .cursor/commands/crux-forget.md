@@ -16,7 +16,7 @@ Remove memories from the CRUX memory corpus.
 
 ## Instructions
 
-This command uses **Pattern B (work first, then escalate)** — the subagent must search and resolve memory matches before the user can choose which to delete. The **parent agent** (you) orchestrates the workflow: spawn a subagent to resolve matches, confirm deletion with the user via `AskQuestion`, then resume the subagent to perform confirmed deletions. The subagent never calls `AskQuestion` directly.
+This command uses **Pattern B (work first, then escalate)**. The subagent NEVER calls `AskQuestion` directly — the parent agent resolves the input to matches, confirms deletion with the user via `AskQuestion`, then resumes the subagent with the confirmed list. For the full Pattern A / Pattern B contract and the `needs_user_input` YAML schema, see `.cursor/skills/_memory-shared.md#user-input-escalation` and `AGENTS.md`.
 
 ### Argument Handling
 
@@ -30,7 +30,7 @@ This command uses **Pattern B (work first, then escalate)** — the subagent mus
 
 **Phase 1 — Subagent resolves matches**:
 
-1. Spawn a `crux-cursor-memory-manager` subagent in Forget mode, passing `$ARGUMENTS`
+1. Spawn a `crux-memory-forget` subagent, passing `$ARGUMENTS`
 2. The subagent resolves the input to matching memory files and returns them with ID, title, type, strength, and file path
 3. If the subagent returns `needs_user_input` with the resolved matches, proceed to Phase 2
 
@@ -50,9 +50,5 @@ This command uses **Pattern B (work first, then escalate)** — the subagent mus
 
 ## Related
 
-- `crux-cursor-memory-manager` agent — The specialist that manages the memory lifecycle
-- `crux-skill-memory-crud` skill — Delete operation that handles memory file and tracker removal
-- `/crux-dream` — Extract and create memories from completed work
-- `/crux-recall` — View and query memories
-- `/crux-remember` — Create ad-hoc memories outside of spec workflows
-- `/crux-meditate` — Recursive memory-informed exploration
+See `.cursor/skills/_memory-shared.md#related-commands--skills` for the full
+registry of memory commands and skills.

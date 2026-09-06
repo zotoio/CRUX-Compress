@@ -1,6 +1,6 @@
 ---
 description: Ensures engineering specs use CRUX-specific agents instead of generalPurpose
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Spec Agent Allocation
@@ -12,7 +12,12 @@ When creating or executing engineering specs (`/zoto-spec-create`, `/zoto-spec-e
 1. **Architecture, design, documentation, and eval strategy** → `crux-platform-architect`
 2. **Code implementation, bug fixes, refactoring, writing evals/tests** → `crux-software-engineer`
 3. **CRUX compression/decompression** → `crux-cursor-rule-manager`
-4. **Memory lifecycle (dream, REM sleep, recall, forget)** → `crux-cursor-memory-manager`
+4. **Memory lifecycle** → mode-scoped thin agents:
+   - Dream extraction → `crux-memory-dream`
+   - REM Sleep rebalance → `crux-memory-rem`
+   - Recall / query / display (incl. `--total` Canvas) → `crux-memory-recall`
+   - Ad-hoc create → `crux-memory-remember`
+   - Delete → `crux-memory-forget`
 5. **Code quality audits, security, CI/CD** → `integrity-expert`
 6. **Documentation sync after source changes** → `docs-sync-agent`
 

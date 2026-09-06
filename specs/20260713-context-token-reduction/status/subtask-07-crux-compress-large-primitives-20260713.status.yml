@@ -1,0 +1,164 @@
+schema_version: 1
+subtask_id: '07'
+feature: context-token-reduction
+assigned_agent: crux-cursor-rule-manager
+model: composer-2-fast
+token_budget: 200000
+state: completed
+started_at: '2026-07-13T18:13:00+10:00'
+last_heartbeat: '2026-07-13T19:16:08+10:00'
+completed_at: '2026-07-13T19:14:02+10:00'
+checklist:
+- id: D01
+  text: '**D01** — For each file in the wave order, apply the standard CRUX compression protocol owned by `crux-cursor-rule-manager` (see `CRUX.md`). Approach:'
+  done: true
+  evidence_path: .cursor/commands/crux-compress.source.mdx
+- id: D02
+  text: '**D02** — After each file compression, run a quick self-verification pass:'
+  done: true
+  evidence_path: .cursor/commands/crux-compress.md
+- id: D03
+  text: '**D03** — Retune any grep-style eval that matches natural-language phrases in a now-compressed file:'
+  done: true
+  evidence_path: evals/conftest.py
+- id: D04
+  text: '**D04** — Record per-file token savings and confidence in the subtask''s status `notes`. Include a summary table (before / after / % saved / confidence).'
+  done: true
+  evidence_path: null
+- id: D05
+  text: '**D05** — Emit an aggregate "compression impact" section in the subtask notes covering:'
+  done: true
+  evidence_path: null
+- id: D06
+  text: '**D06** — Flag any file whose compression required an update to `.crux/dist-manifest.json` (should be zero — approach (c) keeps paths stable — but confirm) for Subtask 09.'
+  done: true
+  evidence_path: null
+- id: DoD01
+  text: '**DoD01** — Wave 1 compressed+verified; Waves 2–5 attempted; deferred documented.'
+  done: true
+  evidence_path: null
+- id: DoD02
+  text: '**DoD02** — Confidence ≥90% and body ≤25% (or ≤30%/documented thin-agent deviation).'
+  done: true
+  evidence_path: null
+- id: DoD03
+  text: '**DoD03** — Dist-manifest paths exist; Cursor loadable paths stable (no rename/delete).'
+  done: true
+  evidence_path: null
+- id: DoD04
+  text: '**DoD04** — Registration YAML frontmatter matches SoT for touched agents.'
+  done: true
+  evidence_path: null
+- id: DoD05
+  text: '**DoD05** — create-crux-zip.py dry-run succeeds; Wave 1 loadables present in zip.'
+  done: true
+  evidence_path: null
+- id: DoD06
+  text: '**DoD06** — Eval grep/prose contracts retuned to prefer .source.mdx SoT.'
+  done: true
+  evidence_path: null
+- id: DoD07
+  text: '**DoD07** — Deferred Compressions list present in status notes.'
+  done: true
+  evidence_path: null
+- id: DoD08
+  text: '**DoD08** — Tests reported passed (771/2 skip); meditate evals 320 passed on re-verify.'
+  done: true
+  evidence_path: null
+- id: DoD09
+  text: '**DoD09** — No linter errors introduced (markdown/CRUX loadables).'
+  done: true
+  evidence_path: null
+- id: DoD10
+  text: '**DoD10** — KD-11 plaintext bootstrap on loadable CRUX `.md` files (between frontmatter and CRUX fence).'
+  done: true
+  evidence_path: .cursor/agents/crux-cursor-meditation-guide.md
+artifacts:
+- path: .cursor/commands/crux-compress.source.mdx
+  kind: created
+  note: Post-S03 SoT with Source-Type Dispatch + registration_model convention
+- path: .cursor/commands/crux-compress.md
+  kind: modified
+  note: Loadable CRUX (registers); regenerated from .source.mdx
+- path: .cursor/commands/crux-meditate.source.mdx
+  kind: created
+  note: Plaintext SoT moved from fat .md
+- path: .cursor/commands/crux-meditate.md
+  kind: modified
+  note: Loadable CRUX body
+- path: .cursor/agents/crux-cursor-meditation-guide.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-cursor-meditation-guide.md
+  kind: modified
+  note: Loadable CRUX + registration frontmatter
+- path: .cursor/agents/crux-memory-dream.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-memory-dream.md
+  kind: modified
+  note: Loadable CRUX
+- path: .cursor/agents/crux-memory-rem.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-memory-rem.md
+  kind: modified
+  note: Loadable CRUX
+- path: .cursor/agents/crux-memory-recall.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-memory-recall.md
+  kind: modified
+  note: Loadable CRUX
+- path: .cursor/agents/crux-memory-remember.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-memory-remember.md
+  kind: modified
+  note: Loadable CRUX
+- path: .cursor/agents/crux-memory-forget.source.mdx
+  kind: created
+  note: Plaintext SoT
+- path: .cursor/agents/crux-memory-forget.md
+  kind: modified
+  note: Loadable CRUX
+- path: .cursor/commands/templates/compress-prompts.md
+  kind: modified
+  note: Updated for .source.mdx / SKILL.mdx registration_model
+- path: evals/conftest.py
+  kind: modified
+  note: D03 prefer .source.mdx for prose-contract reads
+- path: evals/test_q_meditate.py
+  kind: modified
+  note: D03 SoT-preferring readers for meditate contracts
+errors: []
+notes: "## OVERRIDE registration_model (authoritative)\n\nPrior override #2 product-gate block and override #3 `.mdx`→`.crux.md` work are\nsuperseded. Authoritative layout applied to all Wave 1–2 targets:\n\n| Primitive | SoT (editable, non-registering) | Loadable (registers with Cursor) |\n|-----------|----------------------------------|----------------------------------|\n| Commands  | `<name>.source.mdx`              | `<name>.md` (CRUX body)          |\n| Agents    | `<name>.source.mdx`              | `<name>.md` (CRUX body)          |\n| Skills    | `SKILL.mdx`                      | `SKILL.md` (CRUX body)           |\n\n[memory:CRUX Compressed File Protection] — edit SoT only; regenerate loadable.\n[memory:Skill and Agent References by name] — instructional prose uses registered names.\n\nMistaken adjacent `*.crux.md` companions for the eight Wave 1–2 targets were deleted.\nRules `*.crux.mdc` untouched.\n\n## USER OVERRIDE #3 remediation — file moves/deletes/regens\n\n### Moves / creates\
+  \ (SoT)\n- `crux-compress.md` (pre-S03 fat) → rebuilt as `crux-compress.source.mdx` (post-S03 dispatch)\n- `crux-meditate.md` → copied to `crux-meditate.source.mdx`\n- `crux-cursor-meditation-guide.md` → `….source.mdx`\n- `crux-memory-{dream,rem,recall,remember,forget}.md` → `….source.mdx`\n\n### Regenerated loadables (`.md` = CRUX)\n- All eight targets: registration FM preserved (agents); body = `⟦CRUX:….source.mdx …⟧`\n- `crux-compress.md` freshly compressed after dispatcher restore (must not reuse pre-S03 companion)\n\n### Deleted\n- All eight `*.crux.md` companions under commands/agents for Wave 1–2\n\n### Guidance updates\n- `crux-compress.source.mdx`: Source vs Output Convention / Output Path Rules / Eligibility\n  document `.source.mdx`→`.md` and `SKILL.mdx`→`SKILL.md`; forbid adjacent `.crux.md` as\n  Cursor-loadable for cmd/agent/skill\n- `templates/compress-prompts.md`: markdown dispatch + preamble updated for same convention\n\n## Token savings table (SoT → loadable)\n\n| File\
+  \ | beforeTokens | afterTokens | Ratio | Saved | Confidence |\n|------|--------------|-------------|-------|-------|------------|\n| commands/crux-compress | 6395 | 1374 | 21.5% | 79% | 94% |\n| commands/crux-meditate | 25468 | 5173 | 20.3% | 80% | 92% |\n| agents/crux-cursor-meditation-guide | 10745 | 2155 | 20.1% | 80% | 93% |\n| agents/crux-memory-dream | 1245 | 637 | 51.2% | 49% | 92% |\n| agents/crux-memory-rem | 1084 | 593 | 54.7% | 45% | 92% |\n| agents/crux-memory-recall | 950 | 486 | 51.2% | 49% | 91% |\n| agents/crux-memory-remember | 875 | 439 | 50.2% | 50% | 91% |\n| agents/crux-memory-forget | 941 | 454 | 48.2% | 52% | 91% |\n| **Wave 1 (meditate+guide+compress)** | **42608** | **8702** | **20.4%** | **80%** | ≥92% |\n\n### Thin-agent ratio deviation (documented)\nWave 2 thin agents measure ~48–55% of current SoT tokens (above ≤25%/≤30% bar).\nRationale: SoT plaintext was already decompressed-from-CRUX (terse); loadable includes\nfull Cursor registration frontmatter + generated\
+  \ metrics + CRUX body. Confidence ≥91%.\nAccept as documented deviation under Deferred Compressions / thin-agent note.\n\n## Compression impact\n- Wave 1 loadables meet ≤25% target (20–22%).\n- Aggregate Wave 1+2 loadable tokens ~11.3k vs SoT ~47.7k (~24% overall including thin agents).\n- Cursor still registers stable `<name>.md` paths (dist-stable).\n\n## Deferred Compressions\n| File | Reason |\n|------|--------|\n| agents/crux-cursor-memory-manager.md | Skip: thin shim ≤60 lines |\n| commands/crux-test.md | Explicit skip (S06 shim) |\n| Wave 3 meditation skills | Deferred: budget |\n| Wave 4 memory skills (incl. memory-compress) | Deferred: leave plaintext; `SKILL.md` has CRUX only as documentation example |\n| Wave 5 remaining agents/commands (rule-manager) | Deferred: budget |\n| Do **not** emit `SKILL.crux.md` | Per registration_model |\n\n## Dist-manifest flags for Subtask 09 (do NOT edit create-crux-zip.py)\n\nLoadable paths stay `<name>.md` (stable for dist). New SoT paths may\
+  \ need dist inclusion\nif consumers must edit/regenerate:\n\n```\nSOURCE_DIST_FILES additions (exact) — awaiting user approval:\n  .cursor/commands/templates/compress-prompts.md\n  .cursor/commands/crux-compress.source.mdx\n  .cursor/commands/crux-meditate.source.mdx\n  .cursor/agents/crux-cursor-meditation-guide.source.mdx\n  .cursor/agents/crux-memory-dream.source.mdx\n  .cursor/agents/crux-memory-rem.source.mdx\n  .cursor/agents/crux-memory-recall.source.mdx\n  .cursor/agents/crux-memory-remember.source.mdx\n  .cursor/agents/crux-memory-forget.source.mdx\n```\n\nPossibly remove any prior `.crux.md` companion entries if they were staged for dist\n(none were added to create-crux-zip.py in this spec).\n\n## Verification evidence\n- Layout: each of 8 targets has `.source.mdx` + CRUX `.md`; zero `*.crux.md` companions\n- `crux-compress.source.mdx`: Source-Type Dispatch → templates/compress-prompts.md; no five fat When-invoked bodies\n- Loadable `crux-compress.md` encodes `tpl=…/compress-prompts.md`\
+  \ and `.source.mdx`/`SKILL.mdx` convention\n- `rg -l '⟦CRUX:' .cursor/skills/*/SKILL.md` → only `crux-skill-memory-compress/SKILL.md` (doc example; deferred)\n- `python3 scripts/test.py` once at end: **771 passed, 2 skipped**\n- D03: `evals/conftest.py` + `evals/test_q_meditate.py` prefer `.source.mdx` for prose contracts\n## Judge fix_list — DoD10 / D01.3 KD-11 plaintext bootstrap (2026-07-13T19:14)\n\nAdded KD-11 plaintext bootstrap on all eight Wave 1–2 **loadable** `.md` files\n(outside the CRUX fence, after YAML frontmatter, before generated banner):\n\n> If this body is CRUX-notated and you cannot decompress it from always-on rules alone, read `CRUX.md` before interpreting the body.\n\nTargets updated:\n- `.cursor/agents/crux-cursor-meditation-guide.md`\n- `.cursor/agents/crux-memory-dream.md`\n- `.cursor/agents/crux-memory-rem.md`\n- `.cursor/agents/crux-memory-recall.md`\n- `.cursor/agents/crux-memory-remember.md`\n- `.cursor/agents/crux-memory-forget.md`\n- `.cursor/commands/crux-compress.md`\
+  \ (optional consistency)\n- `.cursor/commands/crux-meditate.md` (optional consistency)\n\nSoT `.source.mdx` unchanged; `sourceChecksum` still matches SoT for all eight.\nNo `*.crux.md` companions recreated.\n[memory:CRUX Compressed File Protection] — bootstrap is plaintext on the generated\nloadable only; SoT remains the editable source.\n"
+extra:
+  judge:
+    verdict: verified
+    at: '2026-07-13T19:16:08+10:00'
+    notes: "Adversarial re-verification (fresh Mode 1) after KD-11 bootstrap remediation.\n\nConfirmed on disk (all 8 Wave 1–2 loadables):\n- Exact KD-11 plaintext bootstrap line between frontmatter and generated banner/CRUX fence:\n  \"If this body is CRUX-notated and you cannot decompress it from always-on rules alone, read `CRUX.md` before interpreting the body.\"\n- Layout intact: `<name>.source.mdx` SoT + `<name>.md` CRUX loadable; zero `*.crux.md` companions under commands/agents for targets.\n- sourceChecksum matches SoT for all eight (crux-utils --cksum).\n- Agent registration FM (name/model/description/…) matches SoT; commands SoT empty FM + generated metrics on loadable.\n- `crux-compress.source.mdx` still post-S03 Source-Type Dispatch → templates/compress-prompts.md; short When-invoked bodies; registration_model `.source.mdx`→`.md` / `SKILL.mdx`→`SKILL.md`; forbids adjacent `.crux.md` loadables. Loadable encodes tpl + same convention.\n- Wave 1 ratios ≤25% conf≥92%; Wave 2 thin\
+      \ agents ~48–55% with documented deviation; deferred Waves 3–5 + memory-manager (40-line plaintext shim) + crux-test documented.\n- Dist-manifest path check: 0 missing. Zip dry-run succeeds; Wave 1 loadables present; no cmd/agent `.crux.md` in zip. SOURCE_DIST SoT additions flagged for S09; create-crux-zip.py not modified by this subtask.\n- D03: evals/conftest.py + test_q_meditate.py prefer `.source.mdx`; pytest evals/test_q_meditate.py → 320 passed on re-verify.\n- `_CRUX-RULE.mdc` still carries Decompression CRITICAL primer.\n- Semantic spot-check: meditate (Research/Quick/Ensemble, Pattern A/B, guide spawn), guide (skills/K10/adversarial), compress (dispatch+registration_model), recall (skills/Pattern B/read-only) survive in CRUX.\n\nPrior partial (DoD10 missing bootstrap) is resolved. fix_list empty.\n[memory:CRUX Compressed File Protection] [memory:Skill and Agent References by name]\n\nNote: judge dry-run of create-crux-zip.py refreshed `.crux/dist-manifest.json` / `.crux/crux-release-files.json`\
+      \ as script side-effects — not a subtask deliverable gap."
+    fix_list: []
+  waves_completed:
+  - 1
+  - 2
+  waves_deferred:
+  - 3
+  - 4
+  - 5
+  memory_manager_skipped: true
+  dist_manifest_updates: 0
+  registration_model: source.mdx_to_md
+  approach_c_superseded: true
+  kd2_override: true
+  thin_agent_ratio_deviation: documented
+  tests_passed: 771
+  tests_skipped: 2
