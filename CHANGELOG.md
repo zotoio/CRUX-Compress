@@ -5,6 +5,15 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.11.5](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.5) - 2026-09-25
+
+- chore: update release manifests for v2.11.5 [skip ci] (cfb57e9)
+- test: lock dist packaging, plaintext thin agents, LLM harness skip (4e042a0)
+- fix: ship thin memory agents and shared deps in dist/install (5462306)
+- feat: update models and configurations to use Claude Opus 5 and GPT 5.6 (2d68a65)
+- feat: reduce context tokens across skills, commands, agents, and rules (af0a1d0)
+- docs: update CHANGELOG.md for v2.11.4 [skip ci] (81d0013)
+
 ## [v2.11.4](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.4) - 2026-07-13
 
 - chore: update release manifests for v2.11.4 [skip ci] (e0ff68e)
