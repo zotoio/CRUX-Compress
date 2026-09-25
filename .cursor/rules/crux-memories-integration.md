@@ -24,6 +24,12 @@ This rule governs how agents interact with the CRUX Memories system. Behavior is
 - Agents MUST discover memories by reading `.crux/memory-index.yml`
 - Load full memory files only for likely matches (by title, description, or tags)
 - If MCP is configured, agents may use semantic search instead of index scanning
+- Proactively query the `crux-memories` MCP server on non-trivial tasks — before making architectural or design decisions, when encountering unfamiliar code, when planning implementations or debugging, and when the task touches patterns or past decisions that may be documented
+- Search early in your workflow, not after you've already committed to an approach
+- Use descriptive queries — the search is semantic, so natural language works well
+- Filter by `types` (core, learning, redflag, idea, goal) when you know the category
+- Filter by `minStrength` to prioritise well-established memories (strength >= 3)
+- Do NOT search if `/crux-amnesia` is active (unless the user explicitly invoked a memory command)
 
 ### Output Annotation (CRITICAL)
 
@@ -86,4 +92,4 @@ This configures `~/.cursor/mcp.json` with:
 }
 ```
 
-When MCP is available, agents prefer semantic search over linear index scanning for large memory sets.
+When MCP is available, agents prefer semantic search over linear index scanning for large memory sets. Example tool call: `CallMcpTool(server="user-crux-memories", toolName="memory-search", arguments={"query": "relevant search terms"})`.

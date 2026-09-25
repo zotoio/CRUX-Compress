@@ -16,19 +16,7 @@ Use this skill whenever you need to:
 - Delete a memory and its reference tracker
 - Validate a memory file against the required schema
 
-## Configuration
-
-All configuration lives in `.crux/crux-memories.json` under the `cruxMemories` key. Key settings:
-
-| Setting | Default | Purpose |
-|---------|---------|---------|
-| `storage.memoriesDir` | `memories` | Root directory for base memories |
-| `storage.agentMemoriesDir` | `memories/agents` | Root directory for agent-scoped memories |
-| `sizeUnit` | `"lines"` | Unit for size thresholds — `"lines"` or `"bytes"` |
-| `compressionMinLines` | 500 | Minimum file size in lines before compression is considered |
-| `maxMemorySize` | 1000 | Maximum memory file size in lines (default) |
-| `referenceTracking.trackingDir` | `.crux/reference-tracking` | Reference tracker location |
-| `typePriority` | `[core, redflag, goal, learning, idea, archived]` | Valid memory types in priority order |
+> Config keys and defaults: see `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative).
 
 ## Memory Frontmatter Schema
 
@@ -205,3 +193,5 @@ Check a memory file against the required schema.
 - Do not delete reference trackers without also deleting the memory
 - Do not silently exceed `maxMemorySize` — always warn the user
 - Do not create memories when the feature flag `enableMemories` is `false` in config without notifying the user
+
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.

@@ -104,7 +104,7 @@ describe("My Test", () => {
   it("does something", async () => {
     const agent = Agent.create({
       apiKey: process.env.CURSOR_API_KEY!,
-      model: { id: "composer-2" },
+      model: { id: "composer-2.5" },
       local: { cwd: getWorkspaceRoot() },
     });
 

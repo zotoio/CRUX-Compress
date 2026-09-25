@@ -1,0 +1,84 @@
+schema_version: 1
+subtask_id: "02"
+feature: context-token-reduction
+assigned_agent: crux-cursor-rule-manager
+model: composer-2-fast
+token_budget: 200000
+state: completed
+checklist:
+  - id: D01
+    text: "**D01** — CRUX-compress `.cursor/rules/spec-agent-allocation.md` following `CRUX.md`:"
+    done: true
+    evidence_path: .cursor/rules/spec-agent-allocation.crux.mdc
+  - id: D02
+    text: "**D02** — Slim `.cursor/rules/_CRUX-RULE.mdc` to remove content already present in `AGENTS.md` `<CRUX>` block:"
+    done: true
+    evidence_path: .cursor/rules/_CRUX-RULE.mdc
+  - id: D03
+    text: "**D03** — Reconcile `.cursor/rules/crux-memories-integration.md` (source) ↔ `.cursor/rules/crux-memories-mcp-context.mdc`:"
+    done: true
+    evidence_path: .cursor/rules/crux-memories-integration.crux.mdc
+  - id: D04
+    text: "**D04** — For each changed always-on rule, record before/after token counts in the subtask's status `notes` (use `.cursor/skills/crux-utils/scripts/crux-utils.py` for estimation)."
+    done: true
+    evidence_path: null
+  - id: D05
+    text: "**D05** — Update `.crux/dist-manifest.json` **only if** an always-on-rule file was **deleted** — the dist manifest edit is a **flag** to raise in the status notes, not applied here. Do **not** modify `scripts/create-crux-zip.py`."
+    done: true
+    evidence_path: null
+artifacts:
+  - path: .cursor/rules/spec-agent-allocation.crux.mdc
+    kind: created
+    note: New always-on CRUX rule (185 tokens measured)
+  - path: .cursor/rules/spec-agent-allocation.crux.md
+    kind: created
+    note: Canonical CRUX source
+  - path: .cursor/rules/_CRUX-RULE.mdc
+    kind: modified
+    note: Slimmed from 422 to 360 tokens; KD-11 CRITICAL sections retained
+  - path: .cursor/rules/crux-memories-integration.md
+    kind: modified
+    note: Merged MCP search guidelines into Discovery section
+  - path: .cursor/rules/crux-memories-integration.crux.mdc
+    kind: modified
+    note: Regenerated from updated source (492→510 tokens); confidence 94%; includes MCP CallMcpTool example
+  - path: .cursor/rules/crux-memories-mcp-context.mdc
+    kind: deleted
+    note: Content subsumed by integration rule
+  - path: .cursor/rules/spec-agent-allocation.md
+    kind: modified
+    note: Set alwaysApply false
+errors: []
+notes: |
+  ## Token Deltas (D04, updated after fix_list pass)
+  | File | Before | After | Delta |
+  |------|--------|-------|-------|
+  | spec-agent-allocation.md (alwaysApply→false) | 366 | 0 | -366 |
+  | spec-agent-allocation.crux.mdc (new, alwaysApply:true) | 0 | 184 | +184 |
+  | _CRUX-RULE.mdc (slimmed) | 422 | 360 | -62 |
+  | crux-memories-mcp-context.mdc (deleted) | 406 | 0 | -406 |
+  | crux-memories-integration.crux.mdc (regenerated+MCP example) | 492 | 510 | +18 |
+  | **NET ALWAYS-ON** | **1686** | **1054** | **-632** |
+  
+  ## Dist-Manifest Flags (D05)
+  - crux-memories-mcp-context.mdc was NOT in dist-manifest — no change needed
+  - spec-agent-allocation.md was NOT in dist-manifest — no change needed
+  - spec-agent-allocation.crux.mdc is NOT a dist target (repo-internal rule) — no change needed
+  - crux-memories-integration.crux.mdc remains in dist-manifest (confirmed)
+  - _CRUX-RULE.mdc remains in dist-manifest (confirmed, slimmed in-place)
+  - No dist-manifest or create-crux-zip.py edits required by this subtask
+  
+  ## fix_list remediation (re-spawn pass)
+  - D03 confidence gate: Performed semantic validation; set confidence to 94% (crux-memories-integration) and 95% (spec-agent-allocation) — both ≥90%
+  - D01 sourceChecksum drift: Updated spec-agent-allocation.crux.md and .crux.mdc sourceChecksum from 2395065204 to 1501558077 (matches current source after alwaysApply flip)
+  - D03 MCP example (nice_to_have): Added one-liner CallMcpTool memory-search example to crux-memories-integration.md source, regenerated .crux.mdc (+26 tokens; net savings still -632, above ≥500 target)
+extra:
+  judge:
+    verdict: verified
+    at: "2026-07-13T07:38:46Z"
+    notes: |
+      Re-verification after fix_list: all prior gaps closed on disk. confidence ≥90% (integration.crux.mdc 94%, allocation.crux.md{,.mdc} 95%); allocation sourceChecksum 1501558077 matches crux-utils --cksum of current source; CallMcpTool memory-search example present in integration.md and compressed R.mcp E:; KD-11 CRITICAL trio retained in _CRUX-RULE.mdc; lazy CRUX.md opening intact; mcp-context.mdc deleted; integration.crux.mdc still in dist-manifest; alwaysApply: allocation.md false / allocation.crux.mdc true; zip dry-run AGENTS extraction clean (no WARN/ERROR); judge re-measure always-on net 1686→1055 (−631) meets ≥500 (notes −632 within ±1 token rounding on allocation.crux.mdc 184 vs 185). Semantic spot-check: allocation agent mapping and integration operational keys present in CRUX bodies.
+    fix_list: []
+last_heartbeat: 2026-07-13T07:38:46Z
+started_at: 2026-07-13T07:13:58.641Z
+completed_at: 2026-07-13T07:27:57.470Z

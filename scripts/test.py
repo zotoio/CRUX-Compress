@@ -66,7 +66,7 @@ def main() -> int:
             result = subprocess.run(
                 [
                     cursor_agent,
-                    "--model", "opus-4.5-thinking",
+                    "--model", "claude-opus-5-thinking-high",
                     "--print",
                     "--output-format", "stream-json",
                     "--workspace", str(PROJECT_ROOT),

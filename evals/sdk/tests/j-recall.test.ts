@@ -84,7 +84,7 @@ describe("J: Recall", () => {
     it("delegates to memory manager or handles recall directly", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -108,7 +108,7 @@ describe("J: Recall", () => {
     it("displays memories with required metadata fields", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -131,7 +131,7 @@ describe("J: Recall", () => {
     it("uses structured display format", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -156,7 +156,7 @@ describe("J: Recall", () => {
     it("searches memories by keyword", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -175,7 +175,7 @@ describe("J: Recall", () => {
     it("explains why memories are relevant", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -202,7 +202,7 @@ describe("J: Recall", () => {
     it("filters memories by source spec", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -222,7 +222,7 @@ describe("J: Recall", () => {
     it("excludes memories from other sources", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -242,7 +242,7 @@ describe("J: Recall", () => {
     it("displays specific memory file by path", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -262,7 +262,7 @@ describe("J: Recall", () => {
     it("shows full frontmatter and body", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 

@@ -1,0 +1,14 @@
+{
+  "loadable": ".cursor/agents/crux-cursor-meditation-guide.md",
+  "sot": ".cursor/agents/crux-cursor-meditation-guide.source.mdx",
+  "wave": 1,
+  "must_preserve": [
+    "Research",
+    "Quick",
+    "Ensemble",
+    "K10",
+    "Adversarial Review",
+    "/crux-meditate",
+    "AskQuestion"
+  ]
+}

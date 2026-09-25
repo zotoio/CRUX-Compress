@@ -56,8 +56,5 @@ Respond with a short status confirmation:
 
 ## Related
 
-- `/crux-dream` — Extract or rebalance memories intentionally
-- `/crux-recall` — Inspect memories intentionally
-- `/crux-forget` — Remove memories intentionally
-- `/crux-remember` — Create ad-hoc memories intentionally
-- `/crux-meditate` — Recursive memory-informed exploration
+See `.cursor/skills/_memory-shared.md#related-commands--skills` for the full
+registry of memory commands and skills.

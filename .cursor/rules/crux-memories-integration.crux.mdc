@@ -1,11 +1,11 @@
 ---
-generated: 2026-04-27 01:42
-sourceChecksum: "4002236386"
+generated: 2026-07-13 17:34
+sourceChecksum: "2439373976"
 cruxLevel: 25
-beforeTokens: 821
-afterTokens: 370
-reducedBy: 55% 
-confidence: 93%
+beforeTokens: 1506
+afterTokens: 510
+reducedBy: 66%
+confidence: 94%
 alwaysApply: true
 ---
 
@@ -26,13 +26,15 @@ alwaysApply: true
 Φ.enabled{enableMemories="true"→
  discover: read idx→load likely matches(title|desc|tags);
  MCP→semantic search ≻ idx scan;
+ ⊛proactive: non-trivial→query MCP early[arch|design|unfamiliar|plan|debug|patterns];
+ descriptive NL queries; filter[types,minStrength≥3];
  ⊛annotate: [memory:{title}] inline near influenced stmt!;
  ⊛annotate=load-bearing: ¬annotate→0refs ∧ ¬strength ∧ ¬REM signal ∧ stale-nudge;
- ⊛passthrough: subagent [memory:T]→parent MUST preserve verbatim in user-facing reply;
- ¬strip; recursive(any depth); paraphrase→copy [memory:…] alongside;
- subagent omits literal syntax but mem identifiable via idx→parent adds annotation;
+ ⊛passthrough: subagent [memory:T]→parent MUST preserve verbatim;
+ ¬strip; recursive; paraphrase→copy [memory:…];
+ subagent omits syntax but identifiable via idx→parent adds;
  ⊛self-check: pre-respond→mem influenced ∧ ¬annotated→add;
- afterAgentResponse hook→auto .refs.yml tracking; ¬manual ref-tracker skill;
+ afterAgentResponse hook→auto .refs.yml; ¬manual ref-tracker;
  post-spec→suggest /crux-dream}
 
 Φ.disabled{enableMemories="false"→skip all silently}
@@ -40,8 +42,8 @@ alwaysApply: true
 R.general{¬direct read|write→use skills; scope=base+own agent; repo-local;
  dir=memories/ (cfg: cruxMemories.storage.memoriesDir)}
 
-R.mcp{~/.cursor/mcp.json→{mcpServers:{crux-memories:{command:"crux-mcp-server",
- args:["-t","stdio","--config",".crux/crux-memories.json"]}}}
- MCP avail→semantic search ≻ linear idx scan}
+R.mcp{pipx install ./crux_mcp_server→~/.cursor/mcp.json;
+ MCP avail→semantic search ≻ idx scan;
+ E: CallMcpTool(server="user-crux-memories",toolName="memory-search",args={query:"…"})}
 ⟧
 ```

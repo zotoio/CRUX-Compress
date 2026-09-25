@@ -34,6 +34,7 @@
   - [MCP Server (Optional)](#mcp-server-optional)
   - [Python Dependencies](#python-dependencies)
 
+> **Recent update**: The memory agent has been split into five mode-scoped thin agents (`crux-memory-dream`, `crux-memory-rem`, `crux-memory-recall`, `crux-memory-remember`, `crux-memory-forget`), reducing per-spawn context load by 52–80% depending on the operation. Primitives loaded unconditionally are now lazy-loaded, cutting context overhead by ~57% across common workflows. See [`analysis/context-token-reduction-report.md`](analysis/context-token-reduction-report.md) for the full analysis.
 
 ## The Problem
 
@@ -840,7 +841,13 @@ To use CRUX in your project, see [Quick Install](#quick-install).
 | `.cursor/hooks/crux-detect-memory-changes.py` | Memory change detection hook                                                 |
 | `.cursor/hooks/crux-session-start.py`        | Session start hook                                                            |
 | `.cursor/agents/crux/crux-cursor-rule-manager.md` | Compression subagent                                                          |
-| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle agent                                                      |
+| `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle dispatcher (deprecated — see thin agents below)            |
+| `.cursor/agents/crux/crux-memory-dream.md`          | Dream mode agent (memory extraction)                                        |
+| `.cursor/agents/crux/crux-memory-rem.md`            | REM Sleep mode agent (rebalance)                                            |
+| `.cursor/agents/crux/crux-memory-recall.md`         | Recall mode agent (query memories)                                          |
+| `.cursor/agents/crux/crux-memory-remember.md`       | Remember mode agent (ad-hoc creation)                                       |
+| `.cursor/agents/crux/crux-memory-forget.md`         | Forget mode agent (memory removal)                                          |
+| `.cursor/agents/crux/templates/recall-canvas.tsx.md` | Canvas structural template (used by Recall `--total`)                      |
 | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Recursive meditation research guide (spawned by `/crux-meditate`)       |
 | `.cursor/commands/crux/crux-compress.md`          | Compression command                                                           |
 | `.cursor/commands/crux/crux-dream.md`             | Memory extraction command                                                     |
@@ -976,7 +983,7 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Always-Applied Rule | `.cursor/rules/crux/_CRUX-RULE.mdc`          | Runtime instructions           |
 | Subagent            | `.cursor/agents/crux/crux-cursor-rule-manager.md` | Compression executor      |
 | Compress Command    | `.cursor/commands/crux/crux-compress.md`     | Compression interface          |
-| Test Command        | `.cursor/commands/crux-test.md`              | LLM feature testing            |
+| Test Command        | `.cursor/commands/crux-test.md`              | Pytest command-suite shim      |
 | Hook                | `.cursor/hooks/crux-detect-changes.py`       | Auto-detect file changes       |
 | Session Hook        | `.cursor/hooks/crux-session-start.py`        | Show pending compressions      |
 | Hook Config         | `.cursor/hooks.json`                         | Hook configuration             |
@@ -990,7 +997,12 @@ These rules are defined in `CRUX.md` (numbered 0-4) and enforced by all CRUX com
 | Plugin Spec         | `.crux/plugins/compression-level.md`         | Default compression-level plugin spec |
 | Memory Config       | `.crux/crux-memories.json`                   | Memory system configuration    |
 | Memory Index        | `.crux/memory-index.yml`                     | Prioritised memory index       |
-| Memory Manager      | `.cursor/agents/crux/crux-cursor-memory-manager.md` | Memory lifecycle agent   |
+| Memory Manager      | `.cursor/agents/crux/crux-cursor-memory-manager.md` | Dispatcher (deprecated — see thin agents) |
+| Memory Dream Agent  | `.cursor/agents/crux/crux-memory-dream.md`          | Dream mode (memory extraction) |
+| Memory REM Agent    | `.cursor/agents/crux/crux-memory-rem.md`            | REM Sleep mode (rebalance)     |
+| Memory Recall Agent | `.cursor/agents/crux/crux-memory-recall.md`         | Recall mode (query memories)   |
+| Memory Remember Agent | `.cursor/agents/crux/crux-memory-remember.md`     | Remember mode (ad-hoc creation)|
+| Memory Forget Agent | `.cursor/agents/crux/crux-memory-forget.md`         | Forget mode (memory removal)   |
 | Meditation Guide    | `.cursor/agents/crux/crux-cursor-meditation-guide.md` | Recursive meditation research agent |
 | Dream Command       | `.cursor/commands/crux/crux-dream.md`        | Memory extraction command      |
 | Recall Command      | `.cursor/commands/crux/crux-recall.md`       | Memory query command           |
@@ -1140,22 +1152,22 @@ The `scripts/test.py` wrapper runs available automated test suites in sequence a
 prints a warning instead of a false success when required tools such as `pytest`
 are not installed.
 
-### LLM Feature Testing
+### Command Suite Testing (`/crux-test`)
 
-Use the `/crux-test` command in Cursor to run comprehensive LLM-driven tests:
+`/crux-test` is a thin pytest shim. Cases live in `evals/test_r_crux_command_suite.py`; LLM-driven scenarios are marked `llm_driven` and skipped by default in CI.
 
+```bash
+# All deterministic command-suite tests
+python3 scripts/run_crux_command_suite.py
+
+# Fast CI smoke subset
+python3 scripts/run_crux_command_suite.py --smoke
+
+# Smoke via pytest directly
+python3 -m pytest evals/test_r_crux_command_suite.py -m crux_command_smoke -v
 ```
-/crux-test              - Run all tests
-/crux-test compression  - Test compression only
-/crux-test validation   - Test semantic validation only
-```
 
-This generates a `CRUX-TEST-REPORT.md` with detailed results including:
-
-- Compression metrics
-- Token reduction analysis
-- Semantic validation scores
-- Any issues found
+In Cursor, invoke `/crux-test` to run the same suite. Historical scenario names (compression, validation, etc.) map to pytest classes documented in the `/crux-test` command.
 
 ## CI/CD
 

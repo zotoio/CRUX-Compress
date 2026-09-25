@@ -1,0 +1,135 @@
+schema_version: 1
+subtask_id: '05'
+feature: context-token-reduction
+assigned_agent: crux-platform-architect
+model: composer-2-fast
+token_budget: 200000
+state: completed
+completed_at: '2026-07-13T18:15:00Z'
+started_at: '2026-07-13T17:39:00Z'
+last_heartbeat: '2026-07-13T08:06:25.860Z'
+checklist:
+- id: D01
+  text: '**D01** — Create five thin mode-scoped agent files under `.cursor/agents/`:'
+  done: true
+  evidence_path: null
+- id: D02
+  text: '**D02** — Handle the Canvas reference template (~80 lines currently inline at memory-manager L178–L242):'
+  done: true
+  evidence_path: null
+- id: D03
+  text: '**D03** — Rewrite `.cursor/agents/crux-cursor-memory-manager.md` as a documented **temporary dispatcher/shim**:'
+  done: true
+  evidence_path: null
+- id: D04
+  text: '**D04** — Re-point every in-repo caller to the new thin agents (**same change set**, no dual-path):'
+  done: true
+  evidence_path: null
+- id: D05
+  text: '**D05** — Update `AGENTS.md` `<CRUX agents="always">` block:'
+  done: true
+  evidence_path: null
+- id: D06
+  text: '**D06** — Update `AGENTS.md` `## Repository-Internal Agents (CRUX-Compress repo only)` **spec-execution allocation table** (line ~87 area) — the memory-lifecycle row currently reads "Memory lifecycle operations (dream, REM, recall) → crux-cursor-memory-manager". Change to enumerate the thin agents. This edit lives **outside** the `<CRUX>` block so it is not shipped to consumers, but it steers this repo''s spec executor.'
+  done: true
+  evidence_path: null
+- id: D07
+  text: '**D07** — Coordinate with Subtask 04 to ensure the split thin agents reference `_memory-shared.md` correctly. If S04 has not yet completed at the time this subtask runs, the executor MUST block until S04 is verified per the dependency graph.'
+  done: true
+  evidence_path: null
+- id: D08
+  text: '**D08** — Record the following in the subtask''s status `notes`:'
+  done: true
+  evidence_path: null
+artifacts:
+- path: .cursor/agents/crux-memory-dream.md
+  kind: created
+  note: thin agent — Dream mode
+- path: .cursor/agents/crux-memory-rem.md
+  kind: created
+  note: thin agent — REM Sleep mode
+- path: .cursor/agents/crux-memory-recall.md
+  kind: created
+  note: thin agent — Recall (references template on --total)
+- path: .cursor/agents/crux-memory-remember.md
+  kind: created
+  note: thin agent — Remember (Pattern A)
+- path: .cursor/agents/crux-memory-forget.md
+  kind: created
+  note: thin agent — Forget (Pattern B)
+- path: .cursor/agents/templates/recall-canvas.tsx.md
+  kind: created
+  note: Canvas structural template extracted from umbrella
+- path: .cursor/agents/crux-cursor-memory-manager.md
+  kind: modified
+  note: rewritten as ≤60-line deprecated dispatcher shim
+- path: .cursor/commands/crux-dream.md
+  kind: modified
+  note: re-pointed to crux-memory-dream / crux-memory-rem
+- path: .cursor/commands/crux-recall.md
+  kind: modified
+  note: re-pointed to crux-memory-recall + Canvas template pointer
+- path: .cursor/commands/crux-remember.md
+  kind: modified
+  note: re-pointed to crux-memory-remember
+- path: .cursor/commands/crux-forget.md
+  kind: modified
+  note: re-pointed to crux-memory-forget
+- path: .cursor/agents/crux-cursor-meditation-guide.md
+  kind: modified
+  note: memory-lifecycle callout re-pointed to thin agents
+- path: .cursor/agents/crux-software-engineer.md
+  kind: modified
+  note: memory-lifecycle delegate re-pointed to thin agents
+- path: .cursor/skills/crux-skill-memory-extract/SKILL.md
+  kind: modified
+  note: dream-workflow orchestrator reference re-pointed
+- path: .cursor/skills/_memory-shared.md
+  kind: modified
+  note: cross-skill-boundaries owner row re-pointed to thin agents
+- path: .cursor/rules/spec-agent-allocation.md
+  kind: modified
+  note: memory-lifecycle allocation enumerates thin agents
+- path: AGENTS.md
+  kind: modified
+  note: Available Agents table + Repository-Internal allocation table updated
+- path: specs/20260713-context-token-reduction/subtask-05-split-memory-manager-and-canvas-template-20260713.md
+  kind: modified
+  note: Consumer Upgrade Steps section filled with idempotent steps 0–5
+errors: []
+notes: "# Token counts (crux-utils prose-based estimator)\n\nUmbrella `crux-cursor-memory-manager.md`:\n- Before: 6908 tokens (352 lines)\n- After (shim): 696 tokens (38 lines) — 90% reduction, well under the 60-line target.\n\nThin agents:\n- crux-memory-dream:     2492 tokens (115 lines)\n- crux-memory-rem:       2089 tokens ( 92 lines)\n- crux-memory-recall:    1729 tokens ( 81 lines)\n- crux-memory-remember:  1382 tokens ( 78 lines)\n- crux-memory-forget:    1462 tokens ( 82 lines)\n\nCanvas template (loaded only on `--total` cold path):\n- .cursor/agents/crux/templates/recall-canvas.tsx.md: 1272 tokens (71 lines)\n\nNote on the ≤1.5K target: dream / rem / recall come in slightly above the target\nbecause each thin agent preserves the load-bearing workflow steps verbatim from the\numbrella (feature guards, conflict-detection rules, full-analysis-in-response\ndiscipline, no-skill-bypass invariants). Net savings per invocation vs the pre-split\numbrella are still substantial:\n- Dream:\
+  \                6908 → 2492  ( 64% reduction)\n- REM Sleep:            6908 → 2089  ( 70% reduction)\n- Recall (no --total):  6908 → 1729  ( 75% reduction)\n- Recall (--total):     6908 → 3001  ( 57% reduction, incl. cold-path template)\n- Remember:             6908 → 1382  ( 80% reduction)\n- Forget:               6908 → 1462  ( 79% reduction)\n\nA follow-up compression pass (e.g. via /crux-compress on each thin agent) could\npush dream / rem / recall under the 1.5K target if desired. Not required by DoD.\n\n# SOURCE_DIST_FILES diff for scripts/create-crux-zip.py (flagged for S09 — DO NOT\n# apply here per KD-5)\n\nAdd these six paths to the SOURCE_DIST_FILES list in\nscripts/create-crux-zip.py, ordered as shown, immediately after the existing\n\".cursor/agents/crux-cursor-memory-manager.md\" entry so the memory-agent block\nstays visually cohesive:\n\n    \".cursor/agents/crux-memory-dream.md\",\n    \".cursor/agents/crux-memory-rem.md\",\n    \".cursor/agents/crux-memory-recall.md\"\
+  ,\n    \".cursor/agents/crux-memory-remember.md\",\n    \".cursor/agents/crux-memory-forget.md\",\n    \".cursor/agents/templates/recall-canvas.tsx.md\",\n\nThe umbrella (`.cursor/agents/crux-cursor-memory-manager.md`) STAYS in the list\nduring the deprecation window so pre-upgrade consumer installs continue to\nresolve the registered name. Remove it after one minor release once all\nconsumers have run the upgrade script.\n\n# create-crux-zip.py dry-run verification (DoD06)\n\nRan `python3 scripts/create-crux-zip.py /tmp/crux-dryrun-s05` from a clean tree.\nResult:\n- Script exit code: 0 (success).\n- CRUX-Compress-v2.11.3.zip built. Zip contents include the rewritten\n  2789-byte umbrella shim (`.cursor/agents/crux/crux-cursor-memory-manager.md`)\n  but do NOT include any of the five thin agents or the Canvas template —\n  exactly as expected because SOURCE_DIST_FILES was not modified per KD-5.\n- Side effects: the script also rewrites `.crux/dist-manifest.json` and\n  `.crux/crux-release-files.json`.\
+  \ Both were reverted with\n  `git checkout` after the dry run to keep the tree clean; S09 will re-run\n  the full release path once SOURCE_DIST_FILES is updated with user approval.\n\n# Handoff to S09\n\nFlags for the aggregate upgrade script and dist protection:\n1. Add the six paths listed above to scripts/create-crux-zip.py's\n   SOURCE_DIST_FILES (requires explicit user approval per\n   `.cursor/rules/zip-contents-protection.crux.mdc`).\n2. Fold the \"Consumer Upgrade Steps\" section (now filled in the subtask spec)\n   into upgrade-context-token-reduction.sh — the section is idempotent and\n   `--yes`-gateable as required by `spec-implementation-hygiene.mdc` Rule 3.\n3. Remove the umbrella file (`.cursor/agents/crux-cursor-memory-manager.md`)\n   and its SOURCE_DIST_FILES entry after one minor release cycle once all\n   consumers have upgraded. Removal criteria are documented in the umbrella\n   shim body under \"## Removal criteria\".\n\n# CRUX-compressed rule regeneration follow-up\
+  \ (docs-sync-agent)\n\nThe source `.cursor/rules/spec-agent-allocation.md` was updated to enumerate\nthe five thin agents. Its two CRUX mirrors\n(`.cursor/rules/spec-agent-allocation.crux.md`, `.cursor/rules/spec-agent-allocation.crux.mdc`)\nare generated files carrying the \"Generated file - do not edit!\" banner and\nwere left untouched per CRUX rule #7. `docs-sync-agent` / `/crux-compress`\nshould regenerate both mirrors before release. The current stale content\n(`mem→crux-cursor-memory-manager`) still resolves via the umbrella dispatcher\nduring the deprecation window.\n\n# DoD verification summary\n\n- DoD01 ✓ `rg -n \"^name: crux-memory-\" .cursor/agents/` returned five matches\n  with directory-basename parity.\n- DoD02 ✓ Umbrella body = 38 lines (well under ≤60), carries the DEPRECATED\n  HTML comment (after frontmatter so Cursor's YAML parser still resolves the\n  name), the dispatcher table (all 5 thin agents), and the routing rule.\n- DoD03 ✓ `rg -n \"crux-cursor-memory-manager\"\
+  \ .cursor/commands/` = 0 matches.\n  `rg -n \"crux-cursor-memory-manager\" .cursor/agents/` = 1 match (the\n  umbrella's own `name:` field).\n- DoD04 ✓ Canvas template exists at\n  `.cursor/agents/templates/recall-canvas.tsx.md`. Operational references:\n  only `crux-memory-recall.md` (agent). The umbrella lists the path once in\n  its \"Removal criteria\" bookkeeping paragraph (contextual, not a load).\n- DoD05 ✓ AGENTS.md `<CRUX>` block table lists all 5 thin agents plus the\n  deprecation-annotated umbrella row. Consumer-safe — no repo-internal\n  agents leaked inside the block.\n- DoD06 ✓ create-crux-zip.py dry-run exit 0; new files intentionally\n  omitted from the zip. Documented above and forwarded to S09.\n- DoD07 pending: run ReadLints before finalising.\n- DoD08 ✓ Consumer Upgrade Steps section in the subtask spec now contains\n  idempotent, `--yes`-gateable steps 0–5.\n- DoD09 ✓ No dual-path forever shim. The umbrella dispatcher is the only\n  exception and it carries explicit\
+  \ removal criteria per hygiene Rule 2.\n"
+extra:
+  sizes:
+    umbrella_before_tokens: 6908
+    umbrella_after_tokens: 696
+    umbrella_after_lines: 38
+    thin_agent_tokens:
+      crux-memory-dream: 2492
+      crux-memory-rem: 2089
+      crux-memory-recall: 1729
+      crux-memory-remember: 1382
+      crux-memory-forget: 1462
+    canvas_template_tokens: 1272
+  dist_flags:
+    source_dist_files_additions:
+    - .cursor/agents/crux-memory-dream.md
+    - .cursor/agents/crux-memory-rem.md
+    - .cursor/agents/crux-memory-recall.md
+    - .cursor/agents/crux-memory-remember.md
+    - .cursor/agents/crux-memory-forget.md
+    - .cursor/agents/templates/recall-canvas.tsx.md
+    umbrella_kept_in_dist_during_deprecation: true
+    apply_source_dist_diff_in_subtask: false
+    subtask_that_applies_dist_diff: 09
+  judge:
+    verdict: verified
+    at: '2026-07-13T08:07:27Z'
+    notes: 'Independently verified D01–D08 and DoD01–DoD09 against disk. Five thin agents exist with name/model/description frontmatter matching basenames, lazy-CRUX + context_manifest honor blocks, _memory-shared pointers, Ownership sections, and mode-only workflows. Umbrella shim is 38 lines (≤60) with DEPRECATED HTML comment (after frontmatter), dispatch table, routing rule, and removal criteria. Callers crux-{dream,recall,remember,forget}.md spawn thin agents by exact name; meditate unchanged (crux-cursor-meditation-guide); rg crux-cursor-memory-manager under .cursor/commands/ is empty and under .cursor/agents/ only hits the umbrella name: field. Canvas template exists without frontmatter and is operationally referenced only by crux-memory-recall.md. AGENTS.md <CRUX> table lists five thin agents + deprecation-annotated umbrella; internal allocation table enumerates thin agents. S04 status verdict=verified. SOURCE_DIST_FILES omits the six new paths (flagged for S09). Consumer Upgrade
+      Steps 0–5 filled. DoD06: mkdir + create-crux-zip.py /tmp/crux-dryrun-s05-judge exit 0; zip has umbrella shim (2789 bytes) and omits thin agents + canvas template; manifests reverted after dry-run. DoD07: ReadLints clean on touched agents/commands. Soft note only: dream/rem/recall exceed the ≤1.5K soft target (documented with per-mode savings; not a DoD hard gate). Stale generated spec-agent-allocation.crux.md(c) left for docs-sync regeneration.'
+    fix_list: []

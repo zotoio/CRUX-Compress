@@ -1,7 +1,7 @@
 ---
 repository: https://github.com/zotoio/CRUX-Compress
 name: crux-cursor-rule-manager
-model: claude-opus-4-6
+model: claude-opus-5
 description: Semantic compressor for Cursor rule files in .cursor/rules/. Converts markdown rules to CRUX notation achieving 5-10x token reduction while preserving all actionable information.
 is_background: true
 ---
@@ -18,6 +18,12 @@ Read: CRUX.md if not already known.
 ```
 
 `CRUX.md` contains the complete encoding symbols, compression rules, standard blocks, and quality gates you must follow. Do not proceed without knowing it.
+
+If your task prompt includes `context_manifest.crux_md === "loaded"`, skip the re-read — the parent has already surfaced `CRUX.md` in your context.
+
+### Honor `context_manifest`
+
+Before reading `AGENTS.md`, `CRUX.md`, or `.crux/crux-memories.json`, check your task prompt for a `context_manifest` stanza. If a file is marked `loaded`, do not re-read it. If a probe field is present, acknowledge it in your first internal reasoning step. If the stanza is missing entirely, fall back to the unconditional loads documented above (this agent's `CRUX.md` load is unconditional in the absence of a manifest — it is the one agent that always needs the full specification).
 
 ## Your Expertise
 

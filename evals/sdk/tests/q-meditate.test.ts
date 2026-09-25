@@ -238,7 +238,7 @@ describe.skipIf(skipExpensive)("Q: Meditate", () => {
     beforeAll(async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -327,7 +327,7 @@ describe.skipIf(skipExpensive)("Q: Meditate", () => {
     beforeAll(async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -394,7 +394,7 @@ describe.skipIf(skipExpensive)("Q: Meditate", () => {
       async () => {
         const agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 

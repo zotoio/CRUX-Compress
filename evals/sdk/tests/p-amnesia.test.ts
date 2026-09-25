@@ -60,7 +60,7 @@ describe("P: Amnesia", () => {
     it("confirms amnesia mode is ON when toggled", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -82,7 +82,7 @@ describe("P: Amnesia", () => {
     it("toggles amnesia mode OFF when called again", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -111,7 +111,7 @@ describe("P: Amnesia", () => {
 
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -129,7 +129,7 @@ describe("P: Amnesia", () => {
     it("suppresses ambient memory usage during amnesia", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -154,7 +154,7 @@ describe("P: Amnesia", () => {
     it("/crux-recall works during amnesia and is not blocked", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -185,7 +185,7 @@ describe("P: Amnesia", () => {
     it("/crux-remember works during amnesia", { timeout: 300_000 }, async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -212,7 +212,7 @@ describe("P: Amnesia", () => {
     it("subagents inherit amnesia state", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 
@@ -237,7 +237,7 @@ describe("P: Amnesia", () => {
     it("/crux-amnesia status shows current mode", async () => {
       agent = Agent.create({
         apiKey: getApiKey(),
-        model: { id: "composer-2" },
+        model: { id: "composer-2.5" },
         local: { cwd: ws.root },
       });
 

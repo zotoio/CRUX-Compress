@@ -7,20 +7,7 @@ description: Track which memories are referenced in agent output, manage .refs.y
 
 Manages per-memory reference tracking files (`.refs.yml`) in the configured `trackingDir`. Tracker files are the single source of truth for how often, how recently, and by whom a memory was referenced. Memory frontmatter stays clean — it stores *what* a memory is, not *how often* it is used.
 
-## Config
-
-All settings live in `.crux/crux-memories.json` under `cruxMemories.referenceTracking`:
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `enabled` | boolean | `true` | Master switch for reference tracking |
-| `trackingDir` | string | `.crux/reference-tracking` | Directory for `.refs.yml` files |
-| `indicateInOutput` | boolean | `true` | Whether agents annotate output when influenced by a memory |
-| `indicatorFormat` | string | `[memory:{title}]` | Format string for output annotations (`{title}` is replaced with the memory title) |
-| `promotionToRuleThreshold` | integer | `30` | Total reference count that flags a memory for promotion to a permanent rule |
-| `maxReferencesStored` | integer | `10` | Maximum entries in `recent_references` (oldest evicted when cap exceeded) |
-
-Additionally, `cruxMemories.unitOfWork` (e.g. `spec`) determines the key name used in `recent_references` source entries.
+> Config keys and defaults: see `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative). This skill reads keys under `cruxMemories.referenceTracking.*` plus `cruxMemories.unitOfWork` (which determines the key name used in `recent_references[]` source entries).
 
 ## Operations
 
@@ -197,23 +184,4 @@ recent_references:
 | `last` | date | Yes | Date of most recent reference from this source |
 | `context` | string | No | Brief description of how the memory was used |
 
-## Design Rationale
-
-- **Per-memory files**: Zero contention — concurrent sessions referencing different memories write to different files.
-- **Externalised from memory frontmatter**: Memory files describe *what* a memory is, not *how often* it's used. Keeps memory files clean and diffable.
-- **Lazy creation**: Unreferenced memories have no tracker file and no overhead.
-- **Capped recent_references**: Prevents unbounded growth while preserving the most significant referrers.
-- **Sorted by count**: The most frequent referrer is always first, making it easy to identify primary use patterns.
-
-## Prerequisites
-
-- `.crux/crux-memories.json` must exist with a valid `referenceTracking` config block.
-- The `trackingDir` directory must exist (created by config scaffolding, subtask 01).
-- Memory files must follow the naming convention `{slug}.memory.md` or `{slug}.memory.crux.md`.
-
-## What This Skill Does NOT Do
-
-- Does not create or modify memory files (that is `crux-skill-memory-crud`).
-- Does not promote or demote memories between types (that is `crux-skill-memory-rebalance`).
-- Does not build the memory index (that is `crux-skill-memory-index`).
-- Does not automatically create rules from promoted memories — it only flags them.
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.

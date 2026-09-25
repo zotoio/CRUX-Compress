@@ -1,0 +1,13 @@
+{
+  "loadable": ".cursor/agents/crux-memory-forget.md",
+  "sot": ".cursor/agents/crux-memory-forget.source.mdx",
+  "wave": 2,
+  "plaintext": true,
+  "must_preserve": [
+    "Forget",
+    "Pattern B",
+    "parent-driven",
+    "/crux-forget",
+    "crux-skill-memory-crud"
+  ]
+}

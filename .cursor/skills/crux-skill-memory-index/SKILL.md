@@ -39,15 +39,9 @@ This script is **not** a Cursor event hook and is **not** registered in `.cursor
 
 ## Configuration
 
-All settings are read from `.crux/crux-memories.json` under the `cruxMemories` key:
+Reads `.crux/crux-memories.json` — uses `cruxMemories.storage.memoriesDir` / `agentMemoriesDir` / `indexFile`, `cruxMemories.referenceTracking.trackingDir`, and `cruxMemories.typePriority`.
 
-| Setting | Default | Purpose |
-|---------|---------|---------|
-| `storage.memoriesDir` | `memories` | Root directory for base memories |
-| `storage.agentMemoriesDir` | `memories/agents` | Root for agent-scoped memories |
-| `storage.indexFile` | `.crux/memory-index.yml` | Output index file path |
-| `referenceTracking.trackingDir` | `.crux/reference-tracking` | Directory containing `.refs.yml` files |
-| `typePriority` | `[core, redflag, goal, learning, idea, archived]` | Sort order for memory types |
+> Config keys and defaults: see `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative).
 
 ## Index File Format
 
@@ -87,23 +81,7 @@ memories:
     references: 12
     tags: [react, performance, rendering]
     file: memories/core/react-memo-list-rendering.memory.crux.md
-  - id: "a1b2c3d"
-    slug: validate-checksums-before-overwrite
-    title: "Always validate CRUX checksums before overwriting"
-    description: "Source files can drift from their CRUX output..."
-    type: "learning"
-    strength: 1
-    references: 0
-    tags: [crux, validation, checksums]
-    file: memories/learning/validate-checksums-before-overwrite.memory.md
 ```
-
-## How Agents Use the Index
-
-1. Read `.crux/memory-index.yml` to get a prioritised list of all memories
-2. Filter by `type`, `tags`, or keyword in `title`/`description` to find relevant memories
-3. Load the full memory file via the `file` path when deeper context is needed
-4. The index is pre-sorted — top entries are the highest priority memories
 
 ## Error Handling
 
@@ -118,9 +96,4 @@ memories:
 - `pyyaml` package installed
 - `.crux/crux-memories.json` must exist with valid config
 
-## What This Skill Does NOT Do
-
-- Does not create or modify memory files (that is `crux-skill-memory-crud`)
-- Does not update reference trackers (that is `crux-skill-memory-reference-tracker`)
-- Does not promote or demote memories between types
-- Does not compress memories (that is `crux-skill-memory-compress`)
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.

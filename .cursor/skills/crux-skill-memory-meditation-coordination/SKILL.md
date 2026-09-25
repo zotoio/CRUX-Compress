@@ -253,7 +253,7 @@ meditations/{yyyymmdd}-{topic-slug}-ensemble/
 ├── cross-model-synthesis.md                     # aggregation output
 ├── ensemble-report-{topic-slug}-{ts}.html       # ensemble-level report
 ├── ensemble-report-{topic-slug}-{ts}.pdf        # ensemble-level PDF
-├── model-gpt-5.5/                               # complete meditation tree for GPT 5.5
+├── model-gpt-5.6-sol/                               # complete meditation tree for GPT 5.6 Sol
 │   ├── facets.md                                # per-model copy with Branch & Leaf Index
 │   ├── consolidation.md
 │   ├── finalisation-enhancements.yml            # per-tree YAML written by per-tree depth-0 manager
@@ -265,13 +265,13 @@ meditations/{yyyymmdd}-{topic-slug}-ensemble/
 │   ├── retrospective-{ts}.md
 │   ├── report-{topic-slug}-{ts}.html
 │   └── report-{topic-slug}-{ts}.pdf
-├── model-opus-4.7/                              # complete meditation tree for Opus 4.7
+├── model-opus-5/                              # complete meditation tree for Opus 5
 │   └── ...same structure...
 └── model-gemini-pro-3.1/                        # complete meditation tree for Gemini Pro 3.1
     └── ...same structure...
 ```
 
-Subdirectory names use the kebab-case version of each model's `label` from `cruxMemories.meditate.modelPool`, prefixed with `model-` (e.g. `model-gpt-5.5`, `model-opus-4.7`, `model-gemini-pro-3.1`).
+Subdirectory names use the kebab-case version of each model's `label` from `cruxMemories.meditate.modelPool`, prefixed with `model-` (e.g. `model-gpt-5.6-sol`, `model-opus-5`, `model-gemini-pro-3.1`).
 
 **Ensemble filename conventions**:
 

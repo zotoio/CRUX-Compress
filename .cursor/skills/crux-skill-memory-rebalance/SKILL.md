@@ -19,59 +19,9 @@ Use this skill when:
 
 Before any operation:
 
-1. **Read config**: Load `.crux/crux-memories.json` and extract:
-   - `cruxMemories.typeTransitions` — promotion thresholds and targets per type
-   - `cruxMemories.demoteAfterDaysUnreferenced` — days before demotion (default `90`)
-   - `cruxMemories.archiveAfterDaysUnreferenced` — days before archival (default `180`)
-   - `cruxMemories.referenceTracking.trackingDir` — tracker file location (default `.crux/reference-tracking`)
-   - `cruxMemories.referenceTracking.promotionToRuleThreshold` — reference count triggering rule promotion flag (default `30`)
-   - `cruxMemories.storage.memoriesDir` — base memory directory (default `memories`)
-   - `cruxMemories.storage.agentMemoriesDir` — agent-scoped memory directory (default `memories/agents`)
-   - `cruxMemories.storage.archiveDir` — archive directory for REM summaries (default `.ai-ignored/executed`)
-   - `cruxMemories.typePriority` — valid types in priority order
-   - `flags.enableMemoryCompression` — whether compression is enabled (default `"false"`)
-   - `flags.enableMemoryConsolidation` — whether consolidation is enabled (default `"false"`)
-   - `cruxMemories.compressionTarget` — target compressed size as % of original (default `33`)
-   - `cruxMemories.sizeUnit` — unit for size thresholds (default `"lines"`)
-   - `cruxMemories.compressionMinLines` — minimum file size in lines before compression is considered (default `500`)
-   - `cruxMemories.maxMemorySize` — hard cap on memory file size in lines (default `1000`)
-   - `cruxMemories.maxConsolidatedSize` — hard cap on consolidated memory file size in lines (default `2000`)
-2. **Guard check**: If `flags.enableMemories` is not `"true"`, abort and inform the caller that memories are disabled
-
-## Config Reference
-
-All config values come from `.crux/crux-memories.json`:
-
-| Key | Type | Default | Purpose |
-|-----|------|---------|---------|
-| `cruxMemories.typeTransitions` | object | See below | Promotion thresholds and targets per type |
-| `cruxMemories.demoteAfterDaysUnreferenced` | integer | `90` | Days without reference before demotion recommended |
-| `cruxMemories.archiveAfterDaysUnreferenced` | integer | `180` | Days without reference before archival recommended |
-| `cruxMemories.referenceTracking.trackingDir` | string | `.crux/reference-tracking` | Directory containing `.refs.yml` files |
-| `cruxMemories.referenceTracking.promotionToRuleThreshold` | integer | `30` | Reference count that flags a memory for rule promotion |
-| `cruxMemories.storage.memoriesDir` | string | `memories` | Root directory for base memories |
-| `cruxMemories.storage.agentMemoriesDir` | string | `memories/agents` | Root directory for agent-scoped memories |
-| `cruxMemories.storage.archiveDir` | string | `.ai-ignored/executed` | Directory for REM sleep summaries |
-| `cruxMemories.typePriority` | array | `[core, redflag, goal, learning, idea, archived]` | Valid types in priority order |
-| `flags.enableMemoryCompression` | string | `"false"` | Feature gate for compression during REM sleep |
-| `flags.enableMemoryConsolidation` | string | `"false"` | Feature gate for consolidation during REM sleep |
-| `cruxMemories.compressionTarget` | number | `33` | Target compressed size as % of original body |
-| `cruxMemories.sizeUnit` | string | `"lines"` | Unit for size thresholds — `"lines"` or `"bytes"` |
-| `cruxMemories.compressionMinLines` | number | `500` | Minimum file size in lines before CRUX compression is considered; files below this are left uncompressed |
-| `cruxMemories.maxMemorySize` | number | `1000` | Hard cap on memory file size in lines (default); files exceeding this must be compressed |
-| `cruxMemories.maxConsolidatedSize` | number | `2000` | Hard cap on consolidated memory file size in lines (default); exceeding triggers volume splitting |
-
-### Type Transition Rules
-
-Read from `cruxMemories.typeTransitions` in config. These are configurable per-repo — do not hard-code thresholds.
-
-| Type | `promoteAt` | `promoteTo` | Notes |
-|------|-------------|-------------|-------|
-| `idea` | 5 | `learning` | Low-confidence insights that gain traction |
-| `learning` | 15 | `core` | Validated learnings graduating to core knowledge |
-| `redflag` | 10 | `core` | Frequently-hit warnings becoming core doctrine |
-| `core` | null | — | Terminal type, no further promotion |
-| `goal` | null | — | Terminal type, no further promotion |
+1. **Read config**: Load `.crux/crux-memories.json`. This skill needs `cruxMemories.typeTransitions`, `demoteAfterDaysUnreferenced`, `archiveAfterDaysUnreferenced`, `typePriority`, `sizeUnit`, `compressionTarget`, `compressionMinLines`, `maxMemorySize`, `maxConsolidatedSize`, `storage.*`, `referenceTracking.trackingDir`, `referenceTracking.promotionToRuleThreshold`, plus the `flags.enableMemories`, `flags.enableMemoryCompression`, and `flags.enableMemoryConsolidation` gates. Defaults and full key descriptions live in `.cursor/skills/_memory-shared.md#config-reference` and `.crux/crux-memories.json` (authoritative).
+2. **Guard check**: If `flags.enableMemories` is not `"true"`, abort and inform the caller that memories are disabled.
+3. **`typeTransitions` values are read verbatim from config — do not hard-code promotion thresholds.**
 
 ## REM Sleep Workflow
 
@@ -570,16 +520,6 @@ When a memory transitions between types, follow this exact procedure:
 6. **Handle compressed companion**: If a `.memory.crux.md` exists for a `.memory.md` being moved (or vice versa), move the companion file to the same target directory and update its frontmatter identically
 7. **No tracker update needed**: Tracker files in `trackingDir` reference memories by `slug`, not by path. Moving a memory file does not break the tracker association
 
-## Integration
-
-| Component | Reference | Role |
-|-----------|-----------|------|
-| Config | `.crux/crux-memories.json` | `typeTransitions`, `demoteAfterDaysUnreferenced`, `archiveAfterDaysUnreferenced`, `referenceTracking`, `storage` |
-| Memory CRUD | `crux-skill-memory-crud` | Frontmatter updates, file moves, type transitions |
-| Reference Tracker | `crux-skill-memory-reference-tracker` | Tracker file format, strength sync, cleanup |
-| Memory Compress | `crux-skill-memory-compress` | Compressed file handling during moves |
-| Memory Index | `crux-skill-memory-index` | Index rebuild in Step 15 after all changes applied |
-
 ## Error Handling
 
 | Condition | Action |
@@ -592,11 +532,4 @@ When a memory transitions between types, follow this exact procedure:
 | Strength exceeds `promoteAt` but `promoteTo` is not in `typePriority` | Skip promotion, report config issue |
 | File move would overwrite an existing file | Return `needs_user_input` for the calling agent to confirm with the user |
 
-## What This Skill Does NOT Do
-
-- Does not create new memories (that is `crux-skill-memory-crud`)
-- Does not perform compression directly — delegates to `crux-skill-memory-compress` when compression is enabled and recommended during Step 8
-- Does not record new references (that is `crux-skill-memory-reference-tracker`)
-- Does not own the memory index script — it calls `crux-skill-memory-index` as a subprocess in Step 15
-- Does not automatically create rules from promoted memories — it only flags candidates
-- Does not modify `created` dates on any memory
+> Out-of-scope and cross-skill delegation: see `.cursor/skills/_memory-shared.md#cross-skill-boundaries` and the agent table in `AGENTS.md`.

@@ -1,0 +1,24 @@
+---
+generated: 2026-07-13 17:34
+sourceChecksum: "1501558077"
+cruxLevel: 25
+beforeTokens: 366
+afterTokens: 184
+reducedBy: 50%
+confidence: 95%
+---
+
+> [!IMPORTANT]
+> Generated file - do not edit!
+
+# Spec Agent Allocation
+
+```crux
+⟦CRUX:spec-agent-allocation.md
+R{¬generalPurpose!→CRUX agents only}
+E{arch|docs|eval→crux-platform-architect;code|test→crux-software-engineer;
+CRUX→crux-cursor-rule-manager;mem→crux-cursor-memory-manager;
+audit|CI→integrity-expert;doc-sync→docs-sync-agent}
+Λ{spec-create→set agent;spec-execute→spawn per E;generalPurpose→remap}
+⟧
+```

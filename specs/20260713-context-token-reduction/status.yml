@@ -1,0 +1,96 @@
+schema_version: 1
+spec_id: 20260713-context-token-reduction
+phase: 0
+aggregate_state: completed
+updated_at: 2026-07-13T09:58:28.239Z
+aggregate_progress:
+  total: 9
+  completed: 9
+  in_progress: 0
+  blocked: 0
+  failed: 0
+subtasks:
+  - subtask_id: "01"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-01-lazy-cruxmd-and-context-manifest-20260713.status.yml
+    last_heartbeat: 2026-07-13T07:25:00.000Z
+  - subtask_id: "02"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-02-compress-always-on-rules-20260713.status.yml
+    last_heartbeat: 2026-07-13T07:38:46Z
+  - subtask_id: "03"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-03-extract-crux-compress-templates-20260713.status.yml
+    last_heartbeat: 2026-07-13 07:17:42.597000+00:00
+  - subtask_id: "04"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-04-dedupe-memory-skill-shared-surface-20260713.status.yml
+    last_heartbeat: 2026-07-13T07:36:52Z
+  - subtask_id: "05"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-05-split-memory-manager-and-canvas-template-20260713.status.yml
+    last_heartbeat: 2026-07-13T08:06:25.860Z
+  - subtask_id: "06"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-06-crux-test-pytest-shim-20260713.status.yml
+    last_heartbeat: 2026-07-13T09:17:00Z
+  - subtask_id: "07"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-07-crux-compress-large-primitives-20260713.status.yml
+    last_heartbeat: 2026-07-13T19:16:08+10:00
+  - subtask_id: "08"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-08-evals-and-ci-coverage-20260713.status.yml
+    last_heartbeat: 2026-07-13T19:38:40+10:00
+  - subtask_id: "09"
+    state: completed
+    status_path: specs/20260713-context-token-reduction/status/subtask-09-docs-sync-and-upgrade-file-20260713.status.yml
+    last_heartbeat: 2026-07-13T09:56:30Z
+blockers: []
+definition_of_done_status:
+  - id: DOD01
+    text: All nine subtasks marked completed with judge verdict `verified`
+    done: true
+  - id: DOD02
+    text: "`pnpm --filter zoto-spec-system-runtime run spec-onstop-check -- --human --repo-root .` (or `tsx plugins/zoto-spec-system/scripts/spec-onstop-check.ts --human --repo-root .` if invoked directly) returns exit `0`"
+    done: true
+  - id: DOD03
+    text: Full `python3 scripts/test.py` suite passes (BATS + pytest); evals under `evals/` pass
+    done: true
+  - id: DOD04
+    text: "`python3 -m evals.<crux_command_suite>` (from Subtask 06) passes and matches previous `/crux-test` semantic coverage"
+    done: true
+  - id: DOD05
+    text: No linter errors in files modified by any subtask
+    done: true
+  - id: DOD06
+    text: "`specs/20260713-context-token-reduction/upgrade-context-token-reduction.sh` is idempotent, `--yes`-gated, and passes `bash -n` (syntax) plus one dry-run against a scratch copy"
+    done: true
+  - id: DOD07
+    text: Any file the subtasks propose adding to the dist zip is listed in the execution report under a **Dist manifest additions — awaiting user approval** section, with the exact `SOURCE_DIST_FILES` diff. `scripts/create-crux-zip.py` is **not** modified as part of the spec.
+    done: true
+  - id: DOD08
+    text: '`AGENTS.md` `<CRUX agents="always">` block edits remain consumer-safe (no repo-internal-only agents leak into the block; no reference to non-dist files)'
+    done: true
+  - id: DOD09
+    text: Docs synchronized per `docs-sync.crux.mdc` (README, CONTRIBUTORS, `web/compress.md/` where relevant)
+    done: true
+  - id: DOD10
+    text: "Baseline vs post-spec token-cost measurement recorded in the execution report for at least three canonical workflows: (a) trivial Q&A, (b) `/crux-dream <spec>`, (c) a 10-subtask `/z-spec-execute` dry-run"
+    done: true
+  - id: DOD11
+    text: Version bump per `version-bump.crux.mdc` noted in the commit message body (minor bump — `feat`); actual `.crux/crux.json` bump left to the release commit at merge time, not performed inside the spec
+    done: true
+config_reloaded: []
+events:
+  - at: 2026-07-13T09:57:51.737Z
+    kind: rebuild
+    message: Aggregated 9 subtask source(s); digest 929cf202…
+  - at: 2026-07-13T09:58:14.550Z
+    kind: rebuild
+    message: Aggregated 9 subtask source(s); digest 16841cae…
+  - at: 2026-07-13T09:58:28.239Z
+    kind: rebuild
+    message: Aggregated 9 subtask source(s); digest 74e21bee…
+extra:
+  aggregator_digest: 74e21bee76fad43e3aa06bf46e242d73e9804ba0c75000901c74b57fc9e1303f

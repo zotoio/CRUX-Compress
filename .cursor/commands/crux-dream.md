@@ -14,9 +14,9 @@ Post-execution memory extraction and REM sleep rebalancing.
 
 ## Instructions
 
-When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to handle the memory workflow. The manager orchestrates the six memory skills to perform extraction or rebalancing.
+When this command is invoked, spawn one of the mode-scoped memory thin agents to handle the workflow — `crux-memory-dream` for a spec-name invocation, or `crux-memory-rem` for `--rem` / `--rem --yolo`. Each thin agent orchestrates the memory skills it needs (`crux-skill-memory-extract`, `crux-skill-memory-rebalance`, `crux-skill-memory-crud`, `crux-skill-memory-compress`, `crux-skill-memory-reference-tracker`, `crux-skill-memory-index`) to perform extraction or rebalancing.
 
-**User input escalation — CRITICAL**: This command uses **Pattern B (work first, then escalate)** — the subagent must analyse artifacts and rank candidates before the user can make decisions. The subagent NEVER calls `AskQuestion` directly. ALL user-facing questions (accepting candidates, applying REM changes, resolving conflicts, archiving) are handled by the **parent agent** (you) using `AskQuestion`. The subagent returns its analysis and any `needs_user_input` sections; you collect answers from the user and resume the subagent with them.
+**User input escalation — CRITICAL**: This command uses **Pattern B (work first, then escalate)**. The subagent NEVER calls `AskQuestion` directly — the parent agent owns all user prompts and resumes the subagent with the answers. For the full Pattern A / Pattern B contract and the `needs_user_input` YAML schema, see `.cursor/skills/_memory-shared.md#user-input-escalation` and `AGENTS.md`.
 
 **Foreground execution — CRITICAL**: The subagent MUST run in the **foreground** (`run_in_background: false`). Background subagents only return a truncated summary notification to the parent — the full analysis is lost. Foreground execution blocks the parent until the subagent completes and returns its **complete response**, which the parent then displays verbatim to the user.
 
@@ -31,8 +31,8 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 ### Argument Handling
 
 - **No arguments** (just `/crux-dream`): The parent agent discovers available specs by scanning the configured `workDir` from `.crux/crux-memories.json` (`cruxMemories.dream.workDir`, default `specs`). It lists all subdirectories in that directory (excluding `.gitkeep` and hidden files), and presents them as structured options using `AskQuestion` so the user can select which spec to dream about. If the `workDir` is empty or contains no spec directories, inform the user and stop. **Do not accept spec names from other directories** — only specs present in the configured `workDir` are valid targets.
-- **Spec name** (e.g. `20260403-crux-memories`): Validate that the named spec exists as a subdirectory of the configured `workDir`. If it does not exist there, report the error and show the available specs from `workDir` instead. Do not search other directories. Once validated, the manager runs the dream extraction workflow on the completed spec. Pass `$ARGUMENTS` to the subagent as the spec name.
-- **`--rem`**: The manager runs REM sleep — a full rebalance of the memory corpus. It scans all memories and trackers, checks consistency, detects conflicts, recommends promotions/demotions/archival/consolidation, and presents a structured report for approval.
+- **Spec name** (e.g. `20260403-crux-memories`): Validate that the named spec exists as a subdirectory of the configured `workDir`. If it does not exist there, report the error and show the available specs from `workDir` instead. Do not search other directories. Once validated, spawn `crux-memory-dream` to run the dream extraction workflow on the completed spec. Pass `$ARGUMENTS` to the subagent as the spec name.
+- **`--rem`**: Spawn `crux-memory-rem` to run REM sleep — a full rebalance of the memory corpus. It scans all memories and trackers, checks consistency, detects conflicts, recommends promotions/demotions/archival/consolidation, and presents a structured report for approval.
 - **`--rem --yolo`**: Same as `--rem` but auto-applies all non-conflict recommendations. Conflicts still require manual resolution — they are never auto-resolved.
 
 ### What Happens
@@ -73,10 +73,5 @@ When this command is invoked, spawn a `crux-cursor-memory-manager` subagent to h
 
 ## Related
 
-- `crux-cursor-memory-manager` agent — The specialist that manages the memory lifecycle
-- `crux-skill-memory-extract` skill — Dream extraction analysis
-- `crux-skill-memory-rebalance` skill — REM sleep rebalancing
-- `/crux-recall` — View and query memories
-- `/crux-forget` — Remove memories from the corpus
-- `/crux-remember` — Create ad-hoc memories outside of spec workflows
-- `/crux-meditate` — Recursive memory-informed exploration
+See `.cursor/skills/_memory-shared.md#related-commands--skills` for the full
+registry of memory commands and skills.

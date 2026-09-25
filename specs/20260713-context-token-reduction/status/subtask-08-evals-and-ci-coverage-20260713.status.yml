@@ -1,0 +1,92 @@
+schema_version: 1
+subtask_id: "08"
+feature: context-token-reduction
+assigned_agent: crux-software-engineer
+model: composer-2-fast
+token_budget: 200000
+state: completed
+started_at: '2026-07-13T19:18:00+10:00'
+last_heartbeat: '2026-07-13T19:38:40+10:00'
+completed_at: '2026-07-13T19:37:30+10:00'
+git_sha: 7f81a121f9906dba980d8d293e6f6225b4c95ad8
+checklist:
+  - id: D01
+    text: "**D01** — Lazy-CRUX enforcement eval:"
+    done: true
+    evidence_path: evals/test_s_context_reduction.py
+  - id: D02
+    text: "**D02** — `context_manifest` honor eval:"
+    done: true
+    evidence_path: evals/test_s_context_reduction.py
+  - id: D03
+    text: "**D03** — Template lazy-load eval:"
+    done: true
+    evidence_path: evals/test_s_context_reduction.py
+  - id: D04
+    text: "**D04** — Memory-manager split eval:"
+    done: true
+    evidence_path: evals/test_s_context_reduction.py
+  - id: D05
+    text: "**D05** — Compressed-primitive semantic parity eval:"
+    done: true
+    evidence_path: evals/fixtures/crux-compressed/
+  - id: D06
+    text: "**D06** — `/crux-test` shim eval:"
+    done: true
+    evidence_path: evals/test_s_context_reduction.py
+  - id: D07
+    text: "**D07** — CI wiring:"
+    done: true
+    evidence_path: pytest.ini
+  - id: D08
+    text: "**D08** — Baseline vs post-spec token-cost measurement:"
+    done: true
+    evidence_path: evals/reports/context-token-reduction-baseline.md
+artifacts:
+  - path: evals/test_s_context_reduction.py
+    kind: modified
+    note: "Honest LLM skip + D04 .source.mdx scan + optional CRUX_LLM_RESULT injection"
+  - path: .cursor/commands/crux-meditate.source.mdx
+    kind: modified
+    note: "Related: umbrella → thin agents; loadable recompress deferred (KD-2)"
+  - path: evals/fixtures/crux-compressed/
+    kind: created
+    note: "8 must-preserve fixtures for Wave 1+2"
+  - path: evals/reports/context-token-reduction-baseline.md
+    kind: created
+    note: "D08 token-cost report"
+  - path: pytest.ini
+    kind: modified
+    note: "context_reduction_smoke marker"
+errors: []
+notes: |
+  ## Re-verify after fix_list (judge Mode 1) — 2026-07-13T19:38
+
+  ### Prior fix_list — confirmed fixed
+  - **D02**: `_try_invoke_llm_parity` / `_skip_if_no_llm_harness` present.
+    `CRUX_LLM_EVAL=1` alone → 9 skipped; with `CRUX_LLM_RESULT_JSON` → 1 passed.
+  - **D04**: Scan covers `*.md` + `*.source.mdx`; SoT Related lists thin agents;
+    `rg crux-cursor-memory-manager .cursor/commands/` → 0 matches (SoT + loadable).
+  - **D05**: Same honest-skip / optional-injection for `TestCompressedPrimitiveParityLLM`.
+
+  ### KD-2 note (not a DoD/false-green gap)
+  - `crux-meditate.source.mdx` SoT checksum now `2429874930` vs loadable
+    `sourceChecksum: "857180073"` (recompress deferred).
+  - Loadable Related is `M.related{…_memory-shared…}` and does **not** name the
+    umbrella; D04 invariant holds on both surfaces — no false eval green.
+  - Flag deferred for Subtask 07 hygiene / future recompress; does not fail DoD.
+
+  ### Independent verification
+  - `pytest evals/test_s_context_reduction.py -m "not llm_driven"` → 92 passed
+  - `scripts/test.py` → 863 passed, 11 skipped (exit 0)
+  - Templates, fixtures, baseline report, thin agents, shims, CI (`pytest evals/`) OK
+extra:
+  judge:
+    verdict: verified
+    at: '2026-07-13T19:38:40+10:00'
+    notes: |
+      Re-verify after fix_list: D02/D04/D05 remediations confirmed on disk and by
+      pytest. All D01–D08 and DoD01–DoD06 satisfied. KD-2 meditate SoT/loadable
+      checksum drift noted but does not break DoD or create false-green D04
+      (neither surface names the umbrella). fix_list empty.
+    fix_list: []

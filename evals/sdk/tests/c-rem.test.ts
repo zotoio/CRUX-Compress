@@ -163,7 +163,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 
@@ -199,7 +199,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 
@@ -228,7 +228,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: ws.root },
         });
 
@@ -326,7 +326,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: c2Ws.root },
         });
 
@@ -358,7 +358,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: c2Ws.root },
         });
 
@@ -390,7 +390,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: c2Ws.root },
         });
 
@@ -465,7 +465,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: c3Ws.root },
         });
 
@@ -493,7 +493,7 @@ describe("C: REM Sleep", () => {
       async () => {
         agent = Agent.create({
           apiKey: getApiKey(),
-          model: { id: "composer-2" },
+          model: { id: "composer-2.5" },
           local: { cwd: c3Ws.root },
         });
 
