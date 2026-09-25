@@ -2686,6 +2686,188 @@
           "size": 12842
         }
       }
+    },
+    "2.11.5": {
+      "date": "2026-09-25",
+      "commit": "ad633f45ffc1004a3324b2c206a8aa50d9f302ef",
+      "files": {
+        "CRUX.md": {
+          "checksum": "7945f45d4e1c37694c5a2253339ccfbefc63160ab87557a12df819aaab9f834e",
+          "size": 28190
+        },
+        "install.crux.md": {
+          "checksum": "517a5278042bd17b6ab529ea24e74c20e69a686d58468f6af60951b17d9d086e",
+          "size": 8592
+        },
+        ".crux/crux.json": {
+          "checksum": "23089af37e2f3bf5ab4ce10250012b311547cb2838dbaffcf8cbd642d13590ef",
+          "size": 26
+        },
+        ".cursor/hooks.json": {
+          "checksum": "add715ccb7e809284c12374b847bf27af569a056adaddb33c13d9a75f3dbf62e",
+          "size": 1008
+        },
+        ".cursor/agents/crux/crux-cursor-rule-manager.md": {
+          "checksum": "d110da27fb4c40f18691e3473ec6f21b6702e993d2c3bfe78daba83d4f7ab29e",
+          "size": 21194
+        },
+        ".cursor/agents/crux/crux-cursor-memory-manager.md": {
+          "checksum": "70ae6f7a48beb092f5fde8fa4a11f15246a3e019c008e8270fd815ce24ba43e3",
+          "size": 2921
+        },
+        ".cursor/agents/crux/crux-cursor-meditation-guide.md": {
+          "checksum": "42aa5175c8cf0a539e642b106420a01a6294c82838569550109b44291a45bf45",
+          "size": 7815
+        },
+        ".cursor/agents/crux/crux-memory-dream.md": {
+          "checksum": "0dcab43f0055d200f603dba0d849473d542b4035fb71f9b3fef340f6a6ec4c07",
+          "size": 4992
+        },
+        ".cursor/agents/crux/crux-memory-rem.md": {
+          "checksum": "85f08fd23b6c2df3a39ab10a072e35b1c41cebefa4cf9d5126cf5f3fc927ca13",
+          "size": 4350
+        },
+        ".cursor/agents/crux/crux-memory-recall.md": {
+          "checksum": "03aa97b75e7d22e8aefbc2cdbc409db3ff0c04b39ad8f5bb149f81b5f3674eda",
+          "size": 3819
+        },
+        ".cursor/agents/crux/crux-memory-remember.md": {
+          "checksum": "da2903b419df6b9450e7a41fe7ed68087b6f7701b9a534e35aeaa23e2ec4640c",
+          "size": 3517
+        },
+        ".cursor/agents/crux/crux-memory-forget.md": {
+          "checksum": "27113ba3a7556fea8f4d431e748b0eb788e25e2e8ae88b6117aa6d65e0cd3dc0",
+          "size": 3785
+        },
+        ".cursor/agents/crux/templates/recall-canvas.tsx.md": {
+          "checksum": "7d654b9a227ba7264b5104f12d2e9f40a7c9b192d5466aa4982158db4700307a",
+          "size": 4897
+        },
+        ".cursor/commands/crux/crux-compress.md": {
+          "checksum": "14914dc2039a964335fd82c96a926e5d73f21087dc1683d99a3d478cce29d9c6",
+          "size": 4930
+        },
+        ".cursor/commands/crux/templates/compress-prompts.md": {
+          "checksum": "ee7525d0eade5b2e193b96e81302de175a32e8a3c292fe22ed4bb62ed420ce9c",
+          "size": 14115
+        },
+        ".cursor/commands/crux/crux-amnesia.md": {
+          "checksum": "bd19ee084be7d02c223dc8a23ae96a28be88a021e019d77edce3c90eb06c4a17",
+          "size": 2651
+        },
+        ".cursor/commands/crux/crux-dream.md": {
+          "checksum": "83c826ac750333e210dba006e3bedcf354400962269cc0a5d364017df7921e5a",
+          "size": 8012
+        },
+        ".cursor/commands/crux/crux-forget.md": {
+          "checksum": "39a7d75cc886195ec80f3663b955086de67aae22842e7e75e85bea65978f9371",
+          "size": 2835
+        },
+        ".cursor/commands/crux/crux-meditate.md": {
+          "checksum": "4bbf7751443b1e2b92956d909cac829f1889c77351c83b8032f98d7103b79dae",
+          "size": 19187
+        },
+        ".cursor/commands/crux/crux-recall.md": {
+          "checksum": "e48bb2a79f05da0fc2f951f1d9854c9540302a3ac3cd985b46ebac6cecb16fc8",
+          "size": 6533
+        },
+        ".cursor/commands/crux/crux-remember.md": {
+          "checksum": "a7515a40918afe3b92167c9062488517976fc677b60dc9d605ec6d66c7698f91",
+          "size": 2802
+        },
+        ".cursor/hooks/crux-detect-changes.py": {
+          "checksum": "0a3e1d46ba20939c19a69a033a8327ea7e99062bcec0443a8f19fbc009e9ca01",
+          "size": 3112
+        },
+        ".cursor/hooks/crux-detect-memory-changes.py": {
+          "checksum": "e02843167caef091b590ba6f47d042d511f574ad3f8724fd69112e1d83036e68",
+          "size": 2957
+        },
+        ".cursor/hooks/crux-session-start.py": {
+          "checksum": "c7bc66c8639c60680673b0c11055bac7efe292290dbebf8bdfc44b087bf2afea",
+          "size": 7359
+        },
+        ".cursor/rules/crux/_CRUX-RULE.mdc": {
+          "checksum": "8d67bafddb8928bd18ce0c8320186fe680007fb6858aa749ad57a5eecad30b27",
+          "size": 1440
+        },
+        ".cursor/rules/crux/crux-memories-integration.crux.mdc": {
+          "checksum": "351a5f70c2936f63ec8ba762a0241cdb1f34a3175d432e167acc1f646cd4734d",
+          "size": 1808
+        },
+        ".cursor/skills/crux/_memory-shared.md": {
+          "checksum": "43c4d34f22be28a9dfd6ff71f68dd5091c323d27bc67d802f538153a480c5a56",
+          "size": 14524
+        },
+        ".cursor/skills/crux/crux-utils/SKILL.md": {
+          "checksum": "e1452859110673f7ec3be4b87b9aff3f85729df5e414e342e4b8a7e0ffb1d4eb",
+          "size": 3229
+        },
+        ".cursor/skills/crux/crux-utils/scripts/crux-utils.py": {
+          "checksum": "dae3b41d758a23f862c5202c3d7f2cad0edf7cc69bd16a3365391d39ad41d853",
+          "size": 7166
+        },
+        ".cursor/skills/crux/crux-skill-memory-crud/SKILL.md": {
+          "checksum": "63f7f238ba1d46a00eeb234bf3bb27666843ca3b7c55961c63fad326393034ed",
+          "size": 8368
+        },
+        ".cursor/skills/crux/crux-skill-memory-compress/SKILL.md": {
+          "checksum": "b8a243d9e93e17c60a696998ef1300a66cae8140c558b138980742c651350bf7",
+          "size": 8177
+        },
+        ".cursor/skills/crux/crux-skill-memory-extract/SKILL.md": {
+          "checksum": "6015356791c04d58ca9562f3f423dcc180c2dd84cfcf1db8a8ffda23cca497e2",
+          "size": 17812
+        },
+        ".cursor/skills/crux/crux-skill-memory-index/SKILL.md": {
+          "checksum": "74d51c1768f6fa84cf710474e11cc227ae395322837ae3d8f117d9c4c119a12b",
+          "size": 4041
+        },
+        ".cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py": {
+          "checksum": "963db6c46d6e6985827b3e24725d9669f1f6daa19e29a4001aa27d4aad98f239",
+          "size": 7159
+        },
+        ".cursor/skills/crux/crux-skill-memory-index/scripts/post-dream.py": {
+          "checksum": "8352c614592888ed26ad96388356903c12eb19f8886f57e61bf0d8c701656b4a",
+          "size": 1393
+        },
+        ".cursor/skills/crux/crux-skill-memory-rebalance/SKILL.md": {
+          "checksum": "76881c691c72866abb14df018cfff3be34e66d659ee5ed027084c833e2349095",
+          "size": 26723
+        },
+        ".cursor/skills/crux/crux-skill-memory-reference-tracker/SKILL.md": {
+          "checksum": "96e9c2de391a32b33cef95c9c09a418a867c137a5de986ab9d5f69076505e222",
+          "size": 8196
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-research/SKILL.md": {
+          "checksum": "881c6679ef69ead127959bff6db03f3757f42f880c2d9bc1a2f7c96929dd2673",
+          "size": 52255
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-quick/SKILL.md": {
+          "checksum": "8ea61df9787a2f63f554e1c24aae2459c77b9f00855352fd6957280522388019",
+          "size": 19030
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-ensemble/SKILL.md": {
+          "checksum": "2f73b33e06c8f1283c1aa11e06a4382e736e38afaed28ee7f5537431948eb27d",
+          "size": 23755
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-review/SKILL.md": {
+          "checksum": "c257f69601faed4dfc01e131c7854736c45ae68e5b1951921b5687c7a929c9d2",
+          "size": 22167
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-report/SKILL.md": {
+          "checksum": "2ea7554978d0f9cbb07c988ee7225340a7f9a4847712bb286a2ef8932a0d14e3",
+          "size": 33642
+        },
+        ".cursor/skills/crux/crux-skill-memory-meditation-coordination/SKILL.md": {
+          "checksum": "63e5b52b2b47a8198952a826cc706b2315b9287365aeabcaae1e4092293eaaa7",
+          "size": 21390
+        },
+        "AGENTS.md": {
+          "checksum": "0a5b45b07ec2b3eb864a8bf75c2e64f8cad8bb182913c99f2748f0107def421b",
+          "size": 12842
+        }
+      }
     }
   },
   "allFiles": {
@@ -2718,7 +2900,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".crux/crux.json": [
       "2.2.0",
@@ -2749,7 +2932,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     "AGENTS.md": [
       "2.2.0",
@@ -2780,7 +2964,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/hooks.json": [
       "2.2.0",
@@ -2811,7 +2996,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux-cursor-rule-manager.md": [
       "2.2.0",
@@ -2953,7 +3139,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/hooks/crux-session-start.py": [
       "2.3.0",
@@ -2982,7 +3169,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux-utils/SKILL.md": [
       "2.8.1",
@@ -3018,7 +3206,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux-utils/scripts/crux-utils.py": [
       "2.8.5",
@@ -3217,7 +3406,8 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux-amnesia.md": [
       "2.9.1",
@@ -3288,193 +3478,229 @@
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-cursor-memory-manager.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-cursor-meditation-guide.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-compress.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-amnesia.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-dream.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-forget.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-meditate.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-recall.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/crux-remember.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/rules/crux/_CRUX-RULE.mdc": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/rules/crux/crux-memories-integration.crux.mdc": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-utils/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-utils/scripts/crux-utils.py": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-crud/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-compress/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-extract/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-index/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-index/scripts/memory-index.py": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-index/scripts/post-dream.py": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-rebalance/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-reference-tracker/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-research/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-quick/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-ensemble/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-review/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-report/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/crux-skill-memory-meditation-coordination/SKILL.md": [
       "2.11.0",
       "2.11.1",
       "2.11.2",
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-memory-dream.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-memory-rem.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-memory-recall.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-memory-remember.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/crux-memory-forget.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/agents/crux/templates/recall-canvas.tsx.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/commands/crux/templates/compress-prompts.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ],
     ".cursor/skills/crux/_memory-shared.md": [
-      "2.11.4"
+      "2.11.4",
+      "2.11.5"
     ]
   }
 }
