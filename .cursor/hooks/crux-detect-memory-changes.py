@@ -14,6 +14,7 @@ See: https://github.com/zotoio/CRUX-Compress
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -75,16 +76,36 @@ def _set_pending_rebuild(file_path: str) -> None:
     PENDING_REBUILD.write_text(json.dumps(data, indent=None) + "\n", encoding="utf-8")
 
 
+
+def _normalize_path(raw_path: str) -> str:
+    """Normalize a path to project-relative form. Cursor sends absolute paths."""
+    path = raw_path
+    if path.startswith("./"):
+        path = path[2:]
+    if os.path.isabs(path):
+        try:
+            path = Path(path).resolve().relative_to(Path.cwd().resolve()).as_posix()
+        except ValueError:
+            pass
+    return path
+
+
+def _enter_project_root() -> None:
+    """Run from the project root so relative .crux/ paths resolve there, even
+    when the hook is started from elsewhere (for example a plugin directory)."""
+    root = os.environ.get("CURSOR_PROJECT_DIR") or os.environ.get("CLAUDE_PROJECT_DIR")
+    if root and os.path.isdir(root):
+        os.chdir(root)
+
 def main() -> None:
+    _enter_project_root()
     raw_input = sys.stdin.readline()
     try:
         input_data = json.loads(raw_input)
     except (json.JSONDecodeError, ValueError):
         return
 
-    raw_path = input_data.get("file_path", "")
-    if raw_path.startswith("./"):
-        raw_path = raw_path[2:]
+    raw_path = _normalize_path(input_data.get("file_path", ""))
 
     cfg = _load_config()
     if cfg is None or not _memories_enabled(cfg):
