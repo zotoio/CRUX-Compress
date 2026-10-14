@@ -25,6 +25,7 @@
     ".cursor/hooks/crux-detect-changes.py",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
+    ".cursor/hooks/crux-track-memory-references.py",
     ".cursor/rules/crux/_CRUX-RULE.mdc",
     ".cursor/rules/crux/crux-memories-integration.crux.mdc",
     ".cursor/skills/crux/_memory-shared.md",
