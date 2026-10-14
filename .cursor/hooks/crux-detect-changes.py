@@ -12,6 +12,7 @@ See: https://github.com/zotoio/CRUX-Compress
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -89,7 +90,16 @@ def _cleanup_invalid_entries() -> None:
         _save_pending(data)
 
 
+
+def _enter_project_root() -> None:
+    """Run from the project root so relative .crux/ paths resolve there, even
+    when the hook is started from elsewhere (for example a plugin directory)."""
+    root = os.environ.get("CURSOR_PROJECT_DIR") or os.environ.get("CLAUDE_PROJECT_DIR")
+    if root and os.path.isdir(root):
+        os.chdir(root)
+
 def main() -> None:
+    _enter_project_root()
     raw_input = sys.stdin.readline()
     try:
         input_data = json.loads(raw_input)
