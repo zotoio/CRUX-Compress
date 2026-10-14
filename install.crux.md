@@ -1,6 +1,6 @@
 ---
 generated: 2026-06-17 00:00
-sourceChecksum: "693158615"
+sourceChecksum: "319190400"
 cruxLevel: 25
 beforeTokens: 13109
 afterTokens: 2496
@@ -59,7 +59,7 @@ M.SOURCE_RELEASE_FILES{CRUX.md;install.crux.md;.crux/crux.json;
   commands/[crux-compress.md,crux-dream.md,crux-recall.md,
    crux-remember.md,crux-meditate.md,crux-forget.md,crux-amnesia.md],
   hooks/[crux-detect-changes.py,crux-detect-memory-changes.py,
-   crux-session-start.py],
+   crux-session-start.py,crux-track-memory-references.py],
   rules/[_CRUX-RULE.mdc,crux-memories-integration.crux.mdc],
   skills/[crux-utils/[SKILL.md,scripts/crux-utils.py],
    crux-skill-memory-crud/SKILL.md,crux-skill-memory-compress/SKILL.md,

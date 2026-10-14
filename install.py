@@ -105,6 +105,7 @@ SOURCE_RELEASE_FILES = [
     ".cursor/hooks/crux-detect-changes.py",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
+    ".cursor/hooks/crux-track-memory-references.py",
     ".cursor/rules/_CRUX-RULE.mdc",
     ".cursor/rules/crux-memories-integration.crux.mdc",
     ".cursor/skills/_memory-shared.md",
