@@ -5,6 +5,12 @@ All notable changes to CRUX Compress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.11.7](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.7) - 2026-10-14
+
+- chore: update release manifests for v2.11.7 [skip ci] (3abc5f4)
+- fix: resolve hook state from the project root and normalize absolute paths (86bb3bc)
+- docs: update CHANGELOG.md for v2.11.6 [skip ci] (d925cce)
+
 ## [v2.11.6](https://github.com/zotoio/CRUX-Compress/releases/tag/v2.11.6) - 2026-10-14
 
 - chore: update release manifests for v2.11.6 [skip ci] (445216a)
