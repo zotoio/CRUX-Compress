@@ -486,6 +486,55 @@ class TestPreview:
         assert "UPDATE" in out
         assert "CREATE" in out
 
+    def test_legacy_migration_compares_with_legacy_file_without_moving_it(self, tmp_path: Path, capsys):
+        mod = _load_install()
+        legacy = tmp_path / ".cursor" / "commands" / "crux-compress.md"
+        legacy.parent.mkdir(parents=True)
+        legacy.write_text("same", encoding="utf-8")
+        staging = tmp_path / "staging"
+        (staging / ".cursor" / "commands" / "crux").mkdir(parents=True)
+        (staging / ".cursor" / "commands" / "crux" / "crux-compress.md").write_text("same", encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.preview_installation(staging, legacy_migration=True)
+        finally:
+            os.chdir(orig_cwd)
+
+        out = capsys.readouterr().out
+        assert "NO CHANGE" in out
+        assert "migrated from .cursor/commands/crux-compress.md" in out
+        assert legacy.is_file()
+        assert not (tmp_path / ".cursor" / "commands" / "crux" / "crux-compress.md").exists()
+
+    def test_legacy_file_with_local_edits_is_reported_as_modified(self, tmp_path: Path, capsys):
+        mod = _load_install()
+        legacy = tmp_path / ".cursor" / "commands" / "crux-compress.md"
+        legacy.parent.mkdir(parents=True)
+        legacy.write_text("local edit", encoding="utf-8")
+        staging = tmp_path / "staging"
+        (staging / ".cursor" / "commands" / "crux").mkdir(parents=True)
+        (staging / ".cursor" / "commands" / "crux" / "crux-compress.md").write_text("release", encoding="utf-8")
+        known = {".cursor/commands/crux/crux-compress.md": {"0" * 64}}
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            modified = mod.preview_installation(staging, known_checksums=known, legacy_migration=True)
+        finally:
+            os.chdir(orig_cwd)
+
+        assert modified == [".cursor/commands/crux-compress.md"]
+        assert "MODIFIED" in capsys.readouterr().out
+
+    def test_migration_runs_only_after_confirmation(self):
+        source = INSTALL_SCRIPT.read_text(encoding="utf-8")
+        main_body = source[source.index("def main() -> None:"):]
+        confirm_at = main_body.index('confirm("Proceed with installation?")')
+        assert main_body.index("migrate_primitive_layout(") > confirm_at
+        assert "migrate_primitive_layout(" not in main_body[:confirm_at]
+
 
 # ── Completion report ──
 

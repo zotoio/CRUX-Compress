@@ -74,6 +74,7 @@ SOURCE_DIST_FILES = [
     ".cursor/hooks/crux-detect-changes.py",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
+    ".cursor/hooks/crux-track-memory-references.py",
     ".cursor/rules/_CRUX-RULE.mdc",
     ".cursor/rules/crux-memories-integration.crux.mdc",
     ".cursor/skills/_memory-shared.md",
@@ -96,6 +97,43 @@ SOURCE_DIST_FILES = [
 ]
 
 DIST_FILES = [to_crux_primitive_path(path) for path in SOURCE_DIST_FILES]
+
+
+def _moved_primitive_pattern() -> re.Pattern[str]:
+    """Match references to shipped primitives at their source (flat) paths.
+
+    Only the first path component of each shipped file under
+    .cursor/<type>/ is matched (e.g. `crux-utils`, `templates`,
+    `_memory-shared.md`), so references to project files such as
+    `.cursor/rules/my-rule.md` are left alone.
+    """
+    names: dict[str, set[str]] = {}
+    for path in SOURCE_DIST_FILES:
+        parts = Path(path).parts
+        if to_crux_primitive_path(path) != path:
+            names.setdefault(parts[1], set()).add(parts[2])
+    alternatives = "|".join(
+        rf"{re.escape(kind)}/(?:{'|'.join(re.escape(n) for n in sorted(found, key=len, reverse=True))})"
+        for kind, found in sorted(names.items())
+    )
+    return re.compile(rf"\.cursor/(?={alternatives}(?![\w.-]))({'|'.join(sorted(names))})/")
+
+
+MOVED_PRIMITIVE_RE = _moved_primitive_pattern()
+
+
+def rewrite_primitive_references(text: str) -> str:
+    """Point references to shipped primitives at their .cursor/<type>/crux/ location."""
+    return MOVED_PRIMITIVE_RE.sub(rf".cursor/\1/{CRUX_PRIMITIVE_SUBDIR}/", text)
+
+
+def dist_bytes(project_root: Path, rel: str) -> bytes:
+    """Content of a distributed file: primitives under .cursor/ get their references
+    rewritten to the nested layout they are installed into."""
+    data = (project_root / from_crux_primitive_path(rel)).read_bytes()
+    if not rel.startswith(".cursor/"):
+        return data
+    return rewrite_primitive_references(data.decode("utf-8")).encode("utf-8")
 
 
 def sha256_file(path: Path) -> str:
@@ -133,8 +171,9 @@ def update_release_manifest(project_root: Path, version: str) -> None:
     for rel in all_release_files:
         src = project_root / from_crux_primitive_path(rel)
         if src.is_file():
-            checksum = sha256_file(src)
-            size = src.stat().st_size
+            data = dist_bytes(project_root, rel) if rel in DIST_FILES else src.read_bytes()
+            checksum = hashlib.sha256(data).hexdigest()
+            size = len(data)
             files_entry[rel] = {"checksum": checksum, "size": size}
             print(f"  {rel}: {checksum[:16]}... ({size} bytes)")
 
@@ -226,7 +265,8 @@ def main() -> None:
         for rel in DIST_FILES:
             src = project_root / from_crux_primitive_path(rel)
             if src.is_file():
-                zf.write(src, rel)
+                info = zipfile.ZipInfo.from_file(src, rel)
+                zf.writestr(info, dist_bytes(project_root, rel), compress_type=zipfile.ZIP_DEFLATED)
 
         release_manifest = project_root / ".crux" / "crux-release-files.json"
         if release_manifest.is_file():

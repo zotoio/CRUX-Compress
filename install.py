@@ -833,8 +833,14 @@ def preview_installation(
     show_diff: bool = False,
     known_checksums: dict[str, set[str]] | None = None,
     install_memories: bool = False,
+    legacy_migration: bool = False,
 ) -> list[str]:
-    """Show what will be installed. Returns list of locally-modified file paths."""
+    """Show what will be installed. Returns list of locally-modified file paths.
+
+    With ``legacy_migration``, a file whose nested ``.cursor/<type>/crux/`` path
+    does not exist yet is compared with the legacy flat-layout file that
+    ``migrate_primitive_layout`` will move there after confirmation.
+    """
     print("\nFiles to be installed/updated:\n")
 
     locally_modified: list[str] = []
@@ -850,17 +856,24 @@ def preview_installation(
                 skipped_memory += 1
                 continue
 
+            label = rel
+            if legacy_migration and not existing.is_file():
+                legacy = from_crux_primitive_path(rel)
+                if legacy != rel and Path(legacy).is_file():
+                    existing = Path(legacy)
+                    label = f"{rel}  (migrated from {legacy})"
+
             if existing.is_file():
                 existing_cksum = get_checksum(str(existing))
                 if existing_cksum == get_checksum(str(full)):
-                    print(f"  {BLUE}[NO CHANGE]{NC} {rel}")
+                    print(f"  {BLUE}[NO CHANGE]{NC} {label}")
                 else:
                     known = known_checksums.get(rel, set()) if known_checksums else set()
                     if known and existing_cksum not in known:
-                        print(f"  {RED}[MODIFIED]{NC} {rel}  ← local changes detected")
-                        locally_modified.append(rel)
+                        print(f"  {RED}[MODIFIED]{NC} {label}  ← local changes detected")
+                        locally_modified.append(str(existing))
                     else:
-                        print(f"  {YELLOW}[UPDATE]{NC} {rel}")
+                        print(f"  {YELLOW}[UPDATE]{NC} {label}")
                     if show_diff:
                         try:
                             subprocess.run(
@@ -1444,10 +1457,9 @@ def main() -> None:
     known_checksums = load_known_checksums() if installed_version else {}
 
     staging_dir = download_and_stage(latest_version)
-    if installed_version:
-        migrate_primitive_layout(install_memories=install_memories)
     locally_modified = preview_installation(
         staging_dir, VERBOSE, known_checksums, install_memories=install_memories,
+        legacy_migration=bool(installed_version),
     )
 
     if locally_modified:
@@ -1462,6 +1474,9 @@ def main() -> None:
         log("Installation cancelled.")
         sys.exit(0)
 
+    # Migrate only after confirmation, so a cancelled run leaves the repo untouched.
+    if installed_version:
+        migrate_primitive_layout(install_memories=install_memories)
     install_from_staging(staging_dir, install_memories=install_memories)
     shutil.rmtree(staging_dir.parent, ignore_errors=True)
     cleanup_deprecated_files()

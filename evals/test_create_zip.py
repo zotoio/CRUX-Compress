@@ -145,3 +145,83 @@ class TestZipIntegrity:
 
         with zipfile.ZipFile(zp) as zf:
             assert any("crux-release-files.json" in n for n in zf.namelist())
+
+
+def _load_create_zip():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("create_crux_zip", str(CREATE_ZIP))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+class TestPrimitiveReferenceRewrite:
+    def test_rewrites_shipped_primitive_references(self):
+        mod = _load_create_zip()
+        text = (
+            "tpl=.cursor/commands/templates/compress-prompts.md; "
+            "see `.cursor/skills/_memory-shared.md#user-input-escalation` and "
+            "`.cursor/agents/templates/recall-canvas.tsx.md`; "
+            "run python3 .cursor/skills/crux-utils/scripts/crux-utils.py"
+        )
+        assert mod.rewrite_primitive_references(text) == (
+            "tpl=.cursor/commands/crux/templates/compress-prompts.md; "
+            "see `.cursor/skills/crux/_memory-shared.md#user-input-escalation` and "
+            "`.cursor/agents/crux/templates/recall-canvas.tsx.md`; "
+            "run python3 .cursor/skills/crux/crux-utils/scripts/crux-utils.py"
+        )
+
+    def test_leaves_project_and_nested_paths_alone(self):
+        mod = _load_create_zip()
+        text = (
+            "compress `.cursor/rules/my-rule.md` and `.cursor/rules/`; "
+            "`.cursor/skills/crux/_memory-shared.md`; `.cursor/hooks/crux-session-start.py`; "
+            "`.cursor/skills/crux-utils-extra/SKILL.md`"
+        )
+        assert mod.rewrite_primitive_references(text) == text
+
+
+class TestZipReferences:
+    @pytest.fixture(scope="class")
+    def extracted(self, tmp_path_factory: pytest.TempPathFactory) -> Path:
+        tmp_path = tmp_path_factory.mktemp("zip-refs")
+        result = _run_zip(tmp_path)
+        assert result.returncode == 0, result.stderr
+        out = tmp_path / "x"
+        with zipfile.ZipFile(_get_zip_path(tmp_path)) as zf:
+            zf.extractall(out)
+        return out
+
+    def test_contains_track_memory_references_hook(self, extracted: Path):
+        hooks = json.loads((extracted / ".cursor" / "hooks.json").read_text(encoding="utf-8"))
+        commands = [h["command"] for entries in hooks["hooks"].values() for h in entries]
+        for command in commands:
+            script = command.split()[-1]
+            assert (extracted / script).is_file(), f"hooks.json runs {script}, which is not in the zip"
+
+    def test_no_references_to_flat_primitive_paths(self, extracted: Path):
+        mod = _load_create_zip()
+        for path in (extracted / ".cursor").rglob("*"):
+            if path.is_file():
+                text = path.read_text(encoding="utf-8")
+                assert not mod.MOVED_PRIMITIVE_RE.search(text), f"{path.relative_to(extracted)} has a flat-layout reference"
+
+    def test_nested_references_resolve(self, extracted: Path):
+        import re
+
+        ref = re.compile(r"\.cursor/(?:agents|commands|rules|skills)/crux/[\w./-]+\.(?:mdc|md|py)\b")
+        for path in (extracted / ".cursor").rglob("*"):
+            if path.is_file():
+                for match in ref.findall(path.read_text(encoding="utf-8")):
+                    assert (extracted / match).is_file(), f"{path.relative_to(extracted)} references missing {match}"
+
+    def test_release_checksums_match_zip_contents(self, extracted: Path):
+        import hashlib
+
+        manifest = json.loads((extracted / ".crux" / "crux-release-files.json").read_text(encoding="utf-8"))
+        version = json.loads((extracted / ".crux" / "crux.json").read_text(encoding="utf-8"))["version"]
+        for rel, meta in manifest["releases"][version]["files"].items():
+            file = extracted / rel
+            if file.is_file():
+                assert hashlib.sha256(file.read_bytes()).hexdigest() == meta["checksum"], rel
