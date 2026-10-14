@@ -105,6 +105,7 @@ SOURCE_RELEASE_FILES = [
     ".cursor/hooks/crux-detect-changes.py",
     ".cursor/hooks/crux-detect-memory-changes.py",
     ".cursor/hooks/crux-session-start.py",
+    ".cursor/hooks/crux-track-memory-references.py",
     ".cursor/rules/_CRUX-RULE.mdc",
     ".cursor/rules/crux-memories-integration.crux.mdc",
     ".cursor/skills/_memory-shared.md",
@@ -442,7 +443,9 @@ def merge_hooks_json(staging_hooks_path: str) -> None:
     existing_hooks = existing.get("hooks", {}) or {}
     new_hooks = new_data.get("hooks", {}) or {}
 
-    for lifecycle in ("sessionStart", "afterFileEdit", "stop"):
+    # Merge every lifecycle event the release defines (e.g. afterAgentResponse),
+    # not just a fixed list, so new CRUX hooks are registered on update.
+    for lifecycle in new_hooks:
         exist_arr = existing_hooks.get(lifecycle) or []
         new_arr = new_hooks.get(lifecycle) or []
         existing_cmds = {h.get("command") for h in exist_arr if isinstance(h, dict)}

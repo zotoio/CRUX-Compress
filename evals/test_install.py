@@ -240,6 +240,39 @@ class TestHooksJsonMerge:
 # ── AGENTS.md upsert ──
 
 
+class TestHooksJsonMergeAllEvents:
+    def test_merges_lifecycle_events_beyond_the_defaults(self, tmp_path: Path):
+        mod = _load_install()
+        (tmp_path / ".cursor").mkdir()
+        (tmp_path / ".cursor" / "hooks.json").write_text(json.dumps({
+            "version": 1,
+            "hooks": {"stop": [{"command": "node .cursor/hooks/mine.mjs"}]},
+        }), encoding="utf-8")
+        staging = tmp_path / "staging-hooks.json"
+        staging.write_text(json.dumps({
+            "version": 1,
+            "hooks": {
+                "sessionStart": [{"command": "python3 .cursor/hooks/crux-session-start.py"}],
+                "afterAgentResponse": [{"command": "python3 .cursor/hooks/crux-track-memory-references.py"}],
+            },
+        }), encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.merge_hooks_json(str(staging))
+            mod.merge_hooks_json(str(staging))
+        finally:
+            os.chdir(orig_cwd)
+
+        hooks = json.loads((tmp_path / ".cursor" / "hooks.json").read_text(encoding="utf-8"))["hooks"]
+        assert hooks["stop"] == [{"command": "node .cursor/hooks/mine.mjs"}]
+        assert hooks["sessionStart"] == [{"command": "python3 .cursor/hooks/crux-session-start.py"}]
+        assert hooks["afterAgentResponse"] == [
+            {"command": "python3 .cursor/hooks/crux-track-memory-references.py"}
+        ]
+
+
 class TestAgentsUpsert:
     def test_creates_new_agents_md(self, tmp_path: Path):
         mod = _load_install()
@@ -944,3 +977,18 @@ class TestCleanupIntegration:
         assert "bash .cursor/hooks/detect-crux-changes.sh" not in commands
         assert "python3 .cursor/hooks/crux-detect-changes.py" in commands
         assert len(data["hooks"]["sessionStart"]) == 1
+
+
+class TestFallbackReleaseFiles:
+    def test_fallback_list_matches_packaged_files(self):
+        """RELEASE_FILES is used when dist-manifest.json can't be fetched, so it
+        must list every file the release zip ships (hooks.json registers them all)."""
+        import importlib.util
+
+        mod = _load_install()
+        spec = importlib.util.spec_from_file_location(
+            "create_crux_zip", str(PROJECT_ROOT / "scripts" / "create-crux-zip.py"),
+        )
+        zip_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(zip_mod)
+        assert sorted(mod.SOURCE_RELEASE_FILES) == sorted(zip_mod.SOURCE_DIST_FILES)
