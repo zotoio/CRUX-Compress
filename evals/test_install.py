@@ -240,6 +240,39 @@ class TestHooksJsonMerge:
 # ── AGENTS.md upsert ──
 
 
+class TestHooksJsonMergeAllEvents:
+    def test_merges_lifecycle_events_beyond_the_defaults(self, tmp_path: Path):
+        mod = _load_install()
+        (tmp_path / ".cursor").mkdir()
+        (tmp_path / ".cursor" / "hooks.json").write_text(json.dumps({
+            "version": 1,
+            "hooks": {"stop": [{"command": "node .cursor/hooks/mine.mjs"}]},
+        }), encoding="utf-8")
+        staging = tmp_path / "staging-hooks.json"
+        staging.write_text(json.dumps({
+            "version": 1,
+            "hooks": {
+                "sessionStart": [{"command": "python3 .cursor/hooks/crux-session-start.py"}],
+                "afterAgentResponse": [{"command": "python3 .cursor/hooks/crux-track-memory-references.py"}],
+            },
+        }), encoding="utf-8")
+
+        orig_cwd = Path.cwd()
+        try:
+            os.chdir(tmp_path)
+            mod.merge_hooks_json(str(staging))
+            mod.merge_hooks_json(str(staging))
+        finally:
+            os.chdir(orig_cwd)
+
+        hooks = json.loads((tmp_path / ".cursor" / "hooks.json").read_text(encoding="utf-8"))["hooks"]
+        assert hooks["stop"] == [{"command": "node .cursor/hooks/mine.mjs"}]
+        assert hooks["sessionStart"] == [{"command": "python3 .cursor/hooks/crux-session-start.py"}]
+        assert hooks["afterAgentResponse"] == [
+            {"command": "python3 .cursor/hooks/crux-track-memory-references.py"}
+        ]
+
+
 class TestAgentsUpsert:
     def test_creates_new_agents_md(self, tmp_path: Path):
         mod = _load_install()

@@ -1,6 +1,6 @@
 ---
 generated: 2026-06-17 00:00
-sourceChecksum: "1456234472"
+sourceChecksum: "693158615"
 cruxLevel: 25
 beforeTokens: 13109
 afterTokens: 2496
@@ -95,7 +95,7 @@ M.MEMORY_PREFIXES{.cursor/[
  src=[AGENTS.md,crux-release-files.json,SOURCE_RELEASE_FILES,
   RELEASE_FILES]→dedup+∀*.crux.*;ZIP_DEFLATED}
 Λ.merge_hooks_json{¬target→copy;
- merge [sessionStart,afterFileEdit,stop] dedup .command;fail→overwrite}
+ ∀lifecycle∈staged.hooks→merge dedup .command;fail→overwrite}
 Λ.upsert_agents_crux_block{∃<CRUX→replace;∃¬block→prepend;
  ¬AGENTS.md→create;rm AGENTS.crux.md}
 Λ.get_release_files{.crux/dist-manifest.json←CDN|RAW→.files;
@@ -109,6 +109,7 @@ M.MEMORY_PREFIXES{.cursor/[
  ∀files→sha256 compare;mismatch→warn}
 Λ.download_and_stage{DL zip→extract→verify;¬→CDN fallback→verify}
 Λ.preview_install{∀staged:mem+¬install→skip;
+ upgrade+¬∃nested+∃legacy→compare legacy,label (migrated from legacy);
  cksum[same→NO_CHANGE;diff∉known→MODIFIED;diff∈known→UPDATE;¬∃→CREATE];
  return locally_modified}
 
@@ -173,9 +174,9 @@ M.MCP{module=crux_mcp_server;cfg=~/.cursor/mcp.json;
  BACKUP→backup_zip»
  install_mem=--with-memories|memories_installed»
  known_checksums(if upgrade)»download_and_stage»
- if upgrade→migrate_primitive_layout(install_mem)»
- preview→locally_modified→warn»
- confirm→install_from_staging(install_mem)»
+ preview(legacy_migration=upgrade)→locally_modified→warn»
+ confirm→[upgrade→migrate_primitive_layout(install_mem)]»
+  install_from_staging(install_mem)»
  cleanup[deprecated,internal_agents,hooks]»
  download_update_script»
  --with-memories→setup_memories»
