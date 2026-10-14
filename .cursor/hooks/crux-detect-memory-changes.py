@@ -86,6 +86,8 @@ def _normalize_path(raw_path: str) -> str:
         try:
             path = Path(path).resolve().relative_to(Path.cwd().resolve()).as_posix()
         except ValueError:
+            # Outside the project root: keep the absolute path, which matches
+            # no configured memory directory, so the edit is ignored.
             pass
     return path
 
